@@ -1,0 +1,104 @@
+{
+  "common": {
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "apply": "लागू करें",
+    "back": "वापस",
+    "loading": "लोड हो रहा है...",
+    "comingSoon": "जल्द आ रहा है"
+  },
+  "appearance": {
+    "title": "अपना रूप चुनें",
+    "subtitle": "आपकी प्राथमिकता Worker और Business दोनों मोड में लागू होती है।",
+    "save": "रूप सहेजें",
+    "cancel": "रद्द करें",
+    "light": "हल्का",
+    "lightCaption": "साफ, सफेद सतह · डिफ़ॉल्ट",
+    "dark": "गहरा",
+    "darkCaption": "कम रोशनी के लिए कम चमक वाली सतह"
+  },
+  "language": {
+    "title": "भाषा",
+    "subtitle": "ऐप में उपयोग करने के लिए भाषा चुनें।",
+    "apply": "भाषा लागू करें"
+  },
+  "welcome": {
+    "title": "KaaamNow में आपका स्वागत है",
+    "subtitle": "अपने मोबाइल नंबर से सुरक्षित रूप से साइन इन करें।",
+    "sendCode": "साइन-इन कोड भेजें",
+    "createAccount": "खाता बनाएं",
+    "phoneLabel": "मोबाइल नंबर",
+    "phoneHelper": "हम एक बार का कोड भेजेंगे। सामान्य SMS शुल्क लागू हो सकते हैं।",
+    "phonePrefix": "+91",
+    "phonePlaceholder": "98765 43210",
+    "legal": "पासवर्ड की आवश्यकता नहीं है। जारी रखकर, आप सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।"
+  },
+  "verifyPhone": {
+    "title": "कोड दर्ज करें",
+    "subtitle": "हमने {{phone}} पर 6 अंकों का कोड भेजा।",
+    "codeLabel": "सत्यापन कोड",
+    "codeExpiresIn": "कोड {{time}} में समाप्त हो जाएगा।",
+    "codeExpired": "कोड समाप्त हो गया। नया कोड मांगें।",
+    "resendIn": "{{time}} में दोबारा कोड उपलब्ध होगा।",
+    "resendNow": "कोड दोबारा भेजें।",
+    "neverShare": "अपना कोड कभी किसी के साथ साझा न करें, जिसमें KaaamNow सहायता भी शामिल है।",
+    "verify": "सत्यापित करें",
+    "changePhone": "फ़ोन नंबर बदलें"
+  },
+  "roleSelect": {
+    "title": "आप KaaamNow का उपयोग कैसे करेंगे?",
+    "subtitle": "आप बाद में मोड बदल सकते हैं।",
+    "worker": "मैं काम करना चाहता हूं",
+    "business": "मैं काम पर रख रहा हूं",
+    "continue": "जारी रखें"
+  },
+  "workerProfile": {
+    "account": "खाता",
+    "editProfile": "प्रोफ़ाइल संपादित करें",
+    "payoutAccount": "भुगतान खाता",
+    "preferences": "प्राथमिकताएं",
+    "language": "भाषा",
+    "appTheme": "ऐप थीम",
+    "themeLight": "हल्का",
+    "themeDark": "गहरा",
+    "support": "सहायता",
+    "faq": "FAQ और सहायता",
+    "offline": "ऑफलाइन एक्सेस",
+    "terms": "नियम और शर्तें",
+    "logOut": "लॉग आउट"
+  },
+  "workerHome": {
+    "greeting": "नमस्ते, {{name}} 👋",
+    "searchPlaceholder": "शिफ्ट खोजें...",
+    "nearbyShifts": "पास की शिफ्ट",
+    "noShifts": "अभी कोई शिफ्ट उपलब्ध नहीं है।",
+    "filter": "फ़िल्टर"
+  },
+  "shiftDetails": {
+    "apply": "शिफ्ट के लिए आवेदन करें",
+    "cancel": "रद्द करें",
+    "pay": "वेतन",
+    "perHour": "प्रति घंटा",
+    "distance": "{{distance}} किमी दूर",
+    "duration": "{{hours}} घंटे की शिफ्ट"
+  },
+  "notifications": {
+    "title": "सूचनाएं",
+    "empty": "अभी कोई सूचना नहीं।"
+  },
+  "offline": {
+    "title": "ऑफलाइन एक्सेस",
+    "subtitle": "डाउनलोड की गई सामग्री बिना इंटरनेट के उपलब्ध है।"
+  },
+  "faq": {
+    "title": "FAQ और सहायता"
+  },
+  "terms": {
+    "title": "नियम और शर्तें"
+  },
+  "errors": {
+    "generic": "कुछ गलत हुआ। कृपया दोबारा प्रयास करें।",
+    "network": "इंटरनेट कनेक्शन नहीं है।",
+    "sessionExpired": "आपका सत्र समाप्त हो गया। कृपया फिर से लॉग इन करें।"
+  }
+}

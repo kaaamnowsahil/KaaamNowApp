@@ -68,5 +68,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 18.2 },
+  label: { fontFamily: FONTS.semiBold, fontSize: 13 },
 });

@@ -1,6 +1,6 @@
 /** UI strings for the Welcome module (Figma 1:39 / 1:78). */
 export const WELCOME_STRINGS = {
-  TITLE: 'Welcome to KaamNow',
+  TITLE: 'Welcome to KaaamNow',
   SUBTITLE: 'Sign in securely with your mobile number.',
   PHONE_LABEL: 'Mobile number',
   PHONE_PREFIX: '+91',

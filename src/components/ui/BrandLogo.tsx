@@ -41,7 +41,7 @@ export const BrandTile: FC<{ gradientId: string }> = ({ gradientId }) => (
   </>
 );
 
-/** Static KaamNow logo — same artwork as the animated splash logo. */
+/** Static KaaamNow logo — same artwork as the animated splash logo. */
 export const BrandLogo: FC<{ size: number }> = ({ size }) => (
   <Svg
     width={size}

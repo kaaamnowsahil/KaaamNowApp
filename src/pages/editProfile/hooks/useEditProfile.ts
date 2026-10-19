@@ -1,15 +1,16 @@
 import { useState } from 'react';
+import { Alert } from 'react-native';
 
 import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { initialsOf } from '@/utils/format';
 
+import { EDIT_PROFILE_STRINGS as S } from '../constants';
 import { CURRENT_ADDRESS, PROFILE_FORM, WORK_TYPES } from '../mock';
 import { editProfileSchema, type EditProfileForm } from '../schema';
 
 const INITIAL: EditProfileForm = {
   fullName: PROFILE_FORM.fullName,
-  email: PROFILE_FORM.email,
-  age: PROFILE_FORM.age,
   address: PROFILE_FORM.address,
   workTypes: PROFILE_FORM.workTypes,
 };
@@ -33,12 +34,11 @@ export const useEditProfile = (onSaved: () => void) => {
   return {
     isLoading,
     form,
+    initials: initialsOf(form.fullName || PROFILE_FORM.fullName),
     phone: PROFILE_FORM.phone,
     workTypeOptions: WORK_TYPES,
     canSave: parsed.success && isDirty,
     setFullName: (v: string) => update('fullName', v),
-    setEmail: (v: string) => update('email', v.trim()),
-    setAge: (v: string) => update('age', v.replace(/\D/g, '').slice(0, 2)),
     setAddress: (v: string) => update('address', v),
     toggleWorkType: (id: string) =>
       update(
@@ -47,6 +47,8 @@ export const useEditProfile = (onSaved: () => void) => {
           ? form.workTypes.filter(w => w !== id)
           : [...form.workTypes, id],
       ),
+    changePhoto: () =>
+      Alert.alert(S.PHOTO_TITLE, S.PHOTO_BODY, [{ text: S.PHOTO_OK }]),
     ...currentAddress,
     save: () => parsed.success && onSaved(),
   };

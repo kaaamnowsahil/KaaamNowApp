@@ -17,7 +17,7 @@ export const WORKER_HOME_STRINGS = {
   FILTER_BUSINESS_TYPE: 'Business type',
   FILTER_BUSINESS_TYPE_HINT: 'Pick one or more.',
   FILTER_VERIFIED: 'Verified businesses only',
-  FILTER_VERIFIED_HINT: 'Businesses checked by KaamNow',
+  FILTER_VERIFIED_HINT: 'Businesses checked by KaaamNow',
   FILTER_RESET: 'Reset',
   FILTER_APPLY: 'Show shifts',
   CLOSE: 'Close filters',

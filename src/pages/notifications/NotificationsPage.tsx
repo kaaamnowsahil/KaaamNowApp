@@ -97,7 +97,7 @@ export const NotificationsPage: FC<
 };
 
 const styles = StyleSheet.create({
-  action: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 16.8 },
+  action: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 18 },
   row: {
     flexDirection: 'row',
     gap: 10,
@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
   dot: { width: 8, height: 8, borderRadius: 4, marginTop: 6 },
   text: { flex: 1, gap: 4 },
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  title: { flex: 1, fontFamily: FONTS.medium, fontSize: 15, lineHeight: 21 },
+  title: { flex: 1, fontFamily: FONTS.medium, fontSize: 15, lineHeight: 22 },
   unread: { fontFamily: FONTS.semiBold },
-  time: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
-  body: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18.2 },
+  time: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 17 },
+  body: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 20 },
 });

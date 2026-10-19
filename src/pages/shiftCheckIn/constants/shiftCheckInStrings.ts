@@ -16,7 +16,7 @@ export const SHIFT_CHECK_IN_STRINGS = {
   HELP: 'I need help checking in',
   HELP_TITLE: 'Need help checking in?',
   HELP_SUBTITLE:
-    'Tell us what’s wrong. Your shift lead or KaamNow support will get you started on time.',
+    'Tell us what’s wrong. Your shift lead or KaaamNow support will get you started on time.',
   CALL_LEAD: 'Call shift lead',
   leadCaption: (name: string, reply: string) => `${name} · ${reply}`,
   MESSAGE_LEAD: 'Message shift lead',
@@ -25,7 +25,7 @@ export const SHIFT_CHECK_IN_STRINGS = {
     `Hi ${lead}, I’ve arrived for the ${role} shift and need help checking in.`,
   CANT_FIND: 'Can’t find the workplace',
   directionsTo: (business: string) => `Open directions to ${business}`,
-  SUPPORT: 'Contact KaamNow support',
+  SUPPORT: 'Contact KaaamNow support',
   supportCaption: (hours: string, phone: string) => `${hours} · ${phone}`,
   ASK_MANUAL: 'Ask lead to check me in',
   waiting: (lead: string) =>

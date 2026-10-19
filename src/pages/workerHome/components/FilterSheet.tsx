@@ -183,8 +183,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   switchText: { flex: 1, gap: 2 },
-  switchTitle: { fontFamily: FONTS.semiBold, fontSize: 15, lineHeight: 21 },
-  switchHint: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 16.8 },
+  switchTitle: { fontFamily: FONTS.semiBold, fontSize: 15, lineHeight: 22 },
+  switchHint: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
   actions: {
     flexDirection: 'row',
     gap: 10,

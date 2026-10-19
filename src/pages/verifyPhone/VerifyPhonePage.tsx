@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text } from 'react-native';
 
 import {
@@ -20,11 +21,12 @@ import { useVerifyPhone } from './hooks/useVerifyPhone';
 /**
  * Verify phone page orchestrator. Figma: Verify your phone · Light (1:120) / Dark (1:152).
  * - state: hooks/useVerifyPhone.ts (code input, expiry + resend countdowns)
- * - constants: constants/verifyPhoneStrings.ts
+ * - i18n: useTranslation ('verifyPhone' namespace)
  */
 export const VerifyPhonePage: FC<
   AuthScreenProps<typeof ROUTES.verifyPhone>
 > = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const { code, setCode, expiresIn, resendIn, onResend, onVerify, canSubmit } =
     useVerifyPhone(route.params.phone);
@@ -36,13 +38,15 @@ export const VerifyPhonePage: FC<
       actions={
         <>
           <PrimaryButton
-            label={VERIFY_PHONE_STRINGS.VERIFY}
+            label={t('verifyPhone.verify')}
             disabled={!canSubmit}
             onPress={onVerify}
             testID="verify-submit"
           />
           <SecondaryButton
-            label={VERIFY_PHONE_STRINGS.CHANGE_PHONE}
+            label={t('verifyPhone.changePhone', {
+              defaultValue: VERIFY_PHONE_STRINGS.CHANGE_PHONE,
+            })}
             onPress={navigation.goBack}
             testID="verify-change-phone"
           />
@@ -50,17 +54,31 @@ export const VerifyPhonePage: FC<
       }
     >
       <ScreenIntro
-        title={VERIFY_PHONE_STRINGS.TITLE}
-        subtitle={VERIFY_PHONE_STRINGS.subtitle(
-          maskIndianPhone(route.params.phone),
-        )}
+        title={t('verifyPhone.title')}
+        subtitle={
+          t('verifyPhone.subtitle', {
+            phone: maskIndianPhone(route.params.phone),
+            defaultValue: VERIFY_PHONE_STRINGS.subtitle(
+              maskIndianPhone(route.params.phone),
+            ),
+          })
+        }
       />
       <TextField
-        label={VERIFY_PHONE_STRINGS.CODE_LABEL}
+        label={t('verifyPhone.codeLabel', {
+          defaultValue: VERIFY_PHONE_STRINGS.CODE_LABEL,
+        })}
         helper={
           expiresIn > 0
-            ? VERIFY_PHONE_STRINGS.codeExpiresIn(formatMmSs(expiresIn))
-            : VERIFY_PHONE_STRINGS.CODE_EXPIRED
+            ? t('verifyPhone.codeExpiresIn', {
+                time: formatMmSs(expiresIn),
+                defaultValue: VERIFY_PHONE_STRINGS.codeExpiresIn(
+                  formatMmSs(expiresIn),
+                ),
+              })
+            : t('verifyPhone.codeExpired', {
+                defaultValue: VERIFY_PHONE_STRINGS.CODE_EXPIRED,
+              })
         }
         value={code}
         onChangeText={setCode}
@@ -74,7 +92,10 @@ export const VerifyPhonePage: FC<
       />
       <BodyNote>
         {resendIn > 0 ? (
-          VERIFY_PHONE_STRINGS.resendIn(formatMmSs(resendIn))
+          t('verifyPhone.resendIn', {
+            time: formatMmSs(resendIn),
+            defaultValue: VERIFY_PHONE_STRINGS.resendIn(formatMmSs(resendIn)),
+          })
         ) : (
           <Text
             accessibilityRole="button"
@@ -82,10 +103,14 @@ export const VerifyPhonePage: FC<
             style={[styles.resend, { color: colors.primary }]}
             testID="verify-resend"
           >
-            {VERIFY_PHONE_STRINGS.RESEND_NOW}
+            {t('verifyPhone.resendNow', {
+              defaultValue: VERIFY_PHONE_STRINGS.RESEND_NOW,
+            })}
           </Text>
         )}{' '}
-        {VERIFY_PHONE_STRINGS.NEVER_SHARE}
+        {t('verifyPhone.neverShare', {
+          defaultValue: VERIFY_PHONE_STRINGS.NEVER_SHARE,
+        })}
       </BodyNote>
     </FormScreen>
   );

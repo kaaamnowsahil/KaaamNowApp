@@ -22,6 +22,16 @@ export type Booking = {
   ratingGiven?: number;
 };
 
+/** Result of a withdrawal request (12 · Withdrawal initiated). */
+export type WithdrawalReceipt = {
+  amount: number;
+  /** UPI id, wallet or masked bank account, e.g. "aarav@okbank". */
+  destination: string;
+  /** e.g. "UPI", "Paytm", "Bank" */
+  method: string;
+  reference: string;
+};
+
 export type PayoutStatus = 'pending' | 'processing' | 'completed';
 
 export type Payout = {

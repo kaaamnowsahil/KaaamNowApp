@@ -5,7 +5,6 @@ import {
   type FC,
   type ReactNode,
 } from 'react';
-import { useColorScheme } from 'react-native';
 
 import {
   DARK_COLORS,
@@ -22,10 +21,8 @@ const ThemeContext = createContext<Theme>({
 });
 
 export const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const system = useColorScheme();
   const preference = usePreferencesStore(s => s.theme);
-  const isDark =
-    preference === 'system' ? system === 'dark' : preference === 'dark';
+  const isDark = preference === 'dark';
   const value = useMemo(
     () => ({ colors: isDark ? DARK_COLORS : LIGHT_COLORS, isDark }),
     [isDark],

@@ -42,5 +42,5 @@ export const CategoryTabs: FC<{
 
 const styles = StyleSheet.create({
   root: { flexDirection: 'row', gap: 7 },
-  label: { fontFamily: FONTS.semiBold, fontSize: 11, lineHeight: 16.5 },
+  label: { fontFamily: FONTS.semiBold, fontSize: 11, lineHeight: 17 },
 });

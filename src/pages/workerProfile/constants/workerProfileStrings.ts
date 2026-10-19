@@ -8,12 +8,12 @@ export const WORKER_PROFILE_STRINGS = {
   LANGUAGE: 'Language',
   APP_THEME: 'App theme',
   THEME_LABEL: {
-    system: 'System',
     light: 'Light',
     dark: 'Dark',
   } as Record<ThemePreference, string>,
   SUPPORT: 'Support',
   FAQ: 'FAQ & Help',
+  OFFLINE: 'Offline access',
   TERMS: 'Terms & Conditions',
   LOG_OUT: 'Log out',
 } as const;

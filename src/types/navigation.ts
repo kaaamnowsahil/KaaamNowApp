@@ -10,6 +10,7 @@ import type { ROUTES } from '@/constants/routes';
 
 import type { BookingStatus } from './booking';
 import type { Shift } from './shift';
+import type { WithdrawalReceipt } from './booking';
 
 /** Screens reachable both before and after login. */
 export type CommonStackParamList = {
@@ -32,8 +33,12 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.notifications]: undefined;
   [ROUTES.editProfile]: undefined;
   [ROUTES.language]: undefined;
+  [ROUTES.appearance]: undefined;
+  [ROUTES.offline]: undefined;
   [ROUTES.payoutAccount]: undefined;
   [ROUTES.earningsHistory]: undefined;
+  [ROUTES.withdraw]: undefined;
+  [ROUTES.withdrawSuccess]: WithdrawalReceipt;
   [ROUTES.shiftRequest]: { shift: Shift };
   /** bookingStatus is set when opened from My shifts or an offer. */
   [ROUTES.shiftDetails]: { shift: Shift; bookingStatus?: BookingStatus };

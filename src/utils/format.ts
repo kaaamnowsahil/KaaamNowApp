@@ -37,3 +37,12 @@ export const splitTimeRange = (timeLabel: string) => {
   const [start = timeLabel, end = ''] = timeLabel.split(/\s*[–-]\s*/);
   return { start, end };
 };
+
+/** "Aarav Sharma" → "AS" (first two words). */
+export const initialsOf = (name: string) =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase())
+    .join('');

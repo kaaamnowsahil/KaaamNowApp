@@ -12,6 +12,7 @@ export { EmptyState } from './EmptyState';
 export { IconField } from './IconField';
 export { Loader } from './Loader';
 export { PopIn, Rise } from './motion';
+export { RadioCheck } from './RadioCheck';
 export { OutlineButton } from './OutlineButton';
 export { SectionHeading } from './SectionHeading';
 export { SegmentedControl } from './SegmentedControl';

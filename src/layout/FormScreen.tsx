@@ -22,6 +22,8 @@ type FormScreenProps = {
   /** Pinned bottom bar ("Screen actions"); omitted on read-only screens. */
   actions?: ReactNode;
   onBack?: () => void;
+  /** `plain` shows a bare chevron instead of the outlined circle. */
+  backVariant?: 'outlined' | 'plain';
   /** Small title beside the back button. */
   title?: string;
   /** Second line under `title`, e.g. "Worker mode / Live request". */
@@ -51,6 +53,7 @@ export const FormScreen: FC<FormScreenProps> = ({
   children,
   actions,
   onBack,
+  backVariant,
   title,
   subtitle,
   compactTitle,
@@ -79,7 +82,7 @@ export const FormScreen: FC<FormScreenProps> = ({
         <View style={styles.appBar}>
           {onBack ? (
             <Rise>
-              <BackButton onPress={onBack} />
+              <BackButton onPress={onBack} variant={backVariant} />
             </Rise>
           ) : null}
           {title && subtitle ? (
@@ -195,14 +198,14 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: FONTS.semiBold,
     fontSize: 17,
-    lineHeight: 23.8,
+    lineHeight: 25,
   },
   titleBlock: { flex: 1 },
   flex: { flex: 1 },
-  titleSmall: { fontFamily: FONTS.semiBold, fontSize: 14, lineHeight: 19.6 },
-  subtitle: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
+  titleSmall: { fontFamily: FONTS.semiBold, fontSize: 14, lineHeight: 21 },
+  subtitle: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 16.5 },
   headerRight: { marginLeft: 'auto' },
-  headerTag: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
+  headerTag: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 16.5 },
   content: {
     paddingTop: 16,
     paddingBottom: 24,

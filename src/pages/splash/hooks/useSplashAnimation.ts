@@ -3,7 +3,7 @@ import { AccessibilityInfo, Animated, Easing } from 'react-native';
 
 import { MOTION } from '@/constants/motion';
 
-/** Timings from "KaamNow Splash Motion" (ms). */
+/** Timings from "KaaamNow Splash Motion" (ms). */
 const SPRING = MOTION.spring;
 const OUT = MOTION.out;
 export const PIECE_DELAYS = [300, 450, 550, 650, 730, 810];

@@ -1,4 +1,4 @@
-// Exports every top-level frame of the KaamNow Figma file as PNG plus a JSON summary.
+// Exports every top-level frame of the KaaamNow Figma file as PNG plus a JSON summary.
 // Usage: FIGMA_TOKEN in .env.local, then `npm run figma:export`.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';

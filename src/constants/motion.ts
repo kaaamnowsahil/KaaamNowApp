@@ -1,6 +1,6 @@
 import { Easing } from 'react-native';
 
-/** Easings and timings from "KaamNow Splash Motion", shared by all screen entrances. */
+/** Easings and timings from "KaaamNow Splash Motion", shared by all screen entrances. */
 export const MOTION = {
   spring: Easing.bezier(0.34, 1.56, 0.64, 1),
   out: Easing.bezier(0.22, 1, 0.36, 1),

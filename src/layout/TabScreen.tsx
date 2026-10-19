@@ -18,6 +18,8 @@ type TabScreenProps = {
   gap?: number;
   /** Shows the brand loader instead of the blocks. */
   isLoading?: boolean;
+  /** Bar pinned above the tab bar with a top border ("Screen actions"). */
+  actions?: ReactNode;
   testID?: string;
 };
 
@@ -31,6 +33,7 @@ export const TabScreen: FC<TabScreenProps> = ({
   blocks,
   gap = 8,
   isLoading,
+  actions,
   testID,
 }) => {
   const { colors } = useTheme();
@@ -66,6 +69,20 @@ export const TabScreen: FC<TabScreenProps> = ({
         <View style={styles.bottomSpace} />
       </ScrollView>
       )}
+      {actions && !isLoading ? (
+        <Rise
+          delay={(blocks.length + 1) * MOTION.stagger}
+          style={[
+            styles.actions,
+            {
+              backgroundColor: colors.background,
+              borderTopColor: colors.border,
+            },
+          ]}
+        >
+          {actions}
+        </Rise>
+      ) : null}
     </SafeAreaView>
   );
 };
@@ -82,4 +99,11 @@ const styles = StyleSheet.create({
   title: { fontFamily: FONTS.bold, fontSize: 22, lineHeight: 30.8 },
   content: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20 },
   bottomSpace: { height: 4 },
+  actions: {
+    borderTopWidth: 1,
+    paddingTop: 12,
+    paddingBottom: 16,
+    paddingHorizontal: 20,
+    gap: 10,
+  },
 });

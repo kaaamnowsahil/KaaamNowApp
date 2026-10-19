@@ -11,7 +11,7 @@ import { BrandLogo } from './BrandLogo';
 const APP_NAME = BRAND.NAME;
 const NOTIFICATIONS = 'Notifications';
 
-/** Figma "App bar" contents (1:1466): KaamNow logo, 22px bold wordmark, bell. */
+/** Figma "App bar" contents (1:1466): KaaamNow logo, 22px bold wordmark, bell. */
 export const BrandAppBar: FC<{ onBellPress?: () => void; hasUnread?: boolean }> = ({
   onBellPress,
   hasUnread,

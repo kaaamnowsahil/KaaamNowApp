@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import {
@@ -14,17 +15,17 @@ import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import type { AuthScreenProps } from '@/types';
 
-import { WELCOME_STRINGS } from './constants';
 import { useWelcome } from './hooks/useWelcome';
 
 /**
  * Welcome / sign-in page orchestrator. Figma: Welcome back · Light (1:39) / Dark (1:78).
  * - state: hooks/useWelcome.ts (phone input + validation)
- * - constants: constants/welcomeStrings.ts
+ * - i18n: useTranslation ('welcome' namespace)
  */
 export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
   navigation,
 }) => {
+  const { t } = useTranslation();
   const { phone, setPhone, e164 } = useWelcome();
   return (
     <FormScreen
@@ -32,7 +33,7 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
       actions={
         <>
           <PrimaryButton
-            label={WELCOME_STRINGS.SEND_CODE}
+            label={t('welcome.sendCode')}
             disabled={!e164}
             onPress={() =>
               e164 &&
@@ -44,7 +45,7 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
             testID="welcome-send-code"
           />
           <SecondaryButton
-            label={WELCOME_STRINGS.CREATE_ACCOUNT}
+            label={t('welcome.createAccount')}
             onPress={() => navigation.navigate(ROUTES.roleSelect)}
             testID="welcome-create-account"
           />
@@ -57,14 +58,14 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
         </PopIn>
       </View>
       <ScreenIntro
-        title={WELCOME_STRINGS.TITLE}
-        subtitle={WELCOME_STRINGS.SUBTITLE}
+        title={t('welcome.title')}
+        subtitle={t('welcome.subtitle')}
       />
       <TextField
-        label={WELCOME_STRINGS.PHONE_LABEL}
-        helper={WELCOME_STRINGS.PHONE_HELPER}
-        prefix={WELCOME_STRINGS.PHONE_PREFIX}
-        placeholder={WELCOME_STRINGS.PHONE_PLACEHOLDER}
+        label={t('welcome.phoneLabel')}
+        helper={t('welcome.phoneHelper')}
+        prefix={t('welcome.phonePrefix')}
+        placeholder={t('welcome.phonePlaceholder')}
         value={phone}
         onChangeText={setPhone}
         keyboardType="number-pad"
@@ -72,7 +73,7 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
         textContentType="telephoneNumber"
         testID="welcome-phone-input"
       />
-      <BodyNote>{WELCOME_STRINGS.LEGAL}</BodyNote>
+      <BodyNote>{t('welcome.legal')}</BodyNote>
     </FormScreen>
   );
 };

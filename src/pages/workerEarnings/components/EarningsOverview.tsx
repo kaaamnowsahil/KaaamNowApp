@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -8,43 +8,64 @@ import { formatRupees } from '@/utils/format';
 import { WORKER_EARNINGS_STRINGS as S } from '../constants';
 import type { EarningsSummary } from '../mock';
 
-/** Figma Earnings (08): Pending / Processing tiles over the completed-payouts card. */
-export const EarningsOverview: FC<{ summary: EarningsSummary }> = ({
-  summary,
-}) => {
+/**
+ * Figma SH-17 Worker earnings: Pending / Processing tiles over the completed-payouts card.
+ * The "Withdraw" pill is not in SH-17; it opens the 12 · Withdraw flow.
+ */
+export const EarningsOverview: FC<{
+  summary: EarningsSummary;
+  onWithdraw: () => void;
+}> = ({ summary, onWithdraw }) => {
   const { colors } = useTheme();
-  const tile = [styles.tile, { backgroundColor: colors.fill }];
+  const tiles = [
+    { amount: summary.pending, label: S.PENDING },
+    { amount: summary.processing, label: S.PROCESSING },
+  ];
 
   return (
     <View style={styles.root}>
       <View style={styles.tiles}>
-        <View style={tile}>
-          <Text style={[styles.tileAmount, { color: colors.text }]}>
-            {formatRupees(summary.pending)}
-          </Text>
-          <Text style={[styles.caption, { color: colors.textSubtle }]}>
-            {S.PENDING}
-          </Text>
-        </View>
-        <View style={tile}>
-          <Text style={[styles.tileAmount, { color: colors.text }]}>
-            {formatRupees(summary.processing)}
-          </Text>
-          <Text style={[styles.caption, { color: colors.textSubtle }]}>
-            {S.PROCESSING}
-          </Text>
-        </View>
+        {tiles.map(tile => (
+          <View
+            key={tile.label}
+            style={[styles.tile, { backgroundColor: colors.fill }]}
+          >
+            <Text style={[styles.tileAmount, { color: colors.text }]}>
+              {formatRupees(tile.amount)}
+            </Text>
+            <Text style={[styles.tileLabel, { color: colors.textSubtle }]}>
+              {tile.label}
+            </Text>
+          </View>
+        ))}
       </View>
 
       <View style={[styles.total, { backgroundColor: colors.fill }]}>
-        <Text style={[styles.caption, { color: colors.textSubtle }]}>
-          {summary.completedLabel}
-        </Text>
+        <View style={styles.totalHead}>
+          <Text style={[styles.caption, styles.flex, { color: colors.textSubtle }]}>
+            {summary.periodLabel}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={onWithdraw}
+            testID="earnings-withdraw"
+            style={({ pressed }) => [
+              styles.pill,
+              { backgroundColor: colors.primarySoft },
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={[styles.pillText, { color: colors.primary }]}>
+              {S.WITHDRAW}
+            </Text>
+          </Pressable>
+        </View>
         <Text style={[styles.totalAmount, { color: colors.text }]}>
           {formatRupees(summary.completed)}
         </Text>
         <Text style={[styles.caption, { color: colors.textSubtle }]}>
-          {S.lastPaid(summary.lastPaid)}
+          {summary.lastPaid}
         </Text>
       </View>
     </View>
@@ -52,11 +73,36 @@ export const EarningsOverview: FC<{ summary: EarningsSummary }> = ({
 };
 
 const styles = StyleSheet.create({
-  root: { gap: 12 },
+  root: { gap: 20 },
   tiles: { flexDirection: 'row', gap: 12 },
-  tile: { flex: 1, borderRadius: 14, padding: 14, gap: 4 },
-  tileAmount: { fontFamily: FONTS.bold, fontSize: 20, lineHeight: 26 },
-  caption: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
-  total: { borderRadius: 16, padding: 16, gap: 6 },
-  totalAmount: { fontFamily: FONTS.bold, fontSize: 36, lineHeight: 44 },
+  tile: {
+    flex: 1,
+    minHeight: 82,
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    justifyContent: 'center',
+    gap: 4,
+  },
+  tileAmount: { fontFamily: FONTS.bold, fontSize: 22, lineHeight: 28 },
+  tileLabel: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
+  total: {
+    minHeight: 146,
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    justifyContent: 'center',
+    gap: 8,
+  },
+  totalHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  flex: { flex: 1 },
+  pill: {
+    height: 28,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    justifyContent: 'center',
+  },
+  pressed: { opacity: 0.7 },
+  pillText: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 18 },
+  caption: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 17 },
+  totalAmount: { fontFamily: FONTS.bold, fontSize: 40, lineHeight: 48 },
 });

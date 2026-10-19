@@ -13,11 +13,15 @@ import ChevronRight from '@/assets/figma/chevron-right.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
-/** Figma "back-button" (1:131): 36px circle, outlined, 20px chevron. */
-export const BackButton: FC<{ onPress: () => void; label?: string }> = ({
-  onPress,
-  label = 'Back',
-}) => {
+/**
+ * Figma "back-button" (1:131): 36px circle, outlined, 20px chevron.
+ * `plain` drops the circle (12 · Withdraw).
+ */
+export const BackButton: FC<{
+  onPress: () => void;
+  label?: string;
+  variant?: 'outlined' | 'plain';
+}> = ({ onPress, label = 'Back', variant = 'outlined' }) => {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -28,7 +32,9 @@ export const BackButton: FC<{ onPress: () => void; label?: string }> = ({
       testID="back-button"
       style={({ pressed }) => [
         styles.backButton,
-        { borderColor: colors.outline },
+        variant === 'plain'
+          ? styles.backPlain
+          : { borderColor: colors.outline },
         pressed && styles.dimmed,
       ]}
     >
@@ -87,15 +93,12 @@ export const InfoRow: FC<{
             <View
               style={[
                 styles.radio,
-                { borderColor: selected ? colors.primary : colors.text },
+                {
+                  borderColor: colors.text,
+                  backgroundColor: selected ? colors.text : undefined,
+                },
               ]}
-            >
-              {selected ? (
-                <View
-                  style={[styles.radioDot, { backgroundColor: colors.primary }]}
-                />
-              ) : null}
-            </View>
+            />
           )}
           <Text style={[styles.infoTitle, { color: colors.text }]}>
             {title}
@@ -159,7 +162,7 @@ export const PrimaryButton: FC<ButtonProps> = ({
   );
 };
 
-/** Figma "Secondary action" (1:74): 52px, radius 12, outlined. */
+/** Figma "Secondary action" (1:74): 52px, radius 12, filled outline (primary colour). */
 export const SecondaryButton: FC<ButtonProps> = ({
   label,
   onPress,
@@ -169,6 +172,7 @@ export const SecondaryButton: FC<ButtonProps> = ({
 }) => {
   const { colors } = useTheme();
   const isDanger = tone === 'danger';
+  const accentColor = isDanger ? colors.danger : colors.primary;
   return (
     <Pressable
       accessibilityRole="button"
@@ -179,8 +183,8 @@ export const SecondaryButton: FC<ButtonProps> = ({
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: colors.background,
-          borderColor: isDanger ? colors.danger : colors.border,
+          backgroundColor: 'transparent',
+          borderColor: accentColor,
         },
         (pressed || disabled) && styles.dimmed,
       ]}
@@ -188,7 +192,7 @@ export const SecondaryButton: FC<ButtonProps> = ({
       <Text
         style={[
           styles.buttonLabel,
-          { color: isDanger ? colors.danger : colors.text },
+          { color: accentColor },
         ]}
       >
         {label}
@@ -261,10 +265,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  backPlain: { width: 30, borderWidth: 0 },
   intro: { gap: 8 },
-  introTitle: { fontFamily: FONTS.bold, fontSize: 25, lineHeight: 29.5 },
-  introSubtitle: { fontFamily: FONTS.regular, fontSize: 15, lineHeight: 21 },
-  note: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18.2 },
+  introTitle: { fontFamily: FONTS.bold, fontSize: 25, lineHeight: 35 },
+  introSubtitle: { fontFamily: FONTS.regular, fontSize: 15, lineHeight: 23 },
+  note: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 21 },
   infoRow: {
     minHeight: 66,
     paddingVertical: 12,
@@ -284,21 +289,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  radioDot: { width: 7, height: 7, borderRadius: 3.5 },
-  infoTitle: { fontFamily: FONTS.regular, fontSize: 15, lineHeight: 22.5 },
+  infoTitle: { fontFamily: FONTS.regular, fontSize: 15, lineHeight: 23 },
   infoCaption: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
   button: {
-    height: 52,
+    minHeight: 52,
     borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
+    paddingVertical: 12,
   },
-  buttonLabel: { fontFamily: FONTS.semiBold, fontSize: 15, lineHeight: 21 },
+  buttonLabel: { fontFamily: FONTS.semiBold, fontSize: 15 },
   dimmed: { opacity: 0.7 },
   field: { width: '100%', gap: 7 },
-  fieldLabel: { fontFamily: FONTS.regular, fontSize: 13 },
+  fieldLabel: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18 },
   inputBox: {
     minHeight: 52,
     borderRadius: 12,
@@ -310,5 +315,5 @@ const styles = StyleSheet.create({
   inputText: { fontFamily: FONTS.regular, fontSize: 15 },
   prefix: { marginRight: 6 },
   input: { flex: 1, paddingVertical: 13, paddingHorizontal: 0 },
-  helper: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
+  helper: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 17 },
 });

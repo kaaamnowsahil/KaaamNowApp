@@ -57,7 +57,7 @@ type Props = {
   pieces: Animated.Value[];
 };
 
-/** Logo tile, staggered K pieces, ring pulse, float and glow — "KaamNow Splash Motion". */
+/** Logo tile, staggered K pieces, ring pulse, float and glow — "KaaamNow Splash Motion". */
 export const AnimatedLogo: FC<Props> = ({
   tile,
   ring,

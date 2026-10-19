@@ -8,7 +8,7 @@ export const VERIFY_PHONE_STRINGS = {
   CODE_EXPIRED: 'Code expired. Request a new one.',
   resendIn: (time: string) => `Resend code available in ${time}.`,
   RESEND_NOW: 'Resend code.',
-  NEVER_SHARE: 'Never share your code with anyone, including KaamNow support.',
+  NEVER_SHARE: 'Never share your code with anyone, including KaaamNow support.',
   VERIFY: 'Verify code',
   CHANGE_PHONE: 'Change phone number',
 } as const;

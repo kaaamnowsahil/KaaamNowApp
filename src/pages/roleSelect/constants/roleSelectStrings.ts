@@ -2,7 +2,7 @@ import type { UserRole } from '@/services/onboarding/useOnboardingStore';
 
 /** UI strings for the Role select module (Figma 1:187 / 1:221). */
 export const ROLE_SELECT_STRINGS = {
-  TITLE: 'How will you use KaamNow?',
+  TITLE: 'How will you use KaaamNow?',
   SUBTITLE: 'Choose a starting mode. You can add the other role later.',
   CONTINUE: 'Continue',
   BACK: 'Back',

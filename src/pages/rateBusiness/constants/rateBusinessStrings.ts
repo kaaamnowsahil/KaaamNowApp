@@ -1,6 +1,6 @@
 export const RATE_BUSINESS_STRINGS = {
   heading: (business: string) => `Rate ${business}`,
-  SUBTITLE: 'Your feedback keeps KaamNow safe and fair.',
+  SUBTITLE: 'Your feedback keeps KaaamNow safe and fair.',
   businessMeta: (verified: boolean, role: string) =>
     verified ? `Verified business · ${role}` : role,
   starLabel: (n: number) => `${n} ${n === 1 ? 'star' : 'stars'}`,

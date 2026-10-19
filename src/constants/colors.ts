@@ -1,5 +1,5 @@
 /**
- * Single source for all app colors, taken from the KaamNow Figma file (qtCoCV096jOWdNxpfqBquH).
+ * Single source for all app colors, taken from the KaaamNow Figma file (qtCoCV096jOWdNxpfqBquH).
  * Add values only as they are read from Figma frames; do not invent new ones.
  */
 export type ThemeColors = {
@@ -17,6 +17,8 @@ export type ThemeColors = {
   onPrimary: string;
   /** "Verified" label (17:190). */
   success: string;
+  /** Disc behind the "Withdrawal initiated" check (12 · Withdraw). */
+  successSoft: string;
   /** "Selected · Confirmation needed", Pending / Processing (My shifts, Earnings 08). */
   warning: string;
   /** Avatar + settings icon tiles (Profile 17:2 / 17:518). */
@@ -41,6 +43,7 @@ export const LIGHT_COLORS: ThemeColors = {
   primary: '#8B5CF6',
   onPrimary: '#FFFFFF',
   success: '#16A34A',
+  successSoft: '#DCFCE7',
   warning: '#D97706',
   primarySoft: '#F5F3FF',
   danger: '#DC2626',
@@ -61,6 +64,7 @@ export const DARK_COLORS: ThemeColors = {
   primary: '#8B5CF6',
   onPrimary: '#FFFFFF',
   success: '#16A34A',
+  successSoft: '#14532D',
   warning: '#F59E0B',
   primarySoft: '#261F48',
   danger: '#DC2626',

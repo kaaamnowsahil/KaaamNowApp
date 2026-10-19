@@ -26,7 +26,7 @@ const rise = (value: Animated.Value) => ({
 
 /**
  * Splash page orchestrator. Figma: Splash · Light (1:10) / Dark (1:23),
- * animated per "KaamNow Splash Motion".
+ * animated per "KaaamNow Splash Motion".
  * - motion: hooks/useSplashAnimation.ts
  * - ui: components/ (AnimatedLogo, LoadingDots)
  */

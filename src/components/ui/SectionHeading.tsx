@@ -33,6 +33,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  title: { fontFamily: FONTS.regular, fontSize: 18, lineHeight: 25.2 },
-  action: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 16.8 },
+  title: { fontFamily: FONTS.regular, fontSize: 18, lineHeight: 26 },
+  action: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 18 },
 });

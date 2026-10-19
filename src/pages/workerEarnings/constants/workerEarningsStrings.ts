@@ -1,28 +1,24 @@
 import type { PayoutStatus } from '@/types';
 
-import type { EarningsPeriod } from '../mock';
-
 export const WORKER_EARNINGS_STRINGS = {
   TITLE: 'Earnings',
-  OVERLINE: 'Earnings',
+  HEADER_TAG: 'Worker',
+  OVERLINE: 'EARNINGS',
   HEADING: 'Worker earnings',
-  PERIOD_LABEL: { week: 'Weekly', month: 'Monthly' } as Record<
-    EarningsPeriod,
-    string
-  >,
-  switchPeriod: (current: string) => `${current}, tap to switch period`,
   PENDING: 'Pending',
   PROCESSING: 'Processing',
-  lastPaid: (text: string) => `Last paid: ${text}`,
   STATUS: {
     pending: 'Pending',
     processing: 'Processing',
     completed: 'Completed',
   } as Record<PayoutStatus, string>,
+  /** "4 h × ₹150 = ₹600" */
   shiftMeta: (hours: number, rate: string, total: string) =>
-    `${hours} h · ${rate} · ${total}`,
-  groupMeta: (shifts: number, total: string) =>
-    `${shifts} shifts · ${total}`,
+    `${hours} h × ${rate} = ${total}`,
+  /** "6 × ₹600 = ₹3,600" */
+  groupMeta: (shifts: number, each: string, total: string) =>
+    `${shifts} × ${each} = ${total}`,
+  WITHDRAW: 'Withdraw',
   VIEW_ALL: 'View all earnings',
   SUPPORT: 'Payment support',
 } as const;

@@ -1,0 +1,104 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "apply": "Apply",
+    "back": "Back",
+    "loading": "Loading...",
+    "comingSoon": "Coming soon"
+  },
+  "appearance": {
+    "title": "Choose your appearance",
+    "subtitle": "Your preference applies to Worker and Business modes.",
+    "save": "Save appearance",
+    "cancel": "Cancel",
+    "light": "Light",
+    "lightCaption": "Clean, white-first surfaces · Default",
+    "dark": "Dark",
+    "darkCaption": "Lower-glare surfaces for low light"
+  },
+  "language": {
+    "title": "Language",
+    "subtitle": "Choose the language you want to use in the app.",
+    "apply": "Apply language"
+  },
+  "welcome": {
+    "title": "Welcome to KaaamNow",
+    "subtitle": "Sign in securely with your mobile number.",
+    "sendCode": "Send sign-in code",
+    "createAccount": "Create an account",
+    "phoneLabel": "Mobile number",
+    "phoneHelper": "We’ll send a one-time code. Standard SMS rates may apply.",
+    "phonePrefix": "+91",
+    "phonePlaceholder": "98765 43210",
+    "legal": "No password required. By continuing, you agree to the Terms of service and Privacy policy."
+  },
+  "verifyPhone": {
+    "title": "Verify your phone",
+    "subtitle": "Enter the 6-digit code sent to {{phone}}.",
+    "codeLabel": "Verification code",
+    "codeExpiresIn": "Code expires in {{time}}.",
+    "codeExpired": "Code expired. Request a new one.",
+    "resendIn": "Resend code available in {{time}}.",
+    "resendNow": "Resend code.",
+    "neverShare": "Never share your code with anyone, including KaaamNow support.",
+    "verify": "Verify code",
+    "changePhone": "Change phone number"
+  },
+  "roleSelect": {
+    "title": "How will you use KaaamNow?",
+    "subtitle": "You can switch between modes later.",
+    "worker": "I want to work",
+    "business": "I'm hiring",
+    "continue": "Continue"
+  },
+  "workerProfile": {
+    "account": "Account",
+    "editProfile": "Edit profile",
+    "payoutAccount": "Payout account",
+    "preferences": "Preferences",
+    "language": "Language",
+    "appTheme": "App theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "support": "Support",
+    "faq": "FAQ & Help",
+    "offline": "Offline access",
+    "terms": "Terms & Conditions",
+    "logOut": "Log out"
+  },
+  "workerHome": {
+    "greeting": "Hello, {{name}} 👋",
+    "searchPlaceholder": "Search shifts...",
+    "nearbyShifts": "Nearby shifts",
+    "noShifts": "No shifts available right now.",
+    "filter": "Filter"
+  },
+  "shiftDetails": {
+    "apply": "Apply for shift",
+    "cancel": "Cancel",
+    "pay": "Pay",
+    "perHour": "per hour",
+    "distance": "{{distance}} km away",
+    "duration": "{{hours}}h shift"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet."
+  },
+  "offline": {
+    "title": "Offline access",
+    "subtitle": "Downloaded content is available without internet."
+  },
+  "faq": {
+    "title": "FAQ & Help"
+  },
+  "terms": {
+    "title": "Terms & Conditions"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "network": "No internet connection.",
+    "sessionExpired": "Your session has expired. Please log in again."
+  }
+}

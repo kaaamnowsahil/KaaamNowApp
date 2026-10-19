@@ -15,7 +15,7 @@ import { BrandLogo } from './BrandLogo';
 const LOADING = 'Loading…';
 
 /**
- * Brand loader: the KaamNow logo (same as Splash) pulsing inside a spinning
+ * Brand loader: the KaaamNow logo (same as Splash) pulsing inside a spinning
  * ring. Fills its parent and centres itself.
  */
 export const Loader: FC<{ label?: string }> = ({ label = LOADING }) => {

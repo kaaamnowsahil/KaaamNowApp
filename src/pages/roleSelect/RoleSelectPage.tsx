@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import {
@@ -9,21 +10,44 @@ import {
 } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useOnboardingStore } from '@/services/onboarding/useOnboardingStore';
+import {
+  useOnboardingStore,
+  type UserRole,
+} from '@/services/onboarding/useOnboardingStore';
 import type { AuthScreenProps } from '@/types';
 
-import { ROLE_OPTIONS, ROLE_SELECT_STRINGS } from './constants';
-
 /**
- * Role select page orchestrator. Figma: How will you use KaamNow? · Light (1:187) / Dark (1:221).
+ * Role select page orchestrator. Figma: How will you use KaaamNow? · Light (1:187) / Dark (1:221).
  * - state: services/onboarding/useOnboardingStore.ts (selected role)
- * - constants: constants/roleSelectStrings.ts
+ * - i18n: useTranslation ('roleSelect' namespace)
  */
 export const RoleSelectPage: FC<AuthScreenProps<typeof ROUTES.roleSelect>> = ({
   navigation,
 }) => {
+  const { t } = useTranslation();
   const role = useOnboardingStore(s => s.role);
   const setRole = useOnboardingStore(s => s.setRole);
+
+  const options: {
+    role: UserRole;
+    title: string;
+    caption: string;
+  }[] = [
+      {
+        role: 'worker',
+        title: t('roleSelect.worker'),
+        caption: t('roleSelect.workerCaption', {
+          defaultValue: 'Discover shifts, apply and earn.',
+        }),
+      },
+      {
+        role: 'business',
+        title: t('roleSelect.business'),
+        caption: t('roleSelect.businessCaption', {
+          defaultValue: 'Post shifts and manage a reliable team.',
+        }),
+      },
+    ];
 
   return (
     <FormScreen
@@ -32,7 +56,7 @@ export const RoleSelectPage: FC<AuthScreenProps<typeof ROUTES.roleSelect>> = ({
       actions={
         <>
           <PrimaryButton
-            label={ROLE_SELECT_STRINGS.CONTINUE}
+            label={t('roleSelect.continue')}
             disabled={!role}
             onPress={() =>
               navigation.navigate(
@@ -44,7 +68,7 @@ export const RoleSelectPage: FC<AuthScreenProps<typeof ROUTES.roleSelect>> = ({
             testID="role-continue"
           />
           <SecondaryButton
-            label={ROLE_SELECT_STRINGS.BACK}
+            label={t('common.back')}
             onPress={navigation.goBack}
             testID="role-back"
           />
@@ -52,11 +76,11 @@ export const RoleSelectPage: FC<AuthScreenProps<typeof ROUTES.roleSelect>> = ({
       }
     >
       <ScreenIntro
-        title={ROLE_SELECT_STRINGS.TITLE}
-        subtitle={ROLE_SELECT_STRINGS.SUBTITLE}
+        title={t('roleSelect.title')}
+        subtitle={t('roleSelect.subtitle')}
       />
       <View>
-        {ROLE_OPTIONS.map(option => (
+        {options.map(option => (
           <InfoRow
             key={option.role}
             title={option.title}

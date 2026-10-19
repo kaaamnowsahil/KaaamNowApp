@@ -13,8 +13,12 @@ export const ROUTES = {
   notifications: 'Notifications',
   editProfile: 'EditProfile',
   language: 'Language',
+  appearance: 'Appearance',
+  offline: 'Offline',
   payoutAccount: 'PayoutAccount',
   earningsHistory: 'EarningsHistory',
+  withdraw: 'Withdraw',
+  withdrawSuccess: 'WithdrawSuccess',
 
   // shift flow (worker): live and scheduled share request + details
   shiftRequest: 'ShiftRequest',

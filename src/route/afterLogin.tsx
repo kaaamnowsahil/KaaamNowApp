@@ -3,8 +3,12 @@ import type { FC } from 'react';
 
 import { ROUTES } from '@/constants/routes';
 import { EarningsHistoryPage } from '@/pages/earningsHistory/EarningsHistoryPage';
+import { WithdrawPage } from '@/pages/withdraw/WithdrawPage';
+import { WithdrawSuccessPage } from '@/pages/withdrawSuccess/WithdrawSuccessPage';
 import { EditProfilePage } from '@/pages/editProfile/EditProfilePage';
 import { LanguagePage } from '@/pages/language/LanguagePage';
+import { AppearancePage } from '@/pages/appearance/AppearancePage';
+import { OfflinePage } from '@/pages/offline/OfflinePage';
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { PayoutAccountPage } from '@/pages/payoutAccount/PayoutAccountPage';
 import { ShiftListPage } from '@/pages/shiftList/ShiftListPage';
@@ -46,6 +50,8 @@ export const AfterLoginRoutes: FC = () => {
       />
       <Stack.Screen name={ROUTES.editProfile} component={EditProfilePage} />
       <Stack.Screen name={ROUTES.language} component={LanguagePage} />
+      <Stack.Screen name={ROUTES.appearance} component={AppearancePage} />
+      <Stack.Screen name={ROUTES.offline} component={OfflinePage} />
       <Stack.Screen
         name={ROUTES.payoutAccount}
         component={PayoutAccountPage}
@@ -53,6 +59,12 @@ export const AfterLoginRoutes: FC = () => {
       <Stack.Screen
         name={ROUTES.earningsHistory}
         component={EarningsHistoryPage}
+      />
+      <Stack.Screen name={ROUTES.withdraw} component={WithdrawPage} />
+      <Stack.Screen
+        name={ROUTES.withdrawSuccess}
+        component={WithdrawSuccessPage}
+        options={{ gestureEnabled: false }}
       />
       <Stack.Screen name={ROUTES.shiftRequest} component={ShiftRequestPage} />
       <Stack.Screen name={ROUTES.shiftDetails} component={ShiftDetailsPage} />
