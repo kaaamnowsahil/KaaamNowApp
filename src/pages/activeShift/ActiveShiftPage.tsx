@@ -6,14 +6,14 @@ import {
   FlowHeading,
   MapPreview,
   StatTiles,
-} from '@/components/liveShift';
+} from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
-import { formatClock } from '@/utils/format';
+import { formatClock, splitTimeRange } from '@/utils/format';
 
 import { ACTIVE_SHIFT_STRINGS as S } from './constants';
 import { useActiveShift } from './hooks/useActiveShift';
@@ -30,6 +30,7 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
   const { shift } = route.params;
   const { colors } = useTheme();
   const a = useActiveShift();
+  const times = splitTimeRange(shift.timeLabel);
 
   const report = () =>
     Alert.alert(S.REPORT_TITLE, S.REPORT_BODY, [
@@ -42,11 +43,7 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
       onBack={navigation.goBack}
       title={S.HEADER_TITLE}
       compactTitle
-      headerRight={
-        <Text style={[styles.headerRight, { color: colors.textSubtle }]}>
-          {S.HEADER_RIGHT}
-        </Text>
-      }
+      headerTag={S.HEADER_RIGHT}
       gap={12}
       isLoading={a.isLoading}
       testID="active-shift-page"
@@ -73,8 +70,8 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
       <MapPreview variant="pin" label={S.mapLabel(shift.distanceKm)} />
       <StatTiles
         items={[
-          { value: a.shift.startTime, label: S.SHIFT_START },
-          { value: a.shift.endTime, label: S.EXPECTED_END },
+          { value: times.start, label: S.SHIFT_START },
+          { value: times.end, label: S.EXPECTED_END },
         ]}
       />
       <View style={[styles.timer, { backgroundColor: colors.fill }]}>
@@ -93,13 +90,13 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
       </View>
       <View>
         <DetailRow
-          compact
+          size="compact"
           title={S.CHECK_IN_RECORDED}
           caption={a.shift.checkInRecorded}
-          onPress={() => navigation.navigate(ROUTES.liveDetails, { shift })}
+          onPress={() => navigation.navigate(ROUTES.shiftDetails, { shift, bookingStatus: 'confirmed' })}
         />
         <DetailRow
-          compact
+          size="compact"
           title={S.SHIFT_LEAD}
           caption={S.lead(a.shift.leadName)}
           onPress={() => Linking.openURL(`sms:${a.shift.leadPhone}`)}
@@ -110,7 +107,6 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
 };
 
 const styles = StyleSheet.create({
-  headerRight: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
   timer: {
     borderRadius: 16,
     paddingVertical: 20,

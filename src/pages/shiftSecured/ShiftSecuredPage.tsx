@@ -1,37 +1,35 @@
 import { useState, type FC } from 'react';
-import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, View } from 'react-native';
 
-import { DetailRow, StatusHero } from '@/components/liveShift';
+import { DetailRow, ReasonSheet, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
-import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
-import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
-import { formatRupees } from '@/utils/format';
+import { formatRupees, splitTimeRange } from '@/utils/format';
 import { mapsUrl } from '@/utils/links';
 
-import { CancelShiftSheet } from './components';
 import { SHIFT_SECURED_STRINGS as S } from './constants';
-import { CANCEL_REASONS, SECURED } from './mock';
+import { CANCEL_REASONS, DEFAULT_SECURED, SECURED } from './mock';
 
 /**
- * Live shift step 3. Figma: Live · Your shift is secured (light/dark).
- * "Cancel shift" is not in Figma; it opens CancelShiftSheet.
+ * Live step 3 / scheduled step 5. Figma: "Live · Your shift is secured".
+ * "Cancel shift" is not in Figma; it opens a ReasonSheet.
  * - data: mock/shiftSecuredMock.ts
  */
 export const ShiftSecuredPage: FC<
   AppScreenProps<typeof ROUTES.shiftSecured>
 > = ({ navigation, route }) => {
   const { shift } = route.params;
-  const { colors } = useTheme();
   const isLoading = useMockLoading();
   const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const secured = { ...DEFAULT_SECURED, ...SECURED[shift.id] };
+  const workplace = secured.workplace ?? shift.area;
 
-  const openDetails = () => navigation.navigate(ROUTES.liveDetails, { shift });
+  const openDetails = () => navigation.navigate(ROUTES.shiftDetails, { shift, bookingStatus: 'confirmed' });
   const openMaps = () =>
-    Linking.openURL(mapsUrl(`${shift.businessName}, ${SECURED.workplace}`));
+    Linking.openURL(mapsUrl(`${shift.businessName}, ${workplace}`));
 
   const cancel = () => {
     setIsCancelOpen(false);
@@ -46,11 +44,7 @@ export const ShiftSecuredPage: FC<
         onBack={navigation.goBack}
         title={S.HEADER_TITLE}
         compactTitle
-        headerRight={
-          <Text style={[styles.headerRight, { color: colors.textSubtle }]}>
-            {S.HEADER_RIGHT}
-          </Text>
-        }
+        headerTag={S.HEADER_RIGHT}
         gap={16}
         isLoading={isLoading}
         testID="shift-secured-page"
@@ -68,7 +62,6 @@ export const ShiftSecuredPage: FC<
             />
             <SecondaryButton
               label={S.CANCEL_LINK}
-              tone="danger"
               onPress={() => setIsCancelOpen(true)}
               testID="shift-secured-cancel"
             />
@@ -76,29 +69,29 @@ export const ShiftSecuredPage: FC<
         }
       >
         <StatusHero
-          overline={S.confirmed(SECURED.checkInCode)}
+          overline={S.confirmed(secured.checkInCode)}
           title={S.HEADING}
           subtitle={S.subtitle(
-            SECURED.arriveMinutesEarly,
-            SECURED.startTime,
-            SECURED.contactName,
+            secured.arriveMinutesEarly,
+            splitTimeRange(shift.timeLabel).start,
+            secured.contactName,
           )}
         />
         <View>
           <DetailRow
-            compact
+            size="compact"
             title={shift.title}
             caption={S.business(shift.businessName, shift.isVerified)}
             onPress={openDetails}
           />
           <DetailRow
-            compact
-            title={SECURED.dateLabel}
+            size="compact"
+            title={secured.dateLabel ?? shift.dateLabel}
             caption={S.timeRange(shift.timeLabel, shift.durationHours)}
             onPress={openDetails}
           />
           <DetailRow
-            compact
+            size="compact"
             title={S.AGREED_RATE}
             caption={S.rate(
               formatRupees(shift.hourlyRate),
@@ -107,25 +100,26 @@ export const ShiftSecuredPage: FC<
             onPress={openDetails}
           />
           <DetailRow
-            compact
+            size="compact"
             title={S.WORKPLACE}
-            caption={S.workplace(SECURED.workplace, shift.distanceKm)}
+            caption={S.workplace(workplace, shift.distanceKm)}
             onPress={openMaps}
           />
         </View>
       </FormScreen>
       {isCancelOpen ? (
-        <CancelShiftSheet
+        <ReasonSheet
+          title={S.CANCEL_TITLE}
+          subtitle={S.cancelBody(secured.lateCancelWindow)}
+          reasonLabel={S.CANCEL_REASON}
           reasons={CANCEL_REASONS}
-          lateWindow={SECURED.lateCancelWindow}
+          confirmLabel={S.CANCEL_CONFIRM}
+          keepLabel={S.KEEP}
           onConfirm={cancel}
           onClose={() => setIsCancelOpen(false)}
+          testID="cancel-shift-sheet"
         />
       ) : null}
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  headerRight: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
-});

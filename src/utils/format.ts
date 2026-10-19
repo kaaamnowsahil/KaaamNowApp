@@ -31,3 +31,9 @@ export const formatClock = (totalSeconds: number) =>
 /** 299 → "04:59" */
 export const formatMinSec = (totalSeconds: number) =>
   `${pad2(Math.floor(totalSeconds / 60))}:${pad2(totalSeconds % 60)}`;
+
+/** "14:00–18:00" → { start: "14:00", end: "18:00" } */
+export const splitTimeRange = (timeLabel: string) => {
+  const [start = timeLabel, end = ''] = timeLabel.split(/\s*[–-]\s*/);
+  return { start, end };
+};

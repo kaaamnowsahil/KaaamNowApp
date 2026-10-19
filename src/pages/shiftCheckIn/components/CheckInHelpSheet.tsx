@@ -7,7 +7,7 @@ import CircleCheckIcon from '@/assets/icons/circle-check.svg';
 import CircleHelpIcon from '@/assets/icons/circle-help.svg';
 import ClockIcon from '@/assets/icons/clock.svg';
 import MessageCircleIcon from '@/assets/icons/message-circle.svg';
-import { DetailRow, InfoCallout } from '@/components/liveShift';
+import { DetailRow, InfoCallout } from '@/components/shiftFlow';
 import {
   BottomSheet,
   PrimaryButton,

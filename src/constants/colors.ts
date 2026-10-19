@@ -24,6 +24,8 @@ export type ThemeColors = {
   /** Log out label and icon (Profile 17:2). */
   danger: string;
   dangerSoft: string;
+  /** Dim layer behind bottom sheets. */
+  backdrop: string;
 };
 
 /** Light frames (Splash 1:10, Welcome 1:39, Verify 1:120, Edit profile 17:152) */
@@ -43,6 +45,7 @@ export const LIGHT_COLORS: ThemeColors = {
   primarySoft: '#F5F3FF',
   danger: '#DC2626',
   dangerSoft: '#FEE2E2',
+  backdrop: 'rgba(11, 16, 32, 0.45)',
 };
 
 /** Dark frames (Splash 1:23, Welcome 1:78, Verify 1:152, Edit profile 17:668) */
@@ -62,4 +65,12 @@ export const DARK_COLORS: ThemeColors = {
   primarySoft: '#261F48',
   danger: '#DC2626',
   dangerSoft: '#451B1F',
+  backdrop: 'rgba(0, 0, 0, 0.6)',
 };
+
+/** Logo artwork (Splash 1:10 / 1:23); identical in light and dark. */
+export const BRAND_COLORS = {
+  mark: '#8B5CF6',
+  tileTop: '#171F35',
+  tileBottom: '#0B1020',
+} as const;

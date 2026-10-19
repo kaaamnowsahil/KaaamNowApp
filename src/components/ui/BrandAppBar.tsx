@@ -2,14 +2,16 @@ import type { FC } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import BellIcon from '@/assets/figma/bell.svg';
-import ZapIcon from '@/assets/figma/zap.svg';
+import { BRAND } from '@/constants/brand';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
-const APP_NAME = 'KaamNow';
+import { BrandLogo } from './BrandLogo';
+
+const APP_NAME = BRAND.NAME;
 const NOTIFICATIONS = 'Notifications';
 
-/** Figma "App bar" contents (1:1466): zap, 22px bold wordmark, bell. */
+/** Figma "App bar" contents (1:1466): KaamNow logo, 22px bold wordmark, bell. */
 export const BrandAppBar: FC<{ onBellPress?: () => void; hasUnread?: boolean }> = ({
   onBellPress,
   hasUnread,
@@ -17,7 +19,7 @@ export const BrandAppBar: FC<{ onBellPress?: () => void; hasUnread?: boolean }> 
   const { colors } = useTheme();
   return (
     <>
-      <ZapIcon width={22} height={22} color={colors.primary} />
+      <BrandLogo size={30} />
       <Text style={[styles.name, { color: colors.text }]}>{APP_NAME}</Text>
       <Pressable
         accessibilityRole="button"

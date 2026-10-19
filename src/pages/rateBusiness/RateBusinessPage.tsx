@@ -1,6 +1,5 @@
-import { useEffect, useState, type FC } from 'react';
+import { useCallback, useState, type FC } from 'react';
 import {
-  BackHandler,
   Pressable,
   StyleSheet,
   Text,
@@ -20,6 +19,7 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { TabScreen } from '@/layout/TabScreen';
+import { useHardwareBack } from '@/shared/hooks/useHardwareBack';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
@@ -44,16 +44,11 @@ export const RateBusinessPage: FC<
   const [tags, setTags] = useState<string[]>([]);
   const [comment, setComment] = useState('');
 
-  useEffect(() => {
-    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerShifts });
-      return true;
-    });
-    return () => sub.remove();
-  }, [navigation]);
-
-  const done = () =>
-    navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerShifts });
+  const done = useCallback(
+    () => navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerShifts }),
+    [navigation],
+  );
+  useHardwareBack(done);
 
   const blocks = [
     <ScreenIntro

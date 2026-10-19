@@ -34,13 +34,15 @@ export const useWorkerShifts = () => {
   const isLoading = useMockLoading();
   const [bookings, setBookings] = useState(BOOKINGS);
 
-  const openBooking = (booking: Booking) =>
-    booking.status === 'confirmed' && booking.isToday
-      ? navigation.navigate(ROUTES.shiftSecured, { shift: booking.shift })
-      : navigation.navigate(ROUTES.shiftDetails, {
-          shift: booking.shift,
-          bookingStatus: booking.status,
-        });
+  const openBooking = ({ status, isToday, shift }: Booking) => {
+    if (status === 'selected') {
+      navigation.navigate(ROUTES.shiftSelected, { shift });
+    } else if (status === 'confirmed' && isToday) {
+      navigation.navigate(ROUTES.shiftSecured, { shift });
+    } else {
+      navigation.navigate(ROUTES.shiftDetails, { shift, bookingStatus: status });
+    }
+  };
 
   return {
     isLoading,

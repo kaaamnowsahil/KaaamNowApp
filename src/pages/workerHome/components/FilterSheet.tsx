@@ -63,7 +63,7 @@ export const FilterSheet: FC<{
           accessibilityRole="button"
           accessibilityLabel={S.CLOSE}
           onPress={onClose}
-          style={styles.backdrop}
+          style={[styles.backdrop, { backgroundColor: colors.backdrop }]}
         />
         <View
           style={[
@@ -158,7 +158,7 @@ export const FilterSheet: FC<{
 
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(11,16,32,0.45)' },
+  backdrop: StyleSheet.absoluteFill,
   sheet: {
     maxHeight: '88%',
     borderTopLeftRadius: 28,

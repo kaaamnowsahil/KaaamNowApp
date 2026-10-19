@@ -9,7 +9,6 @@ export const ROUTES = {
 
   // after login
   mainTabs: 'MainTabs',
-  shiftDetails: 'ShiftDetails',
   shiftList: 'ShiftList',
   notifications: 'Notifications',
   editProfile: 'EditProfile',
@@ -17,9 +16,11 @@ export const ROUTES = {
   payoutAccount: 'PayoutAccount',
   earningsHistory: 'EarningsHistory',
 
-  // live shift flow (worker)
-  liveRequest: 'LiveRequest',
-  liveDetails: 'LiveDetails',
+  // shift flow (worker): live and scheduled share request + details
+  shiftRequest: 'ShiftRequest',
+  shiftDetails: 'ShiftDetails',
+  applicationSubmitted: 'ApplicationSubmitted',
+  shiftSelected: 'ShiftSelected',
   shiftSecured: 'ShiftSecured',
   shiftTravel: 'ShiftTravel',
   shiftCheckIn: 'ShiftCheckIn',

@@ -6,7 +6,7 @@ import {
   InfoCard,
   MapPreview,
   StatTiles,
-} from '@/components/liveShift';
+} from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';

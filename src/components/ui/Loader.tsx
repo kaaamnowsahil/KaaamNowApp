@@ -7,22 +7,18 @@ import {
   Text,
   View,
 } from 'react-native';
-import type { SvgProps } from 'react-native-svg';
-
-import ZapIcon from '@/assets/figma/zap.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
+
+import { BrandLogo } from './BrandLogo';
 
 const LOADING = 'Loading…';
 
 /**
- * Brand loader: the KaamNow zap in a soft tile, with a spinning ring and a
- * gentle pulse. Fills its parent and centres itself.
+ * Brand loader: the KaamNow logo (same as Splash) pulsing inside a spinning
+ * ring. Fills its parent and centres itself.
  */
-export const Loader: FC<{ icon?: FC<SvgProps>; label?: string }> = ({
-  icon: Icon = ZapIcon,
-  label = LOADING,
-}) => {
+export const Loader: FC<{ label?: string }> = ({ label = LOADING }) => {
   const { colors } = useTheme();
   const [spin] = useState(() => new Animated.Value(0));
   const [pulse] = useState(() => new Animated.Value(0));
@@ -97,7 +93,6 @@ export const Loader: FC<{ icon?: FC<SvgProps>; label?: string }> = ({
           style={[
             styles.tile,
             {
-              backgroundColor: colors.primarySoft,
               transform: [
                 {
                   scale: pulse.interpolate({
@@ -109,7 +104,7 @@ export const Loader: FC<{ icon?: FC<SvgProps>; label?: string }> = ({
             },
           ]}
         >
-          <Icon width={24} height={24} color={colors.primary} />
+          <BrandLogo size={46} />
         </Animated.View>
       </View>
       <Text style={[styles.label, { color: colors.textSubtle }]}>{label}</Text>
@@ -126,24 +121,18 @@ const styles = StyleSheet.create({
     paddingBottom: 56,
   },
   badge: {
-    width: 68,
-    height: 68,
+    width: 72,
+    height: 72,
     alignItems: 'center',
     justifyContent: 'center',
   },
   ring: {
     position: 'absolute',
-    width: 68,
-    height: 68,
-    borderRadius: 34,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     borderWidth: 3,
   },
-  tile: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  tile: { alignItems: 'center', justifyContent: 'center' },
   label: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18.2 },
 });

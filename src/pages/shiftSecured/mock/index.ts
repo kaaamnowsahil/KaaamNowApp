@@ -1,1 +1,6 @@
-export { CANCEL_REASONS, SECURED } from './shiftSecuredMock';
+export {
+  CANCEL_REASONS,
+  DEFAULT_SECURED,
+  SECURED,
+  type SecuredInfo,
+} from './shiftSecuredMock';

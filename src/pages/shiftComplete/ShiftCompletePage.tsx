@@ -1,13 +1,10 @@
 import type { FC } from 'react';
-import { StyleSheet, Text } from 'react-native';
 
-import { StatTiles, StatusHero } from '@/components/liveShift';
+import { StatTiles, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
-import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
-import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
@@ -22,7 +19,6 @@ export const ShiftCompletePage: FC<
   AppScreenProps<typeof ROUTES.shiftComplete>
 > = ({ navigation, route }) => {
   const { shift } = route.params;
-  const { colors } = useTheme();
   const isLoading = useMockLoading();
 
   return (
@@ -30,11 +26,7 @@ export const ShiftCompletePage: FC<
       onBack={() => navigation.popToTop()}
       title={S.HEADER_TITLE}
       compactTitle
-      headerRight={
-        <Text style={[styles.headerRight, { color: colors.textSubtle }]}>
-          {S.HEADER_RIGHT}
-        </Text>
-      }
+      headerTag={S.HEADER_RIGHT}
       gap={16}
       isLoading={isLoading}
       testID="shift-complete-page"
@@ -74,7 +66,3 @@ export const ShiftCompletePage: FC<
     </FormScreen>
   );
 };
-
-const styles = StyleSheet.create({
-  headerRight: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
-});

@@ -11,7 +11,10 @@ import Svg, {
   Stop,
 } from 'react-native-svg';
 
-export const BRAND_PURPLE = '#8B5CF6';
+import { BRAND } from '@/constants/brand';
+import { BRAND_COLORS } from '@/constants/colors';
+
+export const BRAND_PURPLE = BRAND_COLORS.mark;
 
 /** Geometry of the "K" mark, in the mark's own coordinate space (see BrandLogo transform). */
 export const BRAND_PIECES = {
@@ -30,8 +33,8 @@ export const BrandTile: FC<{ gradientId: string }> = ({ gradientId }) => (
   <>
     <Defs>
       <LinearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-        <Stop offset="0" stopColor="#171F35" />
-        <Stop offset="1" stopColor="#0B1020" />
+        <Stop offset="0" stopColor={BRAND_COLORS.tileTop} />
+        <Stop offset="1" stopColor={BRAND_COLORS.tileBottom} />
       </LinearGradient>
     </Defs>
     <Rect width={64} height={64} rx={14} fill={`url(#${gradientId})`} />
@@ -44,7 +47,7 @@ export const BrandLogo: FC<{ size: number }> = ({ size }) => (
     width={size}
     height={size}
     viewBox="0 0 64 64"
-    accessibilityLabel="KaamNow logo"
+    accessibilityLabel={BRAND.LOGO_LABEL}
   >
     <BrandTile gradientId="brandTileStatic" />
     <G

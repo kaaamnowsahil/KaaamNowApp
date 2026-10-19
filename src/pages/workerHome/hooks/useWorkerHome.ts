@@ -90,9 +90,7 @@ export const useWorkerHome = () => {
     isLoading,
     worker: WORKER,
     openShift: (shift: Shift) =>
-      shift.status === 'live'
-        ? navigation.navigate(ROUTES.liveRequest, { shift })
-        : navigation.navigate(ROUTES.shiftDetails, { shift }),
+      navigation.navigate(ROUTES.shiftRequest, { shift }),
     openAllShifts: () => navigation.navigate(ROUTES.shiftList),
     openNotifications: () => navigation.navigate(ROUTES.notifications),
     locations: LOCATIONS,

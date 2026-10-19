@@ -7,10 +7,11 @@ import { EditProfilePage } from '@/pages/editProfile/EditProfilePage';
 import { LanguagePage } from '@/pages/language/LanguagePage';
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { PayoutAccountPage } from '@/pages/payoutAccount/PayoutAccountPage';
-import { ShiftDetailsPage } from '@/pages/shiftDetails/ShiftDetailsPage';
 import { ShiftListPage } from '@/pages/shiftList/ShiftListPage';
-import { LiveRequestPage } from '@/pages/liveRequest/LiveRequestPage';
-import { LiveDetailsPage } from '@/pages/liveDetails/LiveDetailsPage';
+import { ShiftRequestPage } from '@/pages/shiftRequest/ShiftRequestPage';
+import { ShiftDetailsPage } from '@/pages/shiftDetails/ShiftDetailsPage';
+import { ApplicationSubmittedPage } from '@/pages/applicationSubmitted/ApplicationSubmittedPage';
+import { ShiftSelectedPage } from '@/pages/shiftSelected/ShiftSelectedPage';
 import { ShiftSecuredPage } from '@/pages/shiftSecured/ShiftSecuredPage';
 import { ShiftTravelPage } from '@/pages/shiftTravel/ShiftTravelPage';
 import { ShiftCheckInPage } from '@/pages/shiftCheckIn/ShiftCheckInPage';
@@ -38,7 +39,6 @@ export const AfterLoginRoutes: FC = () => {
       }}
     >
       <Stack.Screen name={ROUTES.mainTabs} component={BottomTabRoutes} />
-      <Stack.Screen name={ROUTES.shiftDetails} component={ShiftDetailsPage} />
       <Stack.Screen name={ROUTES.shiftList} component={ShiftListPage} />
       <Stack.Screen
         name={ROUTES.notifications}
@@ -54,8 +54,13 @@ export const AfterLoginRoutes: FC = () => {
         name={ROUTES.earningsHistory}
         component={EarningsHistoryPage}
       />
-      <Stack.Screen name={ROUTES.liveRequest} component={LiveRequestPage} />
-      <Stack.Screen name={ROUTES.liveDetails} component={LiveDetailsPage} />
+      <Stack.Screen name={ROUTES.shiftRequest} component={ShiftRequestPage} />
+      <Stack.Screen name={ROUTES.shiftDetails} component={ShiftDetailsPage} />
+      <Stack.Screen
+        name={ROUTES.applicationSubmitted}
+        component={ApplicationSubmittedPage}
+      />
+      <Stack.Screen name={ROUTES.shiftSelected} component={ShiftSelectedPage} />
       <Stack.Screen name={ROUTES.shiftSecured} component={ShiftSecuredPage} />
       <Stack.Screen name={ROUTES.shiftTravel} component={ShiftTravelPage} />
       <Stack.Screen name={ROUTES.shiftCheckIn} component={ShiftCheckInPage} />

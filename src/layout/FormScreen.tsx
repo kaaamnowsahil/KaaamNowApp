@@ -30,6 +30,8 @@ type FormScreenProps = {
   compactTitle?: boolean;
   /** Right side of the app bar, e.g. a text action. */
   headerRight?: ReactNode;
+  /** Small muted label on the right of the app bar, e.g. "Worker". */
+  headerTag?: string;
   /** Space between content blocks; forms use 20. */
   gap?: number;
   /** Shows the brand loader instead of the content and actions. */
@@ -53,6 +55,7 @@ export const FormScreen: FC<FormScreenProps> = ({
   subtitle,
   compactTitle,
   headerRight,
+  headerTag,
   gap = 20,
   isLoading,
   asSheet,
@@ -109,6 +112,17 @@ export const FormScreen: FC<FormScreenProps> = ({
           ) : null}
           {headerRight ? (
             <View style={styles.headerRight}>{headerRight}</View>
+          ) : headerTag ? (
+            <Text
+              numberOfLines={1}
+              style={[
+                styles.headerRight,
+                styles.headerTag,
+                { color: colors.textSubtle },
+              ]}
+            >
+              {headerTag}
+            </Text>
           ) : null}
         </View>
         <View
@@ -188,6 +202,7 @@ const styles = StyleSheet.create({
   titleSmall: { fontFamily: FONTS.semiBold, fontSize: 14, lineHeight: 19.6 },
   subtitle: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
   headerRight: { marginLeft: 'auto' },
+  headerTag: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
   content: {
     paddingTop: 16,
     paddingBottom: 24,

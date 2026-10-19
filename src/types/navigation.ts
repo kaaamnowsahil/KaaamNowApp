@@ -28,16 +28,17 @@ export type AuthStackParamList = CommonStackParamList & {
 
 export type AppStackParamList = CommonStackParamList & {
   [ROUTES.mainTabs]: NavigatorScreenParams<TabParamList> | undefined;
-  /** bookingStatus is set when opened from My shifts. */
-  [ROUTES.shiftDetails]: { shift: Shift; bookingStatus?: BookingStatus };
   [ROUTES.shiftList]: undefined;
   [ROUTES.notifications]: undefined;
   [ROUTES.editProfile]: undefined;
   [ROUTES.language]: undefined;
   [ROUTES.payoutAccount]: undefined;
   [ROUTES.earningsHistory]: undefined;
-  [ROUTES.liveRequest]: { shift: Shift };
-  [ROUTES.liveDetails]: { shift: Shift };
+  [ROUTES.shiftRequest]: { shift: Shift };
+  /** bookingStatus is set when opened from My shifts or an offer. */
+  [ROUTES.shiftDetails]: { shift: Shift; bookingStatus?: BookingStatus };
+  [ROUTES.applicationSubmitted]: { shift: Shift };
+  [ROUTES.shiftSelected]: { shift: Shift };
   [ROUTES.shiftSecured]: { shift: Shift };
   [ROUTES.shiftTravel]: { shift: Shift };
   [ROUTES.shiftCheckIn]: { shift: Shift };

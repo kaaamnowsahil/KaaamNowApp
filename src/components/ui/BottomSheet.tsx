@@ -24,7 +24,7 @@ export const BottomSheet: FC<{
       <View style={styles.root}>
         <Pressable
           accessibilityLabel={closeLabel}
-          style={styles.backdrop}
+          style={[styles.backdrop, { backgroundColor: colors.backdrop }]}
           onPress={onClose}
         />
         <View
@@ -60,10 +60,7 @@ export const BottomSheet: FC<{
 
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(11, 16, 32, 0.45)',
-  },
+  backdrop: StyleSheet.absoluteFill,
   sheet: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

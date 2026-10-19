@@ -1,7 +1,7 @@
 import { useState, type FC } from 'react';
 import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { DetailRow, FlowHeading, InfoCallout } from '@/components/liveShift';
+import { DetailRow, FlowHeading, InfoCallout } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
@@ -51,11 +51,7 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
       onBack={navigation.goBack}
       title={S.HEADER_TITLE}
       compactTitle
-      headerRight={
-        <Text style={[styles.headerRight, { color: colors.textSubtle }]}>
-          {S.HEADER_RIGHT}
-        </Text>
-      }
+      headerTag={S.HEADER_RIGHT}
       asSheet
       gap={14}
       isLoading={isLoading}
@@ -100,7 +96,7 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
         {rows.map((row, i) => (
           <DetailRow
             key={row.title}
-            compact
+            size="compact"
             title={row.title}
             caption={row.caption}
             onPress={() => explain(row.title)}
@@ -113,7 +109,6 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
 };
 
 const styles = StyleSheet.create({
-  headerRight: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
   field: { gap: 6 },
   label: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
   input: {

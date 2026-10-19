@@ -2,8 +2,6 @@ export const CHECK_IN = {
   /** Today's workplace code the shift lead reads out. */
   code: '4821',
   withinMeters: 120,
-  startTime: '14:00',
-  endTime: '18:00',
 };
 
 export const CHECK_IN_HELP = {

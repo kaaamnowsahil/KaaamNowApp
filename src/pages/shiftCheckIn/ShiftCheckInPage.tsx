@@ -6,7 +6,7 @@ import {
   InfoCallout,
   MapPreview,
   StatTiles,
-} from '@/components/liveShift';
+} from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
@@ -14,6 +14,7 @@ import { FormScreen } from '@/layout/FormScreen';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
+import { splitTimeRange } from '@/utils/format';
 
 import { CheckInHelpSheet } from './components';
 import { SHIFT_CHECK_IN_STRINGS as S } from './constants';
@@ -28,6 +29,7 @@ export const ShiftCheckInPage: FC<
   AppScreenProps<typeof ROUTES.shiftCheckIn>
 > = ({ navigation, route }) => {
   const { shift } = route.params;
+  const times = splitTimeRange(shift.timeLabel);
   const { colors } = useTheme();
   const isLoading = useMockLoading();
   const [code, setCode] = useState('');
@@ -44,11 +46,7 @@ export const ShiftCheckInPage: FC<
       onBack={navigation.goBack}
       title={S.HEADER_TITLE}
       compactTitle
-      headerRight={
-        <Text style={[styles.headerRight, { color: colors.textSubtle }]}>
-          {S.HEADER_RIGHT}
-        </Text>
-      }
+      headerTag={S.HEADER_RIGHT}
       gap={12}
       isLoading={isLoading}
       testID="shift-check-in-page"
@@ -76,8 +74,8 @@ export const ShiftCheckInPage: FC<
       <MapPreview variant="pin" label={S.mapLabel(shift.distanceKm)} />
       <StatTiles
         items={[
-          { value: CHECK_IN.startTime, label: S.SHIFT_START },
-          { value: CHECK_IN.endTime, label: S.EXPECTED_END },
+          { value: times.start, label: S.SHIFT_START },
+          { value: times.end, label: S.EXPECTED_END },
         ]}
       />
       <View style={styles.field}>
@@ -129,7 +127,6 @@ export const ShiftCheckInPage: FC<
 };
 
 const styles = StyleSheet.create({
-  headerRight: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
   field: { gap: 6, marginTop: 4 },
   label: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 16.8 },
   input: {
