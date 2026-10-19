@@ -1,0 +1,6 @@
+export {
+  OTP_LENGTH,
+  OTP_RESEND_COOLDOWN_SECONDS,
+  OTP_TTL_SECONDS,
+  VERIFY_PHONE_STRINGS,
+} from './verifyPhoneStrings';

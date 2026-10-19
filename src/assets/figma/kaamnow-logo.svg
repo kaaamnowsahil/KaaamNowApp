@@ -1,0 +1,22 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="KaamNow logo" clip-path="url(#clip0_0_4)">
+<path id="Vector" d="M93.75 0H26.25C11.7525 0 0 11.7525 0 26.25V93.75C0 108.247 11.7525 120 26.25 120H93.75C108.247 120 120 108.247 120 93.75V26.25C120 11.7525 108.247 0 93.75 0Z" fill="url(#paint0_linear_0_4)"/>
+<g id="Group">
+<path id="Vector_2" d="M42.0375 23.4375H32.4375C28.3001 23.4375 24.3322 25.0811 21.4066 28.0066C18.4811 30.9322 16.8375 34.9001 16.8375 39.0375V91.8375C16.8375 95.1792 18.165 98.3841 20.528 100.747C22.8909 103.11 26.0958 104.438 29.4375 104.438C32.7792 104.438 35.9841 103.11 38.347 100.747C40.71 98.3841 42.0375 95.1792 42.0375 91.8375V23.4375Z" fill="#8B5CF6"/>
+<path id="Vector_3" d="M74.4375 39.3375C81.0649 39.3375 86.4375 33.9649 86.4375 27.3375C86.4375 20.7101 81.0649 15.3375 74.4375 15.3375C67.8101 15.3375 62.4375 20.7101 62.4375 27.3375C62.4375 33.9649 67.8101 39.3375 74.4375 39.3375Z" fill="#8B5CF6"/>
+<path id="Vector_4" d="M57.0375 62.1375L93.0375 42.9375" stroke-width="9.28" stroke-linecap="round" stroke="#8B5CF6"/>
+<path id="Vector_5" d="M59.4375 70.5375L91.8375 93.3375" stroke-width="12.16" stroke-linecap="round" stroke="#8B5CF6"/>
+<path id="Vector_6" d="M57.0375 46.5375L46.8375 56.7375C44.0375 62.7375 44.0375 68.9375 46.8375 75.3375L55.8375 85.5375L62.4375 78.9375V53.4375L57.0375 46.5375Z" fill="#8B5CF6" stroke-width="0.64" stroke-linejoin="round" stroke="#8B5CF6"/>
+<path id="Vector_7" d="M87.6375 53.7375L93.9375 60.9375L98.4375 50.7375L87.6375 53.7375Z" fill="#8B5CF6" stroke-width="0.64" stroke-linejoin="round" stroke="#8B5CF6"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_4" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+<stop stop-color="#171F35"/>
+<stop offset="1" stop-color="#0B1020"/>
+</linearGradient>
+<clipPath id="clip0_0_4">
+<rect width="120" height="120" fill="white"/>
+</clipPath>
+</defs>
+</svg>
