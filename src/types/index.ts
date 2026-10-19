@@ -1,1 +1,9 @@
-export type { RootScreenProps, RootStackParamList } from './navigation';
+export type {
+  AppScreenProps,
+  AppStackParamList,
+  AuthScreenProps,
+  AuthStackParamList,
+  CommonStackParamList,
+  TabParamList,
+  TabScreenProps,
+} from './navigation';

@@ -1,6 +1,15 @@
 import type { FC, ReactNode } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 import { BackButton } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -18,7 +27,12 @@ type FormScreenProps = {
  * "Screen content" (16/24 vertical, 20 horizontal, 20 gap) and a top-bordered
  * "Screen actions" bar (12 top, 24 bottom + home-indicator inset).
  */
-export const FormScreen: FC<FormScreenProps> = ({ children, actions, onBack, testID }) => {
+export const FormScreen: FC<FormScreenProps> = ({
+  children,
+  actions,
+  onBack,
+  testID,
+}) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -32,8 +46,13 @@ export const FormScreen: FC<FormScreenProps> = ({ children, actions, onBack, tes
         style={styles.root}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.appBar}>{onBack ? <BackButton onPress={onBack} /> : null}</View>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <View style={styles.appBar}>
+          {onBack ? <BackButton onPress={onBack} /> : null}
+        </View>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
           {children}
         </ScrollView>
         <View
@@ -55,7 +74,22 @@ export const FormScreen: FC<FormScreenProps> = ({ children, actions, onBack, tes
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  appBar: { height: 56, paddingHorizontal: 20, flexDirection: 'row', alignItems: 'center' },
-  content: { paddingTop: 16, paddingBottom: 24, paddingHorizontal: 20, gap: 20 },
-  actions: { borderTopWidth: 1, paddingTop: 12, paddingHorizontal: 20, gap: 10 },
+  appBar: {
+    height: 56,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  content: {
+    paddingTop: 16,
+    paddingBottom: 24,
+    paddingHorizontal: 20,
+    gap: 20,
+  },
+  actions: {
+    borderTopWidth: 1,
+    paddingTop: 12,
+    paddingHorizontal: 20,
+    gap: 10,
+  },
 });

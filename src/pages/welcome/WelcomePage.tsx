@@ -2,10 +2,16 @@ import type { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import KaamNowLogo from '@/assets/figma/kaamnow-logo.svg';
-import { BodyNote, PrimaryButton, ScreenIntro, SecondaryButton, TextField } from '@/components/ui';
+import {
+  BodyNote,
+  PrimaryButton,
+  ScreenIntro,
+  SecondaryButton,
+  TextField,
+} from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import type { RootScreenProps } from '@/types';
+import type { AuthScreenProps } from '@/types';
 
 import { WELCOME_STRINGS } from './constants';
 import { useWelcome } from './hooks/useWelcome';
@@ -15,17 +21,10 @@ import { useWelcome } from './hooks/useWelcome';
  * - state: hooks/useWelcome.ts (phone input + validation)
  * - constants: constants/welcomeStrings.ts
  */
-export const WelcomePage: FC<RootScreenProps<typeof ROUTES.welcome>> = ({ navigation }) => {
-  const { phone, setPhone, e164, showInvalid, flagInvalid } = useWelcome();
-
-  const startVerification = (intent: 'signIn' | 'signUp') => {
-    if (e164) {
-      navigation.navigate(ROUTES.verifyPhone, { phone: e164, intent });
-    } else {
-      flagInvalid();
-    }
-  };
-
+export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
+  navigation,
+}) => {
+  const { phone, setPhone, e164 } = useWelcome();
   return (
     <FormScreen
       testID="welcome-page"
@@ -34,12 +33,18 @@ export const WelcomePage: FC<RootScreenProps<typeof ROUTES.welcome>> = ({ naviga
           <PrimaryButton
             label={WELCOME_STRINGS.SEND_CODE}
             disabled={!e164}
-            onPress={() => startVerification('signIn')}
+            onPress={() =>
+              e164 &&
+              navigation.navigate(ROUTES.verifyPhone, {
+                phone: e164,
+                intent: 'signIn',
+              })
+            }
             testID="welcome-send-code"
           />
           <SecondaryButton
             label={WELCOME_STRINGS.CREATE_ACCOUNT}
-            onPress={() => startVerification('signUp')}
+            onPress={() => navigation.navigate(ROUTES.roleSelect)}
             testID="welcome-create-account"
           />
         </>
@@ -48,10 +53,13 @@ export const WelcomePage: FC<RootScreenProps<typeof ROUTES.welcome>> = ({ naviga
       <View style={styles.logoRow}>
         <KaamNowLogo width={96} height={96} />
       </View>
-      <ScreenIntro title={WELCOME_STRINGS.TITLE} subtitle={WELCOME_STRINGS.SUBTITLE} />
+      <ScreenIntro
+        title={WELCOME_STRINGS.TITLE}
+        subtitle={WELCOME_STRINGS.SUBTITLE}
+      />
       <TextField
         label={WELCOME_STRINGS.PHONE_LABEL}
-        helper={showInvalid ? WELCOME_STRINGS.PHONE_INVALID : WELCOME_STRINGS.PHONE_HELPER}
+        helper={WELCOME_STRINGS.PHONE_HELPER}
         prefix={WELCOME_STRINGS.PHONE_PREFIX}
         placeholder={WELCOME_STRINGS.PHONE_PLACEHOLDER}
         value={phone}

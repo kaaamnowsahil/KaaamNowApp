@@ -1,31 +1,37 @@
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import type { FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { StatusBar } from 'react-native';
 
-import { ROUTES } from '@/constants/routes';
 import { SplashPage } from '@/pages/splash/SplashPage';
-import { VerifyPhonePage } from '@/pages/verifyPhone/VerifyPhonePage';
-import { WelcomePage } from '@/pages/welcome/WelcomePage';
+import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
-import type { RootStackParamList } from '@/types';
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+import { AfterLoginRoutes } from './afterLogin';
+import { BeforeLoginRoutes } from './beforeLogin';
 
+const SPLASH_DURATION_MS = 1500;
+
+/** Root: splash, then the login stack or the app stack depending on isAuth. */
 export const AppRoutes: FC = () => {
-  const { isDark, colors } = useTheme();
+  const { isDark } = useTheme();
+  const isAuth = useAuthStore(s => s.isAuth);
+  const [isBooting, setIsBooting] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsBooting(false), SPLASH_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}
-        >
-          <Stack.Screen name={ROUTES.splash} component={SplashPage} />
-          <Stack.Screen name={ROUTES.welcome} component={WelcomePage} />
-          <Stack.Screen name={ROUTES.verifyPhone} component={VerifyPhonePage} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      {isBooting ? (
+        <SplashPage />
+      ) : (
+        <NavigationContainer>
+          {isAuth ? <AfterLoginRoutes /> : <BeforeLoginRoutes />}
+        </NavigationContainer>
+      )}
     </>
   );
 };

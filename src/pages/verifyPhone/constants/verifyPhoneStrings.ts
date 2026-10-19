@@ -1,7 +1,8 @@
 /** UI strings for the Verify phone module (Figma 1:120 / 1:152). */
 export const VERIFY_PHONE_STRINGS = {
   TITLE: 'Verify your phone',
-  subtitle: (maskedPhone: string) => `Enter the 6-digit code sent to ${maskedPhone}.`,
+  subtitle: (maskedPhone: string) =>
+    `Enter the 6-digit code sent to ${maskedPhone}.`,
   CODE_LABEL: 'Verification code',
   codeExpiresIn: (time: string) => `Code expires in ${time}.`,
   CODE_EXPIRED: 'Code expired. Request a new one.',

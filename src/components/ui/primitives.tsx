@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import ChevronLeft from '@/assets/figma/chevron-left.svg';
+import ChevronRight from '@/assets/figma/chevron-right.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -37,24 +38,86 @@ export const BackButton: FC<{ onPress: () => void; label?: string }> = ({
 };
 
 /** Figma "Screen introduction" (1:61): 25px bold title + 15px muted subtitle. */
-export const ScreenIntro: FC<{ title: string; subtitle?: string }> = ({ title, subtitle }) => {
+export const ScreenIntro: FC<{ title: string; subtitle?: string }> = ({
+  title,
+  subtitle,
+}) => {
   const { colors } = useTheme();
   return (
     <View style={styles.intro}>
-      <Text accessibilityRole="header" style={[styles.introTitle, { color: colors.text }]}>
+      <Text
+        accessibilityRole="header"
+        style={[styles.introTitle, { color: colors.text }]}
+      >
         {title}
       </Text>
       {subtitle ? (
-        <Text style={[styles.introSubtitle, { color: colors.textMuted }]}>{subtitle}</Text>
+        <Text style={[styles.introSubtitle, { color: colors.textMuted }]}>
+          {subtitle}
+        </Text>
       ) : null}
     </View>
+  );
+};
+
+/** Figma "Information row" (1:206): title + caption, chevron, bottom divider, min 66px. */
+export const InfoRow: FC<{
+  title: string;
+  caption?: string;
+  onPress?: () => void;
+  selected?: boolean;
+  testID?: string;
+}> = ({ title, caption, onPress, selected, testID }) => {
+  const { colors } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole={selected === undefined ? 'button' : 'radio'}
+      accessibilityState={selected === undefined ? undefined : { selected }}
+      onPress={onPress}
+      testID={testID}
+      style={({ pressed }) => [
+        styles.infoRow,
+        { borderBottomColor: colors.border },
+        pressed && styles.dimmed,
+      ]}
+    >
+      <View style={styles.infoText}>
+        <View style={styles.infoTitleRow}>
+          {selected === undefined ? null : (
+            <View
+              style={[
+                styles.radio,
+                { borderColor: selected ? colors.primary : colors.text },
+              ]}
+            >
+              {selected ? (
+                <View
+                  style={[styles.radioDot, { backgroundColor: colors.primary }]}
+                />
+              ) : null}
+            </View>
+          )}
+          <Text style={[styles.infoTitle, { color: colors.text }]}>
+            {title}
+          </Text>
+        </View>
+        {caption ? (
+          <Text style={[styles.infoCaption, { color: colors.textSubtle }]}>
+            {caption}
+          </Text>
+        ) : null}
+      </View>
+      <ChevronRight width={18} height={18} color={colors.textSubtle} />
+    </Pressable>
   );
 };
 
 /** Figma 13px muted paragraph used under forms (1:70, 1:144). */
 export const BodyNote: FC<{ children: ReactNode }> = ({ children }) => {
   const { colors } = useTheme();
-  return <Text style={[styles.note, { color: colors.textMuted }]}>{children}</Text>;
+  return (
+    <Text style={[styles.note, { color: colors.textMuted }]}>{children}</Text>
+  );
 };
 
 type ButtonProps = {
@@ -65,7 +128,12 @@ type ButtonProps = {
 };
 
 /** Figma "Primary action" (1:72): 52px, radius 12, filled primary. */
-export const PrimaryButton: FC<ButtonProps> = ({ label, onPress, disabled, testID }) => {
+export const PrimaryButton: FC<ButtonProps> = ({
+  label,
+  onPress,
+  disabled,
+  testID,
+}) => {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -80,13 +148,20 @@ export const PrimaryButton: FC<ButtonProps> = ({ label, onPress, disabled, testI
         (pressed || disabled) && styles.dimmed,
       ]}
     >
-      <Text style={[styles.buttonLabel, { color: colors.onPrimary }]}>{label}</Text>
+      <Text style={[styles.buttonLabel, { color: colors.onPrimary }]}>
+        {label}
+      </Text>
     </Pressable>
   );
 };
 
 /** Figma "Secondary action" (1:74): 52px, radius 12, outlined. */
-export const SecondaryButton: FC<ButtonProps> = ({ label, onPress, disabled, testID }) => {
+export const SecondaryButton: FC<ButtonProps> = ({
+  label,
+  onPress,
+  disabled,
+  testID,
+}) => {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -124,22 +199,38 @@ export const TextField: FC<TextFieldProps> = ({
   const { colors } = useTheme();
   return (
     <View style={styles.field}>
-      <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>{label}</Text>
+      <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>
+        {label}
+      </Text>
       <View
-        style={[styles.inputBox, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        style={[
+          styles.inputBox,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
       >
         {prefix ? (
-          <Text style={[styles.inputText, styles.prefix, { color: colors.text }]}>{prefix}</Text>
+          <Text
+            style={[styles.inputText, styles.prefix, { color: colors.text }]}
+          >
+            {prefix}
+          </Text>
         ) : null}
         <TextInput
           accessibilityLabel={label}
           placeholderTextColor={colors.textSubtle}
-          style={[styles.inputText, styles.input, { color: colors.text }, style]}
+          style={[
+            styles.inputText,
+            styles.input,
+            { color: colors.text },
+            style,
+          ]}
           {...inputProps}
         />
       </View>
       {helper ? (
-        <Text style={[styles.helper, { color: colors.textSubtle }]}>{helper}</Text>
+        <Text style={[styles.helper, { color: colors.textSubtle }]}>
+          {helper}
+        </Text>
       ) : null}
     </View>
   );
@@ -158,6 +249,28 @@ const styles = StyleSheet.create({
   introTitle: { fontFamily: FONTS.bold, fontSize: 25, lineHeight: 29.5 },
   introSubtitle: { fontFamily: FONTS.regular, fontSize: 15, lineHeight: 21 },
   note: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18.2 },
+  infoRow: {
+    minHeight: 66,
+    paddingVertical: 12,
+    gap: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+  },
+  infoText: { flex: 1 },
+  infoTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  // Fixed-size circle replaces Figma's "○" glyph so selection never shifts the text.
+  radio: {
+    width: 13,
+    height: 13,
+    borderRadius: 6.5,
+    borderWidth: 1.2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioDot: { width: 7, height: 7, borderRadius: 3.5 },
+  infoTitle: { fontFamily: FONTS.regular, fontSize: 15, lineHeight: 22.5 },
+  infoCaption: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
   button: {
     height: 52,
     borderRadius: 12,

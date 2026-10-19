@@ -1,11 +1,17 @@
 import type { FC } from 'react';
 import { StyleSheet, Text } from 'react-native';
 
-import { BodyNote, PrimaryButton, ScreenIntro, SecondaryButton, TextField } from '@/components/ui';
+import {
+  BodyNote,
+  PrimaryButton,
+  ScreenIntro,
+  SecondaryButton,
+  TextField,
+} from '@/components/ui';
 import type { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { useTheme } from '@/theme/ThemeProvider';
-import type { RootScreenProps } from '@/types';
+import type { AuthScreenProps } from '@/types';
 import { formatMmSs, maskIndianPhone } from '@/utils/format';
 
 import { OTP_LENGTH, VERIFY_PHONE_STRINGS } from './constants';
@@ -16,12 +22,12 @@ import { useVerifyPhone } from './hooks/useVerifyPhone';
  * - state: hooks/useVerifyPhone.ts (code input, expiry + resend countdowns)
  * - constants: constants/verifyPhoneStrings.ts
  */
-export const VerifyPhonePage: FC<RootScreenProps<typeof ROUTES.verifyPhone>> = ({
-  navigation,
-  route,
-}) => {
+export const VerifyPhonePage: FC<
+  AuthScreenProps<typeof ROUTES.verifyPhone>
+> = ({ navigation, route }) => {
   const { colors } = useTheme();
-  const { code, setCode, expiresIn, resendIn, onResend, canSubmit } = useVerifyPhone();
+  const { code, setCode, expiresIn, resendIn, onResend, onVerify, canSubmit } =
+    useVerifyPhone(route.params.phone);
 
   return (
     <FormScreen
@@ -32,6 +38,7 @@ export const VerifyPhonePage: FC<RootScreenProps<typeof ROUTES.verifyPhone>> = (
           <PrimaryButton
             label={VERIFY_PHONE_STRINGS.VERIFY}
             disabled={!canSubmit}
+            onPress={onVerify}
             testID="verify-submit"
           />
           <SecondaryButton
@@ -44,7 +51,9 @@ export const VerifyPhonePage: FC<RootScreenProps<typeof ROUTES.verifyPhone>> = (
     >
       <ScreenIntro
         title={VERIFY_PHONE_STRINGS.TITLE}
-        subtitle={VERIFY_PHONE_STRINGS.subtitle(maskIndianPhone(route.params.phone))}
+        subtitle={VERIFY_PHONE_STRINGS.subtitle(
+          maskIndianPhone(route.params.phone),
+        )}
       />
       <TextField
         label={VERIFY_PHONE_STRINGS.CODE_LABEL}

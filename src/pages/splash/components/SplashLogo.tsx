@@ -15,6 +15,11 @@ export const SplashLogo: FC = () => (
 );
 
 const styles = StyleSheet.create({
-  slot: { width: 120, height: 120, alignItems: 'center', justifyContent: 'center' },
+  slot: {
+    width: 120,
+    height: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   ring: { position: 'absolute', width: 300, height: 300, top: -90, left: -90 },
 });
