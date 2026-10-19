@@ -9,10 +9,29 @@ export const ROUTES = {
 
   // after login
   mainTabs: 'MainTabs',
+  shiftDetails: 'ShiftDetails',
+  shiftList: 'ShiftList',
+  notifications: 'Notifications',
+  editProfile: 'EditProfile',
+  language: 'Language',
+  payoutAccount: 'PayoutAccount',
+  earningsHistory: 'EarningsHistory',
+
+  // live shift flow (worker)
+  liveRequest: 'LiveRequest',
+  liveDetails: 'LiveDetails',
+  shiftSecured: 'ShiftSecured',
+  shiftTravel: 'ShiftTravel',
+  shiftCheckIn: 'ShiftCheckIn',
+  activeShift: 'ActiveShift',
+  finishShift: 'FinishShift',
+  shiftComplete: 'ShiftComplete',
+  rateBusiness: 'RateBusiness',
 
   // bottom tabs — worker
   workerHome: 'WorkerHome',
   workerShifts: 'WorkerShifts',
+  workerEarnings: 'WorkerEarnings',
   workerProfile: 'WorkerProfile',
 
   // bottom tabs — business

@@ -23,7 +23,7 @@ import { useWorkerSignup } from './hooks/useWorkerSignup';
  * Worker sign-up orchestrator. No dedicated Figma frame; built from the
  * Edit profile frame (17:152 / 17:668) fields and chips.
  * - state + validation: hooks/useWorkerSignup.ts, schema.ts
- * - work types: backend list with local fallback (constants/options.ts)
+ * - work types + current address: mock/workerSignupMock.ts
  */
 export const WorkerSignupPage: FC<
   AuthScreenProps<typeof ROUTES.workerSignup>
@@ -40,6 +40,7 @@ export const WorkerSignupPage: FC<
         <PrimaryButton
           label={S.CONTINUE}
           onPress={f.submit}
+          disabled={!f.canSubmit}
           testID="worker-continue"
         />
       }

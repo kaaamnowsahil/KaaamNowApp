@@ -1,1 +1,2 @@
-export { SplashLogo } from './SplashLogo';
+export { AnimatedLogo } from './AnimatedLogo';
+export { LoadingDots } from './LoadingDots';

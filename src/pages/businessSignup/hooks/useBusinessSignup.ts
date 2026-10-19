@@ -1,8 +1,5 @@
 import { useState } from 'react';
 
-import { ENDPOINTS } from '@/constants/endpoints';
-import { FALLBACK_BUSINESS_TYPES } from '@/constants/options';
-import { useOptionList } from '@/services/catalog/useOptionList';
 import {
   type GeoPoint,
   useOnboardingStore,
@@ -11,6 +8,7 @@ import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
 import { toE164India, toLocalDigits } from '@/utils/phone';
 import { fieldErrors } from '@/utils/validation';
 
+import { BUSINESS_TYPES, CURRENT_ADDRESS } from '../mock';
 import { businessSignupSchema, type BusinessSignupForm } from '../schema';
 
 const EMPTY: BusinessSignupForm = {
@@ -27,11 +25,6 @@ export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
   const [form, setForm] = useState<BusinessSignupForm>(EMPTY);
   const [location, setLocation] = useState<GeoPoint | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const businessTypes = useOptionList(
-    ENDPOINTS.businessTypes,
-    FALLBACK_BUSINESS_TYPES,
-  );
-
   const update = <K extends keyof BusinessSignupForm>(
     key: K,
     value: BusinessSignupForm[K],
@@ -40,7 +33,7 @@ export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
     setErrors(prev => ({ ...prev, [key]: '' }));
   };
 
-  const currentAddress = useCurrentAddress(picked => {
+  const currentAddress = useCurrentAddress(CURRENT_ADDRESS, picked => {
     update('address', picked.address);
     setLocation({ lat: picked.lat, lng: picked.lng });
   });
@@ -67,6 +60,7 @@ export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
   return {
     form,
     errors,
+    canSubmit: businessSignupSchema.safeParse(form).success,
     setBusinessName: (v: string) => update('businessName', v),
     setContactName: (v: string) => update('contactName', v),
     setPhone: (v: string) => update('phone', toLocalDigits(v)),
@@ -76,7 +70,7 @@ export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
       setLocation(undefined);
     },
     selectBusinessType: (id: string) => update('businessType', id),
-    businessTypeOptions: businessTypes.options,
+    businessTypeOptions: BUSINESS_TYPES,
     ...currentAddress,
     submit,
   };

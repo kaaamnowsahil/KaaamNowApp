@@ -1,8 +1,5 @@
 import { useState } from 'react';
 
-import { ENDPOINTS } from '@/constants/endpoints';
-import { FALLBACK_WORK_TYPES } from '@/constants/options';
-import { useOptionList } from '@/services/catalog/useOptionList';
 import {
   type GeoPoint,
   useOnboardingStore,
@@ -11,6 +8,7 @@ import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
 import { toE164India, toLocalDigits } from '@/utils/phone';
 import { fieldErrors } from '@/utils/validation';
 
+import { CURRENT_ADDRESS, WORK_TYPES } from '../mock';
 import { workerSignupSchema, type WorkerSignupForm } from '../schema';
 
 const EMPTY: WorkerSignupForm = {
@@ -27,8 +25,6 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
   const [form, setForm] = useState<WorkerSignupForm>(EMPTY);
   const [location, setLocation] = useState<GeoPoint | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const workTypes = useOptionList(ENDPOINTS.workTypes, FALLBACK_WORK_TYPES);
-
   const update = <K extends keyof WorkerSignupForm>(
     key: K,
     value: WorkerSignupForm[K],
@@ -37,7 +33,7 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
     setErrors(prev => ({ ...prev, [key]: '' }));
   };
 
-  const currentAddress = useCurrentAddress(picked => {
+  const currentAddress = useCurrentAddress(CURRENT_ADDRESS, picked => {
     update('address', picked.address);
     setLocation({ lat: picked.lat, lng: picked.lng });
   });
@@ -64,6 +60,7 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
   return {
     form,
     errors,
+    canSubmit: workerSignupSchema.safeParse(form).success,
     setFullName: (v: string) => update('fullName', v),
     setPhone: (v: string) => update('phone', toLocalDigits(v)),
     setEmail: (v: string) => update('email', v.trim()),
@@ -79,7 +76,7 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
           ? form.workTypes.filter(w => w !== id)
           : [...form.workTypes, id],
       ),
-    workTypeOptions: workTypes.options,
+    workTypeOptions: WORK_TYPES,
     ...currentAddress,
     submit,
   };

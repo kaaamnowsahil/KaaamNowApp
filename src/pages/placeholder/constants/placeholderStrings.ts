@@ -5,9 +5,6 @@ export const PLACEHOLDER_SCREENS: Record<
   string,
   { title: string; figma: string }
 > = {
-  [ROUTES.workerHome]: { title: 'Home', figma: '1:1456 / 1:1556' },
-  [ROUTES.workerShifts]: { title: 'My shifts', figma: '38:635 / 38:710' },
-  [ROUTES.workerProfile]: { title: 'Profile', figma: '17:2 / 17:518' },
   [ROUTES.businessLive]: { title: 'Live now', figma: '1:2913 / 1:2991' },
   [ROUTES.businessShifts]: { title: 'Shifts', figma: '38:491 / 38:563' },
   [ROUTES.businessApplicants]: {

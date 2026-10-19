@@ -1,7 +1,15 @@
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import type {
+  NavigationProp,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
+
 import type { ROUTES } from '@/constants/routes';
+
+import type { BookingStatus } from './booking';
+import type { Shift } from './shift';
 
 /** Screens reachable both before and after login. */
 export type CommonStackParamList = {
@@ -19,12 +27,33 @@ export type AuthStackParamList = CommonStackParamList & {
 };
 
 export type AppStackParamList = CommonStackParamList & {
-  [ROUTES.mainTabs]: undefined;
+  [ROUTES.mainTabs]: NavigatorScreenParams<TabParamList> | undefined;
+  /** bookingStatus is set when opened from My shifts. */
+  [ROUTES.shiftDetails]: { shift: Shift; bookingStatus?: BookingStatus };
+  [ROUTES.shiftList]: undefined;
+  [ROUTES.notifications]: undefined;
+  [ROUTES.editProfile]: undefined;
+  [ROUTES.language]: undefined;
+  [ROUTES.payoutAccount]: undefined;
+  [ROUTES.earningsHistory]: undefined;
+  [ROUTES.liveRequest]: { shift: Shift };
+  [ROUTES.liveDetails]: { shift: Shift };
+  [ROUTES.shiftSecured]: { shift: Shift };
+  [ROUTES.shiftTravel]: { shift: Shift };
+  [ROUTES.shiftCheckIn]: { shift: Shift };
+  [ROUTES.activeShift]: { shift: Shift };
+  [ROUTES.finishShift]: { shift: Shift };
+  [ROUTES.shiftComplete]: { shift: Shift };
+  [ROUTES.rateBusiness]: { shift: Shift };
 };
+
+/** Navigation from a tab screen: its own tabs plus app-stack screens. */
+export type TabAppNavigation = NavigationProp<AppStackParamList & TabParamList>;
 
 export type TabParamList = {
   [ROUTES.workerHome]: undefined;
   [ROUTES.workerShifts]: undefined;
+  [ROUTES.workerEarnings]: undefined;
   [ROUTES.workerProfile]: undefined;
   [ROUTES.businessLive]: undefined;
   [ROUTES.businessShifts]: undefined;

@@ -1,38 +1,68 @@
 import type { FC } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
-import { SplashLogo } from './components';
+import { AnimatedLogo, LoadingDots } from './components';
 import { SPLASH_STRINGS } from './constants';
+import { useSplashAnimation } from './hooks/useSplashAnimation';
+
+/** Total length of the intro before route/route.tsx leaves the splash (ms). */
+export const SPLASH_DURATION_MS = 2600;
+
+const rise = (value: Animated.Value) => ({
+  opacity: value,
+  transform: [
+    {
+      translateY: value.interpolate({
+        inputRange: [0, 1],
+        outputRange: [14, 0],
+      }),
+    },
+  ],
+});
+
 /**
- * Splash page orchestrator. Figma: Splash · Light (1:10) / Splash · Dark (1:23).
- * - ui: components/ (SplashLogo)
- * - constants: constants/splashStrings.ts
- * Shown by route/route.tsx while the app boots.
+ * Splash page orchestrator. Figma: Splash · Light (1:10) / Dark (1:23),
+ * animated per "KaamNow Splash Motion".
+ * - motion: hooks/useSplashAnimation.ts
+ * - ui: components/ (AnimatedLogo, LoadingDots)
  */
 export const SplashPage: FC = () => {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const motion = useSplashAnimation();
 
   return (
     <View
       style={[styles.container, { backgroundColor: colors.background }]}
       testID="splash-page"
     >
-      <SplashLogo />
-      <Text style={[styles.title, { color: colors.text }]}>
+      <AnimatedLogo
+        tile={motion.tile}
+        ring={motion.ring}
+        float={motion.float}
+        glow={motion.glow}
+        pieces={motion.pieces}
+      />
+      <Animated.Text
+        style={[styles.title, { color: colors.text }, rise(motion.word)]}
+      >
         {SPLASH_STRINGS.BRAND_TITLE}
-      </Text>
-      <Text style={[styles.tagline, { color: colors.textMuted }]}>
+      </Animated.Text>
+      <Animated.Text
+        style={[styles.tagline, { color: colors.textMuted }, rise(motion.tag)]}
+      >
         {SPLASH_STRINGS.TAGLINE}
-      </Text>
+      </Animated.Text>
+      <LoadingDots dots={motion.dots} bottom={26 + insets.bottom} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // Content block sits 30px above vertical centre in the 390x872 frame.
   container: {
     flex: 1,
     alignItems: 'center',

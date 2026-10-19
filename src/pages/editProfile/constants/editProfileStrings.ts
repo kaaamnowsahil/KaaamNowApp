@@ -1,0 +1,15 @@
+export const EDIT_PROFILE_STRINGS = {
+  TITLE: 'Edit profile',
+  NAME_LABEL: 'Full name',
+  PHONE_LABEL: 'Mobile number',
+  VERIFIED: 'Verified',
+  EMAIL_LABEL: 'Email (optional)',
+  EMAIL_PLACEHOLDER: 'you@example.com',
+  AGE_LABEL: 'Age',
+  ADDRESS_LABEL: 'Address',
+  USE_CURRENT: 'Use current',
+  LOCATING: 'Locating…',
+  WORK_TYPE_LABEL: 'Work I do',
+  WORK_TYPE_HINT: 'Pick all that apply.',
+  SAVE: 'Save changes',
+} as const;

@@ -1,28 +1,23 @@
 import { useState } from 'react';
 
-import {
-  fetchCurrentAddress,
-  type PickedAddress,
-} from '@/services/location/currentAddress';
+import type { PickedAddress } from '@/types';
 
-/** Fills an address from the device location; caller can still edit it manually. */
+const LOCATE_DELAY_MS = 600;
+
+/** Fills an address from the page's mock location; caller can still edit it manually. */
 export const useCurrentAddress = (
+  mockAddress: PickedAddress,
   onPicked: (picked: PickedAddress) => void,
 ) => {
   const [isLocating, setIsLocating] = useState(false);
-  const [locateError, setLocateError] = useState<string | null>(null);
 
-  const locate = async () => {
+  const locate = () => {
     setIsLocating(true);
-    setLocateError(null);
-    try {
-      onPicked(await fetchCurrentAddress());
-    } catch {
-      setLocateError('Could not get your location. Please type your address.');
-    } finally {
+    setTimeout(() => {
+      onPicked(mockAddress);
       setIsLocating(false);
-    }
+    }, LOCATE_DELAY_MS);
   };
 
-  return { locate, isLocating, locateError };
+  return { locate, isLocating, locateError: null as string | null };
 };

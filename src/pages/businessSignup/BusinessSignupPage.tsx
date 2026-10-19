@@ -23,7 +23,7 @@ import { useBusinessSignup } from './hooks/useBusinessSignup';
  * Business sign-up orchestrator. No dedicated Figma frame; built from the
  * Edit business profile frame (25:242 / 25:304) fields and chips.
  * - state + validation: hooks/useBusinessSignup.ts, schema.ts
- * - business types: backend list with local fallback (constants/options.ts)
+ * - business types + current address: mock/businessSignupMock.ts
  */
 export const BusinessSignupPage: FC<
   AuthScreenProps<typeof ROUTES.businessSignup>
@@ -40,6 +40,7 @@ export const BusinessSignupPage: FC<
         <PrimaryButton
           label={S.CONTINUE}
           onPress={f.submit}
+          disabled={!f.canSubmit}
           testID="business-continue"
         />
       }

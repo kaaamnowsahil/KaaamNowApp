@@ -124,6 +124,8 @@ type ButtonProps = {
   label: string;
   onPress?: () => void;
   disabled?: boolean;
+  /** `danger` swaps primary purple for red, e.g. "Cancel shift". */
+  tone?: 'default' | 'danger';
   testID?: string;
 };
 
@@ -132,9 +134,11 @@ export const PrimaryButton: FC<ButtonProps> = ({
   label,
   onPress,
   disabled,
+  tone = 'default',
   testID,
 }) => {
   const { colors } = useTheme();
+  const fill = tone === 'danger' ? colors.danger : colors.primary;
   return (
     <Pressable
       accessibilityRole="button"
@@ -144,7 +148,7 @@ export const PrimaryButton: FC<ButtonProps> = ({
       testID={testID}
       style={({ pressed }) => [
         styles.button,
-        { backgroundColor: colors.primary, borderColor: colors.primary },
+        { backgroundColor: fill, borderColor: fill },
         (pressed || disabled) && styles.dimmed,
       ]}
     >
@@ -160,9 +164,11 @@ export const SecondaryButton: FC<ButtonProps> = ({
   label,
   onPress,
   disabled,
+  tone = 'default',
   testID,
 }) => {
   const { colors } = useTheme();
+  const isDanger = tone === 'danger';
   return (
     <Pressable
       accessibilityRole="button"
@@ -172,11 +178,21 @@ export const SecondaryButton: FC<ButtonProps> = ({
       testID={testID}
       style={({ pressed }) => [
         styles.button,
-        { backgroundColor: colors.background, borderColor: colors.border },
+        {
+          backgroundColor: colors.background,
+          borderColor: isDanger ? colors.danger : colors.border,
+        },
         (pressed || disabled) && styles.dimmed,
       ]}
     >
-      <Text style={[styles.buttonLabel, { color: colors.text }]}>{label}</Text>
+      <Text
+        style={[
+          styles.buttonLabel,
+          { color: isDanger ? colors.danger : colors.text },
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 };

@@ -2,14 +2,12 @@ import { NavigationContainer } from '@react-navigation/native';
 import { useEffect, useState, type FC } from 'react';
 import { StatusBar } from 'react-native';
 
-import { SplashPage } from '@/pages/splash/SplashPage';
+import { SPLASH_DURATION_MS, SplashPage } from '@/pages/splash/SplashPage';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import { AfterLoginRoutes } from './afterLogin';
 import { BeforeLoginRoutes } from './beforeLogin';
-
-const SPLASH_DURATION_MS = 1500;
 
 /** Root: splash, then the login stack or the app stack depending on isAuth. */
 export const AppRoutes: FC = () => {

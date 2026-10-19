@@ -1,0 +1,15 @@
+export const SHIFT_TRAVEL_STRINGS = {
+  HEADER_TITLE: 'Worker mode',
+  HEADER_SUBTITLE: 'Live request',
+  OVERLINE: 'SHIFT SECURED',
+  heading: (business: string) => `Head to ${business}`,
+  eta: (min: number) => `${min} min`,
+  ETA: 'Estimated travel',
+  distance: (km: number) => `${km} km`,
+  DISTANCE: 'To the business',
+  LIVE: 'Live',
+  placeCaption: (address: string, starts: string) => `${address} · ${starts}`,
+  START_NAVIGATION: 'Start navigation',
+  ARRIVED: 'I’ve arrived',
+  MESSAGE: 'Message business',
+} as const;

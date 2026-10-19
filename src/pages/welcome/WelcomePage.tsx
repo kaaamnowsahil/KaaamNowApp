@@ -1,9 +1,10 @@
 import type { FC } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import KaamNowLogo from '@/assets/figma/kaamnow-logo.svg';
 import {
   BodyNote,
+  BrandLogo,
+  PopIn,
   PrimaryButton,
   ScreenIntro,
   SecondaryButton,
@@ -51,7 +52,9 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
       }
     >
       <View style={styles.logoRow}>
-        <KaamNowLogo width={96} height={96} />
+        <PopIn>
+          <BrandLogo size={96} />
+        </PopIn>
       </View>
       <ScreenIntro
         title={WELCOME_STRINGS.TITLE}

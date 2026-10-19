@@ -1,0 +1,1 @@
+export { LANGUAGES } from './languageMock';

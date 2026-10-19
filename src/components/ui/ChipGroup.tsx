@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FONTS } from '@/constants/fonts';
-import type { Option } from '@/constants/options';
+import type { Option } from '@/types';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type ChipGroupProps = {

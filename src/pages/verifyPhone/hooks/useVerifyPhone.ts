@@ -9,6 +9,7 @@ import {
   OTP_RESEND_COOLDOWN_SECONDS,
   OTP_TTL_SECONDS,
 } from '../constants';
+import { DEMO_ACCOUNTS } from '../mock';
 
 export const useVerifyPhone = (phone: string) => {
   const [code, setCodeRaw] = useState('');
@@ -27,7 +28,8 @@ export const useVerifyPhone = (phone: string) => {
   };
 
   // Backend OTP verification is not wired yet: any 6-digit code signs in locally.
-  const onVerify = () => signIn({ phone, role: role ?? 'worker' });
+  const onVerify = () =>
+    signIn({ phone, role: DEMO_ACCOUNTS[phone] ?? role ?? 'worker' });
 
   return {
     code,
