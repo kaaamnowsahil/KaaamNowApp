@@ -251,7 +251,8 @@
     "viewAll": "تمام کمائی دیکھیں",
     "support": "ادائیگی میں مدد",
     "period": "{{month}} · مکمل ادائیگیاں",
-    "lastPaid": "{{job}} · {{date}}"
+    "lastPaid": "{{job}} · {{date}}",
+    "detailTitle": "کمائی کی تفصیلات"
   },
   "earningsHistory": {
     "title": "تمام کمائی",
@@ -504,7 +505,8 @@
       "applicants": "درخواست دہندگان",
       "profile": "پروفائل"
     },
-    "distance": "{{distance}} کلومیٹر"
+    "distance": "{{distance}} کلومیٹر",
+    "locationPickerHint": "کاروبار کا مقام منتخب کریں"
   },
   "businessShifts": {
     "title": "شفٹیں",
@@ -827,5 +829,16 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "workerEarningDetail": {
+    "business": "کاروبار",
+    "shift": "شفٹ",
+    "date": "تاریخ",
+    "hours": "کام کے گھنٹے",
+    "hoursValue": "{{hours}} گھنٹے",
+    "rate": "فی گھنٹہ نرخ",
+    "hour": "گھنٹہ",
+    "shifts": "شامل شفٹس",
+    "reference": "کمائی کا حوالہ"
   }
 }

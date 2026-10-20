@@ -250,6 +250,7 @@
     "withdraw": "ઉપાડો",
     "viewAll": "બધી કમાણી જુઓ",
     "support": "ચુકવણી સહાય",
+    "detailTitle": "કમાણીની વિગતો",
     "period": "{{month}} · પૂર્ણ ચુકવણીઓ",
     "lastPaid": "{{job}} · {{date}}"
   },
@@ -262,6 +263,17 @@
       "processing": "પ્રક્રિયામાં",
       "completed": "પૂર્ણ"
     }
+  },
+  "workerEarningDetail": {
+    "business": "વ્યવસાય",
+    "shift": "શિફ્ટ",
+    "date": "તારીખ",
+    "hours": "કામના કલાકો",
+    "hoursValue": "{{hours}} કલાક",
+    "rate": "કલાકદીઠ દર",
+    "hour": "કલાક",
+    "shifts": "સમાવેલ શિફ્ટ",
+    "reference": "કમાણી સંદર્ભ"
   },
   "withdraw": {
     "title": "ઉપાડો",
@@ -504,7 +516,8 @@
       "applicants": "અરજદારો",
       "profile": "પ્રોફાઇલ"
     },
-    "distance": "{{distance}} કિમી"
+    "distance": "{{distance}} કિમી",
+    "locationPickerHint": "વ્યવસાયનું સ્થળ પસંદ કરો"
   },
   "businessShifts": {
     "title": "શિફ્ટ",

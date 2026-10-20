@@ -17,6 +17,7 @@ export const ROUTES = {
   offline: 'Offline',
   payoutAccount: 'PayoutAccount',
   earningsHistory: 'EarningsHistory',
+  workerEarningDetail: 'WorkerEarningDetail',
   withdraw: 'Withdraw',
   withdrawSuccess: 'WithdrawSuccess',
 

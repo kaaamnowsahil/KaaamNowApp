@@ -3,6 +3,7 @@ import type { FC } from 'react';
 
 import { ROUTES } from '@/constants/routes';
 import { EarningsHistoryPage } from '@/pages/earningsHistory/EarningsHistoryPage';
+import { WorkerEarningDetailPage } from '@/pages/earningsHistory/WorkerEarningDetailPage';
 import { WithdrawPage } from '@/pages/withdraw/WithdrawPage';
 import { WithdrawSuccessPage } from '@/pages/withdrawSuccess/WithdrawSuccessPage';
 import { EditProfilePage } from '@/pages/editProfile/EditProfilePage';
@@ -155,6 +156,10 @@ export const AfterLoginRoutes: FC = () => {
       <Stack.Screen
         name={ROUTES.earningsHistory}
         component={EarningsHistoryPage}
+      />
+      <Stack.Screen
+        name={ROUTES.workerEarningDetail}
+        component={WorkerEarningDetailPage}
       />
       <Stack.Screen name={ROUTES.withdraw} component={WithdrawPage} />
       <Stack.Screen

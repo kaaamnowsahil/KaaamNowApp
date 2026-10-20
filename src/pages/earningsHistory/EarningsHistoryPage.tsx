@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { EarningsRowItem } from '@/components/earnings';
 import { SectionHeading } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
-import type { ROUTES } from '@/constants/routes';
+import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -56,6 +56,20 @@ export const EarningsHistoryPage: FC<
                 status={p.status}
                 statusLabel={t(`earningsHistory.status.${p.status}`)}
                 isLast={i === month.payouts.length - 1}
+                onPress={() =>
+                  navigation.navigate(ROUTES.workerEarningDetail, {
+                    earning: {
+                      id: p.id,
+                      title: p.shiftTitle,
+                      businessName: p.businessName,
+                      dateLabel: p.dateLabel,
+                      hours: p.hours,
+                      amount: p.amount,
+                      status: p.status,
+                      rate: p.hours > 0 ? p.amount / p.hours : undefined,
+                    },
+                  })
+                }
               />
             ))}
           </View>

@@ -251,7 +251,8 @@
     "viewAll": "ਸਾਰੀ ਕਮਾਈ ਵੇਖੋ",
     "support": "ਭੁਗਤਾਨ ਸਹਾਇਤਾ",
     "period": "{{month}} · ਮੁਕੰਮਲ ਭੁਗਤਾਨ",
-    "lastPaid": "{{job}} · {{date}}"
+    "lastPaid": "{{job}} · {{date}}",
+    "detailTitle": "ਕਮਾਈ ਦੇ ਵੇਰਵੇ"
   },
   "earningsHistory": {
     "title": "ਸਾਰੀ ਕਮਾਈ",
@@ -504,7 +505,8 @@
       "applicants": "ਬਿਨੈਕਾਰ",
       "profile": "ਪ੍ਰੋਫ਼ਾਈਲ"
     },
-    "distance": "{{distance}} ਕਿਮੀ"
+    "distance": "{{distance}} ਕਿਮੀ",
+    "locationPickerHint": "ਕਾਰੋਬਾਰ ਦਾ ਟਿਕਾਣਾ ਚੁਣੋ"
   },
   "businessShifts": {
     "title": "ਸ਼ਿਫਟਾਂ",
@@ -827,5 +829,16 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "workerEarningDetail": {
+    "business": "ਕਾਰੋਬਾਰ",
+    "shift": "ਸ਼ਿਫਟ",
+    "date": "ਤਾਰੀਖ",
+    "hours": "ਕੰਮ ਦੇ ਘੰਟੇ",
+    "hoursValue": "{{hours}} ਘੰਟੇ",
+    "rate": "ਘੰਟੇ ਦੀ ਦਰ",
+    "hour": "ਘੰਟਾ",
+    "shifts": "ਸ਼ਾਮਲ ਸ਼ਿਫਟਾਂ",
+    "reference": "ਕਮਾਈ ਹਵਾਲਾ"
   }
 }

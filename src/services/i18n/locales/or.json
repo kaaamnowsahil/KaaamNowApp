@@ -251,7 +251,8 @@
     "viewAll": "ସମସ୍ତ ରୋଜଗାର ଦେଖନ୍ତୁ",
     "support": "ପେମେଣ୍ଟ ସହାୟତା",
     "period": "{{month}} · ସମାପ୍ତ ପେମେଣ୍ଟ",
-    "lastPaid": "{{job}} · {{date}}"
+    "lastPaid": "{{job}} · {{date}}",
+    "detailTitle": "ରୋଜଗାର ବିବରଣୀ"
   },
   "earningsHistory": {
     "title": "ସମସ୍ତ ରୋଜଗାର",
@@ -504,7 +505,8 @@
       "applicants": "ଆବେଦନକାରୀ",
       "profile": "ପ୍ରୋଫାଇଲ୍"
     },
-    "distance": "{{distance}} କିମି"
+    "distance": "{{distance}} କିମି",
+    "locationPickerHint": "ବ୍ୟବସାୟ ସ୍ଥାନ ବାଛନ୍ତୁ"
   },
   "businessShifts": {
     "title": "ଶିଫ୍ଟ",
@@ -827,5 +829,16 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "workerEarningDetail": {
+    "business": "ବ୍ୟବସାୟ",
+    "shift": "ଶିଫ୍ଟ",
+    "date": "ତାରିଖ",
+    "hours": "କାମ ଘଣ୍ଟା",
+    "hoursValue": "{{hours}} ଘଣ୍ଟା",
+    "rate": "ପ୍ରତି ଘଣ୍ଟା ଦର",
+    "hour": "ଘଣ୍ଟା",
+    "shifts": "ଅନ୍ତର୍ଭୁକ୍ତ ଶିଫ୍ଟ",
+    "reference": "ରୋଜଗାର ରେଫରେନ୍ସ"
   }
 }
