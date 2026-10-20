@@ -6,6 +6,7 @@ import { EarningsHistoryPage } from '@/pages/earningsHistory/EarningsHistoryPage
 import { WithdrawPage } from '@/pages/withdraw/WithdrawPage';
 import { WithdrawSuccessPage } from '@/pages/withdrawSuccess/WithdrawSuccessPage';
 import { EditProfilePage } from '@/pages/editProfile/EditProfilePage';
+import { BusinessEditProfilePage } from '@/pages/businessEditProfile/BusinessEditProfilePage';
 import { LanguagePage } from '@/pages/language/LanguagePage';
 import { AppearancePage } from '@/pages/appearance/AppearancePage';
 import { OfflinePage } from '@/pages/offline/OfflinePage';
@@ -49,6 +50,10 @@ export const AfterLoginRoutes: FC = () => {
         component={NotificationsPage}
       />
       <Stack.Screen name={ROUTES.editProfile} component={EditProfilePage} />
+      <Stack.Screen
+        name={ROUTES.businessEditProfile}
+        component={BusinessEditProfilePage}
+      />
       <Stack.Screen name={ROUTES.language} component={LanguagePage} />
       <Stack.Screen name={ROUTES.appearance} component={AppearancePage} />
       <Stack.Screen name={ROUTES.offline} component={OfflinePage} />

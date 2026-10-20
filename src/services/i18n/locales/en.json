@@ -475,5 +475,77 @@
     "shiftSecured": {
       "headerTitle": "Worker mode"
     }
+  },
+  "businessDashboard": {
+    "heading": "Your team, at a glance",
+    "verifiedSubtitle": "{{business}} · Verified business",
+    "liveConfirmed": "Live confirmed",
+    "newApplicants": "New applicants",
+    "changeLocation": "Change business location: {{location}}",
+    "liveNow": "Live Now",
+    "scheduled": "Scheduled",
+    "todayLive": "Today’s live shifts",
+    "upcoming": "Upcoming shifts",
+    "viewAll": "View all",
+    "liveStatus": "Live · starts soon",
+    "scheduledStatus": "Scheduled",
+    "verified": "Verified",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} hours",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ hour",
+    "estimated": "{{amount}} estimated / worker",
+    "confirmed": "{{count}} / {{total}} confirmed",
+    "applicants": "{{count}} applicants",
+    "emptyLiveTitle": "No live shifts right now",
+    "emptyLiveBody": "Post a live request and workers within 3–5 km are notified instantly.",
+    "emptyScheduledTitle": "No scheduled shifts yet",
+    "emptyScheduledBody": "Create a shift in advance and workers within 5 km can apply.",
+    "createShift": "+ Create shift",
+    "postLiveRequest": "+ Post live request",
+    "tabs": {
+      "dashboard": "Dashboard",
+      "shifts": "Shifts",
+      "applicants": "Applicants",
+      "profile": "Profile"
+    },
+    "distance": "{{distance}} km"
+  },
+  "businessShifts": {
+    "title": "Shifts",
+    "scheduled": "Scheduled",
+    "rosterTitle": "Manage your confirmed roster",
+    "fullyStaffed": "Fully staffed · {{count}} of {{total}}",
+    "viewSelectedOffers": "View selected offers"
+  },
+  "businessApplicants": {
+    "title": "Review your applicants",
+    "headerTitle": "Business mode",
+    "headerTag": "Business",
+    "tabs": {
+      "applied": "Applied",
+      "selected": "Selected",
+      "confirmed": "Confirmed"
+    },
+    "status": {
+      "applied": "Applied",
+      "selected": "Selected",
+      "confirmed": "Confirmed"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "Open {{name}}’s profile",
+    "filterSort": "Filter & sort applicants",
+    "emptyTitle": "No applicants here yet",
+    "emptyBody": "Applicants for your shifts will appear here.",
+    "filterTitle": "Filter & sort applicants",
+    "sortRecent": "Most recent",
+    "sortRating": "Highest rated",
+    "sortExperience": "Most experience",
+    "close": "Close"
+  },
+  "businessProfile": {
+    "sectionBusiness": "Business",
+    "editBusinessProfile": "Edit business profile",
+    "paymentHistory": "Payment history",
+    "verifiedLocation": "Verified business · {{location}}"
   }
 }

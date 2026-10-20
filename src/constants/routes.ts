@@ -44,6 +44,7 @@ export const ROUTES = {
   businessShifts: 'BusinessShifts',
   businessApplicants: 'BusinessApplicants',
   businessProfile: 'BusinessProfile',
+  businessEditProfile: 'BusinessEditProfile',
 
   // common (both stacks)
   terms: 'Terms',

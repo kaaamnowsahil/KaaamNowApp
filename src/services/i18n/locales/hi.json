@@ -475,5 +475,77 @@
     "shiftSecured": {
       "headerTitle": "वर्कर मोड"
     }
+  },
+  "businessDashboard": {
+    "heading": "आपकी टीम एक नज़र में",
+    "verifiedSubtitle": "{{business}} · सत्यापित व्यवसाय",
+    "liveConfirmed": "पुष्ट लाइव शिफ्ट",
+    "newApplicants": "नए आवेदन",
+    "changeLocation": "व्यवसाय का स्थान बदलें: {{location}}",
+    "liveNow": "अभी लाइव",
+    "scheduled": "निर्धारित",
+    "todayLive": "आज की लाइव शिफ्ट",
+    "upcoming": "आने वाली शिफ्ट",
+    "viewAll": "सभी देखें",
+    "liveStatus": "लाइव · जल्द शुरू",
+    "scheduledStatus": "निर्धारित",
+    "verified": "सत्यापित",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} घंटे",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ घंटा",
+    "estimated": "{{amount}} अनुमानित / कर्मचारी",
+    "confirmed": "{{total}} में से {{count}} पुष्ट",
+    "applicants": "{{count}} आवेदन",
+    "emptyLiveTitle": "अभी कोई लाइव शिफ्ट नहीं",
+    "emptyLiveBody": "लाइव अनुरोध पोस्ट करें; 3–5 किमी के कर्मचारी तुरंत सूचना पाएँगे।",
+    "emptyScheduledTitle": "अभी कोई निर्धारित शिफ्ट नहीं",
+    "emptyScheduledBody": "पहले से शिफ्ट बनाएँ ताकि 5 किमी के कर्मचारी आवेदन कर सकें।",
+    "createShift": "+ शिफ्ट बनाएँ",
+    "postLiveRequest": "+ लाइव अनुरोध पोस्ट करें",
+    "tabs": {
+      "dashboard": "डैशबोर्ड",
+      "shifts": "शिफ्ट",
+      "applicants": "आवेदक",
+      "profile": "प्रोफ़ाइल"
+    },
+    "distance": "{{distance}} किमी"
+  },
+  "businessShifts": {
+    "title": "शिफ्ट",
+    "scheduled": "निर्धारित",
+    "rosterTitle": "पुष्ट टीम प्रबंधित करें",
+    "fullyStaffed": "पूरी टीम · {{total}} में से {{count}}",
+    "viewSelectedOffers": "चुने गए ऑफ़र देखें"
+  },
+  "businessApplicants": {
+    "title": "आवेदकों की समीक्षा करें",
+    "headerTitle": "बिज़नेस मोड",
+    "headerTag": "व्यवसाय",
+    "tabs": {
+      "applied": "आवेदन",
+      "selected": "चुने गए",
+      "confirmed": "पुष्ट"
+    },
+    "status": {
+      "applied": "आवेदन",
+      "selected": "चुने गए",
+      "confirmed": "पुष्ट"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}} की प्रोफ़ाइल खोलें",
+    "filterSort": "आवेदक फ़िल्टर और क्रमबद्ध करें",
+    "emptyTitle": "अभी कोई आवेदक नहीं",
+    "emptyBody": "आपकी शिफ्ट के आवेदक यहाँ दिखेंगे।",
+    "filterTitle": "आवेदक फ़िल्टर और क्रमबद्ध करें",
+    "sortRecent": "नवीनतम",
+    "sortRating": "सबसे अच्छी रेटिंग",
+    "sortExperience": "सबसे अधिक अनुभव",
+    "close": "बंद करें"
+  },
+  "businessProfile": {
+    "sectionBusiness": "व्यवसाय",
+    "editBusinessProfile": "व्यवसाय प्रोफ़ाइल संपादित करें",
+    "paymentHistory": "भुगतान इतिहास",
+    "verifiedLocation": "सत्यापित व्यवसाय · {{location}}"
   }
 }

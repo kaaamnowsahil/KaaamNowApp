@@ -475,5 +475,77 @@
     "shiftSecured": {
       "headerTitle": "কর্মী মোড"
     }
+  },
+  "businessDashboard": {
+    "heading": "আপনার দল এক নজরে",
+    "verifiedSubtitle": "{{business}} · যাচাইকৃত ব্যবসা",
+    "liveConfirmed": "নিশ্চিত লাইভ শিফট",
+    "newApplicants": "নতুন আবেদনকারী",
+    "changeLocation": "ব্যবসার অবস্থান বদলান: {{location}}",
+    "liveNow": "এখন লাইভ",
+    "scheduled": "নির্ধারিত",
+    "todayLive": "আজকের লাইভ শিফট",
+    "upcoming": "আসন্ন শিফট",
+    "viewAll": "সব দেখুন",
+    "liveStatus": "লাইভ · শিগগির শুরু",
+    "scheduledStatus": "নির্ধারিত",
+    "verified": "যাচাইকৃত",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} ঘণ্টা",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ ঘণ্টা",
+    "estimated": "{{amount}} আনুমানিক / কর্মী",
+    "confirmed": "{{total}}টির মধ্যে {{count}} নিশ্চিত",
+    "applicants": "{{count}} জন আবেদনকারী",
+    "emptyLiveTitle": "এখন কোনো লাইভ শিফট নেই",
+    "emptyLiveBody": "লাইভ অনুরোধ পোস্ট করুন; 3–5 কিমির কর্মীরা সঙ্গে সঙ্গে বিজ্ঞপ্তি পাবেন।",
+    "emptyScheduledTitle": "এখনও নির্ধারিত শিফট নেই",
+    "emptyScheduledBody": "আগে থেকে শিফট তৈরি করুন, 5 কিমির কর্মীরা আবেদন করতে পারবেন।",
+    "createShift": "+ শিফট তৈরি করুন",
+    "postLiveRequest": "+ লাইভ অনুরোধ পোস্ট করুন",
+    "tabs": {
+      "dashboard": "ড্যাশবোর্ড",
+      "shifts": "শিফট",
+      "applicants": "আবেদনকারী",
+      "profile": "প্রোফাইল"
+    },
+    "distance": "{{distance}} কিমি"
+  },
+  "businessShifts": {
+    "title": "শিফট",
+    "scheduled": "নির্ধারিত",
+    "rosterTitle": "নিশ্চিত কর্মীদের পরিচালনা করুন",
+    "fullyStaffed": "দল সম্পূর্ণ · {{total}}টির মধ্যে {{count}}",
+    "viewSelectedOffers": "নির্বাচিত অফার দেখুন"
+  },
+  "businessApplicants": {
+    "title": "আবেদনকারীদের পর্যালোচনা করুন",
+    "headerTitle": "ব্যবসা মোড",
+    "headerTag": "ব্যবসা",
+    "tabs": {
+      "applied": "আবেদন করেছে",
+      "selected": "নির্বাচিত",
+      "confirmed": "নিশ্চিত"
+    },
+    "status": {
+      "applied": "আবেদন করেছে",
+      "selected": "নির্বাচিত",
+      "confirmed": "নিশ্চিত"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}}-এর প্রোফাইল খুলুন",
+    "filterSort": "আবেদনকারী ফিল্টার ও সাজান",
+    "emptyTitle": "এখন কোনো আবেদনকারী নেই",
+    "emptyBody": "আপনার শিফটের আবেদনকারীরা এখানে দেখা যাবে।",
+    "filterTitle": "আবেদনকারী ফিল্টার ও সাজান",
+    "sortRecent": "সাম্প্রতিক",
+    "sortRating": "সর্বোচ্চ রেটিং",
+    "sortExperience": "সবচেয়ে বেশি অভিজ্ঞতা",
+    "close": "বন্ধ করুন"
+  },
+  "businessProfile": {
+    "sectionBusiness": "ব্যবসা",
+    "editBusinessProfile": "ব্যবসার প্রোফাইল সম্পাদনা করুন",
+    "paymentHistory": "পেমেন্টের ইতিহাস",
+    "verifiedLocation": "যাচাইকৃত ব্যবসা · {{location}}"
   }
 }

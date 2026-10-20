@@ -470,5 +470,77 @@
     "shiftSecured": {
       "headerTitle": "କର୍ମୀ ମୋଡ୍"
     }
+  },
+  "businessDashboard": {
+    "heading": "ଆପଣଙ୍କ ଦଳ ଏକ ନଜରରେ",
+    "verifiedSubtitle": "{{business}} · ଯାଞ୍ଚ ହୋଇଥିବା ବ୍ୟବସାୟ",
+    "liveConfirmed": "ନିଶ୍ଚିତ ଲାଇଭ୍ ଶିଫ୍ଟ",
+    "newApplicants": "ନୂଆ ଆବେଦନକାରୀ",
+    "changeLocation": "ବ୍ୟବସାୟ ସ୍ଥାନ ବଦଳାନ୍ତୁ: {{location}}",
+    "liveNow": "ଏବେ ଲାଇଭ୍",
+    "scheduled": "ନିର୍ଦ୍ଧାରିତ",
+    "todayLive": "ଆଜିର ଲାଇଭ୍ ଶିଫ୍ଟ",
+    "upcoming": "ଆଗାମୀ ଶିଫ୍ଟ",
+    "viewAll": "ସବୁ ଦେଖନ୍ତୁ",
+    "liveStatus": "ଲାଇଭ୍ · ଶୀଘ୍ର ଆରମ୍ଭ",
+    "scheduledStatus": "ନିର୍ଦ୍ଧାରିତ",
+    "verified": "ଯାଞ୍ଚ ହୋଇଛି",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} ଘଣ୍ଟା",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ ଘଣ୍ଟା",
+    "estimated": "{{amount}} ଆନୁମାନିକ / କର୍ମୀ",
+    "confirmed": "{{total}}ରୁ {{count}} ନିଶ୍ଚିତ",
+    "applicants": "{{count}} ଆବେଦନକାରୀ",
+    "emptyLiveTitle": "ଏବେ କୌଣସି ଲାଇଭ୍ ଶିଫ୍ଟ ନାହିଁ",
+    "emptyLiveBody": "ଲାଇଭ୍ ଅନୁରୋଧ ପୋଷ୍ଟ କରନ୍ତୁ; 3–5 କିମି ମଧ୍ୟରେ ଥିବା କର୍ମୀଙ୍କୁ ତୁରନ୍ତ ସୂଚନା ମିଳିବ।",
+    "emptyScheduledTitle": "ଏପର୍ଯ୍ୟନ୍ତ ନିର୍ଦ୍ଧାରିତ ଶିଫ୍ଟ ନାହିଁ",
+    "emptyScheduledBody": "ଆଗୁଆ ଶିଫ୍ଟ ସୃଷ୍ଟି କରନ୍ତୁ, 5 କିମି ମଧ୍ୟରେ ଥିବା କର୍ମୀ ଆବେଦନ କରିପାରିବେ।",
+    "createShift": "+ ଶିଫ୍ଟ ସୃଷ୍ଟି କରନ୍ତୁ",
+    "postLiveRequest": "+ ଲାଇଭ୍ ଅନୁରୋଧ ପୋଷ୍ଟ କରନ୍ତୁ",
+    "tabs": {
+      "dashboard": "ଡ୍ୟାସବୋର୍ଡ",
+      "shifts": "ଶିଫ୍ଟ",
+      "applicants": "ଆବେଦନକାରୀ",
+      "profile": "ପ୍ରୋଫାଇଲ୍"
+    },
+    "distance": "{{distance}} କିମି"
+  },
+  "businessShifts": {
+    "title": "ଶିଫ୍ଟ",
+    "scheduled": "ନିର୍ଦ୍ଧାରିତ",
+    "rosterTitle": "ନିଶ୍ଚିତ ଦଳ ପରିଚାଳନା କରନ୍ତୁ",
+    "fullyStaffed": "ଦଳ ପୂର୍ଣ୍ଣ · {{total}}ରୁ {{count}}",
+    "viewSelectedOffers": "ଚୟନ କରାଯାଇଥିବା ଅଫର୍ ଦେଖନ୍ତୁ"
+  },
+  "businessApplicants": {
+    "title": "ଆବେଦନକାରୀଙ୍କୁ ସମୀକ୍ଷା କରନ୍ତୁ",
+    "headerTitle": "ବ୍ୟବସାୟ ମୋଡ୍",
+    "headerTag": "ବ୍ୟବସାୟ",
+    "tabs": {
+      "applied": "ଆବେଦନ କରିଛନ୍ତି",
+      "selected": "ଚୟନ ହୋଇଛନ୍ତି",
+      "confirmed": "ନିଶ୍ଚିତ"
+    },
+    "status": {
+      "applied": "ଆବେଦନ କରିଛନ୍ତି",
+      "selected": "ଚୟନ ହୋଇଛନ୍ତି",
+      "confirmed": "ନିଶ୍ଚିତ"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}}ଙ୍କ ପ୍ରୋଫାଇଲ୍ ଖୋଲନ୍ତୁ",
+    "filterSort": "ଆବେଦନକାରୀଙ୍କୁ ଫିଲ୍ଟର୍ ଓ ସଜାନ୍ତୁ",
+    "emptyTitle": "ଏପର୍ଯ୍ୟନ୍ତ ଆବେଦନକାରୀ ନାହାନ୍ତି",
+    "emptyBody": "ଆପଣଙ୍କ ଶିଫ୍ଟ ପାଇଁ ଆବେଦନକାରୀ ଏଠାରେ ଦେଖାଯିବେ।",
+    "filterTitle": "ଆବେଦନକାରୀଙ୍କୁ ଫିଲ୍ଟର୍ ଓ ସଜାନ୍ତୁ",
+    "sortRecent": "ସଦ୍ୟତମ",
+    "sortRating": "ସର୍ବାଧିକ ରେଟିଂ",
+    "sortExperience": "ସର୍ବାଧିକ ଅଭିଜ୍ଞତା",
+    "close": "ବନ୍ଦ କରନ୍ତୁ"
+  },
+  "businessProfile": {
+    "sectionBusiness": "ବ୍ୟବସାୟ",
+    "editBusinessProfile": "ବ୍ୟବସାୟ ପ୍ରୋଫାଇଲ୍ ସମ୍ପାଦନ କରନ୍ତୁ",
+    "paymentHistory": "ପେମେଣ୍ଟ ଇତିହାସ",
+    "verifiedLocation": "ଯାଞ୍ଚ ହୋଇଥିବା ବ୍ୟବସାୟ · {{location}}"
   }
 }

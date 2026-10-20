@@ -470,5 +470,77 @@
     "shiftSecured": {
       "headerTitle": "કામદાર મોડ"
     }
+  },
+  "businessDashboard": {
+    "heading": "તમારી ટીમ એક નજરમાં",
+    "verifiedSubtitle": "{{business}} · ચકાસાયેલ વ્યવસાય",
+    "liveConfirmed": "પુષ્ટિ થયેલી લાઇવ શિફ્ટ",
+    "newApplicants": "નવા અરજદારો",
+    "changeLocation": "વ્યવસાયનું સ્થળ બદલો: {{location}}",
+    "liveNow": "હમણાં લાઇવ",
+    "scheduled": "નિયોજિત",
+    "todayLive": "આજની લાઇવ શિફ્ટ",
+    "upcoming": "આવનારી શિફ્ટ",
+    "viewAll": "બધી જુઓ",
+    "liveStatus": "લાઇવ · ટૂંક સમયમાં શરૂ",
+    "scheduledStatus": "નિયોજિત",
+    "verified": "ચકાસાયેલ",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} કલાક",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ કલાક",
+    "estimated": "{{amount}} અંદાજિત / કામદાર",
+    "confirmed": "{{total}}માંથી {{count}} પુષ્ટિ",
+    "applicants": "{{count}} અરજદારો",
+    "emptyLiveTitle": "હમણાં કોઈ લાઇવ શિફ્ટ નથી",
+    "emptyLiveBody": "લાઇવ વિનંતી પોસ્ટ કરો; 3–5 કિમીના કામદારોને તરત સૂચના મળશે.",
+    "emptyScheduledTitle": "હજી કોઈ નિયોજિત શિફ્ટ નથી",
+    "emptyScheduledBody": "આગોતરી શિફ્ટ બનાવો જેથી 5 કિમીના કામદારો અરજી કરી શકે.",
+    "createShift": "+ શિફ્ટ બનાવો",
+    "postLiveRequest": "+ લાઇવ વિનંતી પોસ્ટ કરો",
+    "tabs": {
+      "dashboard": "ડેશબોર્ડ",
+      "shifts": "શિફ્ટ",
+      "applicants": "અરજદારો",
+      "profile": "પ્રોફાઇલ"
+    },
+    "distance": "{{distance}} કિમી"
+  },
+  "businessShifts": {
+    "title": "શિફ્ટ",
+    "scheduled": "નિયોજિત",
+    "rosterTitle": "પુષ્ટિ થયેલી ટીમ સંભાળો",
+    "fullyStaffed": "ટીમ પૂર્ણ · {{total}}માંથી {{count}}",
+    "viewSelectedOffers": "પસંદ કરેલી ઑફર જુઓ"
+  },
+  "businessApplicants": {
+    "title": "અરજદારોની સમીક્ષા કરો",
+    "headerTitle": "વ્યવસાય મોડ",
+    "headerTag": "વ્યવસાય",
+    "tabs": {
+      "applied": "અરજી કરનાર",
+      "selected": "પસંદ કરેલા",
+      "confirmed": "પુષ્ટિ થયેલા"
+    },
+    "status": {
+      "applied": "અરજી કરી",
+      "selected": "પસંદ કરેલા",
+      "confirmed": "પુષ્ટિ થયેલા"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}}ની પ્રોફાઇલ ખોલો",
+    "filterSort": "અરજદારોને ફિલ્ટર અને ક્રમબદ્ધ કરો",
+    "emptyTitle": "હજી અરજદારો નથી",
+    "emptyBody": "તમારી શિફ્ટના અરજદારો અહીં દેખાશે.",
+    "filterTitle": "અરજદારોને ફિલ્ટર અને ક્રમબદ્ધ કરો",
+    "sortRecent": "તાજેતરના",
+    "sortRating": "સૌથી વધુ રેટિંગ",
+    "sortExperience": "સૌથી વધુ અનુભવ",
+    "close": "બંધ કરો"
+  },
+  "businessProfile": {
+    "sectionBusiness": "વ્યવસાય",
+    "editBusinessProfile": "વ્યવસાય પ્રોફાઇલ સંપાદિત કરો",
+    "paymentHistory": "ચુકવણીનો ઇતિહાસ",
+    "verifiedLocation": "ચકાસાયેલ વ્યવસાય · {{location}}"
   }
 }

@@ -475,5 +475,77 @@
     "shiftSecured": {
       "headerTitle": "ಕೆಲಸಗಾರರ ಮೋಡ್"
     }
+  },
+  "businessDashboard": {
+    "heading": "ನಿಮ್ಮ ತಂಡ ಒಂದೇ ನೋಟದಲ್ಲಿ",
+    "verifiedSubtitle": "{{business}} · ಪರಿಶೀಲಿಸಿದ ವ್ಯವಹಾರ",
+    "liveConfirmed": "ದೃಢೀಕರಿಸಿದ ಲೈವ್ ಶಿಫ್ಟ್‌ಗಳು",
+    "newApplicants": "ಹೊಸ ಅರ್ಜಿದಾರರು",
+    "changeLocation": "ವ್ಯವಹಾರದ ಸ್ಥಳ ಬದಲಿಸಿ: {{location}}",
+    "liveNow": "ಈಗ ಲೈವ್",
+    "scheduled": "ನಿಗದಿತ",
+    "todayLive": "ಇಂದಿನ ಲೈವ್ ಶಿಫ್ಟ್‌ಗಳು",
+    "upcoming": "ಮುಂಬರುವ ಶಿಫ್ಟ್‌ಗಳು",
+    "viewAll": "ಎಲ್ಲವನ್ನೂ ನೋಡಿ",
+    "liveStatus": "ಲೈವ್ · ಶೀಘ್ರ ಆರಂಭ",
+    "scheduledStatus": "ನಿಗದಿತ",
+    "verified": "ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} ಗಂಟೆ",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ ಗಂಟೆ",
+    "estimated": "{{amount}} ಅಂದಾಜು / ಕೆಲಸಗಾರ",
+    "confirmed": "{{total}}ರಲ್ಲಿ {{count}} ದೃಢ",
+    "applicants": "{{count}} ಅರ್ಜಿಗಳು",
+    "emptyLiveTitle": "ಈಗ ಲೈವ್ ಶಿಫ್ಟ್‌ಗಳಿಲ್ಲ",
+    "emptyLiveBody": "ಲೈವ್ ವಿನಂತಿ ಪೋಸ್ಟ್ ಮಾಡಿ; 3–5 ಕಿಮೀ ಒಳಗಿನ ಕೆಲಸಗಾರರಿಗೆ ತಕ್ಷಣ ತಿಳಿಸಲಾಗುತ್ತದೆ.",
+    "emptyScheduledTitle": "ಇನ್ನೂ ನಿಗದಿತ ಶಿಫ್ಟ್‌ಗಳಿಲ್ಲ",
+    "emptyScheduledBody": "ಮುಂಚಿತವಾಗಿ ಶಿಫ್ಟ್ ರಚಿಸಿ; 5 ಕಿಮೀ ಒಳಗಿನ ಕೆಲಸಗಾರರು ಅರ್ಜಿ ಸಲ್ಲಿಸಬಹುದು.",
+    "createShift": "+ ಶಿಫ್ಟ್ ರಚಿಸಿ",
+    "postLiveRequest": "+ ಲೈವ್ ವಿನಂತಿ ಪೋಸ್ಟ್ ಮಾಡಿ",
+    "tabs": {
+      "dashboard": "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್",
+      "shifts": "ಶಿಫ್ಟ್‌ಗಳು",
+      "applicants": "ಅರ್ಜಿದಾರರು",
+      "profile": "ಪ್ರೊಫೈಲ್"
+    },
+    "distance": "{{distance}} ಕಿಮೀ"
+  },
+  "businessShifts": {
+    "title": "ಶಿಫ್ಟ್‌ಗಳು",
+    "scheduled": "ನಿಗದಿತ",
+    "rosterTitle": "ದೃಢೀಕರಿಸಿದ ತಂಡ ನಿರ್ವಹಿಸಿ",
+    "fullyStaffed": "ತಂಡ ಪೂರ್ಣ · {{total}}ರಲ್ಲಿ {{count}}",
+    "viewSelectedOffers": "ಆಯ್ಕೆ ಮಾಡಿದ ಆಫರ್‌ಗಳನ್ನು ನೋಡಿ"
+  },
+  "businessApplicants": {
+    "title": "ಅರ್ಜಿದಾರರನ್ನು ಪರಿಶೀಲಿಸಿ",
+    "headerTitle": "ವ್ಯವಹಾರ ಮೋಡ್",
+    "headerTag": "ವ್ಯವಹಾರ",
+    "tabs": {
+      "applied": "ಅರ್ಜಿ ಸಲ್ಲಿಸಿದವರು",
+      "selected": "ಆಯ್ಕೆಯಾದವರು",
+      "confirmed": "ದೃಢೀಕರಿಸಿದವರು"
+    },
+    "status": {
+      "applied": "ಅರ್ಜಿ ಸಲ್ಲಿಸಲಾಗಿದೆ",
+      "selected": "ಆಯ್ಕೆಯಾಗಿದೆ",
+      "confirmed": "ದೃಢೀಕರಿಸಲಾಗಿದೆ"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}} ಪ್ರೊಫೈಲ್ ತೆರೆಯಿರಿ",
+    "filterSort": "ಅರ್ಜಿದಾರರನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ ವಿಂಗಡಿಸಿ",
+    "emptyTitle": "ಅರ್ಜಿದಾರರಿಲ್ಲ",
+    "emptyBody": "ನಿಮ್ಮ ಶಿಫ್ಟ್‌ಗಳ ಅರ್ಜಿದಾರರು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತಾರೆ.",
+    "filterTitle": "ಅರ್ಜಿದಾರರನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ ವಿಂಗಡಿಸಿ",
+    "sortRecent": "ಇತ್ತೀಚಿನವು",
+    "sortRating": "ಅತ್ಯಧಿಕ ರೇಟಿಂಗ್",
+    "sortExperience": "ಹೆಚ್ಚು ಅನುಭವ",
+    "close": "ಮುಚ್ಚಿ"
+  },
+  "businessProfile": {
+    "sectionBusiness": "ವ್ಯವಹಾರ",
+    "editBusinessProfile": "ವ್ಯವಹಾರದ ಪ್ರೊಫೈಲ್ ಸಂಪಾದಿಸಿ",
+    "paymentHistory": "ಪಾವತಿ ಇತಿಹಾಸ",
+    "verifiedLocation": "ಪರಿಶೀಲಿಸಿದ ವ್ಯವಹಾರ · {{location}}"
   }
 }

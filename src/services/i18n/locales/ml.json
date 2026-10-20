@@ -475,5 +475,77 @@
     "shiftSecured": {
       "headerTitle": "തൊഴിലാളി മോഡ്"
     }
+  },
+  "businessDashboard": {
+    "heading": "നിങ്ങളുടെ ടീമിനെ ഒറ്റനോട്ടത്തിൽ",
+    "verifiedSubtitle": "{{business}} · സ്ഥിരീകരിച്ച സ്ഥാപനം",
+    "liveConfirmed": "സ്ഥിരീകരിച്ച ലൈവ് ഷിഫ്റ്റുകൾ",
+    "newApplicants": "പുതിയ അപേക്ഷകർ",
+    "changeLocation": "ബിസിനസ് സ്ഥലം മാറ്റുക: {{location}}",
+    "liveNow": "ഇപ്പോൾ ലൈവ്",
+    "scheduled": "ഷെഡ്യൂൾ ചെയ്തത്",
+    "todayLive": "ഇന്നത്തെ ലൈവ് ഷിഫ്റ്റുകൾ",
+    "upcoming": "വരാനിരിക്കുന്ന ഷിഫ്റ്റുകൾ",
+    "viewAll": "എല്ലാം കാണുക",
+    "liveStatus": "ലൈവ് · ഉടൻ തുടങ്ങും",
+    "scheduledStatus": "ഷെഡ്യൂൾ ചെയ്തത്",
+    "verified": "സ്ഥിരീകരിച്ചു",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} മണിക്കൂർ",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ മണിക്കൂർ",
+    "estimated": "{{amount}} ഏകദേശം / തൊഴിലാളി",
+    "confirmed": "{{total}}ൽ {{count}} സ്ഥിരീകരിച്ചു",
+    "applicants": "{{count}} അപേക്ഷകൾ",
+    "emptyLiveTitle": "ഇപ്പോൾ ലൈവ് ഷിഫ്റ്റുകളില്ല",
+    "emptyLiveBody": "ലൈവ് അഭ്യർത്ഥന പോസ്റ്റ് ചെയ്യുക; 3–5 കി.മീ. ഉള്ളിലെ തൊഴിലാളികളെ ഉടൻ അറിയിക്കും.",
+    "emptyScheduledTitle": "ഷെഡ്യൂൾ ചെയ്ത ഷിഫ്റ്റുകളില്ല",
+    "emptyScheduledBody": "മുൻകൂട്ടി ഷിഫ്റ്റ് സൃഷ്ടിക്കുക; 5 കി.മീ. ഉള്ളിലെ തൊഴിലാളികൾക്ക് അപേക്ഷിക്കാം.",
+    "createShift": "+ ഷിഫ്റ്റ് സൃഷ്ടിക്കുക",
+    "postLiveRequest": "+ ലൈവ് അഭ്യർത്ഥന പോസ്റ്റ് ചെയ്യുക",
+    "tabs": {
+      "dashboard": "ഡാഷ്ബോർഡ്",
+      "shifts": "ഷിഫ്റ്റുകൾ",
+      "applicants": "അപേക്ഷകർ",
+      "profile": "പ്രൊഫൈൽ"
+    },
+    "distance": "{{distance}} കി.മീ."
+  },
+  "businessShifts": {
+    "title": "ഷിഫ്റ്റുകൾ",
+    "scheduled": "ഷെഡ്യൂൾ ചെയ്തത്",
+    "rosterTitle": "സ്ഥിരീകരിച്ച ടീമിനെ നിയന്ത്രിക്കുക",
+    "fullyStaffed": "ടീം പൂർണ്ണം · {{total}}ൽ {{count}}",
+    "viewSelectedOffers": "തിരഞ്ഞെടുത്ത ഓഫറുകൾ കാണുക"
+  },
+  "businessApplicants": {
+    "title": "അപേക്ഷകരെ പരിശോധിക്കുക",
+    "headerTitle": "ബിസിനസ് മോഡ്",
+    "headerTag": "ബിസിനസ്",
+    "tabs": {
+      "applied": "അപേക്ഷിച്ചത്",
+      "selected": "തിരഞ്ഞെടുത്തത്",
+      "confirmed": "സ്ഥിരീകരിച്ചത്"
+    },
+    "status": {
+      "applied": "അപേക്ഷിച്ചു",
+      "selected": "തിരഞ്ഞെടുത്തു",
+      "confirmed": "സ്ഥിരീകരിച്ചു"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}}ന്റെ പ്രൊഫൈൽ തുറക്കുക",
+    "filterSort": "അപേക്ഷകരെ ഫിൽട്ടർ ചെയ്ത് ക്രമീകരിക്കുക",
+    "emptyTitle": "അപേക്ഷകരില്ല",
+    "emptyBody": "നിങ്ങളുടെ ഷിഫ്റ്റുകളിലെ അപേക്ഷകർ ഇവിടെ കാണിക്കും.",
+    "filterTitle": "അപേക്ഷകരെ ഫിൽട്ടർ ചെയ്ത് ക്രമീകരിക്കുക",
+    "sortRecent": "ഏറ്റവും പുതിയത്",
+    "sortRating": "ഏറ്റവും ഉയർന്ന റേറ്റിംഗ്",
+    "sortExperience": "ഏറ്റവും കൂടുതൽ പരിചയം",
+    "close": "അടയ്ക്കുക"
+  },
+  "businessProfile": {
+    "sectionBusiness": "ബിസിനസ്",
+    "editBusinessProfile": "ബിസിനസ് പ്രൊഫൈൽ തിരുത്തുക",
+    "paymentHistory": "പേയ്മെന്റ് ചരിത്രം",
+    "verifiedLocation": "സ്ഥിരീകരിച്ച സ്ഥാപനം · {{location}}"
   }
 }

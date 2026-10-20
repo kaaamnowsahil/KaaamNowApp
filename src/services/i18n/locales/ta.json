@@ -475,5 +475,77 @@
     "shiftSecured": {
       "headerTitle": "பணியாளர் பயன்முறை"
     }
+  },
+  "businessDashboard": {
+    "heading": "உங்கள் குழுவை ஒரே பார்வையில்",
+    "verifiedSubtitle": "{{business}} · சரிபார்க்கப்பட்ட நிறுவனம்",
+    "liveConfirmed": "உறுதிசெய்யப்பட்ட நேரடி ஷிப்ட்கள்",
+    "newApplicants": "புதிய விண்ணப்பங்கள்",
+    "changeLocation": "வணிக இடத்தை மாற்று: {{location}}",
+    "liveNow": "இப்போது நேரடி",
+    "scheduled": "திட்டமிட்டவை",
+    "todayLive": "இன்றைய நேரடி ஷிப்ட்கள்",
+    "upcoming": "வரவிருக்கும் ஷிப்ட்கள்",
+    "viewAll": "அனைத்தையும் பார்",
+    "liveStatus": "நேரடி · விரைவில் தொடங்கும்",
+    "scheduledStatus": "திட்டமிட்டது",
+    "verified": "சரிபார்க்கப்பட்டது",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} மணி",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ மணி",
+    "estimated": "{{amount}} மதிப்பீடு / பணியாளர்",
+    "confirmed": "{{total}}ல் {{count}} உறுதி",
+    "applicants": "{{count}} விண்ணப்பங்கள்",
+    "emptyLiveTitle": "இப்போது நேரடி ஷிப்ட்கள் இல்லை",
+    "emptyLiveBody": "நேரடி கோரிக்கையைப் பதிவிடுங்கள்; 3–5 கிமீ உள்ள பணியாளர்களுக்கு உடனே அறிவிக்கப்படும்.",
+    "emptyScheduledTitle": "திட்டமிட்ட ஷிப்ட்கள் இன்னும் இல்லை",
+    "emptyScheduledBody": "முன்கூட்டியே ஷிப்ட் உருவாக்கி, 5 கிமீ உள்ள பணியாளர்கள் விண்ணப்பிக்கலாம்.",
+    "createShift": "+ ஷிப்ட் உருவாக்கு",
+    "postLiveRequest": "+ நேரடி கோரிக்கையைப் பதிவிடு",
+    "tabs": {
+      "dashboard": "டாஷ்போர்டு",
+      "shifts": "ஷிப்ட்கள்",
+      "applicants": "விண்ணப்பதாரர்கள்",
+      "profile": "சுயவிவரம்"
+    },
+    "distance": "{{distance}} கிமீ"
+  },
+  "businessShifts": {
+    "title": "ஷிப்ட்கள்",
+    "scheduled": "திட்டமிட்டவை",
+    "rosterTitle": "உறுதிசெய்யப்பட்ட குழுவை நிர்வகிக்கவும்",
+    "fullyStaffed": "முழுமையான குழு · {{total}}ல் {{count}}",
+    "viewSelectedOffers": "தேர்ந்தெடுத்த சலுகைகளைப் பார்"
+  },
+  "businessApplicants": {
+    "title": "விண்ணப்பதாரர்களைப் பார்வையிடவும்",
+    "headerTitle": "வணிகப் பயன்முறை",
+    "headerTag": "வணிகம்",
+    "tabs": {
+      "applied": "விண்ணப்பித்தவை",
+      "selected": "தேர்ந்தெடுத்தவை",
+      "confirmed": "உறுதிசெய்தவை"
+    },
+    "status": {
+      "applied": "விண்ணப்பித்தது",
+      "selected": "தேர்ந்தெடுத்தது",
+      "confirmed": "உறுதிசெய்தது"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}} சுயவிவரத்தைத் திற",
+    "filterSort": "விண்ணப்பங்களை வடிகட்டி வரிசைப்படுத்து",
+    "emptyTitle": "விண்ணப்பதாரர்கள் இல்லை",
+    "emptyBody": "உங்கள் ஷிப்ட்களுக்கான விண்ணப்பதாரர்கள் இங்கே தோன்றுவார்கள்.",
+    "filterTitle": "விண்ணப்பங்களை வடிகட்டி வரிசைப்படுத்து",
+    "sortRecent": "சமீபத்தியவை",
+    "sortRating": "அதிக மதிப்பீடு",
+    "sortExperience": "அதிக அனுபவம்",
+    "close": "மூடு"
+  },
+  "businessProfile": {
+    "sectionBusiness": "வணிகம்",
+    "editBusinessProfile": "வணிக சுயவிவரத்தைத் திருத்து",
+    "paymentHistory": "கட்டண வரலாறு",
+    "verifiedLocation": "சரிபார்க்கப்பட்ட நிறுவனம் · {{location}}"
   }
 }

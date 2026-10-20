@@ -37,7 +37,11 @@ export const EmptyState: FC<{
 };
 
 const styles = StyleSheet.create({
-  root: { alignItems: 'center', paddingTop: 40, gap: 8 },
+  root: {
+    alignItems: 'center',
+    gap: 8,
+    flex: 1
+  },
   tile: {
     width: 64,
     height: 64,

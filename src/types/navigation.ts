@@ -32,6 +32,7 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.shiftList]: undefined;
   [ROUTES.notifications]: undefined;
   [ROUTES.editProfile]: undefined;
+  [ROUTES.businessEditProfile]: undefined;
   [ROUTES.language]: undefined;
   [ROUTES.appearance]: undefined;
   [ROUTES.offline]: undefined;

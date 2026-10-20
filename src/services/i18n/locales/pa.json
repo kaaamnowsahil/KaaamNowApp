@@ -470,5 +470,77 @@
     "shiftSecured": {
       "headerTitle": "ਕਾਮੇ ਦਾ ਮੋਡ"
     }
+  },
+  "businessDashboard": {
+    "heading": "ਤੁਹਾਡੀ ਟੀਮ ਇੱਕ ਨਜ਼ਰ ਵਿੱਚ",
+    "verifiedSubtitle": "{{business}} · ਤਸਦੀਕ ਕੀਤਾ ਕਾਰੋਬਾਰ",
+    "liveConfirmed": "ਪੱਕੀਆਂ ਲਾਈਵ ਸ਼ਿਫਟਾਂ",
+    "newApplicants": "ਨਵੇਂ ਬਿਨੈਕਾਰ",
+    "changeLocation": "ਕਾਰੋਬਾਰ ਦਾ ਟਿਕਾਣਾ ਬਦਲੋ: {{location}}",
+    "liveNow": "ਹੁਣੇ ਲਾਈਵ",
+    "scheduled": "ਤੈਅ ਕੀਤੀਆਂ",
+    "todayLive": "ਅੱਜ ਦੀਆਂ ਲਾਈਵ ਸ਼ਿਫਟਾਂ",
+    "upcoming": "ਆਉਣ ਵਾਲੀਆਂ ਸ਼ਿਫਟਾਂ",
+    "viewAll": "ਸਭ ਵੇਖੋ",
+    "liveStatus": "ਲਾਈਵ · ਛੇਤੀ ਸ਼ੁਰੂ",
+    "scheduledStatus": "ਤੈਅ",
+    "verified": "ਤਸਦੀਕ ਕੀਤਾ",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} ਘੰਟੇ",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ ਘੰਟਾ",
+    "estimated": "{{amount}} ਅੰਦਾਜ਼ਨ / ਕਾਮਾ",
+    "confirmed": "{{total}} ਵਿੱਚੋਂ {{count}} ਪੱਕੀਆਂ",
+    "applicants": "{{count}} ਬਿਨੈਕਾਰ",
+    "emptyLiveTitle": "ਹਾਲੇ ਕੋਈ ਲਾਈਵ ਸ਼ਿਫਟ ਨਹੀਂ",
+    "emptyLiveBody": "ਲਾਈਵ ਬੇਨਤੀ ਪੋਸਟ ਕਰੋ; 3–5 ਕਿਮੀ ਦੇ ਕਾਮਿਆਂ ਨੂੰ ਤੁਰੰਤ ਸੂਚਨਾ ਮਿਲੇਗੀ।",
+    "emptyScheduledTitle": "ਹਾਲੇ ਕੋਈ ਤੈਅ ਸ਼ਿਫਟ ਨਹੀਂ",
+    "emptyScheduledBody": "ਪਹਿਲਾਂ ਤੋਂ ਸ਼ਿਫਟ ਬਣਾਓ ਤਾਂ 5 ਕਿਮੀ ਦੇ ਕਾਮੇ ਅਰਜ਼ੀ ਦੇ ਸਕਣ।",
+    "createShift": "+ ਸ਼ਿਫਟ ਬਣਾਓ",
+    "postLiveRequest": "+ ਲਾਈਵ ਬੇਨਤੀ ਪੋਸਟ ਕਰੋ",
+    "tabs": {
+      "dashboard": "ਡੈਸ਼ਬੋਰਡ",
+      "shifts": "ਸ਼ਿਫਟਾਂ",
+      "applicants": "ਬਿਨੈਕਾਰ",
+      "profile": "ਪ੍ਰੋਫ਼ਾਈਲ"
+    },
+    "distance": "{{distance}} ਕਿਮੀ"
+  },
+  "businessShifts": {
+    "title": "ਸ਼ਿਫਟਾਂ",
+    "scheduled": "ਤੈਅ ਕੀਤੀਆਂ",
+    "rosterTitle": "ਪੱਕੀ ਟੀਮ ਸੰਭਾਲੋ",
+    "fullyStaffed": "ਟੀਮ ਪੂਰੀ · {{total}} ਵਿੱਚੋਂ {{count}}",
+    "viewSelectedOffers": "ਚੁਣੀਆਂ ਪੇਸ਼ਕਸ਼ਾਂ ਵੇਖੋ"
+  },
+  "businessApplicants": {
+    "title": "ਬਿਨੈਕਾਰਾਂ ਦੀ ਸਮੀਖਿਆ ਕਰੋ",
+    "headerTitle": "ਕਾਰੋਬਾਰੀ ਮੋਡ",
+    "headerTag": "ਕਾਰੋਬਾਰ",
+    "tabs": {
+      "applied": "ਅਰਜ਼ੀ ਦਿੱਤੀ",
+      "selected": "ਚੁਣੇ",
+      "confirmed": "ਪੱਕੇ"
+    },
+    "status": {
+      "applied": "ਅਰਜ਼ੀ ਦਿੱਤੀ",
+      "selected": "ਚੁਣਿਆ",
+      "confirmed": "ਪੱਕਾ"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}} ਦੀ ਪ੍ਰੋਫ਼ਾਈਲ ਖੋਲ੍ਹੋ",
+    "filterSort": "ਬਿਨੈਕਾਰ ਫਿਲਟਰ ਅਤੇ ਕ੍ਰਮਬੱਧ ਕਰੋ",
+    "emptyTitle": "ਹਾਲੇ ਕੋਈ ਬਿਨੈਕਾਰ ਨਹੀਂ",
+    "emptyBody": "ਤੁਹਾਡੀਆਂ ਸ਼ਿਫਟਾਂ ਦੇ ਬਿਨੈਕਾਰ ਇੱਥੇ ਦਿਖਣਗੇ।",
+    "filterTitle": "ਬਿਨੈਕਾਰ ਫਿਲਟਰ ਅਤੇ ਕ੍ਰਮਬੱਧ ਕਰੋ",
+    "sortRecent": "ਹਾਲੀਆ",
+    "sortRating": "ਸਭ ਤੋਂ ਵੱਧ ਰੇਟਿੰਗ",
+    "sortExperience": "ਸਭ ਤੋਂ ਵੱਧ ਤਜਰਬਾ",
+    "close": "ਬੰਦ ਕਰੋ"
+  },
+  "businessProfile": {
+    "sectionBusiness": "ਕਾਰੋਬਾਰ",
+    "editBusinessProfile": "ਕਾਰੋਬਾਰੀ ਪ੍ਰੋਫ਼ਾਈਲ ਸੰਪਾਦਿਤ ਕਰੋ",
+    "paymentHistory": "ਭੁਗਤਾਨ ਇਤਿਹਾਸ",
+    "verifiedLocation": "ਤਸਦੀਕ ਕੀਤਾ ਕਾਰੋਬਾਰ · {{location}}"
   }
 }

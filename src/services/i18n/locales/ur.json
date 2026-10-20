@@ -470,5 +470,77 @@
     "shiftSecured": {
       "headerTitle": "کارکن موڈ"
     }
+  },
+  "businessDashboard": {
+    "heading": "آپ کی ٹیم ایک نظر میں",
+    "verifiedSubtitle": "{{business}} · تصدیق شدہ کاروبار",
+    "liveConfirmed": "تصدیق شدہ لائیو شفٹیں",
+    "newApplicants": "نئے درخواست دہندگان",
+    "changeLocation": "کاروبار کا مقام بدلیں: {{location}}",
+    "liveNow": "ابھی لائیو",
+    "scheduled": "مقررہ",
+    "todayLive": "آج کی لائیو شفٹیں",
+    "upcoming": "آنے والی شفٹیں",
+    "viewAll": "سب دیکھیں",
+    "liveStatus": "لائیو · جلد شروع",
+    "scheduledStatus": "مقررہ",
+    "verified": "تصدیق شدہ",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} گھنٹے",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ گھنٹہ",
+    "estimated": "{{amount}} اندازاً / کارکن",
+    "confirmed": "{{total}} میں سے {{count}} تصدیق شدہ",
+    "applicants": "{{count}} درخواستیں",
+    "emptyLiveTitle": "ابھی کوئی لائیو شفٹ نہیں",
+    "emptyLiveBody": "لائیو درخواست پوسٹ کریں؛ 3–5 کلومیٹر کے کارکنوں کو فوراً اطلاع ملے گی۔",
+    "emptyScheduledTitle": "ابھی کوئی مقررہ شفٹ نہیں",
+    "emptyScheduledBody": "پہلے سے شفٹ بنائیں تاکہ 5 کلومیٹر کے کارکن درخواست دے سکیں۔",
+    "createShift": "+ شفٹ بنائیں",
+    "postLiveRequest": "+ لائیو درخواست پوسٹ کریں",
+    "tabs": {
+      "dashboard": "ڈیش بورڈ",
+      "shifts": "شفٹیں",
+      "applicants": "درخواست دہندگان",
+      "profile": "پروفائل"
+    },
+    "distance": "{{distance}} کلومیٹر"
+  },
+  "businessShifts": {
+    "title": "شفٹیں",
+    "scheduled": "مقررہ",
+    "rosterTitle": "تصدیق شدہ ٹیم کا انتظام کریں",
+    "fullyStaffed": "ٹیم مکمل · {{total}} میں سے {{count}}",
+    "viewSelectedOffers": "منتخب پیشکشیں دیکھیں"
+  },
+  "businessApplicants": {
+    "title": "درخواست دہندگان کا جائزہ",
+    "headerTitle": "کاروباری موڈ",
+    "headerTag": "کاروبار",
+    "tabs": {
+      "applied": "درخواست دی",
+      "selected": "منتخب",
+      "confirmed": "تصدیق شدہ"
+    },
+    "status": {
+      "applied": "درخواست دی",
+      "selected": "منتخب",
+      "confirmed": "تصدیق شدہ"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}} کا پروفائل کھولیں",
+    "filterSort": "درخواست دہندگان فلٹر اور ترتیب دیں",
+    "emptyTitle": "ابھی درخواست دہندگان نہیں",
+    "emptyBody": "آپ کی شفٹوں کے درخواست دہندگان یہاں نظر آئیں گے۔",
+    "filterTitle": "درخواست دہندگان فلٹر اور ترتیب دیں",
+    "sortRecent": "تازہ ترین",
+    "sortRating": "سب سے زیادہ ریٹنگ",
+    "sortExperience": "سب سے زیادہ تجربہ",
+    "close": "بند کریں"
+  },
+  "businessProfile": {
+    "sectionBusiness": "کاروبار",
+    "editBusinessProfile": "کاروباری پروفائل میں ترمیم کریں",
+    "paymentHistory": "ادائیگی کی تاریخ",
+    "verifiedLocation": "تصدیق شدہ کاروبار · {{location}}"
   }
 }

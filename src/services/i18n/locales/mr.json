@@ -475,5 +475,77 @@
     "shiftSecured": {
       "headerTitle": "कामगार मोड"
     }
+  },
+  "businessDashboard": {
+    "heading": "तुमची टीम एका नजरेत",
+    "verifiedSubtitle": "{{business}} · पडताळलेला व्यवसाय",
+    "liveConfirmed": "निश्चित लाइव्ह शिफ्ट",
+    "newApplicants": "नवीन अर्जदार",
+    "changeLocation": "व्यवसायाचे ठिकाण बदला: {{location}}",
+    "liveNow": "आत्ता लाइव्ह",
+    "scheduled": "नियोजित",
+    "todayLive": "आजच्या लाइव्ह शिफ्ट",
+    "upcoming": "आगामी शिफ्ट",
+    "viewAll": "सर्व पाहा",
+    "liveStatus": "लाइव्ह · लवकरच सुरू",
+    "scheduledStatus": "नियोजित",
+    "verified": "पडताळले",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} तास",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ तास",
+    "estimated": "{{amount}} अंदाजे / कामगार",
+    "confirmed": "{{total}} पैकी {{count}} निश्चित",
+    "applicants": "{{count}} अर्जदार",
+    "emptyLiveTitle": "सध्या लाइव्ह शिफ्ट नाहीत",
+    "emptyLiveBody": "लाइव्ह विनंती पोस्ट करा; 3–5 किमीतील कामगारांना लगेच सूचना मिळेल.",
+    "emptyScheduledTitle": "अजून नियोजित शिफ्ट नाहीत",
+    "emptyScheduledBody": "आधीच शिफ्ट तयार करा; 5 किमीतील कामगार अर्ज करू शकतात.",
+    "createShift": "+ शिफ्ट तयार करा",
+    "postLiveRequest": "+ लाइव्ह विनंती पोस्ट करा",
+    "tabs": {
+      "dashboard": "डॅशबोर्ड",
+      "shifts": "शिफ्ट",
+      "applicants": "अर्जदार",
+      "profile": "प्रोफाइल"
+    },
+    "distance": "{{distance}} किमी"
+  },
+  "businessShifts": {
+    "title": "शिफ्ट",
+    "scheduled": "नियोजित",
+    "rosterTitle": "निश्चित झालेली टीम व्यवस्थापित करा",
+    "fullyStaffed": "टीम पूर्ण · {{total}} पैकी {{count}}",
+    "viewSelectedOffers": "निवडलेल्या ऑफर पाहा"
+  },
+  "businessApplicants": {
+    "title": "अर्जदार तपासा",
+    "headerTitle": "व्यवसाय मोड",
+    "headerTag": "व्यवसाय",
+    "tabs": {
+      "applied": "अर्ज केलेले",
+      "selected": "निवडलेले",
+      "confirmed": "निश्चित"
+    },
+    "status": {
+      "applied": "अर्ज केला",
+      "selected": "निवडले",
+      "confirmed": "निश्चित"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}}चे प्रोफाइल उघडा",
+    "filterSort": "अर्जदार फिल्टर आणि क्रमवारी लावा",
+    "emptyTitle": "अर्जदार नाहीत",
+    "emptyBody": "तुमच्या शिफ्टचे अर्जदार येथे दिसतील.",
+    "filterTitle": "अर्जदार फिल्टर आणि क्रमवारी लावा",
+    "sortRecent": "अलीकडील",
+    "sortRating": "सर्वाधिक रेटिंग",
+    "sortExperience": "सर्वाधिक अनुभव",
+    "close": "बंद करा"
+  },
+  "businessProfile": {
+    "sectionBusiness": "व्यवसाय",
+    "editBusinessProfile": "व्यवसाय प्रोफाइल संपादित करा",
+    "paymentHistory": "पेमेंट इतिहास",
+    "verifiedLocation": "पडताळलेला व्यवसाय · {{location}}"
   }
 }

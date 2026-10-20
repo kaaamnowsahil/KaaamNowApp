@@ -1,14 +1,19 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { SvgProps } from 'react-native-svg';
 
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import HouseIcon from '@/assets/figma/house.svg';
 import UserRoundIcon from '@/assets/figma/user-round.svg';
+import UserIcon from '@/assets/figma/user.svg';
 import WalletIcon from '@/assets/figma/wallet.svg';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
-import { PlaceholderPage } from '@/pages/placeholder/PlaceholderPage';
+import { BusinessLivePage } from '@/pages/businessLive/BusinessLivePage';
+import { BusinessShiftsPage } from '@/pages/businessShifts/BusinessShiftsPage';
+import { BusinessApplicantsPage } from '@/pages/businessApplicants/BusinessApplicantsPage';
+import { BusinessProfilePage } from '@/pages/businessProfile/BusinessProfilePage';
 import { WorkerEarningsPage } from '@/pages/workerEarnings/WorkerEarningsPage';
 import { WorkerHomePage } from '@/pages/workerHome/WorkerHomePage';
 import { WorkerProfilePage } from '@/pages/workerProfile/WorkerProfilePage';
@@ -21,8 +26,8 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 const tabIcon =
   (Icon: FC<SvgProps>) =>
-  ({ color }: { color: string }) =>
-    <Icon width={22} height={22} color={color} />;
+    ({ color }: { color: string }) =>
+      <Icon width={22} height={22} color={color} />;
 
 type TabDef = {
   name: keyof TabParamList;
@@ -60,25 +65,43 @@ const WORKER_TABS: TabDef[] = [
 ];
 
 const BUSINESS_TABS: TabDef[] = [
-  { name: ROUTES.businessLive, title: 'Live now', component: PlaceholderPage },
-  { name: ROUTES.businessShifts, title: 'Shifts', component: PlaceholderPage },
+  {
+    name: ROUTES.businessLive,
+    title: 'dashboard',
+    component: BusinessLivePage,
+    icon: tabIcon(HouseIcon),
+  },
+  {
+    name: ROUTES.businessShifts,
+    title: 'shifts',
+    component: BusinessShiftsPage,
+    icon: tabIcon(CalendarDaysIcon),
+  },
   {
     name: ROUTES.businessApplicants,
-    title: 'Applicants',
-    component: PlaceholderPage,
+    title: 'applicants',
+    component: BusinessApplicantsPage,
+    icon: tabIcon(UserRoundIcon),
   },
   {
     name: ROUTES.businessProfile,
-    title: 'Profile',
-    component: PlaceholderPage,
+    title: 'profile',
+    component: BusinessProfilePage,
+    icon: tabIcon(UserIcon),
   },
 ];
 
 /** Role-based bottom tabs: worker and business get different tab sets. */
 export const BottomTabRoutes: FC = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const role = useAuthStore(s => s.role);
-  const tabs = role === 'business' ? BUSINESS_TABS : WORKER_TABS;
+  const tabs = role === 'business'
+    ? BUSINESS_TABS.map(tab => ({
+      ...tab,
+      title: t(`businessDashboard.tabs.${tab.title}`),
+    }))
+    : WORKER_TABS;
 
   return (
     <Tab.Navigator

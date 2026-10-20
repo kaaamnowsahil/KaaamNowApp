@@ -475,5 +475,77 @@
     "shiftSecured": {
       "headerTitle": "కార్మికుల మోడ్"
     }
+  },
+  "businessDashboard": {
+    "heading": "మీ బృందం ఒక చూపులో",
+    "verifiedSubtitle": "{{business}} · ధృవీకరించిన వ్యాపారం",
+    "liveConfirmed": "నిర్ధారించిన లైవ్ షిఫ్ట్‌లు",
+    "newApplicants": "కొత్త దరఖాస్తులు",
+    "changeLocation": "వ్యాపార స్థానాన్ని మార్చండి: {{location}}",
+    "liveNow": "ఇప్పుడు లైవ్",
+    "scheduled": "షెడ్యూల్ చేసినవి",
+    "todayLive": "ఈరోజు లైవ్ షిఫ్ట్‌లు",
+    "upcoming": "రాబోయే షిఫ్ట్‌లు",
+    "viewAll": "అన్నీ చూడండి",
+    "liveStatus": "లైవ్ · త్వరలో ప్రారంభం",
+    "scheduledStatus": "షెడ్యూల్ చేయబడింది",
+    "verified": "ధృవీకరించబడింది",
+    "dateTimeHours": "{{date}} · {{time}} · {{hours}} గంటలు",
+    "areaRequirement": "{{area}} · {{requirement}}",
+    "perHour": "/ గంట",
+    "estimated": "{{amount}} అంచనా / కార్మికుడు",
+    "confirmed": "{{total}}లో {{count}} నిర్ధారించారు",
+    "applicants": "{{count}} దరఖాస్తులు",
+    "emptyLiveTitle": "ఇప్పుడు లైవ్ షిఫ్ట్‌లు లేవు",
+    "emptyLiveBody": "లైవ్ అభ్యర్థనను పోస్ట్ చేయండి; 3–5 కి.మీ.లోని కార్మికులకు వెంటనే తెలియజేస్తాం.",
+    "emptyScheduledTitle": "ఇంకా షెడ్యూల్ షిఫ్ట్‌లు లేవు",
+    "emptyScheduledBody": "ముందుగానే షిఫ్ట్ సృష్టిస్తే 5 కి.మీ.లోని కార్మికులు దరఖాస్తు చేయవచ్చు.",
+    "createShift": "+ షిఫ్ట్ సృష్టించండి",
+    "postLiveRequest": "+ లైవ్ అభ్యర్థన పోస్ట్ చేయండి",
+    "tabs": {
+      "dashboard": "డ్యాష్‌బోర్డ్",
+      "shifts": "షిఫ్ట్‌లు",
+      "applicants": "దరఖాస్తుదారులు",
+      "profile": "ప్రొఫైల్"
+    },
+    "distance": "{{distance}} కి.మీ."
+  },
+  "businessShifts": {
+    "title": "షిఫ్ట్‌లు",
+    "scheduled": "షెడ్యూల్ చేసినవి",
+    "rosterTitle": "నిర్ధారించిన బృందాన్ని నిర్వహించండి",
+    "fullyStaffed": "బృందం పూర్తయింది · {{total}}లో {{count}}",
+    "viewSelectedOffers": "ఎంపిక చేసిన ఆఫర్‌లను చూడండి"
+  },
+  "businessApplicants": {
+    "title": "దరఖాస్తుదారులను సమీక్షించండి",
+    "headerTitle": "వ్యాపార మోడ్",
+    "headerTag": "వ్యాపారం",
+    "tabs": {
+      "applied": "దరఖాస్తు",
+      "selected": "ఎంపికైనవి",
+      "confirmed": "నిర్ధారించినవి"
+    },
+    "status": {
+      "applied": "దరఖాస్తు",
+      "selected": "ఎంపికైంది",
+      "confirmed": "నిర్ధారితం"
+    },
+    "meta": "{{experience}} · {{category}} · {{rating}}",
+    "openProfile": "{{name}} ప్రొఫైల్ తెరవండి",
+    "filterSort": "దరఖాస్తుదారులను ఫిల్టర్ చేసి క్రమబద్ధీకరించండి",
+    "emptyTitle": "దరఖాస్తుదారులు లేరు",
+    "emptyBody": "మీ షిఫ్ట్‌ల దరఖాస్తుదారులు ఇక్కడ కనిపిస్తారు.",
+    "filterTitle": "దరఖాస్తుదారులను ఫిల్టర్ చేసి క్రమబద్ధీకరించండి",
+    "sortRecent": "ఇటీవలి",
+    "sortRating": "అత్యధిక రేటింగ్",
+    "sortExperience": "అత్యధిక అనుభవం",
+    "close": "మూసివేయండి"
+  },
+  "businessProfile": {
+    "sectionBusiness": "వ్యాపారం",
+    "editBusinessProfile": "వ్యాపార ప్రొఫైల్‌ను సవరించండి",
+    "paymentHistory": "చెల్లింపు చరిత్ర",
+    "verifiedLocation": "ధృవీకరించిన వ్యాపారం · {{location}}"
   }
 }
