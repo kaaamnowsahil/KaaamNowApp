@@ -81,6 +81,7 @@ export const WorkerEarningsPage: FC = () => {
           meta={rowMeta(row)}
           status={row.status}
           statusLabel={t(`workerEarnings.status.${row.status}`)}
+          onPress={() => earnings.openEarningDetail(row)}
         />
       ))}
     </View>,

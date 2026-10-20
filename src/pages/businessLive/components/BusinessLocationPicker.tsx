@@ -31,52 +31,109 @@ export const BusinessLocationPicker: FC<BusinessLocationPickerProps> = ({
                 accessibilityRole="button"
                 accessibilityLabel={t('businessDashboard.changeLocation', { location })}
                 accessibilityState={{ expanded: isOpen }}
-                onPress={onToggle}
-                style={styles.button}
-            >
-                <MapPinIcon width={16} height={16} color={colors.primary} />
-                <Text numberOfLines={1} style={[styles.location, {
-                    color: colors.textSubtle,
-                }]}>
-                    {location}
-                </Text>
-                <ChevronDownIcon width={15} height={15} color={colors.textSubtle} />
-            </Pressable>
-            {isOpen ? (
-                <View style={[styles.menu, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                    {options.map((option, index) => (
-                        <Pressable
-                            key={option}
-                            accessibilityRole="button"
-                            onPress={() => onSelect(option)}
-                            style={[
-                                styles.option,
-                                index > 0 && {
-                                    borderTopColor: colors.border,
-                                    borderTopWidth: StyleSheet.hairlineWidth,
-                                },
-                            ]}
-                        >
-                            <Text style={[styles.location, { color: option === location ? colors.primary : colors.text }]}>
-                                {option}
-                            </Text>
-                        </Pressable>
-                    ))}
-                </View>
-            ) : null}
+                    hitSlop={6}
+                    onPress={onToggle}
+                    style={styles.button}
+                    testID="business-location"
+                >
+                    <MapPinIcon width={18} height={18} color={colors.primary} />
+                    <Text numberOfLines={1} style={[styles.location, {
+                        color: colors.textMuted,
+                    }]}>
+                        {location}
+                    </Text>
+                    <View style={isOpen && styles.flipped}>
+                        <ChevronDownIcon width={16} height={16} color={colors.textMuted} />
+                    </View>
+                </Pressable>
+                {isOpen ? (
+                    <View
+                        accessibilityRole="menu"
+                        style={[
+                            styles.menu,
+                            { backgroundColor: colors.surface, borderColor: colors.border },
+                        ]}
+                        testID="business-location-menu"
+                    >
+                        <Text style={[styles.hint, { color: colors.textSubtle }]}>
+                            {t('businessDashboard.locationPickerHint')}
+                        </Text>
+                        {options.map((option, index) => {
+                            const selected = option === location;
+                            return (
+                            <Pressable
+                                key={option}
+                                accessibilityRole="menuitem"
+                                accessibilityState={{ selected }}
+                                onPress={() => onSelect(option)}
+                                style={({ pressed }) => [
+                                    styles.option,
+                                    index > 0 && {
+                                        borderTopColor: colors.border,
+                                        borderTopWidth: 1,
+                                    },
+                                    pressed && { backgroundColor: colors.fill },
+                                ]}
+                                testID={`business-location-option-${index}`}
+                            >
+                                <Text
+                                    style={[
+                                        styles.optionText,
+                                        selected && styles.optionSelected,
+                                        { color: selected ? colors.primary : colors.text },
+                                    ]}
+                                >
+                                    {option}
+                                </Text>
+                                {selected ? (
+                                    <View
+                                        style={[
+                                            styles.dot,
+                                            { backgroundColor: colors.primary },
+                                        ]}
+                                    />
+                                ) : null}
+                            </Pressable>
+                            );
+                        })}
+                    </View>
+                ) : null}
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    root: { gap: 6 },
+    root: { gap: 8 },
     button: { minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 8 },
     location: {
         flex: 1,
         fontFamily: FONTS.regular,
-        fontSize: 11,
-        lineHeight: 16,
+        fontSize: 13,
+        lineHeight: 18.2,
     },
-    menu: { borderWidth: 1, borderRadius: 10, overflow: 'hidden' },
-    option: { minHeight: 40, justifyContent: 'center', paddingHorizontal: 12 },
+    flipped: { transform: [{ rotate: '180deg' }] },
+    menu: { borderWidth: 1, borderRadius: 12, overflow: 'hidden' },
+    hint: {
+        fontFamily: FONTS.semiBold,
+        fontSize: 11,
+        lineHeight: 16.5,
+        paddingHorizontal: 14,
+        paddingTop: 10,
+        paddingBottom: 4,
+    },
+    option: {
+        minHeight: 44,
+        paddingHorizontal: 14,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
+    optionText: {
+        flex: 1,
+        fontFamily: FONTS.regular,
+        fontSize: 14,
+        lineHeight: 19.6,
+    },
+    optionSelected: { fontFamily: FONTS.semiBold },
+    dot: { width: 8, height: 8, borderRadius: 4 },
 });

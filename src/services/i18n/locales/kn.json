@@ -256,7 +256,8 @@
     "viewAll": "ಎಲ್ಲಾ ಗಳಿಕೆ ನೋಡಿ",
     "support": "ಪಾವತಿ ಸಹಾಯ",
     "period": "{{month}} · ಪೂರ್ಣಗೊಂಡ ಪಾವತಿಗಳು",
-    "lastPaid": "{{job}} · {{date}}"
+    "lastPaid": "{{job}} · {{date}}",
+    "detailTitle": "ಗಳಿಕೆಯ ವಿವರಗಳು"
   },
   "earningsHistory": {
     "title": "ಎಲ್ಲಾ ಗಳಿಕೆ",
@@ -509,7 +510,8 @@
       "applicants": "ಅರ್ಜಿದಾರರು",
       "profile": "ಪ್ರೊಫೈಲ್"
     },
-    "distance": "{{distance}} ಕಿಮೀ"
+    "distance": "{{distance}} ಕಿಮೀ",
+    "locationPickerHint": "ವ್ಯವಹಾರದ ಸ್ಥಳವನ್ನು ಆಯ್ಕೆಮಾಡಿ"
   },
   "businessShifts": {
     "title": "ಶಿಫ್ಟ್‌ಗಳು",
@@ -832,5 +834,16 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "workerEarningDetail": {
+    "business": "ವ್ಯಾಪಾರ",
+    "shift": "ಶಿಫ್ಟ್",
+    "date": "ದಿನಾಂಕ",
+    "hours": "ಕೆಲಸದ ಗಂಟೆಗಳು",
+    "hoursValue": "{{hours}} ಗಂಟೆಗಳು",
+    "rate": "ಗಂಟೆಯ ದರ",
+    "hour": "ಗಂಟೆ",
+    "shifts": "ಒಳಗೊಂಡಿರುವ ಶಿಫ್ಟ್‌ಗಳು",
+    "reference": "ಗಳಿಕೆಯ ಉಲ್ಲೇಖ"
   }
 }

@@ -256,7 +256,8 @@
     "viewAll": "सर्व कमाई पाहा",
     "support": "पेमेंट मदत",
     "period": "{{month}} · पूर्ण झालेली पेमेंट",
-    "lastPaid": "{{job}} · {{date}}"
+    "lastPaid": "{{job}} · {{date}}",
+    "detailTitle": "कमाईचा तपशील"
   },
   "earningsHistory": {
     "title": "सर्व कमाई",
@@ -509,7 +510,8 @@
       "applicants": "अर्जदार",
       "profile": "प्रोफाइल"
     },
-    "distance": "{{distance}} किमी"
+    "distance": "{{distance}} किमी",
+    "locationPickerHint": "व्यवसायाचे ठिकाण निवडा"
   },
   "businessShifts": {
     "title": "शिफ्ट",
@@ -832,5 +834,16 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "workerEarningDetail": {
+    "business": "व्यवसाय",
+    "shift": "शिफ्ट",
+    "date": "तारीख",
+    "hours": "कामाचे तास",
+    "hoursValue": "{{hours}} तास",
+    "rate": "तासाचा दर",
+    "hour": "तास",
+    "shifts": "समाविष्ट शिफ्ट",
+    "reference": "कमाई संदर्भ"
   }
 }

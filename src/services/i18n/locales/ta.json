@@ -256,7 +256,8 @@
     "viewAll": "அனைத்து வருமானத்தையும் பார்",
     "support": "கட்டண உதவி",
     "period": "{{month}} · முடிந்த கட்டணங்கள்",
-    "lastPaid": "{{job}} · {{date}}"
+    "lastPaid": "{{job}} · {{date}}",
+    "detailTitle": "வருமான விவரங்கள்"
   },
   "earningsHistory": {
     "title": "அனைத்து வருமானம்",
@@ -509,7 +510,8 @@
       "applicants": "விண்ணப்பதாரர்கள்",
       "profile": "சுயவிவரம்"
     },
-    "distance": "{{distance}} கிமீ"
+    "distance": "{{distance}} கிமீ",
+    "locationPickerHint": "வணிக இடத்தைத் தேர்ந்தெடுக்கவும்"
   },
   "businessShifts": {
     "title": "ஷிப்ட்கள்",
@@ -832,5 +834,16 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "workerEarningDetail": {
+    "business": "வணிகம்",
+    "shift": "ஷிப்ட்",
+    "date": "தேதி",
+    "hours": "வேலை செய்த நேரம்",
+    "hoursValue": "{{hours}} மணி நேரம்",
+    "rate": "மணிநேரக் கட்டணம்",
+    "hour": "மணி",
+    "shifts": "சேர்க்கப்பட்ட ஷிப்ட்கள்",
+    "reference": "வருமானக் குறிப்பு"
   }
 }

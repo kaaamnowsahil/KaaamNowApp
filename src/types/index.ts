@@ -3,6 +3,7 @@ export type {
   BookingStatus,
   Payout,
   PayoutStatus,
+  WorkerEarningDetails,
   WithdrawalReceipt,
 } from './booking';
 export type { Option, PickedAddress } from './common';

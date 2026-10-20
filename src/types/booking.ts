@@ -43,3 +43,15 @@ export type Payout = {
   amount: number;
   status: PayoutStatus;
 };
+
+export type WorkerEarningDetails = {
+  id: string;
+  title: string;
+  amount: number;
+  status: PayoutStatus;
+  businessName?: string;
+  dateLabel?: string;
+  hours?: number;
+  rate?: number;
+  shifts?: number;
+};

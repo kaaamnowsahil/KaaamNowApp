@@ -255,6 +255,7 @@
     "withdraw": "निकालें",
     "viewAll": "सभी कमाई देखें",
     "support": "भुगतान सहायता",
+    "detailTitle": "कमाई का विवरण",
     "period": "{{month}} · पूरे भुगतान",
     "lastPaid": "{{job}} · {{date}}"
   },
@@ -267,6 +268,17 @@
       "processing": "प्रक्रिया में",
       "completed": "पूरी"
     }
+  },
+  "workerEarningDetail": {
+    "business": "व्यवसाय",
+    "shift": "शिफ्ट",
+    "date": "तारीख",
+    "hours": "काम के घंटे",
+    "hoursValue": "{{hours}} घंटे",
+    "rate": "प्रति घंटे की दर",
+    "hour": "घंटा",
+    "shifts": "शामिल शिफ्ट",
+    "reference": "कमाई संदर्भ"
   },
   "withdraw": {
     "title": "पैसे निकालें",
@@ -509,7 +521,8 @@
       "applicants": "आवेदक",
       "profile": "प्रोफ़ाइल"
     },
-    "distance": "{{distance}} किमी"
+    "distance": "{{distance}} किमी",
+    "locationPickerHint": "व्यवसाय का स्थान चुनें"
   },
   "businessShifts": {
     "title": "शिफ्ट",

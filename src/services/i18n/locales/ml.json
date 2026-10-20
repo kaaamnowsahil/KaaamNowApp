@@ -256,7 +256,8 @@
     "viewAll": "എല്ലാ വരുമാനവും കാണുക",
     "support": "പേയ്മെന്റ് സഹായം",
     "period": "{{month}} · പൂർത്തിയായ പേയ്മെന്റുകൾ",
-    "lastPaid": "{{job}} · {{date}}"
+    "lastPaid": "{{job}} · {{date}}",
+    "detailTitle": "വരുമാനത്തിന്റെ വിശദാംശങ്ങൾ"
   },
   "earningsHistory": {
     "title": "എല്ലാ വരുമാനവും",
@@ -509,7 +510,8 @@
       "applicants": "അപേക്ഷകർ",
       "profile": "പ്രൊഫൈൽ"
     },
-    "distance": "{{distance}} കി.മീ."
+    "distance": "{{distance}} കി.മീ.",
+    "locationPickerHint": "ബിസിനസ് സ്ഥലം തിരഞ്ഞെടുക്കുക"
   },
   "businessShifts": {
     "title": "ഷിഫ്റ്റുകൾ",
@@ -832,5 +834,16 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "workerEarningDetail": {
+    "business": "ബിസിനസ്",
+    "shift": "ഷിഫ്റ്റ്",
+    "date": "തീയതി",
+    "hours": "ജോലി ചെയ്ത മണിക്കൂറുകൾ",
+    "hoursValue": "{{hours}} മണിക്കൂർ",
+    "rate": "മണിക്കൂർ നിരക്ക്",
+    "hour": "മണിക്കൂർ",
+    "shifts": "ഉൾപ്പെടുത്തിയ ഷിഫ്റ്റുകൾ",
+    "reference": "വരുമാന റഫറൻസ്"
   }
 }
