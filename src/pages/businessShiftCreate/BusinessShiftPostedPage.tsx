@@ -97,7 +97,7 @@ export const BusinessShiftPostedPage: FC<
         >
           <View style={styles.shiftCopy}>
             <Text style={[styles.cardTitle, { color: colors.text }]}>
-              {draft.role}
+              {draft.schedules[index]?.role ?? draft.role}
             </Text>
             <Text style={[styles.caption, { color: colors.textSubtle }]}>
               {schedule.date} · {schedule.time}

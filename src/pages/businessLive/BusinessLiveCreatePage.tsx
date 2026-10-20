@@ -5,6 +5,7 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -16,6 +17,7 @@ import { MapPreview } from '@/components/shiftFlow';
 import { PrimaryButton, ScreenIntro, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
+import { BUSINESS_TYPES } from '@/pages/businessSignup/mock';
 import { useBusinessLiveStore } from '@/services/business/useBusinessLiveStore';
 import { useOnboardingStore } from '@/services/onboarding/useOnboardingStore';
 import {
@@ -38,13 +40,22 @@ export const BusinessLiveCreatePage: FC<
   const savedDraft = useBusinessLiveStore(state => state.draft);
   const saveDraft = useBusinessLiveStore(state => state.saveDraft);
   const businessAddress = useOnboardingStore(state => state.business?.address);
-  const [draft, setDraft] = useState(
-    () =>
+  const businessType =
+    useOnboardingStore(state => state.business?.businessType) ?? 'hospitality';
+  const [draft, setDraft] = useState(() => {
+    const initialDraft =
       savedDraft ??
       createDefaultBusinessLiveDraft(
         businessAddress || BUSINESS_DASHBOARD.location,
-      ),
-  );
+      );
+    const hasSelectableCategory = BUSINESS_TYPES.some(
+      category => category.id === initialDraft.category,
+    );
+    return {
+      ...initialDraft,
+      category: hasSelectableCategory ? initialDraft.category : businessType,
+    };
+  });
   const [locationEdited, setLocationEdited] = useState(false);
   const [locationStatus, setLocationStatus] = useState<
     'locating' | 'located' | 'unavailable' | 'edited'
@@ -266,13 +277,41 @@ export const BusinessLiveCreatePage: FC<
         placeholder={t('businessLiveCreate.rolePlaceholder')}
         testID="business-live-role"
       />
-      <ShiftFormField
-        label={t('businessLiveCreate.category')}
-        value={draft.category}
-        onChangeText={value => update('category', value)}
-        placeholder={t('businessLiveCreate.categoryPlaceholder')}
-        testID="business-live-category"
-      />
+      <View style={styles.categoryField}>
+        <Text style={[styles.fieldLabel, { color: colors.textSubtle }]}>
+          {t('businessLiveCreate.category')}
+        </Text>
+        <View accessibilityRole="radiogroup" style={styles.categoryOptions}>
+          {BUSINESS_TYPES.map(category => {
+            const selected = draft.category === category.id;
+            return (
+              <Pressable
+                key={category.id}
+                accessibilityRole="radio"
+                accessibilityState={{ selected }}
+                onPress={() => update('category', category.id)}
+                style={[
+                  styles.categoryOption,
+                  {
+                    backgroundColor: selected ? colors.primary : colors.fill,
+                    borderColor: selected ? colors.primary : colors.border,
+                  },
+                ]}
+                testID={`business-live-category-${category.id}`}
+              >
+                <Text
+                  style={[
+                    styles.categoryOptionText,
+                    { color: selected ? colors.onPrimary : colors.textMuted },
+                  ]}
+                >
+                  {t(`businessSignup.businessTypes.${category.id}`)}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
       <ShiftFormField
         label={t('businessLiveCreate.responsibilities')}
         value={draft.responsibilities}
@@ -282,28 +321,14 @@ export const BusinessLiveCreatePage: FC<
         style={styles.multiline}
         testID="business-live-responsibilities"
       />
-      <ShiftFormField
-        label={t('businessLiveCreate.requirement')}
-        value={draft.requirement}
-        onChangeText={value => update('requirement', value)}
-        testID="business-live-requirement"
-      />
-      <ShiftFormField
-        label={t('businessLiveCreate.workers')}
-        value={draft.workers}
-        onChangeText={value => update('workers', value)}
-        keyboardType="number-pad"
-        testID="business-live-workers"
-      />
-      <ShiftFormField
-        label={t('businessLiveCreate.hourlyRate')}
-        value={draft.hourlyRate}
-        onChangeText={value => update('hourlyRate', value)}
-        keyboardType="decimal-pad"
-        prefix="₹"
-        testID="business-live-rate"
-      />
       <View style={styles.row}>
+        <ShiftFormField
+          label={t('businessLiveCreate.workers')}
+          value={draft.workers}
+          onChangeText={value => update('workers', value)}
+          keyboardType="number-pad"
+          testID="business-live-workers"
+        />
         <ShiftFormField
           label={t('businessLiveCreate.startTime')}
           value={draft.startTime}
@@ -312,6 +337,16 @@ export const BusinessLiveCreatePage: FC<
           placeholder="14:00"
           maxLength={5}
           testID="business-live-start-time"
+        />
+      </View>
+      <View style={styles.row}>
+        <ShiftFormField
+          label={t('businessLiveCreate.hourlyRate')}
+          value={draft.hourlyRate}
+          onChangeText={value => update('hourlyRate', value)}
+          keyboardType="decimal-pad"
+          prefix="₹"
+          testID="business-live-rate"
         />
         <ShiftFormField
           label={t('businessLiveCreate.hours')}
@@ -380,6 +415,15 @@ export const BusinessLiveCreatePage: FC<
         placeholder={t('businessLiveCreate.workplaceInstructionsPlaceholder')}
         testID="business-live-instructions"
       />
+      <ShiftFormField
+        label={t('businessLiveCreate.requirement')}
+        value={draft.requirement}
+        onChangeText={value => update('requirement', value)}
+        multiline
+        textAlignVertical="top"
+        style={styles.multiline}
+        testID="business-live-requirement"
+      />
       <View
         style={[
           styles.details,
@@ -420,6 +464,15 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: 8 },
   multiline: { minHeight: 64, paddingTop: 10 },
   field: { flex: 1, gap: 6 },
+  categoryField: { gap: 6 },
+  categoryOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  categoryOption: {
+    borderWidth: 1,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  categoryOptionText: { fontFamily: FONTS.semiBold, fontSize: 13 },
   fieldLabel: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 16 },
   readOnlyField: {
     minHeight: 44,
