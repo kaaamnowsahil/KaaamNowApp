@@ -11,6 +11,7 @@ export type BusinessDashboardShift = {
   hours: number;
   area: string;
   requirement: string;
+  responsibilities?: string;
   distanceKm: number;
   hourlyRate: number;
   estimatedTotal: number;
@@ -72,7 +73,7 @@ export const createLiveDraftFromDashboardShift = (
 ): BusinessLiveRequestDraft => ({
   role: shift.title,
   category: shift.category ?? 'General',
-  responsibilities: shift.requirement,
+  responsibilities: shift.responsibilities ?? shift.requirement,
   requirement: shift.requirement,
   location: shift.area,
   latitude: null,
