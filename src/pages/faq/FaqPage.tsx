@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 import { BodyNote } from '@/components/ui';
 import { FormScreen } from '@/layout/FormScreen';
@@ -10,6 +11,7 @@ import { useFaq } from './hooks/useFaq';
 
 /** Profile → FAQ & Help (Figma 13 · Account / Help). Questions: mock/faqMock.ts */
 export const FaqPage: FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const f = useFaq();
 
@@ -17,7 +19,7 @@ export const FaqPage: FC = () => {
     <FormScreen
       onBack={navigation.goBack}
       backVariant="plain"
-      title={S.TITLE}
+      title={t('faq.title')}
       gap={16}
       isLoading={f.isLoading}
       testID="faq-page"

@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Linking, View } from 'react-native';
 
 import { DetailRow, ReasonSheet, StatusHero } from '@/components/shiftFlow';
@@ -10,7 +11,6 @@ import type { AppScreenProps } from '@/types';
 import { formatRupees, splitTimeRange } from '@/utils/format';
 import { mapsUrl } from '@/utils/links';
 
-import { SHIFT_SECURED_STRINGS as S } from './constants';
 import { CANCEL_REASONS, DEFAULT_SECURED, SECURED } from './mock';
 
 /**
@@ -21,11 +21,16 @@ import { CANCEL_REASONS, DEFAULT_SECURED, SECURED } from './mock';
 export const ShiftSecuredPage: FC<
   AppScreenProps<typeof ROUTES.shiftSecured>
 > = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { shift } = route.params;
   const isLoading = useMockLoading();
   const [isCancelOpen, setIsCancelOpen] = useState(false);
   const secured = { ...DEFAULT_SECURED, ...SECURED[shift.id] };
   const workplace = secured.workplace ?? shift.area;
+  const cancelReasons = CANCEL_REASONS.map(reason => ({
+    ...reason,
+    label: t(`shiftSecured.reasons.${reason.id}`),
+  }));
 
   const openDetails = () => navigation.navigate(ROUTES.shiftDetails, { shift, bookingStatus: 'confirmed' });
   const openMaps = () =>
@@ -33,8 +38,8 @@ export const ShiftSecuredPage: FC<
 
   const cancel = () => {
     setIsCancelOpen(false);
-    Alert.alert(S.CANCELLED_TITLE, S.CANCELLED_BODY, [
-      { text: S.OK, onPress: () => navigation.popToTop() },
+    Alert.alert(t('shiftSecured.cancelledTitle'), t('shiftSecured.cancelledBody'), [
+      { text: t('shiftSecured.ok'), onPress: () => navigation.popToTop() },
     ]);
   };
 
@@ -42,26 +47,26 @@ export const ShiftSecuredPage: FC<
     <>
       <FormScreen
         onBack={navigation.goBack}
-        title={S.HEADER_TITLE}
+        title={t('shiftSecured.headerTitle')}
         compactTitle
-        headerTag={S.HEADER_RIGHT}
+        headerTag={t('shiftSecured.headerRight')}
         gap={16}
         isLoading={isLoading}
         testID="shift-secured-page"
         actions={
           <>
             <PrimaryButton
-              label={S.VIEW_SHIFT}
+              label={t('shiftSecured.viewShift')}
               onPress={() => navigation.navigate(ROUTES.shiftTravel, { shift })}
               testID="shift-secured-view"
             />
             <SecondaryButton
-              label={S.DIRECTIONS}
+              label={t('shiftSecured.directions')}
               onPress={openMaps}
               testID="shift-secured-directions"
             />
             <SecondaryButton
-              label={S.CANCEL_LINK}
+              label={t('shiftSecured.cancelLink')}
               onPress={() => setIsCancelOpen(true)}
               testID="shift-secured-cancel"
             />
@@ -69,52 +74,62 @@ export const ShiftSecuredPage: FC<
         }
       >
         <StatusHero
-          overline={S.confirmed(secured.checkInCode)}
-          title={S.HEADING}
-          subtitle={S.subtitle(
-            secured.arriveMinutesEarly,
-            splitTimeRange(shift.timeLabel).start,
-            secured.contactName,
-          )}
+          overline={t('shiftSecured.confirmed', { code: secured.checkInCode })}
+          title={t('shiftSecured.heading')}
+          subtitle={t('shiftSecured.subtitle', {
+            minutes: secured.arriveMinutesEarly,
+            start: splitTimeRange(shift.timeLabel).start,
+            contact: secured.contactName,
+          })}
         />
         <View>
           <DetailRow
             size="compact"
             title={shift.title}
-            caption={S.business(shift.businessName, shift.isVerified)}
+            caption={shift.isVerified
+              ? t('shiftSecured.verifiedBusiness', { business: shift.businessName })
+              : shift.businessName}
             onPress={openDetails}
           />
           <DetailRow
             size="compact"
             title={secured.dateLabel ?? shift.dateLabel}
-            caption={S.timeRange(shift.timeLabel, shift.durationHours)}
+            caption={t('shiftSecured.timeRange', {
+              time: shift.timeLabel,
+              hours: shift.durationHours,
+            })}
             onPress={openDetails}
           />
           <DetailRow
             size="compact"
-            title={S.AGREED_RATE}
-            caption={S.rate(
-              formatRupees(shift.hourlyRate),
-              formatRupees(shift.hourlyRate * shift.durationHours),
-            )}
+            title={t('shiftSecured.agreedRate')}
+            caption={t('shiftSecured.rate', {
+              rate: formatRupees(shift.hourlyRate),
+              total: formatRupees(shift.hourlyRate * shift.durationHours),
+            })}
             onPress={openDetails}
           />
           <DetailRow
             size="compact"
-            title={S.WORKPLACE}
-            caption={S.workplace(workplace, shift.distanceKm)}
+            title={t('shiftSecured.workplace')}
+            caption={t('shiftSecured.workplaceDistance', {
+              address: workplace,
+              distance: shift.distanceKm,
+            })}
             onPress={openMaps}
           />
         </View>
       </FormScreen>
       {isCancelOpen ? (
         <ReasonSheet
-          title={S.CANCEL_TITLE}
-          subtitle={S.cancelBody(secured.lateCancelWindow)}
-          reasonLabel={S.CANCEL_REASON}
-          reasons={CANCEL_REASONS}
-          confirmLabel={S.CANCEL_CONFIRM}
-          keepLabel={S.KEEP}
+          title={t('shiftSecured.cancelTitle')}
+          subtitle={t('shiftSecured.cancelBody', {
+            window: secured.lateCancelWindow,
+          })}
+          reasonLabel={t('shiftSecured.cancelReason')}
+          reasons={cancelReasons}
+          confirmLabel={t('shiftSecured.cancelConfirm')}
+          keepLabel={t('shiftSecured.keep')}
           onConfirm={cancel}
           onClose={() => setIsCancelOpen(false)}
           testID="cancel-shift-sheet"

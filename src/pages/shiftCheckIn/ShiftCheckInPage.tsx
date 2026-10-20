@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import {
@@ -17,7 +18,6 @@ import type { AppScreenProps } from '@/types';
 import { splitTimeRange } from '@/utils/format';
 
 import { CheckInHelpSheet } from './components';
-import { SHIFT_CHECK_IN_STRINGS as S } from './constants';
 import { CHECK_IN } from './mock';
 
 /**
@@ -28,6 +28,7 @@ import { CHECK_IN } from './mock';
 export const ShiftCheckInPage: FC<
   AppScreenProps<typeof ROUTES.shiftCheckIn>
 > = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { shift } = route.params;
   const times = splitTimeRange(shift.timeLabel);
   const { colors } = useTheme();
@@ -42,86 +43,98 @@ export const ShiftCheckInPage: FC<
 
   return (
     <>
-    <FormScreen
-      onBack={navigation.goBack}
-      title={S.HEADER_TITLE}
-      compactTitle
-      headerTag={S.HEADER_RIGHT}
-      gap={12}
-      isLoading={isLoading}
-      testID="shift-check-in-page"
-      actions={
-        <>
-          <PrimaryButton
-            label={S.VERIFY}
-            disabled={code.length !== CHECK_IN.code.length}
-            onPress={verify}
-            testID="shift-check-in-verify"
-          />
-          <SecondaryButton
-            label={S.HELP}
-            onPress={() => setIsHelpOpen(true)}
-            testID="shift-check-in-help"
-          />
-        </>
-      }
-    >
-      <FlowHeading
-        title={S.HEADING}
-        subtitle={S.subtitle(shift.title, shift.businessName)}
-      />
-      <InfoCallout text={S.within(CHECK_IN.withinMeters)} />
-      <MapPreview variant="pin" label={S.mapLabel(shift.distanceKm)} />
-      <StatTiles
-        items={[
-          { value: times.start, label: S.SHIFT_START },
-          { value: times.end, label: S.EXPECTED_END },
-        ]}
-      />
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.textMuted }]}>
-          {S.CODE_LABEL}
-        </Text>
-        <TextInput
-          accessibilityLabel={S.CODE_LABEL}
-          value={code}
-          onChangeText={v => {
-            setCode(v.replace(/\D/g, '').slice(0, CHECK_IN.code.length));
-            setIsWrong(false);
-          }}
-          keyboardType="number-pad"
-          placeholder={S.CODE_PLACEHOLDER}
-          placeholderTextColor={colors.textSubtle}
-          style={[
-            styles.input,
-            {
-              color: colors.text,
-              backgroundColor: colors.surface,
-              borderColor: isWrong ? colors.danger : colors.border,
-            },
-          ]}
-          testID="shift-check-in-code"
+      <FormScreen
+        onBack={navigation.goBack}
+        title={t('workerFlow.shiftSecured.headerTitle')}
+        compactTitle
+        headerTag={t('workerFlow.checkIn.headerRight')}
+        gap={12}
+        isLoading={isLoading}
+        testID="shift-check-in-page"
+        actions={
+          <>
+            <PrimaryButton
+              label={t('workerFlow.checkIn.verify')}
+              disabled={code.length !== CHECK_IN.code.length}
+              onPress={verify}
+              testID="shift-check-in-verify"
+            />
+            <SecondaryButton
+              label={t('workerFlow.checkIn.help')}
+              onPress={() => setIsHelpOpen(true)}
+              testID="shift-check-in-help"
+            />
+          </>
+        }
+      >
+        <FlowHeading
+          title={t('workerFlow.checkIn.heading')}
+          subtitle={t('workerFlow.checkIn.subtitle', {
+            role: shift.title,
+            business: shift.businessName,
+          })}
         />
-        <Text
-          style={[
-            styles.helper,
-            { color: isWrong ? colors.danger : colors.textSubtle },
+        <InfoCallout
+          text={t('workerFlow.checkIn.within', { meters: CHECK_IN.withinMeters })}
+        />
+        <MapPreview
+          variant="pin"
+          label={t('workerFlow.checkIn.mapLabel', {
+            distance: shift.distanceKm,
+          })}
+        />
+        <StatTiles
+          items={[
+            { value: times.start, label: t('workerFlow.checkIn.shiftStart') },
+            { value: times.end, label: t('workerFlow.checkIn.expectedEnd') },
           ]}
-        >
-          {isWrong ? S.CODE_WRONG : S.CODE_HELPER}
-        </Text>
-      </View>
-    </FormScreen>
-    {isHelpOpen ? (
-      <CheckInHelpSheet
-        shift={shift}
-        onCheckedIn={() => {
-          setIsHelpOpen(false);
-          startShift();
-        }}
-        onClose={() => setIsHelpOpen(false)}
-      />
-    ) : null}
+        />
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.textMuted }]}>
+            {t('workerFlow.checkIn.codeLabel')}
+          </Text>
+          <TextInput
+            accessibilityLabel={t('workerFlow.checkIn.codeLabel')}
+            value={code}
+            onChangeText={v => {
+              setCode(v.replace(/\D/g, '').slice(0, CHECK_IN.code.length));
+              setIsWrong(false);
+            }}
+            keyboardType="number-pad"
+            placeholder={t('workerFlow.checkIn.codePlaceholder')}
+            placeholderTextColor={colors.textSubtle}
+            style={[
+              styles.input,
+              {
+                color: colors.text,
+                backgroundColor: colors.surface,
+                borderColor: isWrong ? colors.danger : colors.border,
+              },
+            ]}
+            testID="shift-check-in-code"
+          />
+          <Text
+            style={[
+              styles.helper,
+              { color: isWrong ? colors.danger : colors.textSubtle },
+            ]}
+          >
+            {isWrong
+              ? t('workerFlow.checkIn.codeWrong')
+              : t('workerFlow.checkIn.codeHelper')}
+          </Text>
+        </View>
+      </FormScreen>
+      {isHelpOpen ? (
+        <CheckInHelpSheet
+          shift={shift}
+          onCheckedIn={() => {
+            setIsHelpOpen(false);
+            startShift();
+          }}
+          onClose={() => setIsHelpOpen(false)}
+        />
+      ) : null}
     </>
   );
 };

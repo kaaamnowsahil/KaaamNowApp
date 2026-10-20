@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { DetailRow, FlowHeading, InfoCallout } from '@/components/shiftFlow';
@@ -11,7 +12,6 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { FINISH_SHIFT_STRINGS as S } from './constants';
 import { FINISH_SUMMARY } from './mock';
 
 /**
@@ -23,6 +23,7 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
   navigation,
   route,
 }) => {
+  const { t } = useTranslation();
   const { shift } = route.params;
   const { colors } = useTheme();
   const isLoading = useMockLoading();
@@ -30,28 +31,41 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
   const hours = FINISH_SUMMARY.recordedHours;
 
   const explain = (title: string) =>
-    Alert.alert(title, S.CORRECTION_BODY, [{ text: S.OK }]);
+    Alert.alert(title, t('workerFlow.finishShift.correctionBody'), [
+      { text: t('workerFlow.finishShift.ok') },
+    ]);
 
   const rows = [
-    { title: S.CHECKED_IN, caption: FINISH_SUMMARY.checkedIn },
-    { title: S.CHECK_OUT, caption: FINISH_SUMMARY.checkOut },
-    { title: S.DURATION, caption: S.hours(hours) },
     {
-      title: S.EARNINGS,
-      caption: S.earnings(
+      title: t('workerFlow.finishShift.checkedIn'),
+      caption: FINISH_SUMMARY.checkedIn,
+    },
+    {
+      title: t('workerFlow.finishShift.checkOut'),
+      caption: FINISH_SUMMARY.checkOut,
+    },
+    {
+      title: t('workerFlow.finishShift.duration'),
+      caption: t(`workerFlow.finishShift.${hours === 1 ? 'hour' : 'hours'}`, {
+        count: hours,
+      }),
+    },
+    {
+      title: t('workerFlow.finishShift.earnings'),
+      caption: t('workerFlow.finishShift.earningsFormula', {
         hours,
-        formatRupees(shift.hourlyRate),
-        formatRupees(shift.hourlyRate * hours),
-      ),
+        rate: formatRupees(shift.hourlyRate),
+        total: formatRupees(shift.hourlyRate * hours),
+      }),
     },
   ];
 
   return (
     <FormScreen
       onBack={navigation.goBack}
-      title={S.HEADER_TITLE}
+      title={t('workerFlow.shiftSecured.headerTitle')}
       compactTitle
-      headerTag={S.HEADER_RIGHT}
+      headerTag={t('workerFlow.checkIn.headerRight')}
       asSheet
       gap={14}
       isLoading={isLoading}
@@ -59,26 +73,29 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
       actions={
         <>
           <PrimaryButton
-            label={S.CONFIRM}
+            label={t('workerFlow.finishShift.confirm')}
             onPress={() => navigation.replace(ROUTES.shiftComplete, { shift })}
             testID="finish-shift-confirm"
           />
           <SecondaryButton
-            label={S.KEEP_ACTIVE}
+            label={t('workerFlow.finishShift.keepActive')}
             onPress={navigation.goBack}
             testID="finish-shift-keep"
           />
         </>
       }
     >
-      <FlowHeading title={S.HEADING} subtitle={S.SUBTITLE} />
-      <InfoCallout text={S.REVIEW_NOTE} />
+      <FlowHeading
+        title={t('workerFlow.finishShift.heading')}
+        subtitle={t('workerFlow.finishShift.subtitle')}
+      />
+      <InfoCallout text={t('workerFlow.finishShift.reviewNote')} />
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.textMuted }]}>
-          {S.NOTE_LABEL}
+          {t('workerFlow.finishShift.noteLabel')}
         </Text>
         <TextInput
-          accessibilityLabel={S.NOTE_LABEL}
+          accessibilityLabel={t('workerFlow.finishShift.noteLabel')}
           value={note}
           onChangeText={setNote}
           style={[

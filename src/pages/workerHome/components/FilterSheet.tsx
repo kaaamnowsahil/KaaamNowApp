@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Pressable,
@@ -19,7 +20,6 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
-import { WORKER_HOME_STRINGS as S } from '../constants';
 import { DEFAULT_FILTERS, type ShiftFilters } from '../hooks/useWorkerHome';
 import {
   ANY_ID,
@@ -39,6 +39,7 @@ export const FilterSheet: FC<{
   onApply: (filters: ShiftFilters) => void;
   onClose: () => void;
 }> = ({ initial, onApply, onClose }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [draft, setDraft] = useState(initial);
@@ -52,16 +53,52 @@ export const FilterSheet: FC<{
       id === ANY_ID
         ? []
         : draft.businessTypeIds.includes(id)
-          ? draft.businessTypeIds.filter(t => t !== id)
+          ? draft.businessTypeIds.filter(typeId => typeId !== id)
           : [...draft.businessTypeIds, id],
     );
+
+  const businessTypeOptions = BUSINESS_TYPE_OPTIONS.map(option => ({
+    ...option,
+    label:
+      option.id === ANY_ID
+        ? t('shiftFilters.any')
+        : t(`shiftFilters.businessTypes.${option.id}`),
+  }));
+  const distanceOptions = DISTANCE_OPTIONS.map(option => ({
+    ...option,
+    label:
+      option.id === ANY_ID
+        ? t('shiftFilters.any')
+        : t('shiftFilters.within', { distance: option.max }),
+  }));
+  const payOptions = PAY_OPTIONS.map(option => ({
+    ...option,
+    label:
+      option.id === ANY_ID
+        ? t('shiftFilters.any')
+        : t('shiftFilters.payThreshold', { amount: option.min }),
+  }));
+  const lengthOptions = LENGTH_OPTIONS.map(option => ({
+    ...option,
+    label:
+      option.id === ANY_ID
+        ? t('shiftFilters.any')
+        : option.id === 'short'
+          ? t('shiftFilters.upToHours', { hours: option.max })
+          : option.id === 'half'
+            ? t('shiftFilters.fromToHours', {
+              from: option.min,
+              to: option.max,
+            })
+            : t('shiftFilters.atLeastHours', { hours: option.min }),
+  }));
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.root}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={S.CLOSE}
+          accessibilityLabel={t('shiftFilters.close')}
           onPress={onClose}
           style={[styles.backdrop, { backgroundColor: colors.backdrop }]}
         />
@@ -74,31 +111,34 @@ export const FilterSheet: FC<{
         >
           <View style={[styles.handle, { backgroundColor: colors.border }]} />
           <ScrollView contentContainerStyle={styles.content}>
-            <ScreenIntro title={S.FILTER_TITLE} subtitle={S.FILTER_SUBTITLE} />
+            <ScreenIntro
+              title={t('shiftFilters.title')}
+              subtitle={t('shiftFilters.subtitle')}
+            />
             <ChipGroup
-              label={S.FILTER_BUSINESS_TYPE}
-              hint={S.FILTER_BUSINESS_TYPE_HINT}
-              options={BUSINESS_TYPE_OPTIONS}
+              label={t('shiftFilters.businessType')}
+              hint={t('shiftFilters.businessTypeHint')}
+              options={businessTypeOptions}
               selected={
                 draft.businessTypeIds.length ? draft.businessTypeIds : [ANY_ID]
               }
               onToggle={toggleBusinessType}
             />
             <ChipGroup
-              label={S.FILTER_DISTANCE}
-              options={DISTANCE_OPTIONS}
+              label={t('shiftFilters.distance')}
+              options={distanceOptions}
               selected={[draft.distanceId]}
               onToggle={id => set('distanceId', id)}
             />
             <ChipGroup
-              label={S.FILTER_PAY}
-              options={PAY_OPTIONS}
+              label={t('shiftFilters.minimumPay')}
+              options={payOptions}
               selected={[draft.payId]}
               onToggle={id => set('payId', id)}
             />
             <ChipGroup
-              label={S.FILTER_LENGTH}
-              options={LENGTH_OPTIONS}
+              label={t('shiftFilters.length')}
+              options={lengthOptions}
               selected={[draft.lengthId]}
               onToggle={id => set('lengthId', id)}
             />
@@ -110,10 +150,10 @@ export const FilterSheet: FC<{
             >
               <View style={styles.switchText}>
                 <Text style={[styles.switchTitle, { color: colors.text }]}>
-                  {S.FILTER_VERIFIED}
+                  {t('shiftFilters.verified')}
                 </Text>
                 <Text style={[styles.switchHint, { color: colors.textSubtle }]}>
-                  {S.FILTER_VERIFIED_HINT}
+                  {t('shiftFilters.verifiedHint')}
                 </Text>
               </View>
               <Switch
@@ -137,14 +177,14 @@ export const FilterSheet: FC<{
           >
             <View style={styles.action}>
               <SecondaryButton
-                label={S.FILTER_RESET}
+                label={t('shiftFilters.reset')}
                 onPress={() => setDraft(DEFAULT_FILTERS)}
                 testID="filter-reset"
               />
             </View>
             <View style={styles.action}>
               <PrimaryButton
-                label={S.FILTER_APPLY}
+                label={t('shiftFilters.apply')}
                 onPress={() => onApply(draft)}
                 testID="filter-apply"
               />

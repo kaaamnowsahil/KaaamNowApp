@@ -4,9 +4,7 @@ export type EarningsSummary = {
   pending: number;
   processing: number;
   completed: number;
-  /** e.g. "October · Completed payouts" */
   periodLabel: string;
-  /** Most recent completed payout, e.g. "Café service associate · 18 Oct 2026". */
   lastPaid: string;
 };
 

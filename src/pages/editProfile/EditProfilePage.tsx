@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
 import PhoneIcon from '@/assets/figma/phone.svg';
@@ -10,7 +11,6 @@ import type { AppScreenProps } from '@/types';
 import { formatLocalPhone } from '@/utils/phone';
 
 import { AvatarPicker } from './components';
-import { EDIT_PROFILE_STRINGS as S } from './constants';
 import { useEditProfile } from './hooks/useEditProfile';
 
 /**
@@ -21,19 +21,20 @@ import { useEditProfile } from './hooks/useEditProfile';
 export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
   navigation,
 }) => {
+  const { t } = useTranslation();
   const f = useEditProfile(navigation.goBack);
 
   return (
     <FormScreen
       onBack={navigation.goBack}
       backVariant="plain"
-      title={S.TITLE}
+      title={t('editProfile.title')}
       gap={16}
       isLoading={f.isLoading}
       testID="edit-profile-page"
       actions={
         <PrimaryButton
-          label={S.SAVE}
+          label={t('editProfile.save')}
           disabled={!f.canSave}
           onPress={f.save}
           testID="edit-profile-save"
@@ -42,12 +43,12 @@ export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
     >
       <AvatarPicker
         initials={f.initials}
-        actionLabel={S.CHANGE_PHOTO}
-        accessibilityLabel={S.CHANGE_PHOTO_A11Y}
+        actionLabel={t('editProfile.changePhoto')}
+        accessibilityLabel={t('editProfile.changePhotoA11y')}
         onPress={f.changePhoto}
       />
       <IconField
-        label={S.NAME_LABEL}
+        label={t('editProfile.nameLabel')}
         icon={UserIcon}
         value={f.form.fullName}
         onChangeText={f.setFullName}
@@ -55,28 +56,31 @@ export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
         testID="edit-name"
       />
       <IconField
-        label={S.PHONE_LABEL}
+        label={t('editProfile.phoneLabel')}
         icon={PhoneIcon}
-        prefix={S.PHONE_PREFIX}
+        prefix={t('editProfile.phonePrefix')}
         value={formatLocalPhone(f.phone)}
         editable={false}
-        action={{ label: S.VERIFIED, tone: 'success' }}
+        action={{ label: t('editProfile.verified'), tone: 'success' }}
         testID="edit-phone"
       />
       <IconField
-        label={S.LOCATION_LABEL}
+        label={t('editProfile.locationLabel')}
         icon={MapPinIcon}
         value={f.form.address}
         onChangeText={f.setAddress}
         action={{
-          label: f.isLocating ? S.LOCATING : S.CHANGE,
+          label: f.isLocating ? t('editProfile.locating') : t('editProfile.change'),
           onPress: f.isLocating ? undefined : f.locate,
         }}
         testID="edit-address"
       />
       <ChipGroup
-        label={S.WORK_TYPE_LABEL}
-        options={f.workTypeOptions}
+        label={t('editProfile.workTypeLabel')}
+        options={f.workTypeOptions.map(option => ({
+          ...option,
+          label: t(`workerSignup.workTypes.${option.id}`),
+        }))}
         selected={f.form.workTypes}
         onToggle={f.toggleWorkType}
       />

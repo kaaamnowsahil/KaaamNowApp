@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
@@ -32,6 +33,7 @@ import { useWorkerHome } from './hooks/useWorkerHome';
  * - data: mock/workerHomeMock.ts
  */
 export const WorkerHomePage: FC = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const home = useWorkerHome();
   const emptyState = S.EMPTY_STATE[home.status];
@@ -39,7 +41,7 @@ export const WorkerHomePage: FC = () => {
   const blocks = [
     <ScreenIntro
       key="intro"
-      title={S.greeting(new Date().getHours(), home.worker.firstName)}
+      title={t('workerHome.greeting', { name: home.worker.firstName })}
       subtitle={S.SUBTITLE}
     />,
     <LocationDropdown
@@ -62,7 +64,7 @@ export const WorkerHomePage: FC = () => {
         <TextInput
           value={home.query}
           onChangeText={home.setQuery}
-          placeholder={S.SEARCH_PLACEHOLDER}
+          placeholder={t('workerHome.searchPlaceholder')}
           placeholderTextColor={colors.textSubtle}
           returnKeyType="search"
           style={[styles.searchInput, { color: colors.text }]}
@@ -71,7 +73,7 @@ export const WorkerHomePage: FC = () => {
       </View>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={S.filtersLabel(home.activeFilterCount)}
+        accessibilityLabel={t('workerHome.filter')}
         onPress={home.openFilters}
         style={({ pressed }) => [
           styles.filters,
@@ -112,43 +114,43 @@ export const WorkerHomePage: FC = () => {
     />,
     ...(home.nearby.length
       ? [
-          <SectionHeading key="nearby" title={S.NEARBY_TITLE[home.status]} />,
-          ...home.nearby.map(shift => (
+        <SectionHeading key="nearby" title={t('workerHome.nearbyShifts')} />,
+        ...home.nearby.map(shift => (
+          <ShiftCard
+            key={shift.id}
+            shift={shift}
+            onPress={() => home.openShift(shift)}
+          />
+        )),
+        <SectionHeading
+          key="recommended"
+          title={S.RECOMMENDED_TITLE}
+          action={S.SEE_ALL}
+          onAction={home.openAllShifts}
+        />,
+        ...(home.recommended.length
+          ? home.recommended.map(shift => (
             <ShiftCard
               key={shift.id}
               shift={shift}
               onPress={() => home.openShift(shift)}
             />
-          )),
-          <SectionHeading
-            key="recommended"
-            title={S.RECOMMENDED_TITLE}
-            action={S.SEE_ALL}
-            onAction={home.openAllShifts}
-          />,
-          ...(home.recommended.length
-            ? home.recommended.map(shift => (
-                <ShiftCard
-                  key={shift.id}
-                  shift={shift}
-                  onPress={() => home.openShift(shift)}
-                />
-              ))
-            : [<BodyNote key="recommended-empty">{S.EMPTY}</BodyNote>]),
-        ]
+          ))
+          : [<BodyNote key="recommended-empty">{S.EMPTY}</BodyNote>]),
+      ]
       : [
-          <EmptyState
-            key={`empty-${home.status}`}
-            icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
-            title={emptyState.title}
-            body={emptyState.body}
-            action={emptyState.action}
-            onAction={
-              home.status === 'live' ? home.showScheduled : home.clearFilters
-            }
-            testID={`home-empty-${home.status}`}
-          />,
-        ]),
+        <EmptyState
+          key={`empty-${home.status}`}
+          icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
+          title={emptyState.title}
+          body={emptyState.body}
+          action={emptyState.action}
+          onAction={
+            home.status === 'live' ? home.showScheduled : home.clearFilters
+          }
+          testID={`home-empty-${home.status}`}
+        />,
+      ]),
   ];
 
   return (

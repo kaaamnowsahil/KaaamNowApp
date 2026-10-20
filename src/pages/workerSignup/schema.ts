@@ -1,27 +1,35 @@
 import { z } from 'zod';
 
-import {
-  addressSchema,
-  nameSchema,
-  optionalEmailSchema,
-  phoneSchema,
-} from '@/utils/validation';
+import { toE164India } from '@/utils/phone';
 
 import { MAX_WORKER_AGE, MIN_WORKER_AGE } from './constants';
 
-export const workerSignupSchema = z.object({
-  fullName: nameSchema,
-  phone: phoneSchema,
-  email: optionalEmailSchema,
-  age: z
-    .string()
-    .regex(/^\d{1,2}$/, 'Enter your age in years.')
-    .refine(
-      v => Number(v) >= MIN_WORKER_AGE && Number(v) <= MAX_WORKER_AGE,
-      `Age must be between ${MIN_WORKER_AGE} and ${MAX_WORKER_AGE}.`,
+export const createWorkerSignupSchema = (t: (key: string) => string) =>
+  z.object({
+    fullName: z
+      .string()
+      .trim()
+      .min(2, t('workerSignup.errors.nameMin'))
+      .max(80, t('workerSignup.errors.nameMax')),
+    phone: z.string().refine(
+      digits => toE164India(digits) !== null,
+      t('workerSignup.errors.phone'),
     ),
-  address: addressSchema,
-  workTypes: z.array(z.string()).min(1, 'Pick at least one work type.'),
-});
+    email: z.union([
+      z.literal(''),
+      z.string().trim().email(t('workerSignup.errors.email')),
+    ]),
+    age: z
+      .string()
+      .regex(/^\d{1,2}$/, t('workerSignup.errors.ageFormat'))
+      .refine(
+        value => Number(value) >= MIN_WORKER_AGE && Number(value) <= MAX_WORKER_AGE,
+        t('workerSignup.errors.ageRange')
+          .replace('{{min}}', String(MIN_WORKER_AGE))
+          .replace('{{max}}', String(MAX_WORKER_AGE)),
+      ),
+    address: z.string().trim().min(3, t('workerSignup.errors.address')),
+    workTypes: z.array(z.string()).min(1, t('workerSignup.errors.workTypes')),
+  });
 
-export type WorkerSignupForm = z.input<typeof workerSignupSchema>;
+export type WorkerSignupForm = z.input<ReturnType<typeof createWorkerSignupSchema>>;

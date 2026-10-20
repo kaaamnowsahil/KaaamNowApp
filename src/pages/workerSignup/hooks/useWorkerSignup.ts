@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   type GeoPoint,
@@ -9,7 +10,7 @@ import { toE164India, toLocalDigits } from '@/utils/phone';
 import { fieldErrors } from '@/utils/validation';
 
 import { CURRENT_ADDRESS, WORK_TYPES } from '../mock';
-import { workerSignupSchema, type WorkerSignupForm } from '../schema';
+import { createWorkerSignupSchema, type WorkerSignupForm } from '../schema';
 
 const EMPTY: WorkerSignupForm = {
   fullName: '',
@@ -21,6 +22,8 @@ const EMPTY: WorkerSignupForm = {
 };
 
 export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
+  const { t } = useTranslation();
+  const workerSignupSchema = createWorkerSignupSchema(t);
   const setWorker = useOnboardingStore(s => s.setWorker);
   const [form, setForm] = useState<WorkerSignupForm>(EMPTY);
   const [location, setLocation] = useState<GeoPoint | undefined>();

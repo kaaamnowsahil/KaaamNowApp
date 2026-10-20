@@ -1,4 +1,5 @@
 import { useEffect, useState, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, View } from 'react-native';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
@@ -16,7 +17,6 @@ import {
 import type { Shift } from '@/types';
 import { mapsUrl } from '@/utils/links';
 
-import { SHIFT_CHECK_IN_STRINGS as S } from '../constants';
 import { CHECK_IN_HELP as H } from '../mock';
 
 type ManualState = 'idle' | 'waiting' | 'confirmed';
@@ -31,6 +31,7 @@ export const CheckInHelpSheet: FC<{
   onCheckedIn: () => void;
   onClose: () => void;
 }> = ({ shift, onCheckedIn, onClose }) => {
+  const { t } = useTranslation();
   const [manual, setManual] = useState<ManualState>('idle');
 
   useEffect(() => {
@@ -41,71 +42,94 @@ export const CheckInHelpSheet: FC<{
     return () => clearTimeout(timer);
   }, [manual]);
 
-  const sms = encodeURIComponent(S.arrivedSms(H.leadFirstName, shift.title));
+  const sms = encodeURIComponent(
+    t('workerFlow.checkIn.arrivedSms', {
+      lead: H.leadFirstName,
+      role: shift.title,
+    }),
+  );
 
   return (
     <BottomSheet
-      title={S.HELP_TITLE}
-      subtitle={S.HELP_SUBTITLE}
+      title={t('workerFlow.checkIn.helpTitle')}
+      subtitle={t('workerFlow.checkIn.helpSubtitle')}
       onClose={onClose}
-      closeLabel={S.CLOSE}
+      closeLabel={t('workerFlow.checkIn.close')}
       testID="check-in-help-sheet"
     >
       <View>
         <DetailRow
           icon={PhoneIcon}
-          title={S.CALL_LEAD}
-          caption={S.leadCaption(H.leadName, H.leadReplyTime)}
+          title={t('workerFlow.checkIn.callLead')}
+          caption={t('workerFlow.checkIn.leadCaption', {
+            name: H.leadName,
+            reply: H.leadReplyTime,
+          })}
           onPress={() => Linking.openURL(`tel:${H.leadPhone}`)}
         />
         <DetailRow
           icon={MessageCircleIcon}
-          title={S.MESSAGE_LEAD}
-          caption={S.MESSAGE_CAPTION}
+          title={t('workerFlow.checkIn.messageLead')}
+          caption={t('workerFlow.checkIn.messageCaption')}
           onPress={() => Linking.openURL(`sms:${H.leadPhone}?body=${sms}`)}
         />
         <DetailRow
           icon={MapPinIcon}
-          title={S.CANT_FIND}
-          caption={S.directionsTo(shift.businessName)}
+          title={t('workerFlow.checkIn.cantFind')}
+          caption={t('workerFlow.checkIn.directionsTo', {
+            business: shift.businessName,
+          })}
           onPress={() =>
             Linking.openURL(mapsUrl(`${shift.businessName}, ${shift.area}`))
           }
         />
         <DetailRow
           icon={CircleHelpIcon}
-          title={S.SUPPORT}
-          caption={S.supportCaption(H.supportHours, H.supportPhoneLabel)}
+          title={t('workerFlow.checkIn.support')}
+          caption={t('workerFlow.checkIn.supportCaption', {
+            hours: H.supportHours,
+            phone: H.supportPhoneLabel,
+          })}
           onPress={() => Linking.openURL(`tel:${H.supportPhone}`)}
           isLast
         />
       </View>
 
       {manual === 'waiting' ? (
-        <InfoCallout icon={ClockIcon} text={S.waiting(H.leadFirstName)} />
+        <InfoCallout
+          icon={ClockIcon}
+          text={t('workerFlow.checkIn.waiting', { lead: H.leadFirstName })}
+        />
       ) : manual === 'confirmed' ? (
         <InfoCallout
           icon={CircleCheckIcon}
-          text={S.confirmed(H.leadFirstName)}
+          text={t('workerFlow.checkIn.confirmed', { lead: H.leadFirstName })}
         />
       ) : null}
 
       <View style={styles.actions}>
         {manual === 'confirmed' ? (
           <PrimaryButton
-            label={S.START_SHIFT}
+            label={t('workerFlow.checkIn.startShift')}
             onPress={onCheckedIn}
             testID="check-in-help-start"
           />
         ) : (
           <PrimaryButton
-            label={manual === 'waiting' ? S.WAITING_BUTTON : S.ASK_MANUAL}
+            label={
+              manual === 'waiting'
+                ? t('workerFlow.checkIn.waitingButton')
+                : t('workerFlow.checkIn.askManual')
+            }
             disabled={manual === 'waiting'}
             onPress={() => setManual('waiting')}
             testID="check-in-help-manual"
           />
         )}
-        <SecondaryButton label={S.CLOSE} onPress={onClose} />
+        <SecondaryButton
+          label={t('workerFlow.checkIn.close')}
+          onPress={onClose}
+        />
       </View>
     </BottomSheet>
   );

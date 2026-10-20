@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BodyNote } from '@/components/ui';
@@ -16,6 +17,7 @@ import { NOTIFICATIONS } from './mock';
 export const NotificationsPage: FC<
   AppScreenProps<typeof ROUTES.notifications>
 > = ({ navigation }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const isLoading = useMockLoading();
   const [items, setItems] = useState(NOTIFICATIONS);
@@ -29,7 +31,7 @@ export const NotificationsPage: FC<
   return (
     <FormScreen
       onBack={navigation.goBack}
-      title={S.TITLE}
+      title={t('notifications.title')}
       gap={0}
       headerRight={
         hasUnread ? (
@@ -90,7 +92,7 @@ export const NotificationsPage: FC<
           </Pressable>
         ))
       ) : (
-        <BodyNote>{S.EMPTY}</BodyNote>
+        <BodyNote>{t('notifications.empty')}</BodyNote>
       )}
     </FormScreen>
   );

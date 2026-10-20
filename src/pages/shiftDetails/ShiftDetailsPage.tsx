@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Linking } from 'react-native';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
@@ -36,6 +37,7 @@ import { DEFAULT_SHIFT_INFO, SHIFT_INFO } from './mock';
 export const ShiftDetailsPage: FC<
   AppScreenProps<typeof ROUTES.shiftDetails>
 > = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { shift, bookingStatus } = route.params;
   const isLoading = useMockLoading();
   const copy = DETAILS_COPY[shift.status];
@@ -125,9 +127,12 @@ export const ShiftDetailsPage: FC<
           { icon: CalendarIcon, text: S.when(shift.dateLabel, shift.timeLabel) },
           {
             icon: ClockIcon,
-            text: S.duration(shift.durationHours, info.durationNote),
+            text: `${t('shiftDetails.duration', { hours: shift.durationHours })} · ${info.durationNote}`,
           },
-          { icon: MapPinIcon, text: S.where(info.placeLabel, shift.distanceKm) },
+          {
+            icon: MapPinIcon,
+            text: `${info.placeLabel} · ${t('shiftDetails.distance', { distance: shift.distanceKm })}`,
+          },
         ]}
       />
 

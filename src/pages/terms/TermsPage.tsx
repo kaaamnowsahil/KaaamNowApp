@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -12,6 +13,7 @@ import { TERMS_SECTIONS } from './mock';
 
 /** Profile / Sign-up → Terms & Conditions (Figma 13 · Account / Terms). Copy: mock/termsMock.ts */
 export const TermsPage: FC = () => {
+  const { t } = useTranslation();
   const navigation = useNavigation();
   const { colors } = useTheme();
   const isLoading = useMockLoading();
@@ -20,7 +22,7 @@ export const TermsPage: FC = () => {
     <FormScreen
       onBack={navigation.goBack}
       backVariant="plain"
-      title={S.TITLE}
+      title={t('terms.title')}
       gap={18}
       isLoading={isLoading}
       testID="terms-page"

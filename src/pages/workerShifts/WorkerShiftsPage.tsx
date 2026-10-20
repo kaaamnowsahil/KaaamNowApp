@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import {
@@ -10,7 +11,6 @@ import {
 import { TabScreen } from '@/layout/TabScreen';
 
 import { MyShiftCard } from './components';
-import { WORKER_SHIFTS_STRINGS as S } from './constants';
 import { useWorkerShifts } from './hooks/useWorkerShifts';
 
 /**
@@ -19,35 +19,40 @@ import { useWorkerShifts } from './hooks/useWorkerShifts';
  * - data: mock/workerShiftsMock.ts
  */
 export const WorkerShiftsPage: FC = () => {
+  const { t } = useTranslation();
   const shifts = useWorkerShifts();
 
   const blocks = [
-    <ScreenIntro key="intro" title={S.TITLE} subtitle={S.SUBTITLE} />,
+    <ScreenIntro
+      key="intro"
+      title={t('workerShifts.title')}
+      subtitle={t('workerShifts.subtitle')}
+    />,
     ...(shifts.sections.length
       ? shifts.sections.flatMap(section => [
-          <SectionHeading
-            key={`heading-${section.id}`}
-            title={S.SECTION_TITLE[section.id]}
-          />,
-          ...section.bookings.map(booking => (
-            <MyShiftCard
-              key={booking.id}
-              booking={booking}
-              onPress={() => shifts.openBooking(booking)}
-              onAction={() => shifts.runAction(booking)}
-            />
-          )),
-        ])
+        <SectionHeading
+          key={`heading-${section.id}`}
+          title={t(`workerShifts.sections.${section.id}`)}
+        />,
+        ...section.bookings.map(booking => (
+          <MyShiftCard
+            key={booking.id}
+            booking={booking}
+            onPress={() => shifts.openBooking(booking)}
+            onAction={() => shifts.runAction(booking)}
+          />
+        )),
+      ])
       : [
-          <EmptyState
-            key="empty"
-            icon={CalendarDaysIcon}
-            title={S.EMPTY_TITLE}
-            body={S.EMPTY_BODY}
-            action={S.EMPTY_ACTION}
-            onAction={shifts.findShifts}
-          />,
-        ]),
+        <EmptyState
+          key="empty"
+          icon={CalendarDaysIcon}
+          title={t('workerShifts.emptyTitle')}
+          body={t('workerShifts.emptyBody')}
+          action={t('workerShifts.emptyAction')}
+          onAction={shifts.findShifts}
+        />,
+      ]),
   ];
 
   return (

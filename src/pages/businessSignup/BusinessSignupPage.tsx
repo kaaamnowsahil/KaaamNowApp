@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import BriefcaseIcon from '@/assets/icons/briefcase.svg';
 import MailIcon from '@/assets/icons/mail.svg';
@@ -16,7 +17,6 @@ import { FormScreen } from '@/layout/FormScreen';
 import type { AuthScreenProps } from '@/types';
 import { formatLocalPhone } from '@/utils/phone';
 
-import { BUSINESS_SIGNUP_STRINGS as S } from './constants';
 import { useBusinessSignup } from './hooks/useBusinessSignup';
 
 /**
@@ -28,6 +28,7 @@ import { useBusinessSignup } from './hooks/useBusinessSignup';
 export const BusinessSignupPage: FC<
   AuthScreenProps<typeof ROUTES.businessSignup>
 > = ({ navigation }) => {
+  const { t } = useTranslation();
   const f = useBusinessSignup(phone =>
     navigation.navigate(ROUTES.verifyPhone, { phone, intent: 'signUp' }),
   );
@@ -38,18 +39,18 @@ export const BusinessSignupPage: FC<
       testID="business-signup-page"
       actions={
         <PrimaryButton
-          label={S.CONTINUE}
+          label={t('businessSignup.continue')}
           onPress={f.submit}
           disabled={!f.canSubmit}
           testID="business-continue"
         />
       }
     >
-      <ScreenIntro title={S.TITLE} subtitle={S.SUBTITLE} />
+      <ScreenIntro title={t('businessSignup.title')} subtitle={t('businessSignup.subtitle')} />
       <IconField
-        label={S.BUSINESS_NAME_LABEL}
+        label={t('businessSignup.businessNameLabel')}
         icon={BriefcaseIcon}
-        placeholder={S.BUSINESS_NAME_PLACEHOLDER}
+        placeholder={t('businessSignup.businessNamePlaceholder')}
         value={f.form.businessName}
         onChangeText={f.setBusinessName}
         autoCapitalize="words"
@@ -59,9 +60,9 @@ export const BusinessSignupPage: FC<
         testID="business-name"
       />
       <IconField
-        label={S.CONTACT_LABEL}
+        label={t('businessSignup.contactLabel')}
         icon={UserIcon}
-        placeholder={S.CONTACT_PLACEHOLDER}
+        placeholder={t('businessSignup.contactPlaceholder')}
         value={f.form.contactName}
         onChangeText={f.setContactName}
         autoCapitalize="words"
@@ -71,10 +72,10 @@ export const BusinessSignupPage: FC<
         testID="business-contact"
       />
       <IconField
-        label={S.PHONE_LABEL}
+        label={t('businessSignup.phoneLabel')}
         icon={PhoneIcon}
         prefix="+91"
-        placeholder={S.PHONE_PLACEHOLDER}
+        placeholder={t('businessSignup.phonePlaceholder')}
         value={formatLocalPhone(f.form.phone)}
         onChangeText={f.setPhone}
         keyboardType="number-pad"
@@ -84,9 +85,9 @@ export const BusinessSignupPage: FC<
         testID="business-phone"
       />
       <IconField
-        label={S.EMAIL_LABEL}
+        label={t('businessSignup.emailLabel')}
         icon={MailIcon}
-        placeholder={S.EMAIL_PLACEHOLDER}
+        placeholder={t('businessSignup.emailPlaceholder')}
         value={f.form.email}
         onChangeText={f.setEmail}
         keyboardType="email-address"
@@ -97,24 +98,27 @@ export const BusinessSignupPage: FC<
         testID="business-email"
       />
       <IconField
-        label={S.ADDRESS_LABEL}
+        label={t('businessSignup.addressLabel')}
         icon={MapPinIcon}
-        placeholder={S.ADDRESS_PLACEHOLDER}
+        placeholder={t('businessSignup.addressPlaceholder')}
         value={f.form.address}
         onChangeText={f.setAddress}
         autoComplete="street-address"
         textContentType="fullStreetAddress"
         action={{
-          label: f.isLocating ? S.LOCATING : S.USE_CURRENT,
+          label: f.isLocating ? t('businessSignup.locating') : t('businessSignup.useCurrent'),
           onPress: f.isLocating ? undefined : f.locate,
         }}
         error={f.errors.address || f.locateError || undefined}
         testID="business-address"
       />
       <ChipGroup
-        label={S.BUSINESS_TYPE_LABEL}
+        label={t('businessSignup.businessTypeLabel')}
         hint={f.errors.businessType}
-        options={f.businessTypeOptions}
+        options={f.businessTypeOptions.map(option => ({
+          ...option,
+          label: t(`businessSignup.businessTypes.${option.id}`),
+        }))}
         selected={f.form.businessType ? [f.form.businessType] : []}
         onToggle={f.selectBusinessType}
       />

@@ -1,11 +1,11 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 import { formatRupees } from '@/utils/format';
 
-import { WORKER_EARNINGS_STRINGS as S } from '../constants';
 import type { EarningsSummary } from '../mock';
 
 /**
@@ -16,10 +16,11 @@ export const EarningsOverview: FC<{
   summary: EarningsSummary;
   onWithdraw: () => void;
 }> = ({ summary, onWithdraw }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const tiles = [
-    { amount: summary.pending, label: S.PENDING },
-    { amount: summary.processing, label: S.PROCESSING },
+    { amount: summary.pending, label: t('workerEarnings.pending') },
+    { amount: summary.processing, label: t('workerEarnings.processing') },
   ];
 
   return (
@@ -57,7 +58,7 @@ export const EarningsOverview: FC<{
             ]}
           >
             <Text style={[styles.pillText, { color: colors.primary }]}>
-              {S.WITHDRAW}
+              {t('workerEarnings.withdraw')}
             </Text>
           </Pressable>
         </View>

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import WifiOffIcon from '@/assets/icons/wifi-off.svg';
@@ -21,6 +22,7 @@ import { LAST_SYNCED_AT, SAVED_CHECK_IN_CODE, SAVED_SHIFT } from './mock';
 export const OfflinePage: FC<AppScreenProps<typeof ROUTES.offline>> = ({
   navigation,
 }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const o = useOffline();
 
@@ -53,7 +55,10 @@ export const OfflinePage: FC<AppScreenProps<typeof ROUTES.offline>> = ({
       >
         <WifiOffIcon width={34} height={34} color={colors.warning} />
       </View>
-      <ScreenIntro title={S.TITLE} subtitle={S.SUBTITLE} />
+      <ScreenIntro
+        title={t('offline.title')}
+        subtitle={t('offline.subtitle')}
+      />
       <View>
         <InfoRow
           title={S.SAVED_BOOKING}

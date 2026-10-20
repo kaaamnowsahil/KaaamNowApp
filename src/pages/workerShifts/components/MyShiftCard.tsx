@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import BadgeCheckIcon from '@/assets/figma/badge-check.svg';
@@ -8,18 +9,21 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { Booking, BookingStatus } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { WORKER_SHIFTS_STRINGS as S } from '../constants';
-
 /** Figma My shifts (08) booking card: status, shift facts, pay, outlined action. */
 export const MyShiftCard: FC<{
   booking: Booking;
   onPress: () => void;
   onAction: () => void;
 }> = ({ booking, onPress, onAction }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const { shift, status } = booking;
   const total = formatRupees(shift.hourlyRate * shift.durationHours);
   const isFaded = status === 'completed' || status === 'cancelled';
+  const translatedStatus =
+    status === 'confirmed' && booking.checkInCode
+      ? t('workerShifts.status.confirmedCode', { code: booking.checkInCode })
+      : t(`workerShifts.status.${status}`);
 
   const statusColor: Record<BookingStatus, string> = {
     confirmed: colors.success,
@@ -32,7 +36,7 @@ export const MyShiftCard: FC<{
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${shift.title}, ${S.status(status)}`}
+      accessibilityLabel={`${shift.title}, ${translatedStatus}`}
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
@@ -42,7 +46,7 @@ export const MyShiftCard: FC<{
       testID={`my-shift-${booking.id}`}
     >
       <Text style={[styles.status, { color: statusColor[status] }]}>
-        {S.status(status, booking.checkInCode)}
+        {translatedStatus}
       </Text>
 
       <Text style={[styles.title, { color: colors.text }]}>{shift.title}</Text>
@@ -51,25 +55,34 @@ export const MyShiftCard: FC<{
           <BadgeCheckIcon width={15} height={15} color={colors.primary} />
         ) : null}
         <Text style={[styles.body, styles.flex, { color: colors.textMuted }]}>
-          {shift.isVerified ? S.verified(shift.businessName) : shift.businessName}
+          {shift.isVerified
+            ? t('workerShifts.verified', { business: shift.businessName })
+            : shift.businessName}
         </Text>
       </View>
 
       <Text style={[styles.meta, { color: colors.textMuted }]}>
-        {S.when(shift.dateLabel, shift.timeLabel, shift.durationHours)}
+        {t('workerShifts.when', {
+          date: shift.dateLabel,
+          time: shift.timeLabel,
+          hours: shift.durationHours,
+        })}
       </Text>
       <Text style={[styles.meta, { color: colors.textSubtle }]}>
-        {S.where(shift.area, shift.distanceKm)}
+        {t('workerShifts.where', { area: shift.area, km: shift.distanceKm })}
       </Text>
 
       {status === 'selected' ? (
         <>
           <Text style={[styles.meta, { color: colors.textMuted }]}>
-            {S.offerPay(formatRupees(shift.hourlyRate), total)}
+            {t('workerShifts.offerPay', {
+              rate: formatRupees(shift.hourlyRate),
+              total,
+            })}
           </Text>
           {booking.confirmBy ? (
             <Text style={[styles.deadline, { color: colors.warning }]}>
-              {S.confirmBy(booking.confirmBy)}
+              {t('workerShifts.confirmBy', { when: booking.confirmBy })}
             </Text>
           ) : null}
         </>
@@ -83,18 +96,18 @@ export const MyShiftCard: FC<{
           >
             {formatRupees(shift.hourlyRate)}
             <Text style={[styles.perHour, { color: colors.textSubtle }]}>
-              {S.PER_HOUR}
+              {t('workerShifts.perHour')}
             </Text>
           </Text>
           <Text style={[styles.estimate, { color: colors.textSubtle }]}>
-            {S.estimated(total)}
+            {t('workerShifts.estimated', { amount: total })}
           </Text>
         </View>
       )}
 
       <View style={styles.action}>
         <OutlineButton
-          label={S.ACTION[status]}
+          label={t(`workerShifts.actions.${status}`)}
           onPress={onAction}
           testID={`my-shift-action-${booking.id}`}
         />

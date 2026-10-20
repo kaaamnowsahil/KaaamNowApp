@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   FlowHeading,
@@ -14,12 +15,6 @@ import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import type { AppScreenProps } from '@/types';
 import { formatMinSec, formatRupees } from '@/utils/format';
 
-import {
-  LIVE_REQUEST_STRINGS as L,
-  REQUEST_COPY,
-  SCHEDULED_REQUEST_STRINGS as SC,
-  SHIFT_REQUEST_STRINGS as S,
-} from './constants';
 import { REQUEST_META } from './mock';
 
 /**
@@ -32,9 +27,12 @@ import { REQUEST_META } from './mock';
 export const ShiftRequestPage: FC<
   AppScreenProps<typeof ROUTES.shiftRequest>
 > = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { shift } = route.params;
   const isLive = shift.status === 'live';
-  const copy = REQUEST_COPY[shift.status];
+  const copyKey = isLive ? 'live' : 'scheduled';
+  const copy = (key: string, options?: Record<string, string | number>) =>
+    t(`workerFlow.request.${copyKey}.${key}`, options);
   const meta = REQUEST_META[shift.status];
   const isLoading = useMockLoading();
   const { remaining } = useCountdown(meta.expiresInSeconds);
@@ -49,21 +47,21 @@ export const ShiftRequestPage: FC<
   return (
     <FormScreen
       onBack={navigation.goBack}
-      title={S.HEADER_TITLE}
-      subtitle={copy.headerSubtitle}
+      title={t('workerFlow.shiftSecured.headerTitle')}
+      subtitle={copy('headerSubtitle')}
       gap={14}
       isLoading={isLoading}
       testID="shift-request-page"
       actions={
         <>
           <PrimaryButton
-            label={isExpired ? L.EXPIRED : copy.accept}
+            label={isExpired ? copy('expired') : copy('accept')}
             disabled={isExpired}
             onPress={accept}
             testID="shift-request-accept"
           />
           <SecondaryButton
-            label={copy.decline}
+            label={copy('decline')}
             onPress={navigation.goBack}
             testID="shift-request-decline"
           />
@@ -72,27 +70,42 @@ export const ShiftRequestPage: FC<
     >
       <PushPreview
         initial={meta.senderInitial}
-        meta={S.pushMeta(meta.sender, meta.sentAt)}
-        title={copy.pushTitle(shift.distanceKm)}
-        body={S.pushBody(
-          shift.title,
-          isLive ? meta.badge : shift.dateLabel,
-        )}
+        meta={t('workerFlow.request.pushMeta', {
+          sender: meta.sender,
+          time: meta.sentAt,
+        })}
+        title={copy('pushTitle', { distance: shift.distanceKm })}
+        body={t('workerFlow.request.pushBody', {
+          role: shift.title,
+          when: isLive ? meta.badge : shift.dateLabel,
+        })}
       />
 
       <FlowHeading
         isLarge
-        overline={copy.overline}
-        title={copy.heading}
-        subtitle={isLive ? L.acceptWithin(timeLeft) : SC.SUBTITLE}
+        overline={copy('overline')}
+        title={copy('heading')}
+        subtitle={
+          isLive
+            ? copy('acceptWithin', { time: timeLeft })
+            : copy('subtitle')
+        }
       />
 
       <StatTiles
         items={[
-          { value: S.km(shift.distanceKm), label: S.FROM_LOCATION },
+          {
+            value: t('workerFlow.request.km', { distance: shift.distanceKm }),
+            label: t('workerFlow.request.fromLocation'),
+          },
           isLive
-            ? { value: timeLeft, label: L.TIME_TO_ACCEPT }
-            : { value: SC.hours(shift.durationHours), label: SC.SHIFT_LENGTH },
+            ? { value: timeLeft, label: copy('timeToAccept') }
+            : {
+              value: copy(shift.durationHours === 1 ? 'hour' : 'hours', {
+                hours: shift.durationHours,
+              }),
+              label: copy('shiftLength'),
+            },
         ]}
       />
 
@@ -100,16 +113,25 @@ export const ShiftRequestPage: FC<
         title={shift.title}
         caption={
           isLive
-            ? L.shiftCaption(shift.businessName, shift.durationHours)
-            : SC.shiftCaption(shift.dateLabel, shift.timeLabel)
+            ? copy('shiftCaption', {
+              business: shift.businessName,
+              hours: shift.durationHours,
+            })
+            : copy('shiftCaption', {
+              date: shift.dateLabel,
+              time: shift.timeLabel,
+            })
         }
         badge={meta.badge}
         onPress={() => navigation.navigate(ROUTES.shiftDetails, { shift })}
         testID="shift-request-shift"
       />
       <InfoCard
-        title={S.PAY}
-        caption={S.payCaption(formatRupees(shift.hourlyRate), meta.payNote)}
+        title={t('workerFlow.request.pay')}
+        caption={t('workerFlow.request.payCaption', {
+          rate: formatRupees(shift.hourlyRate),
+          note: meta.payNote,
+        })}
       />
     </FormScreen>
   );

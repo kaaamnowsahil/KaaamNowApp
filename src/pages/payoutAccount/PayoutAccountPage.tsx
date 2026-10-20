@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import UserIcon from '@/assets/figma/user.svg';
 import WalletIcon from '@/assets/figma/wallet.svg';
@@ -13,7 +14,6 @@ import { FormScreen } from '@/layout/FormScreen';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import type { AppScreenProps } from '@/types';
 
-import { PAYOUT_ACCOUNT_STRINGS as S } from './constants';
 import { PAYOUT_ACCOUNT } from './mock';
 
 const UPI_PATTERN = /^[\w.-]{2,}@[a-zA-Z]{2,}$/;
@@ -22,6 +22,7 @@ const UPI_PATTERN = /^[\w.-]{2,}@[a-zA-Z]{2,}$/;
 export const PayoutAccountPage: FC<
   AppScreenProps<typeof ROUTES.payoutAccount>
 > = ({ navigation }) => {
+  const { t } = useTranslation();
   const isLoading = useMockLoading();
   const [holderName, setHolderName] = useState(PAYOUT_ACCOUNT.holderName);
   const [upiId, setUpiId] = useState(PAYOUT_ACCOUNT.upiId);
@@ -33,46 +34,49 @@ export const PayoutAccountPage: FC<
   return (
     <FormScreen
       onBack={navigation.goBack}
-      title={S.TITLE}
+      title={t('payoutAccount.title')}
       isLoading={isLoading}
       testID="payout-account-page"
       actions={
         <PrimaryButton
-          label={S.SAVE}
+          label={t('payoutAccount.save')}
           disabled={!upiValid || !nameValid || isUnchanged}
           onPress={navigation.goBack}
           testID="payout-save"
         />
       }
     >
-      <ScreenIntro title={S.INTRO_TITLE} subtitle={S.INTRO_SUBTITLE} />
+      <ScreenIntro
+        title={t('payoutAccount.introTitle')}
+        subtitle={t('payoutAccount.introSubtitle')}
+      />
       <IconField
-        label={S.HOLDER_LABEL}
+        label={t('payoutAccount.holderLabel')}
         icon={UserIcon}
-        placeholder={S.HOLDER_PLACEHOLDER}
+        placeholder={t('payoutAccount.holderPlaceholder')}
         value={holderName}
         onChangeText={setHolderName}
         autoCapitalize="words"
-        error={holderName && !nameValid ? S.NAME_ERROR : undefined}
+        error={holderName && !nameValid ? t('payoutAccount.nameError') : undefined}
         testID="payout-holder"
       />
       <IconField
-        label={S.UPI_LABEL}
+        label={t('payoutAccount.upiLabel')}
         icon={WalletIcon}
-        placeholder={S.UPI_PLACEHOLDER}
+        placeholder={t('payoutAccount.upiPlaceholder')}
         value={upiId}
         onChangeText={v => setUpiId(v.trim())}
         autoCapitalize="none"
         keyboardType="email-address"
         action={
           upiId === PAYOUT_ACCOUNT.upiId && PAYOUT_ACCOUNT.isVerified
-            ? { label: S.VERIFIED, tone: 'success' }
+            ? { label: t('payoutAccount.verified'), tone: 'success' }
             : undefined
         }
-        error={upiId && !upiValid ? S.UPI_ERROR : undefined}
+        error={upiId && !upiValid ? t('payoutAccount.upiError') : undefined}
         testID="payout-upi"
       />
-      <BodyNote>{S.NOTE}</BodyNote>
+      <BodyNote>{t('payoutAccount.note')}</BodyNote>
     </FormScreen>
   );
 };

@@ -1,4 +1,5 @@
 import { useState, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import ShieldCheckIcon from '@/assets/icons/shield-check.svg';
@@ -12,7 +13,6 @@ import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
 import { PayoutOptionRow } from './components';
-import { WITHDRAW_STRINGS as S } from './constants';
 import {
   BALANCE,
   DEFAULT_OPTION_ID,
@@ -28,6 +28,7 @@ import {
 export const WithdrawPage: FC<AppScreenProps<typeof ROUTES.withdraw>> = ({
   navigation,
 }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const isLoading = useMockLoading();
   const [selectedId, setSelectedId] = useState(DEFAULT_OPTION_ID);
@@ -51,13 +52,17 @@ export const WithdrawPage: FC<AppScreenProps<typeof ROUTES.withdraw>> = ({
     <FormScreen
       onBack={navigation.goBack}
       backVariant="plain"
-      title={S.TITLE}
+      title={t('withdraw.title')}
       gap={14}
       isLoading={isLoading}
       testID="withdraw-page"
       actions={
         <PrimaryButton
-          label={selected?.destination ? S.withdraw(amount) : S.CONTINUE}
+          label={
+            selected?.destination
+              ? t('withdraw.withdrawAmount', { amount })
+              : t('withdraw.continue')
+          }
           onPress={submit}
           testID="withdraw-submit"
         />
@@ -70,17 +75,17 @@ export const WithdrawPage: FC<AppScreenProps<typeof ROUTES.withdraw>> = ({
         ]}
       >
         <Text style={[styles.small, { color: colors.textSubtle }]}>
-          {S.AVAILABLE}
+          {t('withdraw.available')}
         </Text>
         <Text style={[styles.amount, { color: colors.text }]}>{amount}</Text>
         <Text style={[styles.small, { color: colors.textMuted }]}>
-          {S.fromShifts(BALANCE.completedShifts)}
+          {t('withdraw.fromShifts', { count: BALANCE.completedShifts })}
         </Text>
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.overline, { color: colors.textSubtle }]}>
-          {S.WITHDRAW_TO}
+          {t('withdraw.withdrawTo')}
         </Text>
         <View
           accessibilityRole="radiogroup"
@@ -104,7 +109,7 @@ export const WithdrawPage: FC<AppScreenProps<typeof ROUTES.withdraw>> = ({
       <View style={styles.note}>
         <ShieldCheckIcon width={14} height={14} color={colors.success} />
         <Text style={[styles.small, { color: colors.textSubtle }]}>
-          {S.PAYOUT_TIME}
+          {t('withdraw.payoutTime')}
         </Text>
       </View>
     </FormScreen>

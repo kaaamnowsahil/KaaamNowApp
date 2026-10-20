@@ -1,11 +1,14 @@
 import { z } from 'zod';
 
-import { addressSchema, nameSchema } from '@/utils/validation';
+export const createEditProfileSchema = (t: (key: string) => string) =>
+  z.object({
+    fullName: z
+      .string()
+      .trim()
+      .min(2, t('editProfile.errors.nameMin'))
+      .max(80, t('editProfile.errors.nameMax')),
+    address: z.string().trim().min(3, t('editProfile.errors.address')),
+    workTypes: z.array(z.string()).min(1, t('editProfile.errors.workTypes')),
+  });
 
-export const editProfileSchema = z.object({
-  fullName: nameSchema,
-  address: addressSchema,
-  workTypes: z.array(z.string()).min(1, 'Pick at least one work type.'),
-});
-
-export type EditProfileForm = z.input<typeof editProfileSchema>;
+export type EditProfileForm = z.input<ReturnType<typeof createEditProfileSchema>>;

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { StatTiles, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
@@ -8,7 +9,6 @@ import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { SHIFT_COMPLETE_STRINGS as S } from './constants';
 import { COMPLETED } from './mock';
 
 /**
@@ -18,22 +18,23 @@ import { COMPLETED } from './mock';
 export const ShiftCompletePage: FC<
   AppScreenProps<typeof ROUTES.shiftComplete>
 > = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { shift } = route.params;
   const isLoading = useMockLoading();
 
   return (
     <FormScreen
       onBack={() => navigation.popToTop()}
-      title={S.HEADER_TITLE}
+      title={t('workerFlow.shiftSecured.headerTitle')}
       compactTitle
-      headerTag={S.HEADER_RIGHT}
+      headerTag={t('workerFlow.checkIn.headerRight')}
       gap={16}
       isLoading={isLoading}
       testID="shift-complete-page"
       actions={
         <>
           <PrimaryButton
-            label={S.VIEW_EARNINGS}
+            label={t('workerFlow.shiftComplete.viewEarnings')}
             onPress={() =>
               navigation.popTo(ROUTES.mainTabs, {
                 screen: ROUTES.workerEarnings,
@@ -42,7 +43,7 @@ export const ShiftCompletePage: FC<
             testID="shift-complete-earnings"
           />
           <SecondaryButton
-            label={S.RATE}
+            label={t('workerFlow.shiftComplete.rateBusiness')}
             onPress={() => navigation.replace(ROUTES.rateBusiness, { shift })}
             testID="shift-complete-rate"
           />
@@ -50,16 +51,24 @@ export const ShiftCompletePage: FC<
       }
     >
       <StatusHero
-        overline={S.OVERLINE}
-        title={S.HEADING}
-        subtitle={S.subtitle(COMPLETED.workerFirstName, COMPLETED.checkOutTime)}
+        overline={t('workerFlow.shiftComplete.overline')}
+        title={t('workerFlow.shiftComplete.heading')}
+        subtitle={t('workerFlow.shiftComplete.subtitle', {
+          name: COMPLETED.workerFirstName,
+          time: COMPLETED.checkOutTime,
+        })}
       />
       <StatTiles
         items={[
-          { value: S.hours(COMPLETED.recordedHours), label: S.RECORDED },
+          {
+            value: t('workerFlow.shiftComplete.hours', {
+              count: COMPLETED.recordedHours,
+            }),
+            label: t('workerFlow.shiftComplete.recorded'),
+          },
           {
             value: formatRupees(shift.hourlyRate * COMPLETED.recordedHours),
-            label: S.EARNINGS,
+            label: t('workerFlow.shiftComplete.earnings'),
           },
         ]}
       />

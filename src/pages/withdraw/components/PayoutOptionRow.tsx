@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import CreditCardIcon from '@/assets/icons/credit-card.svg';
@@ -16,13 +17,32 @@ export const PayoutOptionRow: FC<{
   isLast: boolean;
   onPress: () => void;
 }> = ({ option, selected, isLast, onPress }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const AddIcon = option.addKind === 'bank' ? CreditCardIcon : QrCodeIcon;
+  const titleKeys: Record<string, string> = {
+    upi: 'upiTitle',
+    paytm: 'paytmTitle',
+    bank: 'bankTitle',
+    'add-upi': 'addUpiTitle',
+    'add-bank': 'addBankTitle',
+  };
+  const captionKeys: Record<string, string> = {
+    paytm: 'phoneLinked',
+    'add-upi': 'addAnother',
+    'add-bank': 'accountIfsc',
+  };
+  const title = titleKeys[option.id]
+    ? t(`withdraw.options.${titleKeys[option.id]}`)
+    : option.title;
+  const caption = captionKeys[option.id]
+    ? t(`withdraw.options.${captionKeys[option.id]}`)
+    : option.caption;
   return (
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      accessibilityLabel={`${option.title}, ${option.caption}`}
+      accessibilityLabel={`${title}, ${caption}`}
       onPress={onPress}
       testID={`payout-option-${option.id}`}
       style={({ pressed }) => [
@@ -45,10 +65,10 @@ export const PayoutOptionRow: FC<{
       </View>
       <View style={styles.text}>
         <Text style={[styles.title, { color: colors.text }]}>
-          {option.title}
+          {title}
         </Text>
         <Text style={[styles.caption, { color: colors.textSubtle }]}>
-          {option.caption}
+          {caption}
         </Text>
       </View>
       <RadioCheck selected={selected} />

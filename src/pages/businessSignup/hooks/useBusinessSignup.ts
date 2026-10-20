@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import {
   type GeoPoint,
@@ -9,7 +10,7 @@ import { toE164India, toLocalDigits } from '@/utils/phone';
 import { fieldErrors } from '@/utils/validation';
 
 import { BUSINESS_TYPES, CURRENT_ADDRESS } from '../mock';
-import { businessSignupSchema, type BusinessSignupForm } from '../schema';
+import { createBusinessSignupSchema, type BusinessSignupForm } from '../schema';
 
 const EMPTY: BusinessSignupForm = {
   businessName: '',
@@ -21,6 +22,8 @@ const EMPTY: BusinessSignupForm = {
 };
 
 export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
+  const { t } = useTranslation();
+  const businessSignupSchema = createBusinessSignupSchema(t);
   const setBusiness = useOnboardingStore(s => s.setBusiness);
   const [form, setForm] = useState<BusinessSignupForm>(EMPTY);
   const [location, setLocation] = useState<GeoPoint | undefined>();

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { EarningsRowItem } from '@/components/earnings';
@@ -11,7 +12,6 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { EARNINGS_HISTORY_STRINGS as S } from './constants';
 import { PAYOUT_MONTHS } from './mock';
 
 /**
@@ -21,13 +21,14 @@ import { PAYOUT_MONTHS } from './mock';
 export const EarningsHistoryPage: FC<
   AppScreenProps<typeof ROUTES.earningsHistory>
 > = ({ navigation }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const isLoading = useMockLoading();
 
   return (
     <FormScreen
       onBack={navigation.goBack}
-      title={S.TITLE}
+      title={t('earningsHistory.title')}
       gap={12}
       isLoading={isLoading}
       testID="earnings-history-page"
@@ -36,18 +37,24 @@ export const EarningsHistoryPage: FC<
         <View key={month.id} style={styles.month}>
           <SectionHeading title={month.label} />
           <Text style={[styles.total, { color: colors.textSubtle }]}>
-            {S.monthTotal(
-              formatRupees(month.payouts.reduce((sum, p) => sum + p.amount, 0)),
-            )}
+            {t('earningsHistory.monthTotal', {
+              total: formatRupees(
+                month.payouts.reduce((sum, payout) => sum + payout.amount, 0),
+              ),
+            })}
           </Text>
           <View>
             {month.payouts.map((p, i) => (
               <EarningsRowItem
                 key={p.id}
-                title={S.title(p.shiftTitle, p.dateLabel)}
-                meta={S.meta(p.businessName, p.hours, formatRupees(p.amount))}
+                title={`${p.shiftTitle} · ${p.dateLabel}`}
+                meta={t('earningsHistory.meta', {
+                  business: p.businessName,
+                  hours: p.hours,
+                  amount: formatRupees(p.amount),
+                })}
                 status={p.status}
-                statusLabel={S.STATUS[p.status]}
+                statusLabel={t(`earningsHistory.status.${p.status}`)}
                 isLast={i === month.payouts.length - 1}
               />
             ))}

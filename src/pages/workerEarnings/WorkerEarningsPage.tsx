@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { EarningsRowItem } from '@/components/earnings';
@@ -13,18 +14,15 @@ import { useTheme } from '@/theme/ThemeProvider';
 import { formatRupees } from '@/utils/format';
 
 import { EarningsOverview } from './components';
-import { WORKER_EARNINGS_STRINGS as S } from './constants';
 import { useWorkerEarnings } from './hooks/useWorkerEarnings';
 import type { EarningsRow } from './mock';
 
 const rowMeta = (row: EarningsRow) =>
   row.hours && row.rate
-    ? S.shiftMeta(row.hours, formatRupees(row.rate), formatRupees(row.amount))
-    : S.groupMeta(
-        row.shifts ?? 0,
-        formatRupees(row.shifts ? row.amount / row.shifts : row.amount),
-        formatRupees(row.amount),
-      );
+    ? `${row.hours} h × ${formatRupees(row.rate)} = ${formatRupees(row.amount)}`
+    : `${row.shifts ?? 0} × ${formatRupees(
+      row.shifts ? row.amount / row.shifts : row.amount,
+    )} = ${formatRupees(row.amount)}`;
 
 /**
  * Worker "Earnings" tab. Figma: SH-17 · Worker earnings (light/dark).
@@ -33,6 +31,7 @@ const rowMeta = (row: EarningsRow) =>
  * - data: mock/workerEarningsMock.ts
  */
 export const WorkerEarningsPage: FC = () => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const earnings = useWorkerEarnings();
 
@@ -44,10 +43,10 @@ export const WorkerEarningsPage: FC = () => {
         numberOfLines={1}
         style={[styles.barTitle, { color: colors.text }]}
       >
-        {S.TITLE}
+        {t('workerEarnings.title')}
       </Text>
       <Text style={[styles.barTag, { color: colors.textSubtle }]}>
-        {S.HEADER_TAG}
+        {t('workerEarnings.headerTag')}
       </Text>
     </>
   );
@@ -59,13 +58,13 @@ export const WorkerEarningsPage: FC = () => {
       </Text>
       <View style={styles.titleBlock}>
         <Text style={[styles.overline, { color: colors.primary }]}>
-          {S.OVERLINE}
+          {t('workerEarnings.overline')}
         </Text>
         <Text
           accessibilityRole="header"
           style={[styles.title, { color: colors.text }]}
         >
-          {S.HEADING}
+          {t('workerEarnings.heading')}
         </Text>
       </View>
     </View>,
@@ -81,7 +80,7 @@ export const WorkerEarningsPage: FC = () => {
           title={row.title}
           meta={rowMeta(row)}
           status={row.status}
-          statusLabel={S.STATUS[row.status]}
+          statusLabel={t(`workerEarnings.status.${row.status}`)}
         />
       ))}
     </View>,
@@ -97,12 +96,12 @@ export const WorkerEarningsPage: FC = () => {
       actions={
         <>
           <PrimaryButton
-            label={S.VIEW_ALL}
+            label={t('workerEarnings.viewAll')}
             onPress={earnings.openAllEarnings}
             testID="earnings-view-all"
           />
           <SecondaryButton
-            label={S.SUPPORT}
+            label={t('workerEarnings.support')}
             onPress={earnings.openSupport}
             testID="earnings-support"
           />

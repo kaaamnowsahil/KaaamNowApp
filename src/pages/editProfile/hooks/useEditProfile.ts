@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { initialsOf } from '@/utils/format';
 
-import { EDIT_PROFILE_STRINGS as S } from '../constants';
 import { CURRENT_ADDRESS, PROFILE_FORM, WORK_TYPES } from '../mock';
-import { editProfileSchema, type EditProfileForm } from '../schema';
+import { createEditProfileSchema, type EditProfileForm } from '../schema';
 
 const INITIAL: EditProfileForm = {
   fullName: PROFILE_FORM.fullName,
@@ -16,6 +16,8 @@ const INITIAL: EditProfileForm = {
 };
 
 export const useEditProfile = (onSaved: () => void) => {
+  const { t } = useTranslation();
+  const editProfileSchema = createEditProfileSchema(t);
   const isLoading = useMockLoading();
   const [form, setForm] = useState<EditProfileForm>(INITIAL);
 
@@ -48,7 +50,11 @@ export const useEditProfile = (onSaved: () => void) => {
           : [...form.workTypes, id],
       ),
     changePhoto: () =>
-      Alert.alert(S.PHOTO_TITLE, S.PHOTO_BODY, [{ text: S.PHOTO_OK }]),
+      Alert.alert(
+        t('editProfile.photoTitle'),
+        t('editProfile.photoBody'),
+        [{ text: t('editProfile.photoOk') }],
+      ),
     ...currentAddress,
     save: () => parsed.success && onSaved(),
   };

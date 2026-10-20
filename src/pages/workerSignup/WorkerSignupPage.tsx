@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CalendarIcon from '@/assets/icons/calendar.svg';
 import MailIcon from '@/assets/icons/mail.svg';
@@ -16,7 +17,6 @@ import { FormScreen } from '@/layout/FormScreen';
 import type { AuthScreenProps } from '@/types';
 import { formatLocalPhone } from '@/utils/phone';
 
-import { WORKER_SIGNUP_STRINGS as S } from './constants';
 import { useWorkerSignup } from './hooks/useWorkerSignup';
 
 /**
@@ -28,6 +28,7 @@ import { useWorkerSignup } from './hooks/useWorkerSignup';
 export const WorkerSignupPage: FC<
   AuthScreenProps<typeof ROUTES.workerSignup>
 > = ({ navigation }) => {
+  const { t } = useTranslation();
   const f = useWorkerSignup(phone =>
     navigation.navigate(ROUTES.verifyPhone, { phone, intent: 'signUp' }),
   );
@@ -38,18 +39,18 @@ export const WorkerSignupPage: FC<
       testID="worker-signup-page"
       actions={
         <PrimaryButton
-          label={S.CONTINUE}
+          label={t('workerSignup.continue')}
           onPress={f.submit}
           disabled={!f.canSubmit}
           testID="worker-continue"
         />
       }
     >
-      <ScreenIntro title={S.TITLE} subtitle={S.SUBTITLE} />
+      <ScreenIntro title={t('workerSignup.title')} subtitle={t('workerSignup.subtitle')} />
       <IconField
-        label={S.NAME_LABEL}
+        label={t('workerSignup.nameLabel')}
         icon={UserIcon}
-        placeholder={S.NAME_PLACEHOLDER}
+        placeholder={t('workerSignup.namePlaceholder')}
         value={f.form.fullName}
         onChangeText={f.setFullName}
         autoCapitalize="words"
@@ -59,10 +60,10 @@ export const WorkerSignupPage: FC<
         testID="worker-name"
       />
       <IconField
-        label={S.PHONE_LABEL}
+        label={t('workerSignup.phoneLabel')}
         icon={PhoneIcon}
         prefix="+91"
-        placeholder={S.PHONE_PLACEHOLDER}
+        placeholder={t('workerSignup.phonePlaceholder')}
         value={formatLocalPhone(f.form.phone)}
         onChangeText={f.setPhone}
         keyboardType="number-pad"
@@ -72,9 +73,9 @@ export const WorkerSignupPage: FC<
         testID="worker-phone"
       />
       <IconField
-        label={S.EMAIL_LABEL}
+        label={t('workerSignup.emailLabel')}
         icon={MailIcon}
-        placeholder={S.EMAIL_PLACEHOLDER}
+        placeholder={t('workerSignup.emailPlaceholder')}
         value={f.form.email}
         onChangeText={f.setEmail}
         keyboardType="email-address"
@@ -85,9 +86,9 @@ export const WorkerSignupPage: FC<
         testID="worker-email"
       />
       <IconField
-        label={S.AGE_LABEL}
+        label={t('workerSignup.ageLabel')}
         icon={CalendarIcon}
-        placeholder={S.AGE_PLACEHOLDER}
+        placeholder={t('workerSignup.agePlaceholder')}
         value={f.form.age}
         onChangeText={f.setAge}
         keyboardType="number-pad"
@@ -95,24 +96,27 @@ export const WorkerSignupPage: FC<
         testID="worker-age"
       />
       <IconField
-        label={S.ADDRESS_LABEL}
+        label={t('workerSignup.addressLabel')}
         icon={MapPinIcon}
-        placeholder={S.ADDRESS_PLACEHOLDER}
+        placeholder={t('workerSignup.addressPlaceholder')}
         value={f.form.address}
         onChangeText={f.setAddress}
         autoComplete="street-address"
         textContentType="fullStreetAddress"
         action={{
-          label: f.isLocating ? S.LOCATING : S.USE_CURRENT,
+          label: f.isLocating ? t('workerSignup.locating') : t('workerSignup.useCurrent'),
           onPress: f.isLocating ? undefined : f.locate,
         }}
         error={f.errors.address || f.locateError || undefined}
         testID="worker-address"
       />
       <ChipGroup
-        label={S.WORK_TYPE_LABEL}
-        hint={f.errors.workTypes || S.WORK_TYPE_HINT}
-        options={f.workTypeOptions}
+        label={t('workerSignup.workTypeLabel')}
+        hint={f.errors.workTypes || t('workerSignup.workTypeHint')}
+        options={f.workTypeOptions.map(option => ({
+          ...option,
+          label: t(`workerSignup.workTypes.${option.id}`),
+        }))}
         selected={f.form.workTypes}
         onToggle={f.toggleWorkType}
       />

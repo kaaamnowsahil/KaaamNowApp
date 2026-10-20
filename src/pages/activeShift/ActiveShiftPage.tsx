@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
 
 import {
@@ -15,7 +16,6 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatClock, splitTimeRange } from '@/utils/format';
 
-import { ACTIVE_SHIFT_STRINGS as S } from './constants';
 import { useActiveShift } from './hooks/useActiveShift';
 
 /**
@@ -27,35 +27,40 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
   navigation,
   route,
 }) => {
+  const { t } = useTranslation();
   const { shift } = route.params;
   const { colors } = useTheme();
   const a = useActiveShift();
   const times = splitTimeRange(shift.timeLabel);
 
   const report = () =>
-    Alert.alert(S.REPORT_TITLE, S.REPORT_BODY, [
-      { text: S.REPORT_CANCEL, style: 'cancel' },
-      { text: S.REPORT_OK },
-    ]);
+    Alert.alert(
+      t('workerFlow.activeShift.reportTitle'),
+      t('workerFlow.activeShift.reportBody'),
+      [
+        { text: t('workerFlow.activeShift.reportCancel'), style: 'cancel' },
+        { text: t('workerFlow.activeShift.reportOk') },
+      ],
+    );
 
   return (
     <FormScreen
       onBack={navigation.goBack}
-      title={S.HEADER_TITLE}
+      title={t('workerFlow.shiftSecured.headerTitle')}
       compactTitle
-      headerTag={S.HEADER_RIGHT}
+      headerTag={t('workerFlow.checkIn.headerRight')}
       gap={12}
       isLoading={a.isLoading}
       testID="active-shift-page"
       actions={
         <>
           <PrimaryButton
-            label={S.CHECK_OUT}
+            label={t('workerFlow.activeShift.checkOut')}
             onPress={() => navigation.navigate(ROUTES.finishShift, { shift })}
             testID="active-shift-check-out"
           />
           <SecondaryButton
-            label={S.REPORT}
+            label={t('workerFlow.activeShift.report')}
             onPress={report}
             testID="active-shift-report"
           />
@@ -63,20 +68,28 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
       }
     >
       <FlowHeading
-        overline={S.OVERLINE}
-        title={S.HEADING}
-        subtitle={S.subtitle(shift.title, a.shift.checkInCode)}
+        overline={t('workerFlow.activeShift.overline')}
+        title={t('workerFlow.activeShift.heading')}
+        subtitle={t('workerFlow.activeShift.subtitle', {
+          role: shift.title,
+          code: a.shift.checkInCode,
+        })}
       />
-      <MapPreview variant="pin" label={S.mapLabel(shift.distanceKm)} />
+      <MapPreview
+        variant="pin"
+        label={t('workerFlow.activeShift.mapLabel', {
+          distance: shift.distanceKm,
+        })}
+      />
       <StatTiles
         items={[
-          { value: times.start, label: S.SHIFT_START },
-          { value: times.end, label: S.EXPECTED_END },
+          { value: times.start, label: t('workerFlow.activeShift.shiftStart') },
+          { value: times.end, label: t('workerFlow.activeShift.expectedEnd') },
         ]}
       />
       <View style={[styles.timer, { backgroundColor: colors.fill }]}>
         <Text style={[styles.timerLabel, { color: colors.textSubtle }]}>
-          {S.TIME_ON_SHIFT}
+          {t('workerFlow.activeShift.timeOnShift')}
         </Text>
         <Text
           style={[styles.clock, { color: colors.text }]}
@@ -85,20 +98,20 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
           {formatClock(a.elapsed)}
         </Text>
         <Text style={[styles.timerLabel, { color: colors.textSubtle }]}>
-          {S.TIMER_NOTE}
+          {t('workerFlow.activeShift.timerNote')}
         </Text>
       </View>
       <View>
         <DetailRow
           size="compact"
-          title={S.CHECK_IN_RECORDED}
+          title={t('workerFlow.activeShift.checkInRecorded')}
           caption={a.shift.checkInRecorded}
           onPress={() => navigation.navigate(ROUTES.shiftDetails, { shift, bookingStatus: 'confirmed' })}
         />
         <DetailRow
           size="compact"
-          title={S.SHIFT_LEAD}
-          caption={S.lead(a.shift.leadName)}
+          title={t('workerFlow.activeShift.shiftLead')}
+          caption={t('workerFlow.activeShift.lead', { name: a.shift.leadName })}
           onPress={() => Linking.openURL(`sms:${a.shift.leadPhone}`)}
         />
       </View>
