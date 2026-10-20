@@ -1,4 +1,4 @@
-package in.kaaamnow.app
+package `in`.kaaamnow.app
 
 import android.app.Application
 import com.facebook.react.PackageList

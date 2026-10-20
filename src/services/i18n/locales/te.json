@@ -256,7 +256,8 @@
     "viewAll": "అన్ని ఆదాయాలు చూడండి",
     "support": "చెల్లింపు సహాయం",
     "period": "{{month}} · పూర్తయిన చెల్లింపులు",
-    "lastPaid": "{{job}} · {{date}}"
+    "lastPaid": "{{job}} · {{date}}",
+    "detailTitle": "ఆదాయ వివరాలు"
   },
   "earningsHistory": {
     "title": "అన్ని ఆదాయాలు",
@@ -509,7 +510,8 @@
       "applicants": "దరఖాస్తుదారులు",
       "profile": "ప్రొఫైల్"
     },
-    "distance": "{{distance}} కి.మీ."
+    "distance": "{{distance}} కి.మీ.",
+    "locationPickerHint": "వ్యాపార స్థానాన్ని ఎంచుకోండి"
   },
   "businessShifts": {
     "title": "షిఫ్ట్‌లు",
@@ -832,5 +834,16 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "workerEarningDetail": {
+    "business": "వ్యాపారం",
+    "shift": "షిఫ్ట్",
+    "date": "తేదీ",
+    "hours": "పని గంటలు",
+    "hoursValue": "{{hours}} గంటలు",
+    "rate": "గంటకు రేటు",
+    "hour": "గంట",
+    "shifts": "చేర్చిన షిఫ్ట్‌లు",
+    "reference": "ఆదాయ సూచన"
   }
 }

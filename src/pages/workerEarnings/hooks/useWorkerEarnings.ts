@@ -16,6 +16,10 @@ export const useWorkerEarnings = () => {
     rows: ROWS,
     goBack: () => navigation.navigate(ROUTES.workerHome),
     openAllEarnings: () => navigation.navigate(ROUTES.earningsHistory),
+    openEarningDetail: (earning: (typeof ROWS)[number]) =>
+      navigation.navigate(ROUTES.workerEarningDetail, {
+        earning,
+      }),
     openWithdraw: () => navigation.navigate(ROUTES.withdraw),
     openSupport: () => navigation.navigate(ROUTES.faq),
   };

@@ -16,6 +16,8 @@ export type EarningsRow = {
   rate?: number;
   /** Number of shifts in a grouped row. */
   shifts?: number;
+  businessName?: string;
+  dateLabel?: string;
   amount: number;
   status: PayoutStatus;
 };
@@ -32,6 +34,8 @@ export const ROWS: EarningsRow[] = [
   {
     id: 'row-cafe',
     title: 'Café service · 18 Oct',
+    businessName: 'Third Wave Coffee',
+    dateLabel: '18 Oct 2026',
     hours: 4,
     rate: 150,
     amount: 600,
@@ -40,6 +44,8 @@ export const ROWS: EarningsRow[] = [
   {
     id: 'row-event',
     title: 'Event service · 12 Oct',
+    businessName: 'The Park Events',
+    dateLabel: '12 Oct 2026',
     hours: 6,
     rate: 175,
     amount: 1050,

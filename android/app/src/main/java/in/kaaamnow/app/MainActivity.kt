@@ -1,4 +1,4 @@
-package in.kaaamnow.app
+package `in`.kaaamnow.app
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

@@ -255,8 +255,20 @@
     "withdraw": "Withdraw",
     "viewAll": "View all earnings",
     "support": "Payment support",
+    "detailTitle": "Earning details",
     "period": "{{month}} · Completed payouts",
     "lastPaid": "{{job}} · {{date}}"
+  },
+  "workerEarningDetail": {
+    "business": "Business",
+    "shift": "Shift",
+    "date": "Date",
+    "hours": "Hours worked",
+    "hoursValue": "{{hours}} hours",
+    "rate": "Hourly rate",
+    "hour": "hour",
+    "shifts": "Shifts included",
+    "reference": "Earning reference"
   },
   "earningsHistory": {
     "title": "All earnings",
@@ -509,7 +521,8 @@
       "applicants": "Applicants",
       "profile": "Profile"
     },
-    "distance": "{{distance}} km"
+    "distance": "{{distance}} km",
+    "locationPickerHint": "Select business location"
   },
   "businessShifts": {
     "title": "Shifts",

@@ -255,6 +255,7 @@
     "withdraw": "তুলুন",
     "viewAll": "সব উপার্জন দেখুন",
     "support": "পেমেন্ট সহায়তা",
+    "detailTitle": "উপার্জনের বিবরণ",
     "period": "{{month}} · সম্পন্ন পেমেন্ট",
     "lastPaid": "{{job}} · {{date}}"
   },
@@ -267,6 +268,17 @@
       "processing": "প্রক্রিয়াধীন",
       "completed": "সম্পন্ন"
     }
+  },
+  "workerEarningDetail": {
+    "business": "ব্যবসা",
+    "shift": "শিফট",
+    "date": "তারিখ",
+    "hours": "কাজের ঘণ্টা",
+    "hoursValue": "{{hours}} ঘণ্টা",
+    "rate": "প্রতি ঘণ্টার পারিশ্রমিক",
+    "hour": "ঘণ্টা",
+    "shifts": "অন্তর্ভুক্ত শিফট",
+    "reference": "উপার্জনের রেফারেন্স"
   },
   "withdraw": {
     "title": "টাকা তুলুন",
@@ -509,7 +521,8 @@
       "applicants": "আবেদনকারী",
       "profile": "প্রোফাইল"
     },
-    "distance": "{{distance}} কিমি"
+    "distance": "{{distance}} কিমি",
+    "locationPickerHint": "ব্যবসার অবস্থান বেছে নিন"
   },
   "businessShifts": {
     "title": "শিফট",

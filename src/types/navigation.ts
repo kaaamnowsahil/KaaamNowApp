@@ -12,6 +12,7 @@ import type { BookingStatus } from './booking';
 import type { Shift } from './shift';
 import type { WithdrawalReceipt } from './booking';
 import type { BusinessShiftDraft } from './businessShift';
+import type { WorkerEarningDetails } from './booking';
 
 export type BusinessPaymentMethod =
   | 'googlePay'
@@ -106,6 +107,7 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.offline]: undefined;
   [ROUTES.payoutAccount]: undefined;
   [ROUTES.earningsHistory]: undefined;
+  [ROUTES.workerEarningDetail]: { earning: WorkerEarningDetails };
   [ROUTES.withdraw]: undefined;
   [ROUTES.withdrawSuccess]: WithdrawalReceipt;
   [ROUTES.shiftRequest]: { shift: Shift };
