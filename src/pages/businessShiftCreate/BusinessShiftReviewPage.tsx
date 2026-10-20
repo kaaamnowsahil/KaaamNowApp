@@ -21,15 +21,13 @@ export const BusinessShiftReviewPage: FC<
   const { draft } = route.params;
   const postShift = useBusinessShiftStore(state => state.postShift);
   const schedules = draft.schedules.map(schedule => ({
+    ...schedule,
     date: new Intl.DateTimeFormat(i18n.language, {
       dateStyle: 'full',
     }).format(parseLocalDate(schedule.date)),
     time: `${schedule.startTime}–${schedule.endTime}`,
     hours: getDurationHours(schedule.startTime, schedule.endTime),
   }));
-  const hourlyRate = Number(draft.hourlyRate);
-  const workerCount = Number(draft.workers);
-
   const post = () => {
     const postedDraft = postShift(draft);
     navigation.replace(ROUTES.businessShiftPosted, { draft: postedDraft });
@@ -79,27 +77,37 @@ export const BusinessShiftReviewPage: FC<
             count: draft.schedules.length,
           })}
         />
-        {schedules.map((schedule, index) => (
-          <ReviewRow
-            key={`${draft.schedules[index].date}-${index}`}
-            label={schedule.date}
-            value={`${schedule.time} · ${t('businessShiftCreate.hoursDuration', {
-              hours: schedule.hours,
-            })}`}
-          />
+        {schedules.map(schedule => (
+          <View key={schedule.date} style={styles.scheduleReview}>
+            <ReviewRow
+              label={schedule.date}
+              value={`${schedule.role} · ${schedule.time} · ${t(
+                'businessShiftCreate.hoursDuration',
+                { hours: schedule.hours },
+              )}`}
+            />
+            <ReviewRow
+              label={t('businessLiveCreate.category')}
+              value={t(`businessSignup.businessTypes.${schedule.category}`)}
+            />
+            <ReviewRow
+              label={t('businessLiveCreate.requirement')}
+              value={schedule.requirement}
+            />
+            <ReviewRow
+              label={t('businessShiftCreate.responsibilities')}
+              value={schedule.responsibilities}
+            />
+            <ReviewRow
+              label={t('businessShiftCreate.payAndHeadcount')}
+              value={t('businessShiftCreate.paySummary', {
+                workers: Number(schedule.workers),
+                rate: formatRupees(Number(schedule.hourlyRate)),
+              })}
+              isLast
+            />
+          </View>
         ))}
-        <ReviewRow
-          label={t('businessShiftCreate.payAndHeadcount')}
-          value={t('businessShiftCreate.paySummary', {
-            workers: workerCount,
-            rate: formatRupees(hourlyRate),
-          })}
-        />
-        <ReviewRow
-          label={t('businessShiftCreate.responsibilities')}
-          value={draft.responsibilities}
-          isLast
-        />
       </View>
 
       <Text style={[styles.note, { color: colors.textSubtle }]}>
@@ -142,6 +150,7 @@ const styles = StyleSheet.create({
   title: { fontFamily: FONTS.bold, fontSize: 21, lineHeight: 28 },
   subtitle: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
   card: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 12 },
+  scheduleReview: { borderBottomWidth: 1 },
   reviewRow: {
     paddingVertical: 12,
     gap: 5,

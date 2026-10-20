@@ -125,7 +125,7 @@ export const BusinessLiveReviewPage: FC<
       >
         <Text style={[styles.title, { color: colors.text }]}>{draft.role}</Text>
         <Text style={[styles.body, { color: colors.textSubtle }]}>
-          {draft.category}
+          {t(`businessSignup.businessTypes.${draft.category}`)}
         </Text>
         <Text style={[styles.body, { color: colors.textSubtle }]}>
           {t('businessLiveCreate.dateTimeSummary', {

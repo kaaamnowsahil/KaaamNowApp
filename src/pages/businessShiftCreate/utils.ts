@@ -39,6 +39,7 @@ export const formatShiftTime = (value: string, locale: string) => {
 export const createDefaultBusinessShiftDraft = (
   responsibilities: string,
   role: string,
+  category = 'hospitality',
 ): BusinessShiftDraft => {
   const date = new Date();
   date.setDate(date.getDate() + 2);
@@ -48,12 +49,20 @@ export const createDefaultBusinessShiftDraft = (
         date: toLocalDateString(date),
         startTime: '10:00',
         endTime: '16:00',
+        role,
+        category,
+        requirement: '',
+        responsibilities,
+        workers: '4',
+        hourlyRate: '175',
       },
     ],
     hourlyRate: '175',
     workers: '4',
     responsibilities,
+    requirement: '',
     role,
+    category,
     location: 'The Fern Events, Indiranagar',
   };
 };
@@ -62,16 +71,16 @@ export const toBusinessDashboardShifts = (
   draft: BusinessShiftDraft,
   locale: string,
 ): BusinessDashboardShift[] => {
-  const hourlyRate = Number(draft.hourlyRate);
-
   return draft.schedules.map(schedule => {
     const date = parseLocalDate(schedule.date);
     const hours = getDurationHours(schedule.startTime, schedule.endTime);
+    const hourlyRate = Number(schedule.hourlyRate);
     return {
       id: `${draft.id ?? 'business-shift'}-${schedule.date}-${
         schedule.startTime
       }`,
-      title: draft.role,
+      title: schedule.role,
+      category: schedule.category,
       date: new Intl.DateTimeFormat(locale, {
         weekday: 'short',
         day: 'numeric',
@@ -80,10 +89,12 @@ export const toBusinessDashboardShifts = (
       time: `${schedule.startTime}–${schedule.endTime}`,
       hours,
       area: draft.location,
-      requirement: draft.responsibilities,
+      requirement: schedule.requirement,
+      responsibilities: schedule.responsibilities,
       distanceKm: 3.2,
       hourlyRate,
-      estimatedTotal: hours * hourlyRate,
+      estimatedTotal: hours * hourlyRate * Number(schedule.workers),
+      totalSpots: Number(schedule.workers),
       applicantCount: 0,
     };
   });
