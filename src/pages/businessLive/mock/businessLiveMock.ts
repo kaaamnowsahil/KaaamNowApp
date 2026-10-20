@@ -1,6 +1,11 @@
+import type { BusinessLiveRequestDraft } from '@/types';
+
+import { BUSINESS_LIVE_SEARCH_MOCK } from './liveSearchMock';
+
 export type BusinessDashboardShift = {
   id: string;
   title: string;
+  category?: string;
   date: string;
   time: string;
   hours: number;
@@ -62,7 +67,46 @@ export const BUSINESS_DASHBOARD = {
   ] as BusinessDashboardShift[],
 };
 
+export const createLiveDraftFromDashboardShift = (
+  shift: BusinessDashboardShift,
+): BusinessLiveRequestDraft => ({
+  role: shift.title,
+  category: shift.category ?? 'General',
+  responsibilities: shift.requirement,
+  requirement: shift.requirement,
+  location: shift.area,
+  latitude: null,
+  longitude: null,
+  workplaceInstructions: '',
+  workers: String(shift.totalSpots ?? 1),
+  hourlyRate: String(shift.hourlyRate),
+  hours: String(shift.hours),
+  startTime: shift.time.split(/[–-]/, 1)[0].trim(),
+  searchRadiusKm: BUSINESS_LIVE_SEARCH_MOCK.maxRadiusKm,
+  customPayAgreed: false,
+});
+
 export const BUSINESS_ROSTER = {
   staffedCount: 4,
   totalCount: 4,
 };
+
+export const createDefaultBusinessLiveDraft = (
+  location: string,
+): BusinessLiveRequestDraft => ({
+  role: 'Café service associate',
+  category: 'Hospitality / Café',
+  responsibilities:
+    'Welcome guests, take orders, serve food and keep the service area clean.',
+  requirement: 'Customer service experience required.',
+  location,
+  latitude: null,
+  longitude: null,
+  workplaceInstructions: 'Closed shoes; main entrance, ask for Meera.',
+  workers: '3',
+  hourlyRate: '150',
+  hours: '4',
+  startTime: '14:00',
+  searchRadiusKm: BUSINESS_LIVE_SEARCH_MOCK.maxRadiusKm,
+  customPayAgreed: false,
+});

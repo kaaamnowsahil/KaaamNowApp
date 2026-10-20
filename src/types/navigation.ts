@@ -11,6 +11,36 @@ import type { ROUTES } from '@/constants/routes';
 import type { BookingStatus } from './booking';
 import type { Shift } from './shift';
 import type { WithdrawalReceipt } from './booking';
+import type { BusinessShiftDraft } from './businessShift';
+
+export type BusinessPaymentMethod =
+  | 'googlePay'
+  | 'paytm'
+  | 'applePay'
+  | 'upiQr'
+  | 'cards';
+
+export type BusinessPaymentRecord = {
+  id: string;
+  role: string;
+  business: string;
+  date: string;
+  amount: number;
+  method: BusinessPaymentMethod;
+  status: 'paid' | 'pending';
+  workerName?: string;
+  workerId?: string;
+};
+
+export type BusinessPaymentDetails = {
+  role: string;
+  business: string;
+  amount: number;
+  date?: string;
+  workerId?: string;
+  workerName?: string;
+  workerIds?: string[];
+};
 
 /** Screens reachable both before and after login. */
 export type CommonStackParamList = {
@@ -33,6 +63,44 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.notifications]: undefined;
   [ROUTES.editProfile]: undefined;
   [ROUTES.businessEditProfile]: undefined;
+  [ROUTES.businessShiftSchedule]: { draft?: BusinessShiftDraft } | undefined;
+  [ROUTES.businessShiftReview]: { draft: BusinessShiftDraft };
+  [ROUTES.businessShiftPosted]: { draft: BusinessShiftDraft };
+  [ROUTES.businessLiveCreate]: undefined;
+  [ROUTES.businessLiveReview]: undefined;
+  [ROUTES.businessLiveFinding]: undefined;
+  [ROUTES.businessLiveStaffing]: undefined;
+  [ROUTES.businessLiveAccepted]: undefined;
+  [ROUTES.businessLiveTracking]: { applicantId?: string } | undefined;
+  [ROUTES.businessLivePayment]: undefined;
+  [ROUTES.businessPaymentMethod]: { payment?: BusinessPaymentDetails } | undefined;
+  [ROUTES.businessPaymentScan]: {
+    method: BusinessPaymentMethod;
+    payment?: BusinessPaymentDetails;
+  };
+  [ROUTES.businessPaymentSuccess]: {
+    method: BusinessPaymentMethod;
+    reference: string;
+    payment?: BusinessPaymentDetails;
+  };
+  [ROUTES.businessPaymentHistory]: undefined;
+  [ROUTES.businessPaymentDetail]: { payment: BusinessPaymentRecord };
+  [ROUTES.businessScheduledWorkerTracking]: {
+    applicantId: string;
+    role: string;
+    business: string;
+    hourlyRate: number;
+    hours: number;
+    date: string;
+  };
+  [ROUTES.businessRateWorker]: {
+    workerId: string;
+    role: string;
+    business: string;
+    workerIds?: string[];
+  };
+  [ROUTES.businessApplicantProfile]: { applicantId: string };
+  [ROUTES.businessRoster]: undefined;
   [ROUTES.language]: undefined;
   [ROUTES.appearance]: undefined;
   [ROUTES.offline]: undefined;
@@ -64,7 +132,9 @@ export type TabParamList = {
   [ROUTES.workerProfile]: undefined;
   [ROUTES.businessLive]: undefined;
   [ROUTES.businessShifts]: undefined;
-  [ROUTES.businessApplicants]: undefined;
+  [ROUTES.businessApplicants]:
+    | { status?: 'applied' | 'selected' | 'confirmed' }
+    | undefined;
   [ROUTES.businessProfile]: undefined;
 };
 

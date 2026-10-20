@@ -6,6 +6,8 @@ import {
   StyleSheet,
   Text,
   View,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
 import {
   SafeAreaView,
@@ -36,6 +38,8 @@ type FormScreenProps = {
   headerTag?: string;
   /** Space between content blocks; forms use 20. */
   gap?: number;
+  /** Additional layout for the scrollable content container. */
+  contentContainerStyle?: StyleProp<ViewStyle>;
   /** Shows the brand loader instead of the content and actions. */
   isLoading?: boolean;
   /** Content sits on a rounded panel with a handle over a filled bar (Finish your shift?). */
@@ -60,6 +64,7 @@ export const FormScreen: FC<FormScreenProps> = ({
   headerRight,
   headerTag,
   gap = 20,
+  contentContainerStyle,
   isLoading,
   asSheet,
   testID,
@@ -145,6 +150,7 @@ export const FormScreen: FC<FormScreenProps> = ({
                 styles.content,
                 asSheet && styles.sheetContent,
                 { gap },
+                contentContainerStyle,
               ]}
               keyboardShouldPersistTaps="handled"
             >
@@ -157,19 +163,19 @@ export const FormScreen: FC<FormScreenProps> = ({
           )}
         </View>
         {actions && !isLoading ? (
-        <Rise
-          delay={(blocks.length + 1) * MOTION.stagger}
-          style={[
-            styles.actions,
-            {
-              backgroundColor: colors.background,
-              borderTopColor: colors.border,
-              paddingBottom: 24 + insets.bottom,
-            },
-          ]}
-        >
-          {actions}
-        </Rise>
+          <Rise
+            delay={(blocks.length + 1) * MOTION.stagger}
+            style={[
+              styles.actions,
+              {
+                backgroundColor: colors.background,
+                borderTopColor: colors.border,
+                paddingBottom: 24 + insets.bottom,
+              },
+            ]}
+          >
+            {actions}
+          </Rise>
         ) : null}
       </KeyboardAvoidingView>
     </SafeAreaView>

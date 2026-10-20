@@ -33,6 +33,7 @@ export const useBusinessProfile = () => {
         openTerms: () => navigation.navigate(ROUTES.terms),
         openNotifications: () => navigation.navigate(ROUTES.notifications),
         openBusinessEditProfile: () => navigation.navigate(ROUTES.businessEditProfile),
+        openPaymentHistory: () => navigation.navigate(ROUTES.businessPaymentHistory),
         signOut,
     };
 };

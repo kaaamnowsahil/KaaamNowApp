@@ -13,6 +13,7 @@ import { BeforeLoginRoutes } from './beforeLogin';
 export const AppRoutes: FC = () => {
   const { isDark } = useTheme();
   const isAuth = useAuthStore(s => s.isAuth);
+  const hasHydrated = useAuthStore(s => s.hasHydrated);
   const [isBooting, setIsBooting] = useState(true);
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export const AppRoutes: FC = () => {
   return (
     <>
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
-      {isBooting ? (
+      {isBooting || !hasHydrated ? (
         <SplashPage />
       ) : (
         <NavigationContainer>

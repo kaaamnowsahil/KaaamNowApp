@@ -7,6 +7,27 @@ import { WithdrawPage } from '@/pages/withdraw/WithdrawPage';
 import { WithdrawSuccessPage } from '@/pages/withdrawSuccess/WithdrawSuccessPage';
 import { EditProfilePage } from '@/pages/editProfile/EditProfilePage';
 import { BusinessEditProfilePage } from '@/pages/businessEditProfile/BusinessEditProfilePage';
+import {
+  BusinessShiftPostedPage,
+  BusinessShiftReviewPage,
+  BusinessShiftSchedulePage,
+} from '@/pages/businessShiftCreate';
+import { BusinessApplicantProfilePage } from '@/pages/businessApplicants/BusinessApplicantProfilePage';
+import { BusinessRosterPage } from '@/pages/businessApplicants/BusinessRosterPage';
+import { BusinessScheduledWorkerTrackingPage } from '@/pages/businessApplicants/BusinessScheduledWorkerTrackingPage';
+import { BusinessRateWorkerPage } from '@/pages/businessApplicants/BusinessRateWorkerPage';
+import { BusinessLiveCreatePage } from '@/pages/businessLive/BusinessLiveCreatePage';
+import { BusinessLiveReviewPage } from '@/pages/businessLive/BusinessLiveReviewPage';
+import { BusinessLiveFindingPage } from '@/pages/businessLive/BusinessLiveFindingPage';
+import { BusinessLiveStaffingPage } from '@/pages/businessLive/BusinessLiveStaffingPage';
+import { BusinessLiveAcceptedPage } from '@/pages/businessLive/BusinessLiveAcceptedPage';
+import { BusinessLiveTrackingPage } from '@/pages/businessLive/BusinessLiveTrackingPage';
+import { BusinessLivePaymentPage } from '@/pages/businessLive/BusinessLivePaymentPage';
+import { BusinessPaymentMethodPage } from '@/pages/businessPayments/BusinessPaymentMethodPage';
+import { BusinessPaymentScanPage } from '@/pages/businessPayments/BusinessPaymentScanPage';
+import { BusinessPaymentSuccessPage } from '@/pages/businessPayments/BusinessPaymentSuccessPage';
+import { BusinessPaymentHistoryPage } from '@/pages/businessPayments/BusinessPaymentHistoryPage';
+import { BusinessPaymentDetailPage } from '@/pages/businessPayments/BusinessPaymentDetailPage';
 import { LanguagePage } from '@/pages/language/LanguagePage';
 import { AppearancePage } from '@/pages/appearance/AppearancePage';
 import { OfflinePage } from '@/pages/offline/OfflinePage';
@@ -45,22 +66,92 @@ export const AfterLoginRoutes: FC = () => {
     >
       <Stack.Screen name={ROUTES.mainTabs} component={BottomTabRoutes} />
       <Stack.Screen name={ROUTES.shiftList} component={ShiftListPage} />
-      <Stack.Screen
-        name={ROUTES.notifications}
-        component={NotificationsPage}
-      />
+      <Stack.Screen name={ROUTES.notifications} component={NotificationsPage} />
       <Stack.Screen name={ROUTES.editProfile} component={EditProfilePage} />
       <Stack.Screen
         name={ROUTES.businessEditProfile}
         component={BusinessEditProfilePage}
       />
+      <Stack.Screen
+        name={ROUTES.businessShiftSchedule}
+        component={BusinessShiftSchedulePage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessShiftReview}
+        component={BusinessShiftReviewPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessShiftPosted}
+        component={BusinessShiftPostedPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessLiveCreate}
+        component={BusinessLiveCreatePage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessLiveReview}
+        component={BusinessLiveReviewPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessLiveFinding}
+        component={BusinessLiveFindingPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessLiveStaffing}
+        component={BusinessLiveStaffingPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessLiveAccepted}
+        component={BusinessLiveAcceptedPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessLiveTracking}
+        component={BusinessLiveTrackingPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessLivePayment}
+        component={BusinessLivePaymentPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessPaymentMethod}
+        component={BusinessPaymentMethodPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessPaymentScan}
+        component={BusinessPaymentScanPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessPaymentSuccess}
+        component={BusinessPaymentSuccessPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessPaymentHistory}
+        component={BusinessPaymentHistoryPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessPaymentDetail}
+        component={BusinessPaymentDetailPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessScheduledWorkerTracking}
+        component={BusinessScheduledWorkerTrackingPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessRateWorker}
+        component={BusinessRateWorkerPage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessApplicantProfile}
+        component={BusinessApplicantProfilePage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessRoster}
+        component={BusinessRosterPage}
+      />
       <Stack.Screen name={ROUTES.language} component={LanguagePage} />
       <Stack.Screen name={ROUTES.appearance} component={AppearancePage} />
       <Stack.Screen name={ROUTES.offline} component={OfflinePage} />
-      <Stack.Screen
-        name={ROUTES.payoutAccount}
-        component={PayoutAccountPage}
-      />
+      <Stack.Screen name={ROUTES.payoutAccount} component={PayoutAccountPage} />
       <Stack.Screen
         name={ROUTES.earningsHistory}
         component={EarningsHistoryPage}
@@ -84,7 +175,10 @@ export const AfterLoginRoutes: FC = () => {
       <Stack.Group screenOptions={{ gestureEnabled: false }}>
         <Stack.Screen name={ROUTES.activeShift} component={ActiveShiftPage} />
         <Stack.Screen name={ROUTES.finishShift} component={FinishShiftPage} />
-        <Stack.Screen name={ROUTES.shiftComplete} component={ShiftCompletePage} />
+        <Stack.Screen
+          name={ROUTES.shiftComplete}
+          component={ShiftCompletePage}
+        />
         <Stack.Screen name={ROUTES.rateBusiness} component={RateBusinessPage} />
       </Stack.Group>
       <Stack.Group>

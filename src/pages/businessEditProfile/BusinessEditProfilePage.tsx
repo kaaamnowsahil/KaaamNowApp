@@ -57,7 +57,7 @@ export const BusinessEditProfilePage: FC<
                 prefix="+91"
                 value={formatLocalPhone(form.phone)}
                 editable={false}
-                action={{ label: t('businessSignup.verified'), tone: 'success' }}
+                action={{ label: t('editProfile.verified'), tone: 'success' }}
                 testID="business-edit-phone"
             />
             <IconField

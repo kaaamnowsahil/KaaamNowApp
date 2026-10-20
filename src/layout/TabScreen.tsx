@@ -14,6 +14,8 @@ type TabScreenProps = {
   header?: ReactNode;
   /** Each block rises in on mount, staggered. Give every block a key. */
   blocks: ReactElement[];
+  /** Lets the final content block fill and align within the available screen height. */
+  fillLastBlock?: boolean;
   /** Space between blocks; Discover uses 8, Profile 10. */
   gap?: number;
   /** Shows the brand loader instead of the blocks. */
@@ -31,6 +33,7 @@ export const TabScreen: FC<TabScreenProps> = ({
   title,
   header,
   blocks,
+  fillLastBlock,
   gap = 8,
   isLoading,
   actions,
@@ -57,12 +60,20 @@ export const TabScreen: FC<TabScreenProps> = ({
         <Loader />
       ) : (
       <ScrollView
-        contentContainerStyle={[styles.content, { gap }]}
+        contentContainerStyle={[
+          styles.content,
+          fillLastBlock && styles.fillContent,
+          { gap },
+        ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         {blocks.map((block, i) => (
-          <Rise key={block.key ?? i} delay={(i + 1) * MOTION.stagger}>
+          <Rise
+            key={block.key ?? i}
+            delay={(i + 1) * MOTION.stagger}
+            style={fillLastBlock && i === blocks.length - 1 ? styles.fillBlock : undefined}
+          >
             {block}
           </Rise>
         ))}
@@ -98,6 +109,8 @@ const styles = StyleSheet.create({
   },
   title: { fontFamily: FONTS.bold, fontSize: 22, lineHeight: 30.8 },
   content: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20 },
+  fillContent: { flexGrow: 1 },
+  fillBlock: { flexGrow: 1 },
   bottomSpace: { height: 4 },
   actions: {
     borderTopWidth: 1,

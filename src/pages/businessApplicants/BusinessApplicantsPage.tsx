@@ -1,7 +1,9 @@
 import type { FC } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { RouteProp } from '@react-navigation/native';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
     BackButton,
@@ -16,6 +18,7 @@ import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import type { TabAppNavigation } from '@/types';
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import { useTheme } from '@/theme/ThemeProvider';
+import type { TabParamList } from '@/types';
 
 import { ApplicantsSortSheet, BusinessApplicantRow } from './components';
 import { useBusinessApplicants } from './hooks';
@@ -24,21 +27,29 @@ export const BusinessApplicantsPage: FC = () => {
     const { t } = useTranslation();
     const { colors } = useTheme();
     const navigation = useNavigation<TabAppNavigation>();
+    const route =
+        useRoute<RouteProp<TabParamList, typeof ROUTES.businessApplicants>>();
     const isLoading = useMockLoading();
-    const applicants = useBusinessApplicants();
+    const applicants = useBusinessApplicants(route.params?.status ?? 'applied');
+    const setApplicantStatus = applicants.setStatus;
+    useEffect(() => {
+        const requestedStatus = route.params?.status;
+        if (requestedStatus) {
+            setApplicantStatus(currentStatus =>
+                currentStatus === requestedStatus ? currentStatus : requestedStatus,
+            );
+            navigation.setParams({ status: undefined });
+        }
+    }, [navigation, route.params?.status, setApplicantStatus]);
 
-    const openProfile = () => {
+    const openApplicant = () => {
         if (!applicants.activeApplicant) return;
-        Alert.alert(
-            t('businessApplicants.openProfile', { name: applicants.activeApplicant.name }),
-            t('businessApplicants.meta', {
-                experience: applicants.activeApplicant.experience,
-                category: applicants.activeApplicant.category,
-                rating: applicants.activeApplicant.rating.toFixed(1),
-            }),
-            [{ text: t('businessApplicants.close') }],
-        );
+        navigation.navigate(ROUTES.businessApplicantProfile, {
+            applicantId: applicants.activeApplicant.id,
+        });
     };
+
+    const openRoster = () => navigation.navigate(ROUTES.businessRoster);
 
     const header = (
         <>
@@ -76,21 +87,23 @@ export const BusinessApplicantsPage: FC = () => {
         </View>,
         ...(applicants.applicants.length
             ? applicants.applicants.map((applicant, index) => (
-                <BusinessApplicantRow
-                    key={applicant.id}
-                    applicant={applicant}
-                    isLast={index === applicants.applicants.length - 1}
-                    onPress={openProfile}
-                />
-            ))
+                  <BusinessApplicantRow
+                      key={applicant.id}
+                      applicant={applicant}
+                      isLast={index === applicants.applicants.length - 1}
+                      onPress={() => navigation.navigate(ROUTES.businessApplicantProfile, {
+                          applicantId: applicant.id,
+                      })}
+                  />
+              ))
             : [
-                <EmptyState
-                    key="empty"
-                    icon={CalendarDaysIcon}
-                    title={t('businessApplicants.emptyTitle')}
-                    body={t('businessApplicants.emptyBody')}
-                />,
-            ]),
+                  <EmptyState
+                      key="empty"
+                      icon={CalendarDaysIcon}
+                      title={t('businessApplicants.emptyTitle')}
+                      body={t('businessApplicants.emptyBody')}
+                  />,
+              ]),
     ];
 
     return (
@@ -98,17 +111,27 @@ export const BusinessApplicantsPage: FC = () => {
             <TabScreen
                 header={header}
                 blocks={blocks}
+                fillLastBlock={!applicants.applicants.length}
                 gap={10}
                 isLoading={isLoading}
                 testID="business-applicants-page"
                 actions={
                     <View style={styles.actions}>
                         <PrimaryButton
-                            label={t('businessApplicants.openProfile', {
-                                name: applicants.activeApplicant?.name ?? '',
-                            })}
-                            onPress={openProfile}
-                            disabled={!applicants.activeApplicant}
+                            label={t(
+                                applicants.status === 'confirmed'
+                                    ? 'businessShifts.rosterTitle'
+                                    : 'businessApplicantProfile.reviewApplicant',
+                            )}
+                            onPress={
+                                applicants.status === 'confirmed'
+                                    ? openRoster
+                                    : openApplicant
+                            }
+                            disabled={
+                                applicants.status !== 'confirmed' &&
+                                !applicants.activeApplicant
+                            }
                         />
                         <SecondaryButton
                             label={t('businessApplicants.filterSort')}

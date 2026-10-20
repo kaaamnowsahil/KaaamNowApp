@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import BriefcaseIcon from '@/assets/icons/briefcase.svg';
@@ -18,8 +17,6 @@ import { useBusinessProfile } from './hooks';
 export const BusinessProfilePage: FC = () => {
     const { t } = useTranslation();
     const profile = useBusinessProfile();
-    const comingSoon = (title: string) =>
-        Alert.alert(title, t('common.comingSoon'));
 
     const blocks = [
         <ProfileCard
@@ -39,7 +36,7 @@ export const BusinessProfilePage: FC = () => {
             <SettingsRow
                 icon={WalletIcon}
                 title={t('businessProfile.paymentHistory')}
-                onPress={() => comingSoon(t('businessProfile.paymentHistory'))}
+                onPress={profile.openPaymentHistory}
             />
         </SettingsGroup>,
         <SettingsGroup key="preferences" title={t('workerProfile.preferences')}>

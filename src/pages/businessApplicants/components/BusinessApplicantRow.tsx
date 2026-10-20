@@ -34,7 +34,17 @@ export const BusinessApplicantRow: FC<{
                     })}
                 </Text>
             </View>
-            <Text style={[styles.status, { color: colors.warning }]}>
+            <Text
+                style={[
+                    styles.status,
+                    {
+                        color:
+                            applicant.status === 'confirmed'
+                                ? colors.success
+                                : colors.warning,
+                    },
+                ]}
+            >
                 {t(`businessApplicants.status.${applicant.status}`)}
             </Text>
         </Pressable>
