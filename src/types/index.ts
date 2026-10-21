@@ -2,6 +2,7 @@ export type {
   Booking,
   BookingStatus,
   Payout,
+  PayoutMethod,
   PayoutStatus,
   WorkerEarningDetails,
   WithdrawalReceipt,

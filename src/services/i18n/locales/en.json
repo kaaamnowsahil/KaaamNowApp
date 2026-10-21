@@ -250,7 +250,8 @@
     "status": {
       "pending": "Pending",
       "processing": "Processing",
-      "completed": "Completed"
+      "completed": "Completed",
+      "failed": "Failed"
     },
     "withdraw": "Withdraw",
     "viewAll": "View all earnings",
@@ -268,7 +269,12 @@
     "rate": "Hourly rate",
     "hour": "hour",
     "shifts": "Shifts included",
-    "reference": "Earning reference"
+    "reference": "Payout reference",
+    "method": "Payout method",
+    "destination": "Paid to",
+    "requestedAt": "Requested",
+    "processedAt": "Processed",
+    "failureReason": "Failure reason"
   },
   "earningsHistory": {
     "title": "All earnings",
@@ -277,7 +283,8 @@
     "status": {
       "pending": "Pending",
       "processing": "Processing",
-      "completed": "Completed"
+      "completed": "Completed",
+      "failed": "Failed"
     }
   },
   "withdraw": {

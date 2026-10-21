@@ -11,6 +11,7 @@ export const WORKER_EARNINGS_STRINGS = {
     pending: 'Pending',
     processing: 'Processing',
     completed: 'Completed',
+    failed: 'Failed',
   } as Record<PayoutStatus, string>,
   /** "4 h × ₹150 = ₹600" */
   shiftMeta: (hours: number, rate: string, total: string) =>
