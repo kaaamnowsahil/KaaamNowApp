@@ -10,5 +10,6 @@ export const EARNINGS_HISTORY_STRINGS = {
     pending: 'Pending',
     processing: 'Processing',
     completed: 'Completed',
+    failed: 'Failed',
   } as Record<PayoutStatus, string>,
 } as const;

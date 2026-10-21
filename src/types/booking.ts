@@ -32,7 +32,8 @@ export type WithdrawalReceipt = {
   reference: string;
 };
 
-export type PayoutStatus = 'pending' | 'processing' | 'completed';
+export type PayoutStatus = 'pending' | 'processing' | 'completed' | 'failed';
+export type PayoutMethod = 'UPI' | 'Paytm' | 'Bank';
 
 export type Payout = {
   id: string;
@@ -42,6 +43,13 @@ export type Payout = {
   hours: number;
   amount: number;
   status: PayoutStatus;
+  reference?: string;
+  method?: PayoutMethod;
+  /** UPI id, wallet number or masked bank account. */
+  destination?: string;
+  requestedAt?: string;
+  processedAt?: string;
+  failureReason?: string;
 };
 
 export type WorkerEarningDetails = {
@@ -49,6 +57,13 @@ export type WorkerEarningDetails = {
   title: string;
   amount: number;
   status: PayoutStatus;
+  reference?: string;
+  method?: PayoutMethod;
+  /** UPI id, wallet number or masked bank account. */
+  destination?: string;
+  requestedAt?: string;
+  processedAt?: string;
+  failureReason?: string;
   businessName?: string;
   dateLabel?: string;
   hours?: number;

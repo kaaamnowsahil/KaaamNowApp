@@ -14,10 +14,21 @@ import { formatRupees } from '@/utils/format';
 export const WorkerEarningDetailPage: FC<
   AppScreenProps<typeof ROUTES.workerEarningDetail>
 > = ({ navigation, route }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const { earning } = route.params;
   const isCompleted = earning.status === 'completed';
+  const statusColor =
+    earning.status === 'completed'
+      ? colors.success
+      : earning.status === 'failed'
+        ? colors.danger
+        : colors.warning;
+  const formatDateTime = (value: string) =>
+    new Intl.DateTimeFormat(i18n.language, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(value));
 
   return (
     <FormScreen
@@ -38,7 +49,11 @@ export const WorkerEarningDetailPage: FC<
           style={[
             styles.statusIcon,
             {
-              backgroundColor: isCompleted ? colors.successSoft : colors.fill,
+              backgroundColor: isCompleted
+                ? colors.successSoft
+                : earning.status === 'failed'
+                  ? colors.dangerSoft
+                  : colors.fill,
             },
           ]}
         >
@@ -54,7 +69,7 @@ export const WorkerEarningDetailPage: FC<
         <Text
           style={[
             styles.status,
-            { color: isCompleted ? colors.success : colors.warning },
+            { color: statusColor },
           ]}
         >
           {t(`workerEarnings.status.${earning.status}`)}
@@ -80,7 +95,7 @@ export const WorkerEarningDetailPage: FC<
             value={earning.dateLabel}
           />
         ) : null}
-        {earning.hours !== undefined ? (
+        {earning.hours !== undefined && earning.hours > 0 ? (
           <Detail
             label={t('workerEarningDetail.hours')}
             value={t('workerEarningDetail.hoursValue', {
@@ -88,7 +103,7 @@ export const WorkerEarningDetailPage: FC<
             })}
           />
         ) : null}
-        {earning.rate !== undefined ? (
+        {earning.rate !== undefined && earning.rate > 0 ? (
           <Detail
             label={t('workerEarningDetail.rate')}
             value={`${formatRupees(earning.rate)} / ${t(
@@ -96,13 +111,46 @@ export const WorkerEarningDetailPage: FC<
             )}`}
           />
         ) : null}
-        {earning.shifts !== undefined ? (
+        {earning.shifts !== undefined && earning.shifts > 0 ? (
           <Detail
             label={t('workerEarningDetail.shifts')}
             value={String(earning.shifts)}
           />
         ) : null}
-        <Detail label={t('workerEarningDetail.reference')} value={earning.id} />
+        {earning.method ? (
+          <Detail
+            label={t('workerEarningDetail.method')}
+            value={earning.method}
+          />
+        ) : null}
+        {earning.destination ? (
+          <Detail
+            label={t('workerEarningDetail.destination')}
+            value={earning.destination}
+          />
+        ) : null}
+        {earning.requestedAt ? (
+          <Detail
+            label={t('workerEarningDetail.requestedAt')}
+            value={formatDateTime(earning.requestedAt)}
+          />
+        ) : null}
+        {earning.processedAt ? (
+          <Detail
+            label={t('workerEarningDetail.processedAt')}
+            value={formatDateTime(earning.processedAt)}
+          />
+        ) : null}
+        {earning.failureReason ? (
+          <Detail
+            label={t('workerEarningDetail.failureReason')}
+            value={earning.failureReason}
+          />
+        ) : null}
+        <Detail
+          label={t('workerEarningDetail.reference')}
+          value={earning.reference ?? earning.id}
+        />
       </View>
     </FormScreen>
   );

@@ -17,12 +17,21 @@ import { EarningsOverview } from './components';
 import { useWorkerEarnings } from './hooks/useWorkerEarnings';
 import type { EarningsRow } from './mock';
 
-const rowMeta = (row: EarningsRow) =>
-  row.hours && row.rate
-    ? `${row.hours} h × ${formatRupees(row.rate)} = ${formatRupees(row.amount)}`
-    : `${row.shifts ?? 0} × ${formatRupees(
-      row.shifts ? row.amount / row.shifts : row.amount,
-    )} = ${formatRupees(row.amount)}`;
+const rowMeta = (row: EarningsRow) => {
+  const hourlyRate =
+    row.hours && row.hours > 0 ? row.amount / row.hours : undefined;
+
+  if (row.hours && row.hours > 0 && hourlyRate !== undefined) {
+    return `${row.hours} h × ${formatRupees(hourlyRate)} = ${formatRupees(row.amount)}`;
+  }
+
+  if (row.shifts && row.shifts > 0) {
+    const perShift = row.amount / row.shifts;
+    return `${row.shifts} × ${formatRupees(perShift)} = ${formatRupees(row.amount)}`;
+  }
+
+  return formatRupees(row.amount);
+};
 
 /**
  * Worker "Earnings" tab. Figma: SH-17 · Worker earnings (light/dark).

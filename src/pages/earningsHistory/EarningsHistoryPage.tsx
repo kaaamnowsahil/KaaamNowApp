@@ -66,7 +66,14 @@ export const EarningsHistoryPage: FC<
                       hours: p.hours,
                       amount: p.amount,
                       status: p.status,
-                      rate: p.hours > 0 ? p.amount / p.hours : undefined,
+                      reference: p.reference,
+                      method: p.method,
+                      destination: p.destination,
+                      requestedAt: p.requestedAt,
+                      processedAt: p.processedAt,
+                      failureReason: p.failureReason,
+                      rate:
+                        p.hours && p.hours > 0 ? p.amount / p.hours : undefined,
                     },
                   })
                 }
