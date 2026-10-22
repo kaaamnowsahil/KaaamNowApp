@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BodyNote, ScreenIntro, SecondaryButton } from '@/components/ui';
+import { logoutAuthSession } from '@/services/auth';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -17,7 +18,6 @@ export const PlaceholderPage: FC = () => {
   const { colors } = useTheme();
   const { name } = useRoute();
   const isAuth = useAuthStore(s => s.isAuth);
-  const signOut = useAuthStore(s => s.signOut);
   const screen = PLACEHOLDER_SCREENS[name] ?? { title: name, figma: '—' };
 
   return (
@@ -28,7 +28,7 @@ export const PlaceholderPage: FC = () => {
         {isAuth ? (
           <SecondaryButton
             label={PLACEHOLDER_STRINGS.SIGN_OUT}
-            onPress={signOut}
+            onPress={logoutAuthSession}
           />
         ) : null}
       </View>

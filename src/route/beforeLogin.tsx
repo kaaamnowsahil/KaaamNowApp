@@ -3,6 +3,7 @@ import type { FC } from 'react';
 
 import { ROUTES } from '@/constants/routes';
 import { BusinessSignupPage } from '@/pages/businessSignup/BusinessSignupPage';
+import { ForgotPasswordPage } from '@/pages/forgotPassword/ForgotPasswordPage';
 import { RoleSelectPage } from '@/pages/roleSelect/RoleSelectPage';
 import { VerifyPhonePage } from '@/pages/verifyPhone/VerifyPhonePage';
 import { WelcomePage } from '@/pages/welcome/WelcomePage';
@@ -26,6 +27,7 @@ export const BeforeLoginRoutes: FC = () => {
       }}
     >
       <Stack.Screen name={ROUTES.welcome} component={WelcomePage} />
+      <Stack.Screen name={ROUTES.forgotPassword} component={ForgotPasswordPage} />
       <Stack.Screen name={ROUTES.verifyPhone} component={VerifyPhonePage} />
       <Stack.Screen name={ROUTES.roleSelect} component={RoleSelectPage} />
       <Stack.Screen name={ROUTES.workerSignup} component={WorkerSignupPage} />

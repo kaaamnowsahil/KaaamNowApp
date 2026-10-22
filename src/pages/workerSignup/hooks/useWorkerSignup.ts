@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -6,10 +6,10 @@ import {
   useOnboardingStore,
 } from '@/services/onboarding/useOnboardingStore';
 import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
+import { AuthApiError, loadWorkerSignupOptions } from '@/services/auth';
 import { toE164India, toLocalDigits } from '@/utils/phone';
 import { fieldErrors } from '@/utils/validation';
 
-import { CURRENT_ADDRESS, WORK_TYPES } from '../mock';
 import { createWorkerSignupSchema, type WorkerSignupForm } from '../schema';
 
 const EMPTY: WorkerSignupForm = {
@@ -19,6 +19,8 @@ const EMPTY: WorkerSignupForm = {
   age: '',
   address: '',
   workTypes: [],
+  password: '',
+  confirmPassword: '',
 };
 
 export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
@@ -28,6 +30,28 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
   const [form, setForm] = useState<WorkerSignupForm>(EMPTY);
   const [location, setLocation] = useState<GeoPoint | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [workTypeOptions, setWorkTypeOptions] = useState<
+    { id: string; label: string; sortOrder: number }[]
+  >([]);
+  const [catalogError, setCatalogError] = useState('');
+  const [catalogReady, setCatalogReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    loadWorkerSignupOptions()
+      .then(options => {
+        if (active) setWorkTypeOptions(options);
+      })
+      .catch(error => {
+        if (active) {
+          setCatalogError(error instanceof AuthApiError ? error.message : t('errors.generic'));
+        }
+      })
+      .finally(() => {
+        if (active) setCatalogReady(true);
+      });
+    return () => { active = false; };
+  }, [t]);
   const update = <K extends keyof WorkerSignupForm>(
     key: K,
     value: WorkerSignupForm[K],
@@ -36,7 +60,7 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
     setErrors(prev => ({ ...prev, [key]: '' }));
   };
 
-  const currentAddress = useCurrentAddress(CURRENT_ADDRESS, picked => {
+  const currentAddress = useCurrentAddress(picked => {
     update('address', picked.address);
     setLocation({ lat: picked.lat, lng: picked.lng });
   });
@@ -56,6 +80,7 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
       address: parsed.data.address,
       location,
       workTypes: parsed.data.workTypes,
+      password: parsed.data.password,
     });
     onDone(phone);
   };
@@ -63,10 +88,14 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
   return {
     form,
     errors,
-    canSubmit: workerSignupSchema.safeParse(form).success,
+    canSubmit: catalogReady && workTypeOptions.length > 0 && workerSignupSchema.safeParse(form).success,
+    catalogError,
+    catalogLoading: !catalogReady,
     setFullName: (v: string) => update('fullName', v),
     setPhone: (v: string) => update('phone', toLocalDigits(v)),
     setEmail: (v: string) => update('email', v.trim()),
+    setPassword: (v: string) => update('password', v),
+    setConfirmPassword: (v: string) => update('confirmPassword', v),
     setAge: (v: string) => update('age', v.replace(/\D/g, '').slice(0, 2)),
     setAddress: (v: string) => {
       update('address', v);
@@ -79,7 +108,7 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
           ? form.workTypes.filter(w => w !== id)
           : [...form.workTypes, id],
       ),
-    workTypeOptions: WORK_TYPES,
+    workTypeOptions,
     ...currentAddress,
     submit,
   };

@@ -30,6 +30,14 @@ export const createWorkerSignupSchema = (t: (key: string) => string) =>
       ),
     address: z.string().trim().min(3, t('workerSignup.errors.address')),
     workTypes: z.array(z.string()).min(1, t('workerSignup.errors.workTypes')),
+    password: z
+      .string()
+      .min(8, t('auth.passwordHint'))
+      .regex(/^(?=.*[A-Za-z])(?=.*\d).+$/, t('auth.passwordHint')),
+    confirmPassword: z.string().min(1, t('auth.confirmPasswordError')),
+  }).refine(value => value.password === value.confirmPassword, {
+    message: t('auth.passwordMismatch'),
+    path: ['confirmPassword'],
   });
 
 export type WorkerSignupForm = z.input<ReturnType<typeof createWorkerSignupSchema>>;

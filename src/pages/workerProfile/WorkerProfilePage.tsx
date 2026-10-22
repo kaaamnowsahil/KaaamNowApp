@@ -71,6 +71,11 @@ export const WorkerProfilePage: FC = () => {
         onPress={p.openTerms}
       />
       <SettingsRow
+        icon={FileTextIcon}
+        title={t('privacy.title')}
+        onPress={p.openPrivacy}
+      />
+      <SettingsRow
         icon={WifiOffIcon}
         title={t('workerProfile.offline')}
         onPress={p.openOffline}

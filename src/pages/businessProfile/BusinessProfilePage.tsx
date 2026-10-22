@@ -64,6 +64,11 @@ export const BusinessProfilePage: FC = () => {
                 title={t('workerProfile.terms')}
                 onPress={profile.openTerms}
             />
+            <SettingsRow
+                icon={FileTextIcon}
+                title={t('privacy.title')}
+                onPress={profile.openPrivacy}
+            />
         </SettingsGroup>,
         <SettingsGroup key="logout">
             <SettingsRow

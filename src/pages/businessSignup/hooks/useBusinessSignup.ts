@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -6,10 +6,10 @@ import {
   useOnboardingStore,
 } from '@/services/onboarding/useOnboardingStore';
 import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
+import { AuthApiError, loadBusinessSignupOptions } from '@/services/auth';
 import { toE164India, toLocalDigits } from '@/utils/phone';
 import { fieldErrors } from '@/utils/validation';
 
-import { BUSINESS_TYPES, CURRENT_ADDRESS } from '../mock';
 import { createBusinessSignupSchema, type BusinessSignupForm } from '../schema';
 
 const EMPTY: BusinessSignupForm = {
@@ -19,6 +19,8 @@ const EMPTY: BusinessSignupForm = {
   email: '',
   address: '',
   businessType: '',
+  password: '',
+  confirmPassword: '',
 };
 
 export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
@@ -28,6 +30,28 @@ export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
   const [form, setForm] = useState<BusinessSignupForm>(EMPTY);
   const [location, setLocation] = useState<GeoPoint | undefined>();
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [businessTypeOptions, setBusinessTypeOptions] = useState<
+    { id: string; label: string; sortOrder: number }[]
+  >([]);
+  const [catalogError, setCatalogError] = useState('');
+  const [catalogReady, setCatalogReady] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    loadBusinessSignupOptions()
+      .then(options => {
+        if (active) setBusinessTypeOptions(options);
+      })
+      .catch(error => {
+        if (active) {
+          setCatalogError(error instanceof AuthApiError ? error.message : t('errors.generic'));
+        }
+      })
+      .finally(() => {
+        if (active) setCatalogReady(true);
+      });
+    return () => { active = false; };
+  }, [t]);
   const update = <K extends keyof BusinessSignupForm>(
     key: K,
     value: BusinessSignupForm[K],
@@ -36,7 +60,7 @@ export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
     setErrors(prev => ({ ...prev, [key]: '' }));
   };
 
-  const currentAddress = useCurrentAddress(CURRENT_ADDRESS, picked => {
+  const currentAddress = useCurrentAddress(picked => {
     update('address', picked.address);
     setLocation({ lat: picked.lat, lng: picked.lng });
   });
@@ -56,6 +80,7 @@ export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
       address: parsed.data.address,
       location,
       businessType: parsed.data.businessType,
+      password: parsed.data.password,
     });
     onDone(phone);
   };
@@ -63,17 +88,21 @@ export const useBusinessSignup = (onDone: (phoneE164: string) => void) => {
   return {
     form,
     errors,
-    canSubmit: businessSignupSchema.safeParse(form).success,
+    canSubmit: catalogReady && businessTypeOptions.length > 0 && businessSignupSchema.safeParse(form).success,
+    catalogError,
+    catalogLoading: !catalogReady,
     setBusinessName: (v: string) => update('businessName', v),
     setContactName: (v: string) => update('contactName', v),
     setPhone: (v: string) => update('phone', toLocalDigits(v)),
     setEmail: (v: string) => update('email', v.trim()),
+    setPassword: (v: string) => update('password', v),
+    setConfirmPassword: (v: string) => update('confirmPassword', v),
     setAddress: (v: string) => {
       update('address', v);
       setLocation(undefined);
     },
     selectBusinessType: (id: string) => update('businessType', id),
-    businessTypeOptions: BUSINESS_TYPES,
+    businessTypeOptions,
     ...currentAddress,
     submit,
   };

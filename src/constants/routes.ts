@@ -2,6 +2,7 @@
 export const ROUTES = {
   // before login
   welcome: 'Welcome',
+  forgotPassword: 'ForgotPassword',
   verifyPhone: 'VerifyPhone',
   roleSelect: 'RoleSelect',
   workerSignup: 'WorkerSignup',
@@ -68,5 +69,6 @@ export const ROUTES = {
 
   // common (both stacks)
   terms: 'Terms',
+  privacy: 'PrivacyPolicy',
   faq: 'Faq',
 } as const;

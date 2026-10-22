@@ -2,7 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import { ROUTES } from '@/constants/routes';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
-import { useAuthStore } from '@/services/auth/useAuthStore';
+import { logoutAuthSession } from '@/services/auth';
 import { usePreferencesStore } from '@/services/config/usePreferencesStore';
 import type { TabAppNavigation } from '@/types';
 import { initialsOf } from '@/utils/format';
@@ -12,7 +12,6 @@ import { PROFILE } from '../mock';
 export const useWorkerProfile = () => {
   const navigation = useNavigation<TabAppNavigation>();
   const isLoading = useMockLoading();
-  const signOut = useAuthStore(s => s.signOut);
   const theme = usePreferencesStore(s => s.theme);
   const language = usePreferencesStore(s => s.language);
 
@@ -30,6 +29,7 @@ export const useWorkerProfile = () => {
     openLanguage: () => navigation.navigate(ROUTES.language),
     openFaq: () => navigation.navigate(ROUTES.faq),
     openTerms: () => navigation.navigate(ROUTES.terms),
-    signOut,
+    openPrivacy: () => navigation.navigate(ROUTES.privacy),
+    signOut: logoutAuthSession,
   };
 };

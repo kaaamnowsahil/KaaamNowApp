@@ -30,7 +30,7 @@ export const useFaq = () => {
     toggle: (id: string) => setOpenId(prev => (prev === id ? null : id)),
     contactSupport: () =>
       Linking.openURL(
-        `mailto:${BRAND.SUPPORT_EMAIL}?subject=${encodeURIComponent(
+        `mailto:${BRAND.SUPPORT_EMAILS.join(',')}?subject=${encodeURIComponent(
           S.MAIL_SUBJECT,
         )}`,
       ),
