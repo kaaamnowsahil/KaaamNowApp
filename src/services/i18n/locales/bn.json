@@ -23,15 +23,16 @@
     "apply": "ভাষা প্রয়োগ করুন"
   },
   "welcome": {
-    "title": "KaaamNow-তে স্বাগতম",
-    "subtitle": "আপনার মোবাইল নম্বর দিয়ে নিরাপদে সাইন ইন করুন।",
+    "title": "KaaamNow-এ সাইন ইন করুন",
+    "subtitle": "ফোন নম্বর ও পাসওয়ার্ড দিয়ে সাইন ইন করুন।",
     "sendCode": "সাইন-ইন কোড পাঠান",
     "createAccount": "অ্যাকাউন্ট তৈরি করুন",
     "phoneLabel": "মোবাইল নম্বর",
-    "phoneHelper": "আমরা একটি ওয়ান-টাইম কোড পাঠাব। স্ট্যান্ডার্ড SMS চার্জ প্রযোজ্য হতে পারে।",
+    "phoneHelper": "আপনার অ্যাকাউন্টে নিবন্ধিত মোবাইল নম্বর ব্যবহার করুন।",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "কোনো পাসওয়ার্ডের প্রয়োজন নেই। এগিয়ে যাওয়ার মাধ্যমে, আপনি পরিষেবার শর্তাবলী এবং গোপনীয়তা নীতিতে সম্মত হচ্ছেন।"
+    "legal": "চালিয়ে গেলে আপনি KaaamNow-এর পরিষেবার শর্তাবলি ও গোপনীয়তা নীতিতে সম্মত হন।",
+    "signIn": "সাইন ইন"
   },
   "verifyPhone": {
     "title": "কোড লিখুন",
@@ -143,7 +144,9 @@
       "security": "নিরাপত্তারক্ষী",
       "driver": "চালক",
       "warehouse": "গুদাম"
-    }
+    },
+    "locationError": "আপনার অবস্থান পাওয়া যায়নি। ঠিকানা লিখুন বা আবার চেষ্টা করুন।",
+    "locationPermissionDenied": "বর্তমান অবস্থানের জন্য লোকেশন অনুমতি দিন।"
   },
   "businessSignup": {
     "title": "আপনার ব্যবসার প্রোফাইল তৈরি করুন",
@@ -845,5 +848,33 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "auth": {
+    "passwordLabel": "পাসওয়ার্ড",
+    "passwordPlaceholder": "আপনার পাসওয়ার্ড লিখুন",
+    "passwordHint": "কমপক্ষে ৮ অক্ষর, একটি অক্ষর ও একটি সংখ্যা রাখুন।",
+    "confirmPassword": "পাসওয়ার্ড নিশ্চিত করুন",
+    "confirmPasswordError": "পাসওয়ার্ড নিশ্চিত করুন।",
+    "passwordMismatch": "পাসওয়ার্ড দুটি মিলছে না।",
+    "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
+    "newPassword": "নতুন পাসওয়ার্ড",
+    "working": "অনুগ্রহ করে অপেক্ষা করুন…",
+    "loginError": "সাইন ইন করা যায়নি। তথ্য দেখে আবার চেষ্টা করুন।",
+    "forgotSubtitle": "রিসেটের জন্য নিবন্ধিত মোবাইল নম্বর লিখুন।",
+    "sendResetCode": "রিসেট কোড পাঠান",
+    "resetPassword": "পাসওয়ার্ড রিসেট করুন",
+    "resetRequestNotice": "এই নম্বরে অ্যাকাউন্ট থাকলে যাচাইকরণ কোড পাঠানো হয়েছে।",
+    "resetRequestError": "রিসেট কোড চাওয়া যায়নি। আবার চেষ্টা করুন।",
+    "resetError": "কোডটি ভুল বা মেয়াদোত্তীর্ণ। নতুন কোড নিন।",
+    "resetComplete": "পাসওয়ার্ড আপডেট হয়েছে",
+    "resetSuccess": "পাসওয়ার্ড রিসেট হয়েছে। এখন সাইন ইন করতে পারবেন।",
+    "backToSignIn": "সাইন ইন-এ ফিরে যান",
+    "sendingCode": "যাচাইকরণ কোড পাঠানো হচ্ছে…",
+    "retryCode": "কোড আবার পাঠাতে ট্যাপ করুন।",
+    "resendResetCode": "আরেকটি কোড পাঠান",
+    "loadingOptions": "বিকল্প লোড হচ্ছে…"
+  },
+  "privacy": {
+    "title": "গোপনীয়তা নীতি"
   }
 }

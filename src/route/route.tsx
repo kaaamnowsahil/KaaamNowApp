@@ -15,11 +15,13 @@ export const AppRoutes: FC = () => {
   const isAuth = useAuthStore(s => s.isAuth);
   const hasHydrated = useAuthStore(s => s.hasHydrated);
   const [isBooting, setIsBooting] = useState(true);
+  const hydrateAuth = useAuthStore(s => s.hydrate);
 
   useEffect(() => {
+    hydrateAuth();
     const timer = setTimeout(() => setIsBooting(false), SPLASH_DURATION_MS);
     return () => clearTimeout(timer);
-  }, []);
+  }, [hydrateAuth]);
 
   return (
     <>

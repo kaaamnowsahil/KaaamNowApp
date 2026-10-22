@@ -6,7 +6,7 @@ module.exports = {
     '@babel/plugin-transform-export-namespace-from',
     [
       'transform-inline-environment-variables',
-      { include: ['GOOGLE_MAPS_API_KEY'] },
+      { include: ['GOOGLE_MAPS_API_KEY', 'API_BASE_URL'] },
     ],
     [
       'module-resolver',

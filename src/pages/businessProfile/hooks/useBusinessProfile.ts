@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 
 import { ROUTES } from '@/constants/routes';
-import { useAuthStore } from '@/services/auth/useAuthStore';
+import { logoutAuthSession } from '@/services/auth';
 import { usePreferencesStore } from '@/services/config/usePreferencesStore';
 import { useOnboardingStore } from '@/services/onboarding/useOnboardingStore';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
@@ -13,7 +13,6 @@ import { BUSINESS_DASHBOARD } from '@/pages/businessLive/mock';
 export const useBusinessProfile = () => {
     const navigation = useNavigation<TabAppNavigation>();
     const business = useOnboardingStore(state => state.business);
-    const signOut = useAuthStore(state => state.signOut);
     const theme = usePreferencesStore(state => state.theme);
     const language = usePreferencesStore(state => state.language);
     const isLoading = useMockLoading();
@@ -31,9 +30,10 @@ export const useBusinessProfile = () => {
         openAppearance: () => navigation.navigate(ROUTES.appearance),
         openFaq: () => navigation.navigate(ROUTES.faq),
         openTerms: () => navigation.navigate(ROUTES.terms),
+        openPrivacy: () => navigation.navigate(ROUTES.privacy),
         openNotifications: () => navigation.navigate(ROUTES.notifications),
         openBusinessEditProfile: () => navigation.navigate(ROUTES.businessEditProfile),
         openPaymentHistory: () => navigation.navigate(ROUTES.businessPaymentHistory),
-        signOut,
+        signOut: logoutAuthSession,
     };
 };

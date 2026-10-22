@@ -31,6 +31,8 @@ export const TERMS_SECTIONS: TermsSection[] = [
   {
     id: 'contact',
     title: 'Contact us',
-    body: `Questions about these terms? Write to ${BRAND.SUPPORT_EMAIL}.`,
+    body: `Questions about these terms? Write to ${BRAND.SUPPORT_EMAILS.join(
+      ' or ',
+    )}.`,
   },
 ];

@@ -23,15 +23,40 @@
     "apply": "Apply language"
   },
   "welcome": {
-    "title": "Welcome to KaaamNow",
-    "subtitle": "Sign in securely with your mobile number.",
-    "sendCode": "Send sign-in code",
+    "title": "Sign in to KaaamNow",
+    "subtitle": "Sign in with your phone number and password.",
+    "signIn": "Sign in",
     "createAccount": "Create an account",
     "phoneLabel": "Mobile number",
-    "phoneHelper": "We’ll send a one-time code. Standard SMS rates may apply.",
+    "phoneHelper": "Use the mobile number registered to your account.",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "No password required. By continuing, you agree to the Terms of service and Privacy policy."
+    "legal": "By continuing, you agree to KaaamNow’s Terms of Service and Privacy Policy."
+  },
+  "auth": {
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "passwordHint": "Use at least 8 characters, including a letter and a number.",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordError": "Confirm your password.",
+    "passwordMismatch": "The passwords do not match.",
+    "forgotPassword": "Forgot password?",
+    "newPassword": "New password",
+    "working": "Please wait…",
+    "loginError": "Could not sign in. Check your details and try again.",
+    "forgotSubtitle": "Enter your registered mobile number to reset your password.",
+    "sendResetCode": "Send reset code",
+    "resetPassword": "Reset password",
+    "resetRequestNotice": "If an account matches this number, we’ve sent a verification code.",
+    "resetRequestError": "Could not request a reset code. Please try again.",
+    "resetError": "That code is invalid or expired. Request a new one and try again.",
+    "resetComplete": "Password updated",
+    "resetSuccess": "Your password has been reset. You can now sign in with it.",
+    "backToSignIn": "Back to sign in",
+    "sendingCode": "Sending verification code…",
+    "retryCode": "Tap to retry sending the code.",
+    "resendResetCode": "Send another code",
+    "loadingOptions": "Loading options…"
   },
   "verifyPhone": {
     "title": "Verify your phone",
@@ -96,6 +121,24 @@
   "terms": {
     "title": "Terms & Conditions"
   },
+  "privacy": {
+    "title": "Privacy Policy",
+    "updated": "Last updated: October 2026",
+    "sections": {
+      "dataTitle": "Information we collect",
+      "dataBody": "We use the information you provide to create and manage your account, including your phone number, name, email (if provided), age for worker profiles, address, location and work or business preferences.",
+      "useTitle": "How we use information",
+      "useBody": "We use account and profile information to operate KaaamNow, help workers and businesses discover and manage shifts, protect accounts, and respond to support requests.",
+      "locationTitle": "Location",
+      "locationBody": "If you choose to use your current location, the app uses the location you share to fill your address and support nearby shift matching and attendance features. You can enter an address manually instead.",
+      "sharingTitle": "Service providers",
+      "sharingBody": "We share only the information needed with providers that help deliver the service, such as our backend hosting, SMS verification and maps providers. We do not put authentication secrets in the mobile app.",
+      "securityTitle": "Security and retention",
+      "securityBody": "Passwords are sent to the KaaamNow backend and stored using password hashing. We retain account information while needed to provide the service and meet legal obligations. Contact us to ask about your account data.",
+      "contactTitle": "Contact",
+      "contactBody": "For privacy questions or account-data requests, contact {{emails}}."
+    }
+  },
   "errors": {
     "generic": "Something went wrong. Please try again.",
     "network": "No internet connection.",
@@ -115,6 +158,8 @@
     "addressLabel": "Location",
     "addressPlaceholder": "Area, city",
     "useCurrent": "Use current",
+    "locationError": "Could not get your location. Enter your address manually or try again.",
+    "locationPermissionDenied": "Allow location access to use your current location.",
     "locating": "Locating...",
     "workTypeLabel": "Work type",
     "workTypeHint": "Pick all that apply.",

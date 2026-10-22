@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 
 import { FONTS } from '@/constants/fonts';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import { TERMS_STRINGS as S } from './constants';
@@ -16,7 +15,6 @@ export const TermsPage: FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const { colors } = useTheme();
-  const isLoading = useMockLoading();
 
   return (
     <FormScreen
@@ -24,7 +22,6 @@ export const TermsPage: FC = () => {
       backVariant="plain"
       title={t('terms.title')}
       gap={18}
-      isLoading={isLoading}
       testID="terms-page"
     >
       <Text style={[styles.updated, { color: colors.textSubtle }]}>

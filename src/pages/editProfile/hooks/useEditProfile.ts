@@ -6,7 +6,7 @@ import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
 import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { initialsOf } from '@/utils/format';
 
-import { CURRENT_ADDRESS, PROFILE_FORM, WORK_TYPES } from '../mock';
+import { PROFILE_FORM, WORK_TYPES } from '../mock';
 import { createEditProfileSchema, type EditProfileForm } from '../schema';
 
 const INITIAL: EditProfileForm = {
@@ -26,7 +26,7 @@ export const useEditProfile = (onSaved: () => void) => {
     value: EditProfileForm[K],
   ) => setForm(prev => ({ ...prev, [key]: value }));
 
-  const currentAddress = useCurrentAddress(CURRENT_ADDRESS, picked =>
+  const currentAddress = useCurrentAddress(picked =>
     update('address', picked.address),
   );
 

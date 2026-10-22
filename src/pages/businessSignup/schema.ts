@@ -24,6 +24,14 @@ export const createBusinessSignupSchema = (t: (key: string) => string) =>
     ]),
     address: z.string().trim().min(3, t('businessSignup.errors.address')),
     businessType: z.string().min(1, t('businessSignup.errors.businessType')),
+    password: z
+      .string()
+      .min(8, t('auth.passwordHint'))
+      .regex(/^(?=.*[A-Za-z])(?=.*\d).+$/, t('auth.passwordHint')),
+    confirmPassword: z.string().min(1, t('auth.confirmPasswordError')),
+  }).refine(value => value.password === value.confirmPassword, {
+    message: t('auth.passwordMismatch'),
+    path: ['confirmPassword'],
   });
 
 export type BusinessSignupForm = z.input<

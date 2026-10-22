@@ -8,7 +8,7 @@ import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { initialsOf } from '@/utils/format';
 import { toLocalDigits } from '@/utils/phone';
 
-import { BUSINESS_TYPES, CURRENT_ADDRESS } from '@/pages/businessSignup/mock';
+import { BUSINESS_TYPES } from '@/pages/businessSignup/mock';
 import {
     createBusinessEditProfileSchema,
     type BusinessEditProfileForm,
@@ -36,7 +36,7 @@ export const useBusinessEditProfile = (onSaved: () => void) => {
         setForm(previous => ({ ...previous, [key]: value }));
         setErrors(previous => ({ ...previous, [key]: '' }));
     };
-    const currentAddress = useCurrentAddress(CURRENT_ADDRESS, picked =>
+    const currentAddress = useCurrentAddress(picked =>
         update('address', picked.address),
     );
     const parsed = schema.safeParse(form);

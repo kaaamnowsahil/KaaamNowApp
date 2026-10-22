@@ -46,13 +46,15 @@ export type BusinessPaymentDetails = {
 /** Screens reachable both before and after login. */
 export type CommonStackParamList = {
   [ROUTES.terms]: undefined;
+  [ROUTES.privacy]: undefined;
   [ROUTES.faq]: undefined;
 };
 
 export type AuthStackParamList = CommonStackParamList & {
   [ROUTES.welcome]: undefined;
+  [ROUTES.forgotPassword]: undefined;
   /** phone is E.164, e.g. +919876543210 */
-  [ROUTES.verifyPhone]: { phone: string; intent: 'signIn' | 'signUp' };
+  [ROUTES.verifyPhone]: { phone: string; intent: 'signUp' };
   [ROUTES.roleSelect]: undefined;
   [ROUTES.workerSignup]: undefined;
   [ROUTES.businessSignup]: undefined;

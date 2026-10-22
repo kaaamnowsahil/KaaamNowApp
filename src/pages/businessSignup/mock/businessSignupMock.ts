@@ -1,4 +1,4 @@
-import type { Option, PickedAddress } from '@/types';
+import type { Option } from '@/types';
 
 export const BUSINESS_TYPES: Option[] = [
   { id: 'hospitality', label: 'Hospitality' },
@@ -10,8 +10,3 @@ export const BUSINESS_TYPES: Option[] = [
   { id: 'other', label: 'Other' },
 ];
 
-export const CURRENT_ADDRESS: PickedAddress = {
-  address: 'Indiranagar, Bengaluru',
-  lat: 12.9784,
-  lng: 77.6408,
-};
