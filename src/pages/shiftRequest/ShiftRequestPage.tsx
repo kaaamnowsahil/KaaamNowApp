@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useEffect, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -10,19 +10,21 @@ import {
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { getDevicePosition } from '@/services/maps/devicePosition';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useShiftAction } from '@/services/shifts/useShiftFlow';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useCountdown } from '@/shared/hooks/useCountdown';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import type { AppScreenProps } from '@/types';
 import { formatMinSec, formatRupees } from '@/utils/format';
 
-import { REQUEST_META } from './mock';
+import { SHIFT_REQUEST_STRINGS } from './constants/shiftRequestStrings';
 
 /**
  * Step 1 of both worker flows, chosen by shift.status.
  * Figma: "Live · New request nearby" and "Scheduled · New shift near you".
- * - live: accept within the countdown → Shift secured
- * - scheduled: apply → Application submitted
- * - data: mock/shiftRequestMock.ts
+ * - live: POST /worker/live-shifts/{id}/accept → Shift secured
+ * - scheduled: POST /worker/shifts/{id}/applications → Application submitted
  */
 export const ShiftRequestPage: FC<
   AppScreenProps<typeof ROUTES.shiftRequest>
@@ -33,51 +35,92 @@ export const ShiftRequestPage: FC<
   const copyKey = isLive ? 'live' : 'scheduled';
   const copy = (key: string, options?: Record<string, string | number>) =>
     t(`workerFlow.request.${copyKey}.${key}`, options);
-  const meta = REQUEST_META[shift.status];
-  const isLoading = useMockLoading();
-  const { remaining } = useCountdown(meta.expiresInSeconds);
-  const isExpired = isLive && remaining === 0;
+  const action = useShiftAction();
+
+  const dispatch = useApiQuery(
+    async () =>
+      isLive
+        ? ((await shiftsApi.liveRequests()).find(item => item.shift.id === shift.id) ?? null)
+        : null,
+    [shift.id, isLive],
+  );
+  const { remaining, restart } = useCountdown(dispatch.data?.seconds_left ?? 0);
+  useEffect(() => {
+    if (dispatch.data) restart();
+  }, [dispatch.data, restart]);
+  const hasCountdown = Boolean(dispatch.data);
+  const isExpired = hasCountdown && remaining === 0;
   const timeLeft = formatMinSec(remaining);
+  const badge = SHIFT_REQUEST_STRINGS.BADGE[shift.status];
 
   const accept = () =>
     isLive
-      ? navigation.replace(ROUTES.shiftSecured, { shift })
-      : navigation.replace(ROUTES.applicationSubmitted, { shift });
+      ? action.run(
+        () => shiftsApi.acceptLive(shift.id),
+        assignment =>
+          navigation.replace(ROUTES.shiftSecured, {
+            shift: { ...shift, assignmentId: assignment.id, assignmentStatus: assignment.status },
+          }),
+        SHIFT_REQUEST_STRINGS.ACCEPT_FAILED,
+      )
+      : action.run(
+        async () => shiftsApi.apply(shift.id, (await getDevicePosition(5000)) ?? undefined),
+        application =>
+          navigation.replace(ROUTES.applicationSubmitted, {
+            shift: {
+              ...shift,
+              applicationId: application.id,
+              applicationStatus: application.status,
+            },
+          }),
+        SHIFT_REQUEST_STRINGS.APPLY_FAILED,
+      );
+
+  const decline = () =>
+    isLive
+      ? action.run(
+        () => shiftsApi.declineLive(shift.id),
+        () => navigation.goBack(),
+        SHIFT_REQUEST_STRINGS.DECLINE_FAILED,
+      )
+      : navigation.goBack();
 
   return (
     <FormScreen
+      busy={action.busy}
       onBack={navigation.goBack}
       title={t('workerFlow.shiftSecured.headerTitle')}
       subtitle={copy('headerSubtitle')}
       gap={14}
-      isLoading={isLoading}
+      isLoading={dispatch.isLoading}
       testID="shift-request-page"
       actions={
         <>
           <PrimaryButton
             label={isExpired ? copy('expired') : copy('accept')}
-            disabled={isExpired}
+            disabled={isExpired || action.busy}
             onPress={accept}
             testID="shift-request-accept"
           />
           <SecondaryButton
             label={copy('decline')}
-            onPress={navigation.goBack}
+            disabled={action.busy}
+            onPress={decline}
             testID="shift-request-decline"
           />
         </>
       }
     >
       <PushPreview
-        initial={meta.senderInitial}
+        initial={SHIFT_REQUEST_STRINGS.SENDER_INITIAL}
         meta={t('workerFlow.request.pushMeta', {
-          sender: meta.sender,
-          time: meta.sentAt,
+          sender: SHIFT_REQUEST_STRINGS.SENDER,
+          time: SHIFT_REQUEST_STRINGS.SENT_AT,
         })}
         title={copy('pushTitle', { distance: shift.distanceKm })}
         body={t('workerFlow.request.pushBody', {
           role: shift.title,
-          when: isLive ? meta.badge : shift.dateLabel,
+          when: isLive ? badge : shift.dateLabel,
         })}
       />
 
@@ -86,9 +129,11 @@ export const ShiftRequestPage: FC<
         overline={copy('overline')}
         title={copy('heading')}
         subtitle={
-          isLive
+          isLive && hasCountdown
             ? copy('acceptWithin', { time: timeLeft })
-            : copy('subtitle')
+            : isLive
+              ? undefined
+              : copy('subtitle')
         }
       />
 
@@ -98,13 +143,14 @@ export const ShiftRequestPage: FC<
             value: t('workerFlow.request.km', { distance: shift.distanceKm }),
             label: t('workerFlow.request.fromLocation'),
           },
-          isLive
+          isLive && hasCountdown
             ? { value: timeLeft, label: copy('timeToAccept') }
             : {
-              value: copy(shift.durationHours === 1 ? 'hour' : 'hours', {
-                hours: shift.durationHours,
-              }),
-              label: copy('shiftLength'),
+              value: t(
+                `workerFlow.request.scheduled.${shift.durationHours === 1 ? 'hour' : 'hours'}`,
+                { hours: shift.durationHours },
+              ),
+              label: t('workerFlow.request.scheduled.shiftLength'),
             },
         ]}
       />
@@ -122,7 +168,7 @@ export const ShiftRequestPage: FC<
               time: shift.timeLabel,
             })
         }
-        badge={meta.badge}
+        badge={badge}
         onPress={() => navigation.navigate(ROUTES.shiftDetails, { shift })}
         testID="shift-request-shift"
       />
@@ -130,7 +176,7 @@ export const ShiftRequestPage: FC<
         title={t('workerFlow.request.pay')}
         caption={t('workerFlow.request.payCaption', {
           rate: formatRupees(shift.hourlyRate),
-          note: meta.payNote,
+          note: SHIFT_REQUEST_STRINGS.PAY_NOTE,
         })}
       />
     </FormScreen>

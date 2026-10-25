@@ -5,7 +5,9 @@
     "apply": "लागू करें",
     "back": "वापस",
     "loading": "लोड हो रहा है...",
-    "comingSoon": "जल्द आ रहा है"
+    "comingSoon": "जल्द आ रहा है",
+    "viewMore": "और देखें ({{count}})",
+    "viewLess": "कम देखें"
   },
   "appearance": {
     "title": "अपना रूप चुनें",
@@ -23,15 +25,45 @@
     "apply": "भाषा लागू करें"
   },
   "welcome": {
-    "title": "KaaamNow में आपका स्वागत है",
-    "subtitle": "अपने मोबाइल नंबर से सुरक्षित रूप से साइन इन करें।",
-    "sendCode": "साइन-इन कोड भेजें",
+    "title": "KaaamNow में साइन इन करें",
+    "subtitle": "फ़ोन नंबर और पासवर्ड से साइन इन करें।",
+    "signIn": "साइन इन करें",
     "createAccount": "खाता बनाएं",
     "phoneLabel": "मोबाइल नंबर",
-    "phoneHelper": "हम एक बार का कोड भेजेंगे। सामान्य SMS शुल्क लागू हो सकते हैं।",
+    "phoneHelper": "अपने खाते से जुड़ा मोबाइल नंबर दर्ज करें।",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "पासवर्ड की आवश्यकता नहीं है। जारी रखकर, आप सेवा की शर्तों और गोपनीयता नीति से सहमत होते हैं।"
+    "legalLinked": "आगे बढ़कर आप KaaamNow की <terms>सेवा शर्तों</terms> से सहमत होते हैं।",
+    "legal": "आगे बढ़कर आप KaaamNow की सेवा शर्तों से सहमत होते हैं।"
+  },
+  "auth": {
+    "passwordLabel": "पासवर्ड",
+    "passwordPlaceholder": "अपना पासवर्ड दर्ज करें",
+    "passwordHint": "कम से कम 8 अक्षर रखें, जिनमें एक अक्षर और एक अंक हो।",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "confirmPasswordError": "पासवर्ड की पुष्टि करें।",
+    "passwordMismatch": "दोनों पासवर्ड मेल नहीं खाते।",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "newPassword": "नया पासवर्ड",
+    "working": "कृपया प्रतीक्षा करें…",
+    "loginError": "साइन इन नहीं हुआ। विवरण जाँचकर फिर कोशिश करें।",
+    "forgotSubtitle": "पासवर्ड रीसेट करने के लिए अपना पंजीकृत मोबाइल नंबर दर्ज करें।",
+    "sendResetCode": "रीसेट कोड भेजें",
+    "resetPassword": "पासवर्ड रीसेट करें",
+    "resetRequestNotice": "अगर इस नंबर से खाता जुड़ा है, तो सत्यापन कोड भेज दिया गया है।",
+    "resetRequestError": "रीसेट कोड का अनुरोध नहीं हो सका। फिर कोशिश करें।",
+    "resetError": "कोड अमान्य या समाप्त हो गया है। नया कोड मँगाकर फिर कोशिश करें।",
+    "resetComplete": "पासवर्ड अपडेट हो गया",
+    "resetSuccess": "पासवर्ड रीसेट हो गया है। अब आप इससे साइन इन कर सकते हैं।",
+    "backToSignIn": "साइन इन पर वापस जाएँ",
+    "sendingCode": "सत्यापन कोड भेजा जा रहा है…",
+    "retryCode": "कोड फिर से भेजने के लिए टैप करें।",
+    "resendResetCode": "दूसरा कोड भेजें",
+    "loadingOptions": "विकल्प लोड हो रहे हैं…",
+    "showPassword": "पासवर्ड दिखाएँ",
+    "hidePassword": "पासवर्ड छिपाएँ",
+    "newPasswordPlaceholder": "पासवर्ड बनाएं",
+    "confirmPasswordPlaceholder": "पासवर्ड दोबारा दर्ज करें"
   },
   "verifyPhone": {
     "title": "कोड दर्ज करें",
@@ -65,7 +97,8 @@
     "faq": "FAQ और सहायता",
     "offline": "ऑफलाइन एक्सेस",
     "terms": "नियम और शर्तें",
-    "logOut": "लॉग आउट"
+    "logOut": "लॉग आउट",
+    "roleLabel": "वर्कर"
   },
   "workerHome": {
     "greeting": "नमस्ते, {{name}} 👋",
@@ -115,6 +148,8 @@
     "addressLabel": "पता",
     "addressPlaceholder": "इलाका, शहर",
     "useCurrent": "वर्तमान स्थान लें",
+    "locationError": "आपका स्थान नहीं मिल सका। पता खुद दर्ज करें या फिर कोशिश करें।",
+    "locationPermissionDenied": "वर्तमान स्थान के लिए स्थान की अनुमति दें।",
     "locating": "स्थान खोज रहे हैं...",
     "workTypeLabel": "काम का प्रकार",
     "workTypeHint": "लागू होने वाले सभी विकल्प चुनें।",
@@ -168,7 +203,8 @@
       "phone": "10 अंकों का सही मोबाइल नंबर दर्ज करें।",
       "email": "सही ईमेल दर्ज करें या खाली छोड़ें।",
       "address": "पता दर्ज करें या वर्तमान स्थान का उपयोग करें।",
-      "businessType": "व्यवसाय का प्रकार चुनें।"
+      "businessType": "व्यवसाय का प्रकार चुनें।",
+      "maxBusinessTypes": "अधिकतम 10 व्यवसाय प्रकार चुनें।"
     },
     "businessTypes": {
       "hospitality": "आतिथ्य सेवा",
@@ -178,7 +214,8 @@
       "household": "घरेलू सेवा",
       "office": "कार्यालय",
       "other": "अन्य"
-    }
+    },
+    "businessTypeHint": "लागू होने वाले सभी विकल्प चुनें।"
   },
   "editProfile": {
     "title": "प्रोफ़ाइल संपादित करें",
@@ -201,7 +238,10 @@
       "nameMax": "नाम 80 अक्षरों से अधिक नहीं होना चाहिए।",
       "address": "पता दर्ज करें या वर्तमान स्थान का उपयोग करें।",
       "workTypes": "कम से कम एक काम का प्रकार चुनें।"
-    }
+    },
+    "photoFailed": "फ़ोटो अपलोड नहीं हो सकी",
+    "saveFailed": "प्रोफ़ाइल सेव नहीं हो सकी",
+    "preferenceFailed": "पसंद सेव नहीं हो सकी"
   },
   "workerShifts": {
     "title": "मेरी शिफ्ट",
@@ -522,14 +562,26 @@
       "profile": "प्रोफ़ाइल"
     },
     "distance": "{{distance}} किमी",
-    "locationPickerHint": "व्यवसाय का स्थान चुनें"
+    "locationPickerHint": "व्यवसाय का स्थान चुनें",
+    "liveComingSoon": "लाइव अनुरोध जल्द आ रहे हैं",
+    "unverifiedSubtitle": "{{business}}"
   },
   "businessShifts": {
     "title": "शिफ्ट",
     "scheduled": "निर्धारित",
     "rosterTitle": "पुष्ट टीम प्रबंधित करें",
     "fullyStaffed": "पूरी टीम · {{total}} में से {{count}}",
-    "viewSelectedOffers": "चुने गए ऑफ़र देखें"
+    "viewSelectedOffers": "चुने गए ऑफ़र देखें",
+    "loadErrorTitle": "शिफ्ट लोड नहीं हो सकीं",
+    "retry": "फिर से कोशिश करें",
+    "publishDraftTitle": "यह ड्राफ्ट प्रकाशित करें?",
+    "publishDraftBody": "आस-पास के वर्कर्स को सूचना मिलेगी और वे आवेदन कर सकेंगे।",
+    "publish": "प्रकाशित करें",
+    "discardDraft": "ड्राफ्ट हटाएँ",
+    "discardReason": "Draft discarded",
+    "actionFailed": "शिफ्ट अपडेट नहीं हो सकी",
+    "emptyRosterTitle": "अभी कोई पुष्टि किया हुआ वर्कर नहीं",
+    "emptyRosterBody": "शिफ्ट की पुष्टि करने पर वर्कर्स यहाँ दिखेंगे।"
   },
   "businessShiftCreate": {
     "prompt": "शिफ्ट कब है?",
@@ -568,14 +620,15 @@
     "postedOverline": "शिफ्ट · निर्धारित",
     "postedTitle": "शिफ्ट पोस्ट हो गई",
     "scheduledShiftSubtitle": "निर्धारित शिफ्ट",
-    "postedSubtitle": "5 किमी के भीतर के कर्मचारियों को सूचना दी जा रही है। आवेदन आने पर यहाँ दिखेंगे।",
+    "postedSubtitle": "आस-पास के वर्कर्स को सूचित किया जा रहा है। आवेदन आते ही यहाँ दिखेंगे।",
     "workersNotified": "सूचित कर्मचारी",
     "notificationRadius": "सूचना का दायरा",
     "applications": "आवेदन",
     "waiting": "पहले आवेदक का इंतज़ार है",
     "reviewApplicants": "आवेदकों की समीक्षा करें",
     "openShift": "खोलें",
-    "editShift": "शिफ्ट संपादित करें"
+    "editShift": "शिफ्ट संपादित करें",
+    "viewShifts": "शिफ्ट देखें"
   },
   "businessLiveCreate": {
     "liveOverline": "लाइव · ऑन डिमांड",
@@ -592,7 +645,7 @@
     "locationFetching": "आपके डिवाइस की लोकेशन प्राप्त की जा रही है…",
     "locationUnavailable": "डिवाइस की लोकेशन नहीं मिली। लोकेशन अनुमति जाँचें या कार्यस्थल का पता दर्ज करें।",
     "locationEditedHint": "कार्यस्थल का स्थान संपादित किया गया; सहेजा गया GPS पिन हटा दिया गया है।",
-    "mapsConfigurationMissing": "Google Maps पूर्वावलोकन के लिए स्थानीय .env.local फ़ाइल में GOOGLE_MAPS_API_KEY जोड़ें।",
+    "mapsConfigurationMissing": "Google Maps पूर्वावलोकन के लिए स्थानीय .env.dev फ़ाइल में GOOGLE_MAPS_API_KEY जोड़ें।",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "ज़रूरतें",
     "workers": "ज़रूरी कर्मचारी",
@@ -699,7 +752,12 @@
     "sortRecent": "नवीनतम",
     "sortRating": "सबसे अच्छी रेटिंग",
     "sortExperience": "सबसे अधिक अनुभव",
-    "close": "बंद करें"
+    "close": "बंद करें",
+    "completedShifts_one": "{{count}} शिफ्ट",
+    "completedShifts_other": "{{count}} शिफ्ट",
+    "distanceAway": "{{distance}} किमी दूर",
+    "loadErrorTitle": "आवेदक लोड नहीं हो सके",
+    "retry": "फिर से कोशिश करें"
   },
   "businessApplicantProfile": {
     "notFoundTitle": "आवेदक नहीं मिला",
@@ -729,7 +787,10 @@
     "confirmed": "पुष्ट",
     "shiftTitle": "कैफ़े सेवा सहयोगी",
     "shiftDate": "शनिवार, 24 अक्टूबर",
-    "shiftTime": "शाम 6:00 – 10:00"
+    "shiftTime": "शाम 6:00 – 10:00",
+    "reject": "अस्वीकार करें",
+    "awaitingWorker": "वर्कर की पुष्टि का इंतज़ार",
+    "actionFailed": "आवेदक अपडेट नहीं हो सका"
   },
   "businessRoster": {
     "sendReminder": "टीम को रिमाइंडर भेजें",
@@ -844,6 +905,7 @@
     "workerFallback": "worker",
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
-    "rateAllWorkers": "Rate all workers"
+    "rateAllWorkers": "Rate all workers",
+    "submitFailed": "रेटिंग सबमिट नहीं हो सकी"
   }
 }

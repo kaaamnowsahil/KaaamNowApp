@@ -29,9 +29,7 @@ export const SettingsGroup: FC<{ title?: string; children: ReactNode }> = ({
         {rows.map((row, i) => (
           <View
             key={i}
-            style={
-              i > 0 && [styles.divided, { borderTopColor: colors.border }]
-            }
+            style={i > 0 && [styles.divided, { borderTopColor: colors.border }]}
           >
             {row}
           </View>

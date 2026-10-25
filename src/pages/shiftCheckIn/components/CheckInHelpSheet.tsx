@@ -1,53 +1,38 @@
-import { useEffect, useState, type FC } from 'react';
+import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, View } from 'react-native';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
 import PhoneIcon from '@/assets/figma/phone.svg';
-import CircleCheckIcon from '@/assets/icons/circle-check.svg';
 import CircleHelpIcon from '@/assets/icons/circle-help.svg';
-import ClockIcon from '@/assets/icons/clock.svg';
 import MessageCircleIcon from '@/assets/icons/message-circle.svg';
-import { DetailRow, InfoCallout } from '@/components/shiftFlow';
-import {
-  BottomSheet,
-  PrimaryButton,
-  SecondaryButton,
-} from '@/components/ui';
+import { DetailRow } from '@/components/shiftFlow';
+import { BottomSheet, SecondaryButton } from '@/components/ui';
+import { BRAND } from '@/constants/brand';
 import type { Shift } from '@/types';
 import { mapsUrl } from '@/utils/links';
 
-import { CHECK_IN_HELP as H } from '../mock';
-
-type ManualState = 'idle' | 'waiting' | 'confirmed';
+export type ShiftContact = { name: string; phone: string };
 
 /**
  * "I need help checking in". Not in Figma; built from the bottom sheet,
  * divided icon rows and Screen actions styles used across the live flow.
- * Mount it only while open.
+ * Contact comes from GET /assignments/{id}/contact. Mount it only while open.
  */
 export const CheckInHelpSheet: FC<{
   shift: Shift;
-  onCheckedIn: () => void;
+  contact: ShiftContact | null;
   onClose: () => void;
-}> = ({ shift, onCheckedIn, onClose }) => {
+}> = ({ shift, contact, onClose }) => {
   const { t } = useTranslation();
-  const [manual, setManual] = useState<ManualState>('idle');
-
-  useEffect(() => {
-    if (manual !== 'waiting') {
-      return;
-    }
-    const timer = setTimeout(() => setManual('confirmed'), H.confirmAfterMs);
-    return () => clearTimeout(timer);
-  }, [manual]);
-
+  const leadName = contact?.name ?? '';
   const sms = encodeURIComponent(
     t('workerFlow.checkIn.arrivedSms', {
-      lead: H.leadFirstName,
+      lead: leadName.split(' ')[0],
       role: shift.title,
     }),
   );
+  const supportEmail = BRAND.SUPPORT_EMAILS[0];
 
   return (
     <BottomSheet
@@ -58,21 +43,22 @@ export const CheckInHelpSheet: FC<{
       testID="check-in-help-sheet"
     >
       <View>
-        <DetailRow
-          icon={PhoneIcon}
-          title={t('workerFlow.checkIn.callLead')}
-          caption={t('workerFlow.checkIn.leadCaption', {
-            name: H.leadName,
-            reply: H.leadReplyTime,
-          })}
-          onPress={() => Linking.openURL(`tel:${H.leadPhone}`)}
-        />
-        <DetailRow
-          icon={MessageCircleIcon}
-          title={t('workerFlow.checkIn.messageLead')}
-          caption={t('workerFlow.checkIn.messageCaption')}
-          onPress={() => Linking.openURL(`sms:${H.leadPhone}?body=${sms}`)}
-        />
+        {contact?.phone ? (
+          <>
+            <DetailRow
+              icon={PhoneIcon}
+              title={t('workerFlow.checkIn.callLead')}
+              caption={leadName}
+              onPress={() => Linking.openURL(`tel:${contact.phone}`)}
+            />
+            <DetailRow
+              icon={MessageCircleIcon}
+              title={t('workerFlow.checkIn.messageLead')}
+              caption={t('workerFlow.checkIn.messageCaption')}
+              onPress={() => Linking.openURL(`sms:${contact.phone}?body=${sms}`)}
+            />
+          </>
+        ) : null}
         <DetailRow
           icon={MapPinIcon}
           title={t('workerFlow.checkIn.cantFind')}
@@ -80,56 +66,22 @@ export const CheckInHelpSheet: FC<{
             business: shift.businessName,
           })}
           onPress={() =>
-            Linking.openURL(mapsUrl(`${shift.businessName}, ${shift.area}`))
+            Linking.openURL(
+              mapsUrl(`${shift.businessName}, ${shift.addressText || shift.area}`),
+            )
           }
         />
         <DetailRow
           icon={CircleHelpIcon}
           title={t('workerFlow.checkIn.support')}
-          caption={t('workerFlow.checkIn.supportCaption', {
-            hours: H.supportHours,
-            phone: H.supportPhoneLabel,
-          })}
-          onPress={() => Linking.openURL(`tel:${H.supportPhone}`)}
+          caption={supportEmail}
+          onPress={() => Linking.openURL(`mailto:${supportEmail}`)}
           isLast
         />
       </View>
 
-      {manual === 'waiting' ? (
-        <InfoCallout
-          icon={ClockIcon}
-          text={t('workerFlow.checkIn.waiting', { lead: H.leadFirstName })}
-        />
-      ) : manual === 'confirmed' ? (
-        <InfoCallout
-          icon={CircleCheckIcon}
-          text={t('workerFlow.checkIn.confirmed', { lead: H.leadFirstName })}
-        />
-      ) : null}
-
       <View style={styles.actions}>
-        {manual === 'confirmed' ? (
-          <PrimaryButton
-            label={t('workerFlow.checkIn.startShift')}
-            onPress={onCheckedIn}
-            testID="check-in-help-start"
-          />
-        ) : (
-          <PrimaryButton
-            label={
-              manual === 'waiting'
-                ? t('workerFlow.checkIn.waitingButton')
-                : t('workerFlow.checkIn.askManual')
-            }
-            disabled={manual === 'waiting'}
-            onPress={() => setManual('waiting')}
-            testID="check-in-help-manual"
-          />
-        )}
-        <SecondaryButton
-          label={t('workerFlow.checkIn.close')}
-          onPress={onClose}
-        />
+        <SecondaryButton label={t('workerFlow.checkIn.close')} onPress={onClose} />
       </View>
     </BottomSheet>
   );

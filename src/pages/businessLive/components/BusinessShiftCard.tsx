@@ -5,9 +5,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import BadgeCheckIcon from '@/assets/figma/badge-check.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
+import type { BusinessDashboardShift } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import type { BusinessDashboardShift } from '../mock';
 import type { BusinessView } from '../hooks/useBusinessLive';
 
 type BusinessShiftCardProps = {
@@ -43,9 +43,11 @@ export const BusinessShiftCard: FC<BusinessShiftCardProps> = ({
                 <Text style={[styles.status, { color: isLive ? colors.success : colors.primary }]}>
                     {t(isLive ? 'businessDashboard.liveStatus' : 'businessDashboard.scheduledStatus')}
                 </Text>
-                <Text style={[styles.meta, { color: colors.textSubtle }]}>
-                    {t('businessDashboard.distance', { distance: shift.distanceKm })}
-                </Text>
+                {shift.distanceKm != null ? (
+                    <Text style={[styles.meta, { color: colors.textSubtle }]}>
+                        {t('businessDashboard.distance', { distance: shift.distanceKm })}
+                    </Text>
+                ) : null}
             </View>
             <Text style={[styles.title, { color: colors.text }]}>{shift.title}</Text>
             <View style={styles.business}>

@@ -6,27 +6,28 @@ import { DetailRow, ReasonSheet, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useShiftAction, useWorkerShiftDetail } from '@/services/shifts/useShiftFlow';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 import { mapsUrl } from '@/utils/links';
 
-import { SHIFT_SELECTED_STRINGS as S } from './constants';
-import { DECLINE_REASONS, DEFAULT_OFFER, OFFERS } from './mock';
+import { DECLINE_REASONS, SHIFT_SELECTED_STRINGS } from './constants/shiftSelectedStrings';
 
 /**
  * Scheduled flow step 4. Figma: "Scheduled · You've been selected" (light/dark).
  * Confirming secures the place; declining asks for a reason first (not in Figma).
- * - data: mock/shiftSelectedMock.ts
+ * - data: GET /worker/shifts/{id}; confirm/decline via /worker/applications/{id}
  */
 export const ShiftSelectedPage: FC<
   AppScreenProps<typeof ROUTES.shiftSelected>
 > = ({ navigation, route }) => {
-  const { shift } = route.params;
-  const isLoading = useMockLoading();
+  const detail = useWorkerShiftDetail(route.params.shift);
+  const { shift } = detail;
+  const action = useShiftAction();
   const [isDeclineOpen, setIsDeclineOpen] = useState(false);
-  const offer = OFFERS[shift.id] ?? DEFAULT_OFFER;
-  const workplace = offer.workplace || shift.area;
+  const workplace = shift.addressText || shift.area;
+  const applicationId = shift.applicationId ?? '';
 
   const openDetails = () =>
     navigation.navigate(ROUTES.shiftDetails, {
@@ -34,36 +35,59 @@ export const ShiftSelectedPage: FC<
       bookingStatus: 'selected',
     });
 
+  const confirm = () =>
+    action.run(
+      () => shiftsApi.confirmSelection(applicationId),
+      application =>
+        navigation.replace(ROUTES.shiftSecured, {
+          shift: {
+            ...shift,
+            applicationStatus: application.status,
+            assignmentId: application.assignment_id ?? shift.assignmentId,
+            assignmentStatus: 'confirmed',
+          },
+        }),
+      SHIFT_SELECTED_STRINGS.CONFIRM_FAILED,
+    );
+
   const decline = () => {
     setIsDeclineOpen(false);
-    Alert.alert(S.DECLINED_TITLE, S.DECLINED_BODY, [
-      {
-        text: S.OK,
-        onPress: () =>
-          navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerShifts }),
-      },
-    ]);
+    action.run(
+      () => shiftsApi.declineSelection(applicationId),
+      () =>
+        Alert.alert(SHIFT_SELECTED_STRINGS.DECLINED_TITLE, SHIFT_SELECTED_STRINGS.DECLINED_BODY, [
+          {
+            text: SHIFT_SELECTED_STRINGS.OK,
+            onPress: () =>
+              navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerShifts }),
+          },
+        ]),
+      SHIFT_SELECTED_STRINGS.DECLINE_FAILED,
+    );
   };
 
   return (
     <>
       <FormScreen
+        busy={action.busy}
         onBack={navigation.goBack}
-        title={S.HEADER_TITLE}
+        title={SHIFT_SELECTED_STRINGS.HEADER_TITLE}
         compactTitle
-        headerTag={S.HEADER_TAG}
+        headerTag={SHIFT_SELECTED_STRINGS.HEADER_TAG}
         gap={20}
-        isLoading={isLoading}
+        isLoading={detail.isLoading}
         testID="shift-selected-page"
         actions={
           <>
             <PrimaryButton
-              label={S.CONFIRM}
-              onPress={() => navigation.replace(ROUTES.shiftSecured, { shift })}
+              label={SHIFT_SELECTED_STRINGS.CONFIRM}
+              disabled={action.busy || !applicationId}
+              onPress={confirm}
               testID="shift-selected-confirm"
             />
             <SecondaryButton
-              label={S.DECLINE}
+              label={SHIFT_SELECTED_STRINGS.DECLINE}
+              disabled={action.busy || !applicationId}
               onPress={() => setIsDeclineOpen(true)}
               testID="shift-selected-decline"
             />
@@ -74,31 +98,34 @@ export const ShiftSelectedPage: FC<
           tone="warning"
           size="large"
           icon={ClockIcon}
-          overline={S.OVERLINE}
-          title={S.HEADING}
-          subtitle={S.subtitle(shift.businessName, offer.confirmBy)}
+          overline={SHIFT_SELECTED_STRINGS.OVERLINE}
+          title={SHIFT_SELECTED_STRINGS.HEADING}
+          subtitle={SHIFT_SELECTED_STRINGS.subtitle(
+            shift.businessName,
+            shift.confirmBy ?? SHIFT_SELECTED_STRINGS.THE_DEADLINE,
+          )}
         />
         <View>
           <DetailRow
             size="large"
             title={shift.title}
-            caption={S.business(shift.businessName, shift.isVerified)}
+            caption={SHIFT_SELECTED_STRINGS.business(shift.businessName, shift.isVerified)}
             onPress={openDetails}
           />
           <DetailRow
             size="large"
-            title={offer.dateLabel || shift.dateLabel}
-            caption={S.timeRange(
+            title={shift.dateLabel}
+            caption={SHIFT_SELECTED_STRINGS.timeRange(
               shift.timeLabel,
               shift.durationHours,
-              offer.breakNote,
+              SHIFT_SELECTED_STRINGS.breakNote(detail.data?.break_minutes ?? 0),
             )}
             onPress={openDetails}
           />
           <DetailRow
             size="large"
-            title={S.AGREED_RATE}
-            caption={S.rate(
+            title={SHIFT_SELECTED_STRINGS.AGREED_RATE}
+            caption={SHIFT_SELECTED_STRINGS.rate(
               formatRupees(shift.hourlyRate),
               formatRupees(shift.hourlyRate * shift.durationHours),
             )}
@@ -106,8 +133,8 @@ export const ShiftSelectedPage: FC<
           />
           <DetailRow
             size="large"
-            title={S.WORKPLACE}
-            caption={S.workplace(workplace, shift.distanceKm)}
+            title={SHIFT_SELECTED_STRINGS.WORKPLACE}
+            caption={SHIFT_SELECTED_STRINGS.workplace(workplace, shift.distanceKm)}
             onPress={() =>
               Linking.openURL(mapsUrl(`${shift.businessName}, ${workplace}`))
             }
@@ -116,12 +143,12 @@ export const ShiftSelectedPage: FC<
       </FormScreen>
       {isDeclineOpen ? (
         <ReasonSheet
-          title={S.DECLINE_TITLE}
-          subtitle={S.declineBody(shift.businessName)}
-          reasonLabel={S.DECLINE_REASON}
+          title={SHIFT_SELECTED_STRINGS.DECLINE_TITLE}
+          subtitle={SHIFT_SELECTED_STRINGS.declineBody(shift.businessName)}
+          reasonLabel={SHIFT_SELECTED_STRINGS.DECLINE_REASON}
           reasons={DECLINE_REASONS}
-          confirmLabel={S.DECLINE}
-          keepLabel={S.KEEP}
+          confirmLabel={SHIFT_SELECTED_STRINGS.DECLINE}
+          keepLabel={SHIFT_SELECTED_STRINGS.KEEP}
           onConfirm={decline}
           onClose={() => setIsDeclineOpen(false)}
           testID="decline-offer-sheet"

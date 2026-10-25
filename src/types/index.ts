@@ -2,12 +2,18 @@ export type {
   Booking,
   BookingStatus,
   Payout,
+  PayoutMethod,
   PayoutStatus,
   WorkerEarningDetails,
   WithdrawalReceipt,
 } from './booking';
 export type { Option, PickedAddress } from './common';
-export type { BusinessShiftDraft } from './businessShift';
+export type {
+  BusinessApplicant,
+  BusinessApplicantStatus,
+  BusinessDashboardShift,
+  BusinessShiftDraft,
+} from './businessShift';
 export type {
   BusinessLiveWorker,
   BusinessLiveRequest,

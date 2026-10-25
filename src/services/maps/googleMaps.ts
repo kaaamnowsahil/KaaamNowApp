@@ -37,7 +37,51 @@ export const getGoogleStaticMapUrl = (
   return `https://maps.googleapis.com/maps/api/staticmap?${params}`;
 };
 
+const OSM_HEADERS = {
+  'User-Agent': 'KaaamNowApp/1.0',
+  Accept: 'application/json',
+};
+
+const geocodeAddressOsm = async (
+  address: string,
+  signal?: AbortSignal,
+): Promise<Coordinates | null> => {
+  const params = buildQuery({
+    format: 'jsonv2',
+    limit: '1',
+    countrycodes: 'in',
+    q: address,
+  });
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/search?${params}`,
+    { signal, headers: OSM_HEADERS },
+  );
+  if (!response.ok) return null;
+  const [match] = (await response.json()) as Array<{
+    lat: string;
+    lon: string;
+  }>;
+  return match
+    ? { latitude: Number(match.lat), longitude: Number(match.lon) }
+    : null;
+};
+
 export const geocodeAddress = async (
+  address: string,
+  signal?: AbortSignal,
+): Promise<Coordinates | null> => {
+  if (!apiKey) return geocodeAddressOsm(address, signal);
+  try {
+    return (
+      (await geocodeAddressGoogle(address, signal)) ??
+      (await geocodeAddressOsm(address, signal))
+    );
+  } catch {
+    return geocodeAddressOsm(address, signal);
+  }
+};
+
+const geocodeAddressGoogle = async (
   address: string,
   signal?: AbortSignal,
 ): Promise<Coordinates | null> => {
@@ -69,7 +113,78 @@ export const geocodeAddress = async (
   return location ? { latitude: location.lat, longitude: location.lng } : null;
 };
 
+type OsmAddress = Partial<
+  Record<
+    | 'house_number'
+    | 'road'
+    | 'suburb'
+    | 'neighbourhood'
+    | 'city_district'
+    | 'village'
+    | 'town'
+    | 'city'
+    | 'county'
+    | 'state_district'
+    | 'state'
+    | 'postcode',
+    string
+  >
+>;
+
+const reverseGeocodeOsm = async (
+  coordinates: Coordinates,
+  signal?: AbortSignal,
+): Promise<string | null> => {
+  const params = buildQuery({
+    format: 'jsonv2',
+    addressdetails: '1',
+    lat: String(coordinates.latitude),
+    lon: String(coordinates.longitude),
+  });
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?${params}`,
+    { signal, headers: OSM_HEADERS },
+  );
+  if (!response.ok) return null;
+  const { address } = (await response.json()) as { address?: OsmAddress };
+  if (!address) return null;
+  const street = [address.house_number, address.road].filter(Boolean).join(' ');
+  const locality =
+    address.suburb ??
+    address.neighbourhood ??
+    address.city_district ??
+    address.village;
+  const city =
+    address.city ?? address.town ?? address.county ?? address.state_district;
+  const parts = [
+    street,
+    locality,
+    city,
+    address.state,
+    address.postcode,
+  ].filter(
+    (part, index, all): part is string =>
+      Boolean(part) && all.indexOf(part) === index,
+  );
+  return parts.length ? parts.join(', ') : null;
+};
+
 export const reverseGeocode = async (
+  coordinates: Coordinates,
+  signal?: AbortSignal,
+): Promise<string | null> => {
+  if (!apiKey) return reverseGeocodeOsm(coordinates, signal);
+  try {
+    return (
+      (await reverseGeocodeGoogle(coordinates, signal)) ??
+      (await reverseGeocodeOsm(coordinates, signal))
+    );
+  } catch {
+    return reverseGeocodeOsm(coordinates, signal);
+  }
+};
+
+const reverseGeocodeGoogle = async (
   coordinates: Coordinates,
   signal?: AbortSignal,
 ): Promise<string | null> => {

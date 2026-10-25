@@ -51,8 +51,15 @@ export type CommonStackParamList = {
 
 export type AuthStackParamList = CommonStackParamList & {
   [ROUTES.welcome]: undefined;
+  [ROUTES.forgotPassword]: undefined;
   /** phone is E.164, e.g. +919876543210 */
-  [ROUTES.verifyPhone]: { phone: string; intent: 'signIn' | 'signUp' };
+  [ROUTES.verifyPhone]: {
+    phone: string;
+    intent: 'signUp';
+    /** Timers from the OTP the sign-up screen already sent. */
+    expiresInSeconds: number;
+    resendAfterSeconds: number;
+  };
   [ROUTES.roleSelect]: undefined;
   [ROUTES.workerSignup]: undefined;
   [ROUTES.businessSignup]: undefined;
@@ -101,7 +108,7 @@ export type AppStackParamList = CommonStackParamList & {
     workerIds?: string[];
   };
   [ROUTES.businessApplicantProfile]: { applicantId: string };
-  [ROUTES.businessRoster]: undefined;
+  [ROUTES.businessRoster]: { shiftId?: string } | undefined;
   [ROUTES.language]: undefined;
   [ROUTES.appearance]: undefined;
   [ROUTES.offline]: undefined;

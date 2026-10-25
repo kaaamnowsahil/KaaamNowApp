@@ -40,4 +40,6 @@ export const WORKER_SHIFTS_STRINGS = {
   EMPTY_BODY:
     'Shifts you accept and offers businesses send you will show up here.',
   EMPTY_ACTION: 'Find shifts',
+  LOAD_ERROR_TITLE: 'Couldn’t load your shifts',
+  RETRY: 'Try again',
 } as const;

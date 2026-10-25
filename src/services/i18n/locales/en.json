@@ -5,7 +5,9 @@
     "apply": "Apply",
     "back": "Back",
     "loading": "Loading...",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "viewMore": "View more ({{count}})",
+    "viewLess": "View less"
   },
   "appearance": {
     "title": "Choose your appearance",
@@ -23,15 +25,45 @@
     "apply": "Apply language"
   },
   "welcome": {
-    "title": "Welcome to KaaamNow",
-    "subtitle": "Sign in securely with your mobile number.",
-    "sendCode": "Send sign-in code",
+    "title": "Sign in to KaaamNow",
+    "subtitle": "Sign in with your phone number and password.",
+    "signIn": "Sign in",
     "createAccount": "Create an account",
     "phoneLabel": "Mobile number",
-    "phoneHelper": "We’ll send a one-time code. Standard SMS rates may apply.",
+    "phoneHelper": "Use the mobile number registered to your account.",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "No password required. By continuing, you agree to the Terms of service and Privacy policy."
+    "legalLinked": "By continuing, you agree to KaaamNow’s <terms>Terms of Service</terms>.",
+    "legal": "By continuing, you agree to KaaamNow’s Terms of Service."
+  },
+  "auth": {
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "passwordHint": "Use at least 8 characters, including a letter and a number.",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordError": "Confirm your password.",
+    "passwordMismatch": "The passwords do not match.",
+    "forgotPassword": "Forgot password?",
+    "newPassword": "New password",
+    "working": "Please wait…",
+    "loginError": "Could not sign in. Check your details and try again.",
+    "forgotSubtitle": "Enter your registered mobile number to reset your password.",
+    "sendResetCode": "Send reset code",
+    "resetPassword": "Reset password",
+    "resetRequestNotice": "If an account matches this number, we’ve sent a verification code.",
+    "resetRequestError": "Could not request a reset code. Please try again.",
+    "resetError": "That code is invalid or expired. Request a new one and try again.",
+    "resetComplete": "Password updated",
+    "resetSuccess": "Your password has been reset. You can now sign in with it.",
+    "backToSignIn": "Back to sign in",
+    "sendingCode": "Sending verification code…",
+    "retryCode": "Tap to retry sending the code.",
+    "resendResetCode": "Send another code",
+    "loadingOptions": "Loading options…",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "newPasswordPlaceholder": "Create a password",
+    "confirmPasswordPlaceholder": "Re-enter your password"
   },
   "verifyPhone": {
     "title": "Verify your phone",
@@ -65,7 +97,8 @@
     "faq": "FAQ & Help",
     "offline": "Offline access",
     "terms": "Terms & Conditions",
-    "logOut": "Log out"
+    "logOut": "Log out",
+    "roleLabel": "Worker"
   },
   "workerHome": {
     "greeting": "Hello, {{name}} 👋",
@@ -115,6 +148,8 @@
     "addressLabel": "Location",
     "addressPlaceholder": "Area, city",
     "useCurrent": "Use current",
+    "locationError": "Could not get your location. Enter your address manually or try again.",
+    "locationPermissionDenied": "Allow location access to use your current location.",
     "locating": "Locating...",
     "workTypeLabel": "Work type",
     "workTypeHint": "Pick all that apply.",
@@ -168,7 +203,8 @@
       "phone": "Enter a valid 10-digit mobile number.",
       "email": "Enter a valid email or leave it empty.",
       "address": "Add your address or use current location.",
-      "businessType": "Pick your business type."
+      "businessType": "Pick your business type.",
+      "maxBusinessTypes": "Choose up to 10 business types."
     },
     "businessTypes": {
       "hospitality": "Hospitality",
@@ -178,7 +214,8 @@
       "household": "Household",
       "office": "Office",
       "other": "Other"
-    }
+    },
+    "businessTypeHint": "Pick all that apply."
   },
   "editProfile": {
     "title": "Edit profile",
@@ -201,7 +238,10 @@
       "nameMax": "Name must be 80 characters or fewer.",
       "address": "Add your address or use current location.",
       "workTypes": "Pick at least one work type."
-    }
+    },
+    "photoFailed": "Couldn’t upload photo",
+    "saveFailed": "Couldn’t save profile",
+    "preferenceFailed": "Couldn’t save preference"
   },
   "workerShifts": {
     "title": "My shifts",
@@ -250,7 +290,8 @@
     "status": {
       "pending": "Pending",
       "processing": "Processing",
-      "completed": "Completed"
+      "completed": "Completed",
+      "failed": "Failed"
     },
     "withdraw": "Withdraw",
     "viewAll": "View all earnings",
@@ -268,7 +309,12 @@
     "rate": "Hourly rate",
     "hour": "hour",
     "shifts": "Shifts included",
-    "reference": "Earning reference"
+    "reference": "Payout reference",
+    "method": "Payout method",
+    "destination": "Paid to",
+    "requestedAt": "Requested",
+    "processedAt": "Processed",
+    "failureReason": "Failure reason"
   },
   "earningsHistory": {
     "title": "All earnings",
@@ -277,7 +323,8 @@
     "status": {
       "pending": "Pending",
       "processing": "Processing",
-      "completed": "Completed"
+      "completed": "Completed",
+      "failed": "Failed"
     }
   },
   "withdraw": {
@@ -522,14 +569,26 @@
       "profile": "Profile"
     },
     "distance": "{{distance}} km",
-    "locationPickerHint": "Select business location"
+    "locationPickerHint": "Select business location",
+    "liveComingSoon": "Live requests are coming soon",
+    "unverifiedSubtitle": "{{business}}"
   },
   "businessShifts": {
     "title": "Shifts",
     "scheduled": "Scheduled",
     "rosterTitle": "Manage your confirmed roster",
     "fullyStaffed": "Fully staffed · {{count}} of {{total}}",
-    "viewSelectedOffers": "View selected offers"
+    "viewSelectedOffers": "View selected offers",
+    "loadErrorTitle": "Couldn’t load shifts",
+    "retry": "Retry",
+    "publishDraftTitle": "Publish this draft?",
+    "publishDraftBody": "Nearby workers will be notified and can apply.",
+    "publish": "Publish",
+    "discardDraft": "Discard draft",
+    "discardReason": "Draft discarded",
+    "actionFailed": "Couldn’t update shift",
+    "emptyRosterTitle": "No confirmed workers yet",
+    "emptyRosterBody": "Workers appear here once they confirm a shift."
   },
   "businessShiftCreate": {
     "prompt": "When is the shift?",
@@ -568,14 +627,15 @@
     "postedOverline": "Shift · Scheduled",
     "postedTitle": "Shift posted",
     "scheduledShiftSubtitle": "Scheduled shift",
-    "postedSubtitle": "Workers within 5 km are being notified. Applications will appear here as they arrive.",
+    "postedSubtitle": "Nearby workers are being notified. Applications will appear here as they arrive.",
     "workersNotified": "Workers notified",
     "notificationRadius": "Notification radius",
     "applications": "Applications",
     "waiting": "Waiting for the first applicant",
     "reviewApplicants": "Review applicants",
     "openShift": "Open",
-    "editShift": "Edit shift"
+    "editShift": "Edit shift",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "Live · On demand",
@@ -595,7 +655,7 @@
     "locationFetching": "Getting your device location…",
     "locationUnavailable": "Could not get your device location. Check location permission or enter the workplace address.",
     "locationEditedHint": "Workplace location manually edited; the saved GPS pin was cleared.",
-    "mapsConfigurationMissing": "Google Maps preview needs GOOGLE_MAPS_API_KEY in your local .env.local file.",
+    "mapsConfigurationMissing": "Google Maps preview needs GOOGLE_MAPS_API_KEY in your local .env.dev file.",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "workplaceInstructions": "Workplace instructions",
     "workplaceInstructionsPlaceholder": "Dress code, entrance, and who to ask for",
@@ -728,7 +788,12 @@
     "sortRecent": "Most recent",
     "sortRating": "Highest rated",
     "sortExperience": "Most experience",
-    "close": "Close"
+    "close": "Close",
+    "completedShifts_one": "{{count}} shift",
+    "completedShifts_other": "{{count}} shifts",
+    "distanceAway": "{{distance}} km away",
+    "loadErrorTitle": "Couldn’t load applicants",
+    "retry": "Retry"
   },
   "businessApplicantProfile": {
     "notFoundTitle": "Applicant not found",
@@ -758,7 +823,10 @@
     "confirmed": "Confirmed",
     "shiftTitle": "Café service associate",
     "shiftDate": "Sat, 24 Oct",
-    "shiftTime": "6:00 PM – 10:00 PM"
+    "shiftTime": "6:00 PM – 10:00 PM",
+    "reject": "Reject",
+    "awaitingWorker": "Waiting for worker to confirm",
+    "actionFailed": "Couldn’t update applicant"
   },
   "businessRoster": {
     "sendReminder": "Send team reminder",
@@ -815,7 +883,8 @@
     "rateAllWorkers": "Rate all workers",
     "workerFallback": "worker",
     "workerUnavailable": "Worker not found",
-    "workerUnavailableBody": "This worker is no longer available to rate."
+    "workerUnavailableBody": "This worker is no longer available to rate.",
+    "submitFailed": "Couldn’t submit rating"
   },
   "businessProfile": {
     "sectionBusiness": "Business",

@@ -23,15 +23,17 @@
     "apply": "ଭାଷା ଲାଗୁ କରନ୍ତୁ"
   },
   "welcome": {
-    "title": "KaaamNow କୁ ସ୍ୱାଗତ",
-    "subtitle": "ଆପଣଙ୍କ ମୋବାଇଲ୍ ନମ୍ବର ସହିତ ସୁରକ୍ଷିତ ଭାବରେ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ।",
+    "title": "KaaamNowରେ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ",
+    "subtitle": "ଫୋନ୍ ନମ୍ବର ଓ ପାସୱାର୍ଡରେ ସାଇନ୍ ଇନ୍ କରନ୍ତୁ।",
     "sendCode": "ସାଇନ୍-ଇନ୍ କୋଡ୍ ପଠାନ୍ତୁ",
     "createAccount": "ଆକାଉଣ୍ଟ୍ ତିଆରି କରନ୍ତୁ",
     "phoneLabel": "ମୋବାଇଲ୍ ନମ୍ବର",
-    "phoneHelper": "ଆମେ ଏକ ୱାନ୍-ଟାଇମ୍ କୋଡ୍ ପଠାଇବୁ। ସାଧାରଣ SMS ଚାର୍ଜ ଲାଗୁ ହୋଇପାରେ।",
+    "phoneHelper": "ଆପଣଙ୍କ ଖାତାରେ ପଞ୍ଜୀକୃତ ମୋବାଇଲ୍ ନମ୍ବର ବ୍ୟବହାର କରନ୍ତୁ।",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "କୌଣସି ପାସୱାର୍ଡର ଆବଶ୍ୟକତା ନାହିଁ। ଜାରି ରଖିବା ଦ୍ୱାରା, ଆପଣ ସେବା ସର୍ତ୍ତାବଳୀ ଏବଂ ଗୋପନୀୟତା ନୀତିରେ ସହମତ ହେଉଛନ୍ତି।"
+    "legalLinked": "ଆଗକୁ ବଢ଼ିଲେ KaaamNow <terms>ସେବା ସର୍ତ୍ତକୁ</terms> ମାନୁଛନ୍ତି।",
+    "legal": "ଆଗକୁ ବଢ଼ିଲେ KaaamNow ସେବା ସର୍ତ୍ତକୁ ମାନୁଛନ୍ତି।",
+    "signIn": "ସାଇନ୍ ଇନ୍"
   },
   "verifyPhone": {
     "title": "କୋଡ୍ ପ୍ରବେଶ କରନ୍ତୁ",
@@ -138,7 +140,9 @@
       "security": "ସୁରକ୍ଷା କର୍ମୀ",
       "driver": "ଚାଳକ",
       "warehouse": "ଗୋଦାମ"
-    }
+    },
+    "locationError": "ଆପଣଙ୍କ ସ୍ଥାନ ମିଳିଲା ନାହିଁ। ଠିକଣା ଲେଖନ୍ତୁ କିମ୍ବା ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।",
+    "locationPermissionDenied": "ବର୍ତ୍ତମାନ ସ୍ଥାନ ପାଇଁ ଅନୁମତି ଦିଅନ୍ତୁ।"
   },
   "businessSignup": {
     "title": "ଆପଣଙ୍କ ବ୍ୟବସାୟ ପ୍ରୋଫାଇଲ୍ ତିଆରି କରନ୍ତୁ",
@@ -559,7 +563,8 @@
     "waiting": "ପ୍ରଥମ ଆବେଦନକାରୀଙ୍କ ଅପେକ୍ଷାରେ",
     "reviewApplicants": "ଆବେଦନକାରୀଙ୍କୁ ସମୀକ୍ଷା କରନ୍ତୁ",
     "openShift": "ଖୋଲନ୍ତୁ",
-    "editShift": "ସିଫ୍ଟ ସମ୍ପାଦନ କରନ୍ତୁ"
+    "editShift": "ସିଫ୍ଟ ସମ୍ପାଦନ କରନ୍ତୁ",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "ଲାଇଭ୍ · ଆବଶ୍ୟକତା ଅନୁସାରେ",
@@ -576,7 +581,7 @@
     "locationFetching": "ଆପଣଙ୍କ ଡିଭାଇସ୍ ସ୍ଥାନ ନିଆଯାଉଛି…",
     "locationUnavailable": "ଡିଭାଇସ୍ ସ୍ଥାନ ମିଳିଲା ନାହିଁ। ସ୍ଥାନ ଅନୁମତି ଯାଞ୍ଚ କରନ୍ତୁ କିମ୍ବା କାର୍ଯ୍ୟସ୍ଥଳ ଠିକଣା ଦିଅନ୍ତୁ।",
     "locationEditedHint": "କାର୍ଯ୍ୟସ୍ଥଳ ସମ୍ପାଦନ ହୋଇଛି; ସଞ୍ଚିତ GPS ପିନ୍ ହଟାଯାଇଛି।",
-    "mapsConfigurationMissing": "Google Maps ପ୍ରିଭ୍ୟୁ ପାଇଁ ସ୍ଥାନୀୟ .env.local ଫାଇଲ୍‌ରେ GOOGLE_MAPS_API_KEY ଆବଶ୍ୟକ।",
+    "mapsConfigurationMissing": "Google Maps ପ୍ରିଭ୍ୟୁ ପାଇଁ ସ୍ଥାନୀୟ .env.dev ଫାଇଲ୍‌ରେ GOOGLE_MAPS_API_KEY ଆବଶ୍ୟକ।",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "ଆବଶ୍ୟକତା",
     "workers": "ଆବଶ୍ୟକ କର୍ମଚାରୀ",
@@ -840,5 +845,30 @@
     "hour": "ଘଣ୍ଟା",
     "shifts": "ଅନ୍ତର୍ଭୁକ୍ତ ଶିଫ୍ଟ",
     "reference": "ରୋଜଗାର ରେଫରେନ୍ସ"
+  },
+  "auth": {
+    "passwordLabel": "ପାସୱାର୍ଡ",
+    "passwordPlaceholder": "ଆପଣଙ୍କ ପାସୱାର୍ଡ ଲେଖନ୍ତୁ",
+    "passwordHint": "ଅତି କମରେ 8 ଅକ୍ଷର, ଗୋଟିଏ ଅକ୍ଷର ଓ ସଂଖ୍ୟା ରଖନ୍ତୁ।",
+    "confirmPassword": "ପାସୱାର୍ଡ ନିଶ୍ଚିତ କରନ୍ତୁ",
+    "confirmPasswordError": "ପାସୱାର୍ଡ ନିଶ୍ଚିତ କରନ୍ତୁ।",
+    "passwordMismatch": "ପାସୱାର୍ଡ ମେଳ ଖାଉନାହିଁ।",
+    "forgotPassword": "ପାସୱାର୍ଡ ଭୁଲିଗଲେ?",
+    "newPassword": "ନୂଆ ପାସୱାର୍ଡ",
+    "working": "ଦୟାକରି ଅପେକ୍ଷା କରନ୍ତୁ…",
+    "loginError": "ସାଇନ୍ ଇନ୍ ହେଲା ନାହିଁ। ବିବରଣୀ ଯାଞ୍ଚ କରି ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।",
+    "forgotSubtitle": "ରିସେଟ୍ ପାଇଁ ପଞ୍ଜୀକୃତ ମୋବାଇଲ୍ ନମ୍ବର ଲେଖନ୍ତୁ।",
+    "sendResetCode": "ରିସେଟ୍ କୋଡ୍ ପଠାନ୍ତୁ",
+    "resetPassword": "ପାସୱାର୍ଡ ରିସେଟ୍ କରନ୍ତୁ",
+    "resetRequestNotice": "ଏହି ନମ୍ବର ସହ ଖାତା ଥିଲେ ଯାଞ୍ଚ କୋଡ୍ ପଠାଯାଇଛି।",
+    "resetRequestError": "ରିସେଟ୍ କୋଡ୍ ମଗାଇହେଲା ନାହିଁ। ପୁଣି ଚେଷ୍ଟା କରନ୍ତୁ।",
+    "resetError": "କୋଡ୍ ଭୁଲ କିମ୍ବା ମିଆଦ ସରିଛି। ନୂଆ କୋଡ୍ ମଗାନ୍ତୁ।",
+    "resetComplete": "ପାସୱାର୍ଡ ଅପଡେଟ୍ ହେଲା",
+    "resetSuccess": "ପାସୱାର୍ଡ ରିସେଟ୍ ହେଲା। ଏବେ ସାଇନ୍ ଇନ୍ କରିପାରିବେ।",
+    "backToSignIn": "ସାଇନ୍ ଇନ୍‌କୁ ଫେରନ୍ତୁ",
+    "sendingCode": "ଯାଞ୍ଚ କୋଡ୍ ପଠାଯାଉଛି…",
+    "retryCode": "କୋଡ୍ ପୁଣି ପଠାଇବାକୁ ଟ୍ୟାପ୍ କରନ୍ତୁ।",
+    "resendResetCode": "ଆଉ ଏକ କୋଡ୍ ପଠାନ୍ତୁ",
+    "loadingOptions": "ବିକଳ୍ପ ଲୋଡ୍ ହେଉଛି…"
   }
 }

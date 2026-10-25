@@ -5,22 +5,30 @@ import { StatTiles, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { meApi } from '@/services/api/meApi';
+import { formatTime } from '@/services/shifts/shiftMappers';
+import { useAssignment } from '@/services/shifts/useShiftFlow';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { COMPLETED } from './mock';
 
 /**
  * Live shift step 8. Figma: Live · Shift completed (light/dark).
- * - data: mock/shiftCompleteMock.ts
+ * - data: GET /assignments/{id} attendance
  */
 export const ShiftCompletePage: FC<
   AppScreenProps<typeof ROUTES.shiftComplete>
 > = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { shift } = route.params;
-  const isLoading = useMockLoading();
+  const assignment = useAssignment(shift.assignmentId);
+  const profile = useApiQuery(() => meApi.profile(), []);
+  const attendance = assignment.data?.attendance;
+  const minutes = attendance?.approved_minutes ?? attendance?.recorded_minutes ?? 0;
+  const recordedHours = Math.round((minutes / 60) * 10) / 10;
+  const firstName = profile.data?.worker?.full_name.trim().split(/\s+/)[0] ?? '';
+  const checkOutTime = attendance?.checked_out_at ? formatTime(attendance.checked_out_at) : '';
 
   return (
     <FormScreen
@@ -29,7 +37,7 @@ export const ShiftCompletePage: FC<
       compactTitle
       headerTag={t('workerFlow.checkIn.headerRight')}
       gap={16}
-      isLoading={isLoading}
+      isLoading={assignment.isLoading}
       testID="shift-complete-page"
       actions={
         <>
@@ -54,20 +62,20 @@ export const ShiftCompletePage: FC<
         overline={t('workerFlow.shiftComplete.overline')}
         title={t('workerFlow.shiftComplete.heading')}
         subtitle={t('workerFlow.shiftComplete.subtitle', {
-          name: COMPLETED.workerFirstName,
-          time: COMPLETED.checkOutTime,
+          name: firstName,
+          time: checkOutTime,
         })}
       />
       <StatTiles
         items={[
           {
             value: t('workerFlow.shiftComplete.hours', {
-              count: COMPLETED.recordedHours,
+              count: recordedHours,
             }),
             label: t('workerFlow.shiftComplete.recorded'),
           },
           {
-            value: formatRupees(shift.hourlyRate * COMPLETED.recordedHours),
+            value: formatRupees(Math.round(shift.hourlyRate * recordedHours)),
             label: t('workerFlow.shiftComplete.earnings'),
           },
         ]}

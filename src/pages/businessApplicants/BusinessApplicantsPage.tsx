@@ -14,7 +14,6 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { TabScreen } from '@/layout/TabScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import type { TabAppNavigation } from '@/types';
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -29,7 +28,6 @@ export const BusinessApplicantsPage: FC = () => {
     const navigation = useNavigation<TabAppNavigation>();
     const route =
         useRoute<RouteProp<TabParamList, typeof ROUTES.businessApplicants>>();
-    const isLoading = useMockLoading();
     const applicants = useBusinessApplicants(route.params?.status ?? 'applied');
     const setApplicantStatus = applicants.setStatus;
     useEffect(() => {
@@ -96,6 +94,17 @@ export const BusinessApplicantsPage: FC = () => {
                       })}
                   />
               ))
+            : applicants.error
+            ? [
+                  <EmptyState
+                      key="error"
+                      icon={CalendarDaysIcon}
+                      title={t('businessApplicants.loadErrorTitle')}
+                      body={applicants.error}
+                      action={t('businessApplicants.retry')}
+                      onAction={applicants.reload}
+                  />,
+              ]
             : [
                   <EmptyState
                       key="empty"
@@ -113,7 +122,7 @@ export const BusinessApplicantsPage: FC = () => {
                 blocks={blocks}
                 fillLastBlock={!applicants.applicants.length}
                 gap={10}
-                isLoading={isLoading}
+                isLoading={applicants.isLoading}
                 testID="business-applicants-page"
                 actions={
                     <View style={styles.actions}>

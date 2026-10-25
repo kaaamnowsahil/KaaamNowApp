@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import CameraIcon from '@/assets/icons/camera.svg';
 import { FONTS } from '@/constants/fonts';
@@ -7,6 +7,8 @@ import { useTheme } from '@/theme/ThemeProvider';
 
 type AvatarPickerProps = {
   initials: string;
+  imageUri?: string | null;
+  isUploading?: boolean;
   actionLabel: string;
   accessibilityLabel: string;
   onPress: () => void;
@@ -15,6 +17,8 @@ type AvatarPickerProps = {
 /** Figma Edit profile avatar: 96px initials disc, 28px camera badge, "Change photo". */
 export const AvatarPicker: FC<AvatarPickerProps> = ({
   initials,
+  imageUri,
+  isUploading,
   actionLabel,
   accessibilityLabel,
   onPress,
@@ -25,13 +29,23 @@ export const AvatarPicker: FC<AvatarPickerProps> = ({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
+      disabled={isUploading}
       style={styles.wrap}
       testID="edit-avatar"
     >
       <View style={[styles.avatar, { backgroundColor: colors.primarySoft }]}>
-        <Text style={[styles.initials, { color: colors.primary }]}>
-          {initials}
-        </Text>
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.image} />
+        ) : (
+          <Text style={[styles.initials, { color: colors.primary }]}>
+            {initials}
+          </Text>
+        )}
+        {isUploading ? (
+          <View style={[styles.image, styles.overlay]}>
+            <ActivityIndicator color={colors.onPrimary} />
+          </View>
+        ) : null}
         <View
           style={[
             styles.badge,
@@ -56,6 +70,12 @@ const styles = StyleSheet.create({
     borderRadius: 48,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  image: { position: 'absolute', width: 96, height: 96, borderRadius: 48 },
+  overlay: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   initials: { fontFamily: FONTS.bold, fontSize: 28, lineHeight: 34 },
   badge: {

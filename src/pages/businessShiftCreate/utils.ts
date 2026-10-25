@@ -1,4 +1,4 @@
-import type { BusinessDashboardShift } from '@/pages/businessLive/mock';
+import type { ShiftBulkItem } from '@/services/shifts/shiftsApi';
 import type { BusinessShiftDraft } from '@/types';
 
 export const toLocalDateString = (date: Date) =>
@@ -63,39 +63,32 @@ export const createDefaultBusinessShiftDraft = (
     requirement: '',
     role,
     category,
-    location: 'The Fern Events, Indiranagar',
+    location: '',
   };
 };
 
-export const toBusinessDashboardShifts = (
-  draft: BusinessShiftDraft,
-  locale: string,
-): BusinessDashboardShift[] => {
-  return draft.schedules.map(schedule => {
+/** One API shift per selected date; times are the business's local time. */
+export const toBulkItems = (draft: BusinessShiftDraft): ShiftBulkItem[] =>
+  draft.schedules.map(schedule => {
     const date = parseLocalDate(schedule.date);
-    const hours = getDurationHours(schedule.startTime, schedule.endTime);
-    const hourlyRate = Number(schedule.hourlyRate);
+    const at = (time: string) => {
+      const [hours, minutes] = time.split(':').map(Number);
+      return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        hours,
+        minutes,
+      ).toISOString();
+    };
     return {
-      id: `${draft.id ?? 'business-shift'}-${schedule.date}-${
-        schedule.startTime
-      }`,
-      title: schedule.role,
-      category: schedule.category,
-      date: new Intl.DateTimeFormat(locale, {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-      }).format(date),
-      time: `${schedule.startTime}–${schedule.endTime}`,
-      hours,
-      area: draft.location,
-      requirement: schedule.requirement,
-      responsibilities: schedule.responsibilities,
-      distanceKm: 3.2,
-      hourlyRate,
-      estimatedTotal: hours * hourlyRate * Number(schedule.workers),
-      totalSpots: Number(schedule.workers),
-      applicantCount: 0,
+      category_slug: schedule.category,
+      job_title: schedule.role.trim(),
+      responsibilities: schedule.responsibilities.trim(),
+      requirements: schedule.requirement.trim(),
+      workers_required: Number(schedule.workers),
+      hourly_rate_minor: Math.round(Number(schedule.hourlyRate) * 100),
+      starts_at: at(schedule.startTime),
+      ends_at: at(schedule.endTime),
     };
   });
-};

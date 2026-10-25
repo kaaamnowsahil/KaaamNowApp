@@ -12,7 +12,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { WITHDRAW_SUCCESS_STRINGS as S } from './constants';
+import { WITHDRAW_SUCCESS_STRINGS } from './constants';
 
 /**
  * Withdraw → confirmation. Figma: 12 · WORKER — Withdraw earnings: Initiated.
@@ -26,10 +26,10 @@ export const WithdrawSuccessPage: FC<
   const { colors } = useTheme();
   const amount = formatRupees(receipt.amount);
   const lines = [
-    { label: S.AMOUNT, value: amount },
-    { label: S.TO, value: receipt.destination },
-    { label: S.METHOD, value: receipt.method },
-    { label: S.REFERENCE, value: receipt.reference },
+    { label: WITHDRAW_SUCCESS_STRINGS.AMOUNT, value: amount },
+    { label: WITHDRAW_SUCCESS_STRINGS.TO, value: receipt.destination },
+    { label: WITHDRAW_SUCCESS_STRINGS.METHOD, value: receipt.method },
+    { label: WITHDRAW_SUCCESS_STRINGS.REFERENCE, value: receipt.reference },
   ];
 
   const backToEarnings = useCallback(
@@ -40,9 +40,9 @@ export const WithdrawSuccessPage: FC<
 
   const shareReceipt = () =>
     Share.share({
-      title: S.RECEIPT_TITLE,
+      title: WITHDRAW_SUCCESS_STRINGS.RECEIPT_TITLE,
       message: [
-        S.RECEIPT_TITLE,
+        WITHDRAW_SUCCESS_STRINGS.RECEIPT_TITLE,
         ...lines.map(l => `${l.label}: ${l.value}`),
       ].join('\n'),
     });
@@ -54,12 +54,12 @@ export const WithdrawSuccessPage: FC<
       actions={
         <>
           <PrimaryButton
-            label={S.BACK}
+            label={WITHDRAW_SUCCESS_STRINGS.BACK}
             onPress={backToEarnings}
             testID="withdraw-success-back"
           />
           <SecondaryButton
-            label={S.DOWNLOAD}
+            label={WITHDRAW_SUCCESS_STRINGS.DOWNLOAD}
             onPress={shareReceipt}
             testID="withdraw-success-receipt"
           />
@@ -74,10 +74,10 @@ export const WithdrawSuccessPage: FC<
           accessibilityRole="header"
           style={[styles.title, { color: colors.text }]}
         >
-          {S.HEADING}
+          {WITHDRAW_SUCCESS_STRINGS.HEADING}
         </Text>
         <Text style={[styles.subtitle, { color: colors.textMuted }]}>
-          {S.subtitle(amount, receipt.method)}
+          {WITHDRAW_SUCCESS_STRINGS.subtitle(amount, receipt.method)}
         </Text>
       </View>
       <ReceiptCard lines={lines} />

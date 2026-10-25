@@ -23,15 +23,17 @@
     "apply": "زبان لاگو کریں"
   },
   "welcome": {
-    "title": "KaaamNow میں خوش آمدید",
-    "subtitle": "اپنے موبائل نمبر سے محفوظ طریقے سے سائن ان کریں۔",
+    "title": "KaaamNow میں سائن اِن کریں",
+    "subtitle": "فون نمبر اور پاس ورڈ سے سائن اِن کریں۔",
     "sendCode": "سائن ان کوڈ بھیجیں",
     "createAccount": "اکاؤنٹ بنائیں",
     "phoneLabel": "موبائل نمبر",
-    "phoneHelper": "ہم ون ٹائم کوڈ بھیجیں گے۔ معیاری SMS چارجز لاگو ہو سکتے ہیں۔",
+    "phoneHelper": "اپنے اکاؤنٹ میں رجسٹرڈ موبائل نمبر استعمال کریں۔",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "کسی پاس ورڈ کی ضرورت نہیں ہے۔ جاری رکھ کر، آپ سروس کی شرائط اور پرائیویسی پالیسی سے اتفاق کرتے ہیں۔"
+    "legalLinked": "آگے بڑھ کر آپ KaaamNow کی <terms>سروس کی شرائط</terms> سے اتفاق کرتے ہیں۔",
+    "legal": "آگے بڑھ کر آپ KaaamNow کی سروس کی شرائط سے اتفاق کرتے ہیں۔",
+    "signIn": "سائن اِن کریں"
   },
   "verifyPhone": {
     "title": "کوڈ درج کریں",
@@ -138,7 +140,9 @@
       "security": "سیکیورٹی گارڈ",
       "driver": "ڈرائیور",
       "warehouse": "گودام"
-    }
+    },
+    "locationError": "آپ کا مقام نہیں مل سکا۔ پتہ درج کریں یا دوبارہ کوشش کریں۔",
+    "locationPermissionDenied": "موجودہ مقام کے لیے مقام کی اجازت دیں۔"
   },
   "businessSignup": {
     "title": "اپنی کاروباری پروفائل بنائیں",
@@ -559,7 +563,8 @@
     "waiting": "پہلے درخواست دہندہ کا انتظار ہے",
     "reviewApplicants": "درخواست دہندگان کا جائزہ لیں",
     "openShift": "کھولیں",
-    "editShift": "شفٹ میں ترمیم کریں"
+    "editShift": "شفٹ میں ترمیم کریں",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "لائیو · ضرورت کے مطابق",
@@ -576,7 +581,7 @@
     "locationFetching": "آپ کے آلے کی لوکیشن حاصل کی جا رہی ہے…",
     "locationUnavailable": "آلے کی لوکیشن حاصل نہیں ہو سکی۔ لوکیشن کی اجازت دیکھیں یا کام کی جگہ کا پتہ درج کریں۔",
     "locationEditedHint": "کام کی جگہ تبدیل کی گئی؛ محفوظ GPS پن ہٹا دیا گیا ہے۔",
-    "mapsConfigurationMissing": "Google Maps پیش منظر کے لیے مقامی .env.local فائل میں GOOGLE_MAPS_API_KEY درکار ہے۔",
+    "mapsConfigurationMissing": "Google Maps پیش منظر کے لیے مقامی .env.dev فائل میں GOOGLE_MAPS_API_KEY درکار ہے۔",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "ضروریات",
     "workers": "درکار کارکن",
@@ -840,5 +845,30 @@
     "hour": "گھنٹہ",
     "shifts": "شامل شفٹس",
     "reference": "کمائی کا حوالہ"
+  },
+  "auth": {
+    "passwordLabel": "پاس ورڈ",
+    "passwordPlaceholder": "اپنا پاس ورڈ درج کریں",
+    "passwordHint": "کم از کم 8 حروف، ایک حرف اور ایک عدد شامل کریں۔",
+    "confirmPassword": "پاس ورڈ کی تصدیق کریں",
+    "confirmPasswordError": "پاس ورڈ کی تصدیق کریں۔",
+    "passwordMismatch": "پاس ورڈ ایک جیسے نہیں ہیں۔",
+    "forgotPassword": "پاس ورڈ بھول گئے؟",
+    "newPassword": "نیا پاس ورڈ",
+    "working": "براہِ کرم انتظار کریں…",
+    "loginError": "سائن اِن نہیں ہو سکا۔ تفصیلات دیکھ کر دوبارہ کوشش کریں۔",
+    "forgotSubtitle": "ری سیٹ کے لیے رجسٹرڈ موبائل نمبر درج کریں۔",
+    "sendResetCode": "ری سیٹ کوڈ بھیجیں",
+    "resetPassword": "پاس ورڈ ری سیٹ کریں",
+    "resetRequestNotice": "اگر اس نمبر پر اکاؤنٹ ہے تو تصدیقی کوڈ بھیج دیا گیا ہے۔",
+    "resetRequestError": "ری سیٹ کوڈ کی درخواست نہیں ہو سکی۔ دوبارہ کوشش کریں۔",
+    "resetError": "کوڈ غلط یا ختم ہو چکا ہے۔ نیا کوڈ منگوائیں۔",
+    "resetComplete": "پاس ورڈ اپ ڈیٹ ہو گیا",
+    "resetSuccess": "پاس ورڈ ری سیٹ ہو گیا۔ اب سائن اِن کر سکتے ہیں۔",
+    "backToSignIn": "سائن اِن پر واپس جائیں",
+    "sendingCode": "تصدیقی کوڈ بھیجا جا رہا ہے…",
+    "retryCode": "کوڈ دوبارہ بھیجنے کے لیے ٹیپ کریں۔",
+    "resendResetCode": "ایک اور کوڈ بھیجیں",
+    "loadingOptions": "اختیارات لوڈ ہو رہے ہیں…"
   }
 }

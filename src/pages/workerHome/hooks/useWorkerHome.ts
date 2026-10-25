@@ -1,22 +1,24 @@
 import { useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { ROUTES } from '@/constants/routes';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
-import type { Shift, ShiftStatus, TabAppNavigation } from '@/types';
+import { meApi } from '@/services/api/meApi';
+import { getDevicePosition, type DevicePosition } from '@/services/maps/devicePosition';
+import { reverseGeocode } from '@/services/maps/googleMaps';
+import { toShift } from '@/services/shifts/shiftMappers';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
+import type { Option, Shift, ShiftStatus, TabAppNavigation } from '@/types';
 
 import {
   ALL_CATEGORIES_ID,
   ANY_ID,
-  CATEGORIES,
+  CURRENT_LOCATION_ID,
   DISTANCE_OPTIONS,
   LENGTH_OPTIONS,
-  LOCATIONS,
-  NEARBY_SHIFTS,
   PAY_OPTIONS,
-  RECOMMENDED_SHIFTS,
-  WORKER,
-} from '../mock';
+  SAVED_LOCATION_ID,
+} from '../constants/filterOptions';
 
 export type ShiftFilters = {
   distanceId: string;
@@ -35,28 +37,14 @@ export const DEFAULT_FILTERS: ShiftFilters = {
   verifiedOnly: false,
 };
 
-const matchesQuery = (shift: Shift, query: string) => {
-  const q = query.trim().toLowerCase();
-  if (!q) {
-    return true;
-  }
-  return [shift.title, shift.businessName, shift.area].some(field =>
-    field.toLowerCase().includes(q),
-  );
-};
-
-const matchesFilters = (shift: Shift, f: ShiftFilters) => {
-  const distance = DISTANCE_OPTIONS.find(o => o.id === f.distanceId);
+/** Pay, length and verified are not API filters, so they apply to the loaded page. */
+const matchesLocalFilters = (shift: Shift, f: ShiftFilters) => {
   const pay = PAY_OPTIONS.find(o => o.id === f.payId);
   const length = LENGTH_OPTIONS.find(o => o.id === f.lengthId);
   return (
-    (!distance || shift.distanceKm <= distance.max) &&
     (!pay || shift.hourlyRate >= pay.min) &&
     (!length ||
-      (shift.durationHours >= length.min &&
-        shift.durationHours <= length.max)) &&
-    (!f.businessTypeIds.length ||
-      f.businessTypeIds.includes(shift.businessTypeId)) &&
+      (shift.durationHours >= length.min && shift.durationHours <= length.max)) &&
     (!f.verifiedOnly || shift.isVerified)
   );
 };
@@ -66,44 +54,122 @@ const countActive = (f: ShiftFilters) =>
   (f.businessTypeIds.length ? 1 : 0) +
   (f.verifiedOnly ? 1 : 0);
 
+const firstName = (fullName?: string | null) => fullName?.trim().split(/\s+/)[0] ?? '';
+
 export const useWorkerHome = () => {
   const navigation = useNavigation<TabAppNavigation>();
-  const isLoading = useMockLoading();
   const [status, setStatus] = useState<ShiftStatus>('live');
   const [categoryId, setCategoryId] = useState(ALL_CATEGORIES_ID);
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [locationId, setLocationId] = useState(LOCATIONS[0].id);
+  const [locationId, setLocationId] = useState(CURRENT_LOCATION_ID);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [position, setPosition] = useState<DevicePosition | null>(null);
+  const [positionResolved, setPositionResolved] = useState(false);
+  const [currentLabel, setCurrentLabel] = useState('');
 
-  const visible = (shift: Shift) =>
-    (categoryId === ALL_CATEGORIES_ID || shift.categoryId === categoryId) &&
-    matchesQuery(shift, query) &&
-    matchesFilters(shift, filters);
+  const profile = useApiQuery(() => meApi.profile(), []);
+  const categories = useApiQuery(() => meApi.workCategories(), []);
+  const businessTypes = useApiQuery(() => meApi.businessTypes(), []);
+  const worker = profile.data?.worker;
 
-  const nearby = NEARBY_SHIFTS.filter(
-    shift => shift.status === status && visible(shift),
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query.trim()), 400);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  useEffect(() => {
+    let active = true;
+    getDevicePosition().then(async next => {
+      if (!active) return;
+      setPosition(next);
+      setPositionResolved(true);
+      if (!next) {
+        setLocationId(SAVED_LOCATION_ID);
+        return;
+      }
+      const label = await reverseGeocode(next).catch(() => null);
+      if (active && label) setCurrentLabel(label);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const coords = locationId === CURRENT_LOCATION_ID ? position : null;
+  const radius = DISTANCE_OPTIONS.find(o => o.id === filters.distanceId)?.max;
+
+  const feed = useApiQuery(
+    async () => {
+      if (!positionResolved) return null;
+      const page = await shiftsApi.feed({
+        shift_type: status,
+        category: categoryId === ALL_CATEGORIES_ID ? undefined : categoryId,
+        q: debouncedQuery || undefined,
+        lat: coords?.latitude,
+        lng: coords?.longitude,
+        radius_km: radius && Number.isFinite(radius) ? radius : undefined,
+        limit: 50,
+        ...(filters.businessTypeIds.length
+          ? { business_type_slugs: filters.businessTypeIds.join(',') }
+          : {}),
+      });
+      return page.items.map(toShift);
+    },
+    [
+      positionResolved,
+      status,
+      categoryId,
+      debouncedQuery,
+      coords?.latitude,
+      coords?.longitude,
+      radius,
+      filters.businessTypeIds.join(','),
+    ],
   );
 
+  const savedLabel = worker?.locality || worker?.address_text || 'Saved address';
+  const locations: Option[] = [
+    ...(position
+      ? [{ id: CURRENT_LOCATION_ID, label: currentLabel || 'Current location' }]
+      : []),
+    { id: SAVED_LOCATION_ID, label: savedLabel },
+  ];
+
+  const nearby = useMemo(
+    () => (feed.data ?? []).filter(shift => matchesLocalFilters(shift, filters)),
+    [feed.data, filters],
+  );
+
+  const openShift = (shift: Shift) =>
+    shift.status === 'live'
+      ? navigation.navigate(ROUTES.shiftRequest, { shift })
+      : navigation.navigate(ROUTES.shiftDetails, { shift });
+
   return {
-    isLoading,
-    worker: WORKER,
-    openShift: (shift: Shift) =>
-      navigation.navigate(ROUTES.shiftRequest, { shift }),
+    isLoading: !positionResolved || feed.isLoading,
+    error: feed.error,
+    retry: feed.reload,
+    firstName: firstName(worker?.full_name),
+    openShift,
     openAllShifts: () => navigation.navigate(ROUTES.shiftList),
     openNotifications: () => navigation.navigate(ROUTES.notifications),
-    locations: LOCATIONS,
+    locations,
     locationId,
-    locationLabel:
-      LOCATIONS.find(l => l.id === locationId)?.label ?? WORKER.location,
+    locationLabel: locations.find(l => l.id === locationId)?.label ?? savedLabel,
     isLocationOpen,
     toggleLocation: () => setIsLocationOpen(prev => !prev),
     selectLocation: (id: string) => {
       setLocationId(id);
       setIsLocationOpen(false);
     },
-    categories: CATEGORIES,
+    categories: [
+      { id: ALL_CATEGORIES_ID, label: 'All roles' },
+      ...(categories.data ?? []),
+    ],
+    businessTypes: businessTypes.data ?? [],
     status,
     setStatus,
     categoryId,
@@ -111,7 +177,6 @@ export const useWorkerHome = () => {
     query,
     setQuery,
     nearby,
-    recommended: RECOMMENDED_SHIFTS.filter(visible),
     filters,
     activeFilterCount: countActive(filters),
     isFilterOpen,

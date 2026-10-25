@@ -7,7 +7,7 @@ import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { Option } from '@/types';
 
-import { WORKER_HOME_STRINGS as S } from '../constants';
+import { WORKER_HOME_STRINGS } from '../constants';
 import { OptionMenu } from './OptionMenu';
 
 /** Figma "Location selector" (1:1476) with an inline dropdown under it. */
@@ -24,7 +24,7 @@ export const LocationDropdown: FC<{
     <View style={styles.root}>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel={`${S.CHANGE_LOCATION}: ${label}`}
+        accessibilityLabel={`${WORKER_HOME_STRINGS.CHANGE_LOCATION}: ${label}`}
         accessibilityState={{ expanded: isOpen }}
         hitSlop={6}
         onPress={onToggle}
@@ -41,7 +41,7 @@ export const LocationDropdown: FC<{
       </Pressable>
       {isOpen ? (
         <OptionMenu
-          hint={S.LOCATION_HINT}
+          hint={WORKER_HOME_STRINGS.LOCATION_HINT}
           options={options}
           value={value}
           onSelect={onSelect}

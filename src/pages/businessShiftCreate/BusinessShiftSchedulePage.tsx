@@ -4,29 +4,37 @@ import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { PrimaryButton, ScreenIntro, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
-import { BUSINESS_TYPES } from '@/pages/businessSignup/mock';
 import { ROUTES } from '@/constants/routes';
-import { useOnboardingStore } from '@/services/onboarding/useOnboardingStore';
 import { FormScreen } from '@/layout/FormScreen';
+import { meApi } from '@/services/api/meApi';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useShiftAction } from '@/services/shifts/useShiftFlow';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
 import { BusinessShiftCalendar, ShiftFormField } from './components';
 import { useBusinessShiftSchedule } from './hooks';
-import { getDurationHours, parseLocalDate } from './utils';
+import { getDurationHours, parseLocalDate, toBulkItems } from './utils';
 
 export const BusinessShiftSchedulePage: FC<
   AppScreenProps<typeof ROUTES.businessShiftSchedule>
 > = ({ navigation, route }) => {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
-  const businessType =
-    useOnboardingStore(state => state.business?.businessType) ?? 'hospitality';
+  const lookups = useApiQuery(
+    () => Promise.all([meApi.workCategories(), meApi.profile()]),
+    [],
+  );
+  const categories = lookups.data?.[0] ?? [];
+  const business = lookups.data?.[1].business;
+  const location = business?.address_text || business?.locality || '';
   const schedule = useBusinessShiftSchedule(route.params?.draft, {
     responsibilities: t('businessShiftCreate.defaultResponsibilities'),
     role: t('businessShiftCreate.defaultRole'),
-    category: businessType,
+    category: '',
   });
+  const { busy, run } = useShiftAction();
   const selectedDates = schedule.draft.schedules.map(({ date }) =>
     new Intl.DateTimeFormat(i18n.language, {
       dateStyle: 'medium',
@@ -44,33 +52,50 @@ export const BusinessShiftSchedulePage: FC<
       return;
     }
     navigation.navigate(ROUTES.businessShiftReview, {
-      draft: { ...schedule.draft, role: schedule.draft.role.trim() },
+      draft: { ...schedule.trimmed(), location },
     });
   };
 
   const save = () => {
-    schedule.save();
-    navigation.navigate(ROUTES.mainTabs, { screen: ROUTES.businessShifts });
+    if (!schedule.validate().isValid) {
+      Alert.alert(t('businessShiftCreate.invalidForm'));
+      return;
+    }
+    run(
+      () =>
+        shiftsApi.createBulk({
+          publish: false,
+          shifts: toBulkItems(schedule.trimmed()),
+        }),
+      () =>
+        navigation.navigate(ROUTES.mainTabs, {
+          screen: ROUTES.businessShifts,
+        }),
+    );
   };
 
   return (
     <FormScreen
+      busy={busy}
       onBack={navigation.goBack}
       title={t('businessApplicants.headerTitle')}
       subtitle={t('businessDashboard.scheduledStatus')}
       headerTag={t('businessApplicants.headerTag')}
       gap={12}
+      isLoading={lookups.isLoading}
       testID="business-shift-schedule-page"
       actions={
         <>
           <PrimaryButton
             label={t('businessShiftCreate.review')}
             onPress={review}
+            disabled={busy}
             testID="business-shift-review"
           />
           <SecondaryButton
             label={t('businessShiftCreate.saveDraft')}
             onPress={save}
+            disabled={busy}
             testID="business-shift-save-draft"
           />
         </>
@@ -83,7 +108,7 @@ export const BusinessShiftSchedulePage: FC<
         </Text>
         <ScreenIntro
           title={t('businessShiftCreate.prompt')}
-          subtitle={`${schedule.draft.role} · ${schedule.draft.location}`}
+          subtitle={[schedule.draft.role, location].filter(Boolean).join(' · ')}
         />
       </View>
 
@@ -184,7 +209,7 @@ export const BusinessShiftSchedulePage: FC<
                 {t('businessLiveCreate.category')}
               </Text>
               <View accessibilityRole="radiogroup" style={styles.categoryOptions}>
-                {BUSINESS_TYPES.map(category => {
+                {categories.map(category => {
                   const selected = daySchedule.category === category.id;
                   return (
                     <Pressable
@@ -219,7 +244,7 @@ export const BusinessShiftSchedulePage: FC<
                           },
                         ]}
                       >
-                        {t(`businessSignup.businessTypes.${category.id}`)}
+                        {category.label}
                       </Text>
                     </Pressable>
                   );

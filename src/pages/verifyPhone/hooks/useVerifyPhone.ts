@@ -1,43 +1,148 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
+import { AuthApiError, completeSignup, sendOtp } from '@/services/auth/authApi';
 import { useAuthStore } from '@/services/auth/useAuthStore';
-import { useOnboardingStore } from '@/services/onboarding/useOnboardingStore';
-import { useCountdown } from '@/shared/hooks/useCountdown';
-
+import { usePreferencesStore } from '@/services/config/usePreferencesStore';
 import {
-  OTP_LENGTH,
-  OTP_RESEND_COOLDOWN_SECONDS,
-  OTP_TTL_SECONDS,
-} from '../constants';
-import { DEMO_ACCOUNTS } from '../mock';
+  useOnboardingStore,
+  type UserRole,
+} from '@/services/onboarding/useOnboardingStore';
+import { OTP_LENGTH } from '../constants';
 
-export const useVerifyPhone = (phone: string) => {
+function responseRole(
+  activeRole: string | null,
+  roles: string[],
+  fallback: UserRole,
+): UserRole {
+  if (activeRole === 'worker' || activeRole === 'business') return activeRole;
+  return (
+    (roles.find(value => value === 'worker' || value === 'business') as
+      | UserRole
+      | undefined) ?? fallback
+  );
+}
+
+/** `sent` holds the timers of the OTP the sign-up screen already sent. */
+export const useVerifyPhone = (
+  phone: string,
+  sent: { expiresInSeconds: number; resendAfterSeconds: number },
+) => {
   const [code, setCodeRaw] = useState('');
-  const expiry = useCountdown(OTP_TTL_SECONDS);
-  const resend = useCountdown(OTP_RESEND_COOLDOWN_SECONDS);
+  const [sentAt] = useState(() => Date.now());
+  const [expiresAt, setExpiresAt] = useState(
+    sentAt + sent.expiresInSeconds * 1000,
+  );
+  const [resendAt, setResendAt] = useState(
+    sentAt + sent.resendAfterSeconds * 1000,
+  );
+  const [now, setNow] = useState(sentAt);
+  const [busy, setBusy] = useState(false);
+  const [otpSent, setOtpSent] = useState(true);
+  const [error, setError] = useState('');
   const signIn = useAuthStore(s => s.signIn);
-  const role = useOnboardingStore(s => s.role);
+  const signupRole = useOnboardingStore(s => s.role);
+  const worker = useOnboardingStore(s => s.worker);
+  const business = useOnboardingStore(s => s.business);
+  const clearSignup = useOnboardingStore(s => s.clearSignup);
+  const language = usePreferencesStore(s => s.language);
+  const expiresIn = Math.max(0, Math.ceil((expiresAt - now) / 1000));
+  const resendIn = Math.max(0, Math.ceil((resendAt - now) / 1000));
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const requestCode = useCallback(async () => {
+    if (!signupRole) {
+      setError('Signup details are missing. Please start again.');
+      return;
+    }
+    setBusy(true);
+    setError('');
+    try {
+      const resent = await sendOtp(phone, 'sign_up', signupRole);
+      const resentAt = Date.now();
+      setExpiresAt(resentAt + resent.expires_in_seconds * 1000);
+      setResendAt(resentAt + resent.resend_after_seconds * 1000);
+      setNow(resentAt);
+      setOtpSent(true);
+      setCodeRaw('');
+    } catch (cause) {
+      setError(
+        cause instanceof AuthApiError
+          ? cause.message
+          : cause instanceof Error
+          ? cause.message
+          : 'Could not send a verification code.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }, [phone, signupRole]);
 
   const setCode = (value: string) =>
     setCodeRaw(value.replace(/\D/g, '').slice(0, OTP_LENGTH));
-
-  const onResend = () => {
-    setCodeRaw('');
-    expiry.restart();
-    resend.restart();
+  const onVerify = async () => {
+    if (!signupRole || !otpSent) return;
+    if (
+      (signupRole === 'worker' && !worker) ||
+      (signupRole === 'business' && !business)
+    ) {
+      setError('Signup details are missing. Please start again.');
+      return;
+    }
+    const signupPassword =
+      signupRole === 'worker' ? worker?.password : business?.password;
+    if (!signupPassword) {
+      setError('Signup details are missing. Please start again.');
+      return;
+    }
+    setBusy(true);
+    setError('');
+    try {
+      const response = await completeSignup({
+        phone,
+        code,
+        password: signupPassword,
+        role: signupRole,
+        languageCode: language.id,
+        worker,
+        business,
+      });
+      await signIn({
+        phone,
+        role: responseRole(
+          response.me.active_role,
+          response.me.roles,
+          signupRole,
+        ),
+        tokens: response.tokens,
+      });
+      clearSignup();
+    } catch (cause) {
+      setError(
+        cause instanceof AuthApiError
+          ? cause.message
+          : cause instanceof Error
+          ? cause.message
+          : 'Could not complete signup. Please try again.',
+      );
+    } finally {
+      setBusy(false);
+    }
   };
-
-  // Backend OTP verification is not wired yet: any 6-digit code signs in locally.
-  const onVerify = () =>
-    signIn({ phone, role: DEMO_ACCOUNTS[phone] ?? role ?? 'worker' });
 
   return {
     code,
     setCode,
-    expiresIn: expiry.remaining,
-    resendIn: resend.remaining,
-    onResend,
+    expiresIn,
+    resendIn,
+    onResend: requestCode,
     onVerify,
-    canSubmit: code.length === OTP_LENGTH && expiry.remaining > 0,
+    busy,
+    otpSent,
+    error,
+    canSubmit: otpSent && code.length === OTP_LENGTH && expiresIn > 0 && !busy,
   };
 };

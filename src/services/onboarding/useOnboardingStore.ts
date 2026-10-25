@@ -12,6 +12,8 @@ export type WorkerSignup = {
   address: string;
   location?: GeoPoint;
   workTypes: string[];
+  /** Kept in memory only until server-side registration completes. */
+  password: string;
 };
 
 export type BusinessSignup = {
@@ -21,7 +23,9 @@ export type BusinessSignup = {
   email?: string;
   address: string;
   location?: GeoPoint;
-  businessType: string;
+  businessTypes: string[];
+  /** Kept in memory only until server-side registration completes. */
+  password?: string;
 };
 
 type OnboardingState = {
@@ -31,6 +35,7 @@ type OnboardingState = {
   setRole: (role: UserRole) => void;
   setWorker: (worker: WorkerSignup) => void;
   setBusiness: (business: BusinessSignup) => void;
+  clearSignup: () => void;
 };
 
 /** Sign-up details held until the phone is verified and the account is created. */
@@ -41,4 +46,5 @@ export const useOnboardingStore = create<OnboardingState>(set => ({
   setRole: role => set({ role }),
   setWorker: worker => set({ worker }),
   setBusiness: business => set({ business }),
+  clearSignup: () => set({ role: null, worker: null, business: null }),
 }));

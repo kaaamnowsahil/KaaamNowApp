@@ -2,6 +2,7 @@
 export const ROUTES = {
   // before login
   welcome: 'Welcome',
+  forgotPassword: 'ForgotPassword',
   verifyPhone: 'VerifyPhone',
   roleSelect: 'RoleSelect',
   workerSignup: 'WorkerSignup',

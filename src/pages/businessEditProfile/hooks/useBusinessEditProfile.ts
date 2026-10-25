@@ -1,34 +1,51 @@
-import { useState } from 'react';
-import { Alert } from 'react-native';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { useOnboardingStore } from '@/services/onboarding/useOnboardingStore';
+import { meApi } from '@/services/api/meApi';
+import { useProfilePhoto } from '@/services/media/useProfilePhoto';
+import { useShiftAction } from '@/services/shifts/useShiftFlow';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { initialsOf } from '@/utils/format';
 import { toLocalDigits } from '@/utils/phone';
 
-import { BUSINESS_TYPES, CURRENT_ADDRESS } from '@/pages/businessSignup/mock';
 import {
     createBusinessEditProfileSchema,
     type BusinessEditProfileForm,
 } from '../schema';
 
-const FALLBACK_PHONE = '+918012345678';
+const EMPTY_FORM: BusinessEditProfileForm = {
+    businessName: '',
+    address: '',
+    businessTypes: [],
+};
 
 export const useBusinessEditProfile = (onSaved: () => void) => {
     const { t } = useTranslation();
     const schema = createBusinessEditProfileSchema(t);
-    const business = useOnboardingStore(state => state.business);
-    const setBusiness = useOnboardingStore(state => state.setBusiness);
-    const isLoading = useMockLoading();
-    const initial: BusinessEditProfileForm = {
-        businessName: business?.businessName ?? 'Third Wave Coffee',
-        address: business?.address ?? 'Koramangala, Bengaluru',
-        businessType: business?.businessType ?? 'hospitality',
-    };
-    const [form, setForm] = useState<BusinessEditProfileForm>(initial);
+    const query = useApiQuery(
+        () => Promise.all([meApi.profile(), meApi.businessTypes()]),
+        [],
+    );
+    const business = query.data?.[0].business;
+    const [initial, setInitial] = useState<BusinessEditProfileForm | null>(null);
+    const [form, setForm] = useState<BusinessEditProfileForm>(EMPTY_FORM);
+    const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const { busy, run } = useShiftAction();
+    const photo = useProfilePhoto(business?.logo_url, profile => profile.business?.logo_url);
+
+    useEffect(() => {
+        if (!business || initial) return;
+        const loaded = {
+            businessName: business.business_name,
+            address: business.address_text || business.locality || '',
+            businessTypes: business.business_type_slugs,
+        };
+        setInitial(loaded);
+        setForm(loaded);
+    }, [business, initial]);
+
     const update = <K extends keyof BusinessEditProfileForm>(
         key: K,
         value: BusinessEditProfileForm[K],
@@ -36,30 +53,36 @@ export const useBusinessEditProfile = (onSaved: () => void) => {
         setForm(previous => ({ ...previous, [key]: value }));
         setErrors(previous => ({ ...previous, [key]: '' }));
     };
-    const currentAddress = useCurrentAddress(CURRENT_ADDRESS, picked =>
-        update('address', picked.address),
-    );
+    const currentAddress = useCurrentAddress(picked => {
+        update('address', picked.address);
+        setCoords({ lat: picked.lat, lng: picked.lng });
+    });
     const parsed = schema.safeParse(form);
-    const isDirty = JSON.stringify(form) !== JSON.stringify(initial);
+    const isDirty = initial !== null && JSON.stringify(form) !== JSON.stringify(initial);
 
     return {
         form,
         errors,
-        isLoading,
-        initials: initialsOf(form.businessName || initial.businessName),
-        phone: toLocalDigits(business?.phone ?? FALLBACK_PHONE),
-        businessTypeOptions: BUSINESS_TYPES,
-        canSave: parsed.success && isDirty,
+        isLoading: query.isLoading,
+        loadError: query.error,
+        initials: initialsOf(form.businessName || business?.business_name || ''),
+        phone: toLocalDigits(business?.phone ?? ''),
+        businessTypeOptions: query.data?.[1] ?? [],
+        canSave: parsed.success && isDirty && !busy,
         setBusinessName: (value: string) => update('businessName', value),
-        setAddress: (value: string) => update('address', value),
-        selectBusinessType: (value: string) => update('businessType', value),
-        ...currentAddress,
-        changePhoto: () =>
-            Alert.alert(
-                t('editProfile.photoTitle'),
-                t('editProfile.photoBody'),
-                [{ text: t('editProfile.photoOk') }],
+        setAddress: (value: string) => {
+            update('address', value);
+            setCoords(null);
+        },
+        toggleBusinessType: (id: string) =>
+            update(
+                'businessTypes',
+                form.businessTypes.includes(id)
+                    ? form.businessTypes.filter(slug => slug !== id)
+                    : [...form.businessTypes, id],
             ),
+        ...currentAddress,
+        ...photo,
         save: () => {
             const result = schema.safeParse(form);
             if (!result.success) {
@@ -71,16 +94,17 @@ export const useBusinessEditProfile = (onSaved: () => void) => {
                 setErrors(nextErrors);
                 return;
             }
-            setBusiness({
-                businessName: result.data.businessName,
-                contactName: business?.contactName ?? '',
-                phone: business?.phone ?? FALLBACK_PHONE,
-                email: business?.email,
-                address: result.data.address,
-                location: business?.location,
-                businessType: result.data.businessType,
-            });
-            onSaved();
+            run(
+                () =>
+                    meApi.updateProfile({
+                        business_name: result.data.businessName,
+                        address_text: result.data.address,
+                        business_type_slugs: result.data.businessTypes,
+                        ...(coords ? { latitude: coords.lat, longitude: coords.lng } : {}),
+                    }),
+                onSaved,
+                t('editProfile.saveFailed'),
+            );
         },
     };
 };

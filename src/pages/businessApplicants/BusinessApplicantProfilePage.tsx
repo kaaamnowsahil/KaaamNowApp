@@ -7,6 +7,8 @@ import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useShiftAction } from '@/services/shifts/useShiftFlow';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
@@ -21,10 +23,13 @@ export const BusinessApplicantProfilePage: FC<
         state.applicants.find(item => item.id === route.params.applicantId),
     );
     const updateStatus = useBusinessApplicantStore(state => state.updateStatus);
+    const remove = useBusinessApplicantStore(state => state.remove);
+    const { busy, run } = useShiftAction();
 
     if (!applicant) {
         return (
             <FormScreen
+                busy={busy}
                 onBack={navigation.goBack}
                 title={t('businessApplicantProfile.title')}
                 subtitle={t('businessShiftCreate.scheduledShiftSubtitle')}
@@ -41,15 +46,29 @@ export const BusinessApplicantProfilePage: FC<
 
     const isApplied = applicant.status === 'applied';
     const isSelected = applicant.status === 'selected';
-    const canAdvance = isApplied || isSelected;
-    const advanceStatus = () => {
-        if (!canAdvance) return;
-        updateStatus(applicant.id, isApplied ? 'selected' : 'confirmed');
-        navigation.goBack();
-    };
+    const actionFailed = t('businessApplicantProfile.actionFailed');
+    const select = () =>
+        run(
+            () => shiftsApi.selectApplicant(applicant.id),
+            () => {
+                updateStatus(applicant.id, 'selected');
+                navigation.goBack();
+            },
+            actionFailed,
+        );
+    const reject = () =>
+        run(
+            () => shiftsApi.rejectApplicant(applicant.id),
+            () => {
+                remove(applicant.id);
+                navigation.goBack();
+            },
+            actionFailed,
+        );
 
     return (
         <FormScreen
+            busy={busy}
             onBack={navigation.goBack}
             title={t('businessApplicants.headerTitle')}
             subtitle={t('businessShiftCreate.scheduledShiftSubtitle')}
@@ -63,16 +82,21 @@ export const BusinessApplicantProfilePage: FC<
                             isApplied
                                 ? 'businessApplicantProfile.acceptApplicant'
                                 : isSelected
-                                  ? 'businessApplicantProfile.confirmApplicant'
+                                  ? 'businessApplicantProfile.awaitingWorker'
                                   : 'businessApplicantProfile.alreadyConfirmed',
                         )}
-                        onPress={advanceStatus}
-                        disabled={!canAdvance}
+                        onPress={select}
+                        disabled={!isApplied || busy}
                         testID="business-applicant-accept"
                     />
                     <SecondaryButton
-                        label={t('businessApplicantProfile.close')}
-                        onPress={navigation.goBack}
+                        label={t(
+                            isApplied
+                                ? 'businessApplicantProfile.reject'
+                                : 'businessApplicantProfile.close',
+                        )}
+                        onPress={isApplied ? reject : navigation.goBack}
+                        disabled={busy}
                         testID="business-applicant-close"
                     />
                 </>
@@ -108,22 +132,26 @@ export const BusinessApplicantProfilePage: FC<
                 title={t('businessApplicantProfile.locationTitle')}
                 caption={applicant.location}
             />
-            <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                    {t('businessApplicantProfile.about')}
-                </Text>
-                <Text style={[styles.body, { color: colors.textSubtle }]}>
-                    {applicant.about}
-                </Text>
-            </View>
-            <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>
-                    {t('businessApplicantProfile.skills')}
-                </Text>
-                <Text style={[styles.body, { color: colors.textSubtle }]}>
-                    {applicant.skills.join(' · ')}
-                </Text>
-            </View>
+            {applicant.about ? (
+                <View style={styles.section}>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                        {t('businessApplicantProfile.about')}
+                    </Text>
+                    <Text style={[styles.body, { color: colors.textSubtle }]}>
+                        {applicant.about}
+                    </Text>
+                </View>
+            ) : null}
+            {applicant.skills.length ? (
+                <View style={styles.section}>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>
+                        {t('businessApplicantProfile.skills')}
+                    </Text>
+                    <Text style={[styles.body, { color: colors.textSubtle }]}>
+                        {applicant.skills.join(' · ')}
+                    </Text>
+                </View>
+            ) : null}
         </FormScreen>
     );
 };

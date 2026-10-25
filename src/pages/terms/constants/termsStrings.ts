@@ -1,5 +1,6 @@
 export const TERMS_STRINGS = {
   TITLE: 'Terms & Conditions',
-  LAST_UPDATED: 'Last updated 1 October 2026',
-  sectionTitle: (index: number, title: string) => `${index}. ${title}`,
+  lastUpdated: (date: string) => `Last updated ${date}`,
+  EMPTY: 'Terms & Conditions have not been published yet.',
+  LOAD_ERROR: 'Could not load Terms & Conditions. Please try again later.',
 } as const;

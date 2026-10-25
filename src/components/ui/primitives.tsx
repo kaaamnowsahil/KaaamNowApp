@@ -1,4 +1,5 @@
-import type { FC, ReactNode } from 'react';
+import { useState, type FC, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Pressable,
   StyleSheet,
@@ -10,6 +11,8 @@ import {
 
 import ChevronLeft from '@/assets/figma/chevron-left.svg';
 import ChevronRight from '@/assets/figma/chevron-right.svg';
+import EyeOffIcon from '@/assets/icons/eye-off.svg';
+import EyeIcon from '@/assets/icons/eye.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -20,8 +23,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 export const BackButton: FC<{
   onPress: () => void;
   label?: string;
-  variant?: 'outlined' | 'plain';
-}> = ({ onPress, label = 'Back', variant = 'outlined' }) => {
+}> = ({ onPress, label = 'Back' }) => {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -32,9 +34,7 @@ export const BackButton: FC<{
       testID="back-button"
       style={({ pressed }) => [
         styles.backButton,
-        variant === 'plain'
-          ? styles.backPlain
-          : { borderColor: colors.outline },
+        { borderColor: colors.outline },
         pressed && styles.dimmed,
       ]}
     >
@@ -204,6 +204,8 @@ export const SecondaryButton: FC<ButtonProps> = ({
 type TextFieldProps = TextInputProps & {
   label: string;
   helper?: string;
+  /** Red message under the input; shown below the helper. */
+  error?: string;
   /** Fixed, non-editable text before the input, e.g. "+91". */
   prefix?: string;
 };
@@ -212,11 +214,16 @@ type TextFieldProps = TextInputProps & {
 export const TextField: FC<TextFieldProps> = ({
   label,
   helper,
+  error,
   prefix,
   style,
+  secureTextEntry,
   ...inputProps
 }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
+  const [isRevealed, setIsRevealed] = useState(false);
+  const EyeToggleIcon = isRevealed ? EyeOffIcon : EyeIcon;
   return (
     <View style={styles.field}>
       <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>
@@ -225,7 +232,10 @@ export const TextField: FC<TextFieldProps> = ({
       <View
         style={[
           styles.inputBox,
-          { backgroundColor: colors.surface, borderColor: colors.border },
+          {
+            backgroundColor: colors.surface,
+            borderColor: error ? colors.danger : colors.border,
+          },
         ]}
       >
         {prefix ? (
@@ -245,11 +255,31 @@ export const TextField: FC<TextFieldProps> = ({
             style,
           ]}
           {...inputProps}
+          secureTextEntry={secureTextEntry && !isRevealed}
         />
+        {secureTextEntry ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t(
+              isRevealed ? 'auth.hidePassword' : 'auth.showPassword',
+            )}
+            hitSlop={10}
+            onPress={() => setIsRevealed(revealed => !revealed)}
+            style={styles.eyeToggle}
+            testID={inputProps.testID ? `${inputProps.testID}-toggle` : undefined}
+          >
+            <EyeToggleIcon width={20} height={20} color={colors.textSubtle} />
+          </Pressable>
+        ) : null}
       </View>
       {helper ? (
         <Text style={[styles.helper, { color: colors.textSubtle }]}>
           {helper}
+        </Text>
+      ) : null}
+      {error ? (
+        <Text style={[styles.fieldError, { color: colors.danger }]}>
+          {error}
         </Text>
       ) : null}
     </View>
@@ -265,7 +295,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backPlain: { width: 30, borderWidth: 0 },
   intro: { gap: 8 },
   introTitle: { fontFamily: FONTS.bold, fontSize: 25, lineHeight: 35 },
   introSubtitle: { fontFamily: FONTS.regular, fontSize: 15, lineHeight: 23 },
@@ -314,6 +343,8 @@ const styles = StyleSheet.create({
   },
   inputText: { fontFamily: FONTS.regular, fontSize: 15 },
   prefix: { marginRight: 6 },
+  eyeToggle: { marginLeft: 8, padding: 2 },
   input: { flex: 1, paddingVertical: 13, paddingHorizontal: 0 },
   helper: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 17 },
+  fieldError: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 17 },
 });

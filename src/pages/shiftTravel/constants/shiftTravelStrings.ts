@@ -12,4 +12,8 @@ export const SHIFT_TRAVEL_STRINGS = {
   START_NAVIGATION: 'Start navigation',
   ARRIVED: 'I’ve arrived',
   MESSAGE: 'Message business',
+  NO_ETA: '—',
+  startsAt: (time: string) => `Starts ${time}`,
+  START_FAILED: 'Couldn’t start travelling',
+  CONTACT_FAILED: 'Couldn’t reach the business',
 } as const;

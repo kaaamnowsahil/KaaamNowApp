@@ -1,23 +1,82 @@
+import Geolocation from '@react-native-community/geolocation';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { PermissionsAndroid, Platform } from 'react-native';
 
+import { reverseGeocode } from '@/services/maps/googleMaps';
 import type { PickedAddress } from '@/types';
 
-const LOCATE_DELAY_MS = 600;
+const LOCATE_TIMEOUT_MS = 20000;
+const GEOCODE_TIMEOUT_MS = 8000;
 
-/** Fills an address from the page's mock location; caller can still edit it manually. */
+const lookupAddress = async (latitude: number, longitude: number) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GEOCODE_TIMEOUT_MS);
+  try {
+    return await reverseGeocode({ latitude, longitude }, controller.signal);
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
 export const useCurrentAddress = (
-  mockAddress: PickedAddress,
   onPicked: (picked: PickedAddress) => void,
 ) => {
+  const { t } = useTranslation();
   const [isLocating, setIsLocating] = useState(false);
+  const [locateError, setLocateError] = useState<string | null>(null);
 
-  const locate = () => {
+  const locate = async () => {
+    if (isLocating) return;
     setIsLocating(true);
-    setTimeout(() => {
-      onPicked(mockAddress);
+    setLocateError(null);
+
+    let settled = false;
+    const finish = (error: string | null) => {
+      if (settled) return false;
+      settled = true;
+      clearTimeout(watchdog);
+      setLocateError(error);
       setIsLocating(false);
-    }, LOCATE_DELAY_MS);
+      return true;
+    };
+    const watchdog = setTimeout(
+      () => finish(t('workerSignup.locationError')),
+      LOCATE_TIMEOUT_MS,
+    );
+
+    const getLocation = () =>
+      Geolocation.getCurrentPosition(
+        async position => {
+          const { latitude, longitude } = position.coords;
+          const address =
+            (await lookupAddress(latitude, longitude)) ||
+            `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+          if (finish(null)) {
+            onPicked({ address, lat: latitude, lng: longitude });
+          }
+        },
+        () => finish(t('workerSignup.locationError')),
+        { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 },
+      );
+
+    try {
+      if (Platform.OS === 'android') {
+        const permission = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        );
+        if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
+          finish(t('workerSignup.locationPermissionDenied'));
+          return;
+        }
+      }
+      getLocation();
+    } catch {
+      finish(t('workerSignup.locationError'));
+    }
   };
 
-  return { locate, isLocating, locateError: null as string | null };
+  return { locate, isLocating, locateError };
 };

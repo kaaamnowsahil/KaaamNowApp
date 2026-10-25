@@ -16,12 +16,22 @@ const LOADING = 'Loading…';
 
 /**
  * Brand loader: the KaaamNow logo (same as Splash) pulsing inside a spinning
- * ring. Fills its parent and centres itself.
+ * ring, on a translucent overlay that fades in over its whole parent screen.
  */
 export const Loader: FC<{ label?: string }> = ({ label = LOADING }) => {
   const { colors } = useTheme();
   const [spin] = useState(() => new Animated.Value(0));
   const [pulse] = useState(() => new Animated.Value(0));
+  const [fade] = useState(() => new Animated.Value(0));
+
+  useEffect(() => {
+    Animated.timing(fade, {
+      toValue: 1,
+      duration: 180,
+      easing: Easing.out(Easing.quad),
+      useNativeDriver: true,
+    }).start();
+  }, [fade]);
 
   useEffect(() => {
     let loops: Animated.CompositeAnimation[] = [];
@@ -65,10 +75,13 @@ export const Loader: FC<{ label?: string }> = ({ label = LOADING }) => {
   }, [spin, pulse]);
 
   return (
-    <View
+    <Animated.View
       accessibilityRole="progressbar"
       accessibilityLabel={label}
-      style={styles.root}
+      style={[
+        styles.root,
+        { backgroundColor: `${colors.background}D1`, opacity: fade },
+      ]}
       testID="loader"
     >
       <View style={styles.badge}>
@@ -108,17 +121,21 @@ export const Loader: FC<{ label?: string }> = ({ label = LOADING }) => {
         </Animated.View>
       </View>
       <Text style={[styles.label, { color: colors.textSubtle }]}>{label}</Text>
-    </View>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   root: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    zIndex: 100,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 14,
-    paddingBottom: 56,
   },
   badge: {
     width: 72,

@@ -1,3 +1,5 @@
+import type { Option } from '@/types';
+
 export const SHIFT_SELECTED_STRINGS = {
   HEADER_TITLE: 'Worker mode',
   HEADER_TAG: 'Worker',
@@ -24,4 +26,17 @@ export const SHIFT_SELECTED_STRINGS = {
   DECLINED_TITLE: 'Offer declined',
   DECLINED_BODY: 'The business has been told. You can find new shifts on Discover.',
   OK: 'OK',
+  THE_DEADLINE: 'the deadline',
+  breakNote: (minutes: number) =>
+    minutes ? `${minutes} min break` : 'no break',
+  CONFIRM_FAILED: 'Couldn’t confirm your place',
+  DECLINE_FAILED: 'Couldn’t decline this offer',
 } as const;
+
+export const DECLINE_REASONS: Option[] = [
+  { id: 'busy', label: 'Not available anymore' },
+  { id: 'another', label: 'Took another shift' },
+  { id: 'far', label: 'Too far to travel' },
+  { id: 'pay', label: 'Pay doesn’t suit me' },
+  { id: 'other', label: 'Other' },
+];

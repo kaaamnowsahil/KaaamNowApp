@@ -28,18 +28,30 @@ export const VerifyPhonePage: FC<
 > = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { code, setCode, expiresIn, resendIn, onResend, onVerify, canSubmit } =
-    useVerifyPhone(route.params.phone);
+  const {
+    code,
+    setCode,
+    expiresIn,
+    resendIn,
+    onResend,
+    onVerify,
+    canSubmit,
+    busy,
+    otpSent,
+    error,
+  } =
+    useVerifyPhone(route.params.phone, route.params);
 
   return (
     <FormScreen
+      busy={busy}
       onBack={navigation.goBack}
       testID="verify-phone-page"
       actions={
         <>
           <PrimaryButton
-            label={t('verifyPhone.verify')}
-            disabled={!canSubmit}
+            label={busy ? t('auth.working') : t('verifyPhone.verify')}
+            disabled={!canSubmit || busy}
             onPress={onVerify}
             testID="verify-submit"
           />
@@ -69,16 +81,20 @@ export const VerifyPhonePage: FC<
           defaultValue: VERIFY_PHONE_STRINGS.CODE_LABEL,
         })}
         helper={
-          expiresIn > 0
-            ? t('verifyPhone.codeExpiresIn', {
-                time: formatMmSs(expiresIn),
-                defaultValue: VERIFY_PHONE_STRINGS.codeExpiresIn(
-                  formatMmSs(expiresIn),
-                ),
-              })
-            : t('verifyPhone.codeExpired', {
-                defaultValue: VERIFY_PHONE_STRINGS.CODE_EXPIRED,
-              })
+          !otpSent && busy
+            ? t('auth.sendingCode')
+            : !otpSent
+              ? t('auth.retryCode')
+              : expiresIn > 0
+                ? t('verifyPhone.codeExpiresIn', {
+                    time: formatMmSs(expiresIn),
+                    defaultValue: VERIFY_PHONE_STRINGS.codeExpiresIn(
+                      formatMmSs(expiresIn),
+                    ),
+                  })
+                : t('verifyPhone.codeExpired', {
+                    defaultValue: VERIFY_PHONE_STRINGS.CODE_EXPIRED,
+                  })
         }
         value={code}
         onChangeText={setCode}
@@ -90,6 +106,11 @@ export const VerifyPhonePage: FC<
         style={styles.codeInput}
         testID="verify-code-input"
       />
+      {error ? (
+        <BodyNote>
+          <Text style={{ color: colors.danger }}>{error}</Text>
+        </BodyNote>
+      ) : null}
       <BodyNote>
         {resendIn > 0 ? (
           t('verifyPhone.resendIn', {
@@ -99,11 +120,11 @@ export const VerifyPhonePage: FC<
         ) : (
           <Text
             accessibilityRole="button"
-            onPress={onResend}
+            onPress={busy ? undefined : onResend}
             style={[styles.resend, { color: colors.primary }]}
             testID="verify-resend"
           >
-            {t('verifyPhone.resendNow', {
+            {t(otpSent ? 'verifyPhone.resendNow' : 'auth.retryCode', {
               defaultValue: VERIFY_PHONE_STRINGS.RESEND_NOW,
             })}
           </Text>

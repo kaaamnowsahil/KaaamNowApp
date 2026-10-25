@@ -17,6 +17,14 @@ export const SHIFT_DETAILS_STRINGS = {
   BEFORE_ACCEPT: 'Before you accept',
   CANCELLATION: 'Cancellation policy',
   MESSAGE: 'Message business',
+  breakNote: (minutes: number) =>
+    minutes ? `includes ${minutes} min break` : 'no break',
+  NO_DETAILS: 'The business hasn’t added details yet.',
+  cancellation: (hours: number) =>
+    `Cancel at least ${hours} ${hours === 1 ? 'hour' : 'hours'} before start from My shifts. Late cancellations are reviewed; contact support in an emergency. Final earnings depend on approved payable hours. Estimates are not guaranteed.`,
+  ACCEPT_FAILED: 'Couldn’t accept this shift',
+  APPLY_FAILED: 'Couldn’t apply for this shift',
+  CONTACT_FAILED: 'Couldn’t reach the business',
 } as const;
 
 /** Figma "Live · Café service associate" vs "Scheduled · Event service associate". */

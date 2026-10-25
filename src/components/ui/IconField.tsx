@@ -46,7 +46,10 @@ export const IconField: FC<IconFieldProps> = ({
       <View
         style={[
           styles.box,
-          { backgroundColor: colors.fill, borderColor: colors.border },
+          {
+            backgroundColor: colors.fill,
+            borderColor: error ? colors.danger : colors.border,
+          },
         ]}
       >
         <Icon width={18} height={18} color={colors.textSubtle} />
@@ -80,15 +83,15 @@ export const IconField: FC<IconFieldProps> = ({
         ) : null}
       </View>
       {error ? (
-        <Text style={[styles.error, { color: colors.textMuted }]}>{error}</Text>
+        <Text style={[styles.error, { color: colors.danger }]}>{error}</Text>
       ) : null}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  field: { width: '100%', gap: 8 },
-  label: { fontFamily: FONTS.semiBold, fontSize: 12 },
+  field: { width: '100%', gap: 7 },
+  label: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18 },
   box: {
     minHeight: 52,
     borderRadius: 12,
@@ -101,5 +104,5 @@ const styles = StyleSheet.create({
   inputText: { fontFamily: FONTS.regular, fontSize: 15 },
   input: { flex: 1, paddingVertical: 14, paddingHorizontal: 0 },
   action: { fontFamily: FONTS.semiBold, fontSize: 12 },
-  error: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15.4 },
+  error: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 17 },
 });

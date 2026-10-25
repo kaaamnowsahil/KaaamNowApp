@@ -19,6 +19,7 @@ export const EarningsRowItem: FC<{
     pending: colors.warning,
     processing: colors.warning,
     completed: colors.success,
+    failed: colors.danger,
   };
 
   return (

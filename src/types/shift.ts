@@ -19,4 +19,15 @@ export type Shift = {
   distanceKm: number;
   hourlyRate: number;
   spotsOpen: number;
+  startsAt?: string;
+  endsAt?: string;
+  addressText?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  applicationId?: string | null;
+  applicationStatus?: string | null;
+  assignmentId?: string | null;
+  assignmentStatus?: string | null;
+  /** Selected offers only, e.g. "20 Oct, 18:00". */
+  confirmBy?: string;
 };

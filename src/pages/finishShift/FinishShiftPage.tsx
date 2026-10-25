@@ -7,17 +7,27 @@ import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { errorMessage } from '@/services/api/apiClient';
+import { getDevicePosition } from '@/services/maps/devicePosition';
+import { formatDateTime } from '@/services/shifts/shiftMappers';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useAssignment } from '@/services/shifts/useShiftFlow';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { FINISH_SUMMARY } from './mock';
+const FINISH_SHIFT_STRINGS = {
+  FAILED: 'Couldn’t check you out',
+  NOT_RECORDED: '—',
+} as const;
+
+const hoursSince = (iso?: string | null) =>
+  iso ? Math.max(0, Math.round(((Date.now() - new Date(iso).getTime()) / 3600000) * 10) / 10) : 0;
 
 /**
  * Live shift step 7. Figma: Live · Finish your shift? (light/dark), shown as a sheet.
  * Confirming replaces the flow with "Shift completed".
- * - data: mock/finishShiftMock.ts
+ * - data: GET /assignments/{id}; POST /worker/assignments/{id}/check-out
  */
 export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
   navigation,
@@ -26,9 +36,30 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
   const { t } = useTranslation();
   const { shift } = route.params;
   const { colors } = useTheme();
-  const isLoading = useMockLoading();
-  const [note, setNote] = useState(FINISH_SUMMARY.defaultNote);
-  const hours = FINISH_SUMMARY.recordedHours;
+  const assignment = useAssignment(shift.assignmentId);
+  const checkedInAt = assignment.data?.attendance?.checked_in_at;
+  const [note, setNote] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const hours = hoursSince(checkedInAt);
+
+  const checkOut = async () => {
+    if (!shift.assignmentId || isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const position = await getDevicePosition(8000);
+      const result = await shiftsApi.checkOut(shift.assignmentId, {
+        ...(position ?? {}),
+        note: note.trim() || undefined,
+      });
+      navigation.replace(ROUTES.shiftComplete, {
+        shift: { ...shift, assignmentStatus: result.status },
+      });
+    } catch (error) {
+      Alert.alert(FINISH_SHIFT_STRINGS.FAILED, errorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const explain = (title: string) =>
     Alert.alert(title, t('workerFlow.finishShift.correctionBody'), [
@@ -38,11 +69,11 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
   const rows = [
     {
       title: t('workerFlow.finishShift.checkedIn'),
-      caption: FINISH_SUMMARY.checkedIn,
+      caption: checkedInAt ? formatDateTime(checkedInAt) : FINISH_SHIFT_STRINGS.NOT_RECORDED,
     },
     {
       title: t('workerFlow.finishShift.checkOut'),
-      caption: FINISH_SUMMARY.checkOut,
+      caption: formatDateTime(new Date().toISOString()),
     },
     {
       title: t('workerFlow.finishShift.duration'),
@@ -68,13 +99,14 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
       headerTag={t('workerFlow.checkIn.headerRight')}
       asSheet
       gap={14}
-      isLoading={isLoading}
+      isLoading={assignment.isLoading}
       testID="finish-shift-page"
       actions={
         <>
           <PrimaryButton
             label={t('workerFlow.finishShift.confirm')}
-            onPress={() => navigation.replace(ROUTES.shiftComplete, { shift })}
+            disabled={isSubmitting || !shift.assignmentId}
+            onPress={checkOut}
             testID="finish-shift-confirm"
           />
           <SecondaryButton

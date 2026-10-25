@@ -20,26 +20,32 @@ import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { TabScreen } from '@/layout/TabScreen';
 import { useHardwareBack } from '@/shared/hooks/useHardwareBack';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useShiftAction } from '@/services/shifts/useShiftFlow';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
-import { RATE_BUSINESS_STRINGS as S } from './constants';
-import { WENT_WELL } from './mock';
+import { RATE_BUSINESS_STRINGS } from './constants';
 
 const STARS = [1, 2, 3, 4, 5];
 
 /**
  * Live shift step 9. Figma: NEW · Rating · Worker rates Business (light/dark).
  * No back button by design; submit, skip or Android back return to My shifts.
- * - data: mock/rateBusinessMock.ts
+ * - data: GET /catalog/rating-tags; POST /assignments/{id}/ratings
  */
 export const RateBusinessPage: FC<
   AppScreenProps<typeof ROUTES.rateBusiness>
 > = ({ navigation, route }) => {
   const { shift } = route.params;
   const { colors } = useTheme();
-  const isLoading = useMockLoading();
+  const tagOptions = useApiQuery(
+    async () =>
+      (await shiftsApi.ratingTags('worker_to_business')).map(tag => ({ id: tag, label: tag })),
+    [],
+  );
+  const action = useShiftAction();
   const [rating, setRating] = useState(0);
   const [tags, setTags] = useState<string[]>([]);
   const [comment, setComment] = useState('');
@@ -53,8 +59,8 @@ export const RateBusinessPage: FC<
   const blocks = [
     <ScreenIntro
       key="intro"
-      title={S.heading(shift.businessName)}
-      subtitle={S.SUBTITLE}
+      title={RATE_BUSINESS_STRINGS.heading(shift.businessName)}
+      subtitle={RATE_BUSINESS_STRINGS.SUBTITLE}
     />,
     <View
       key="business"
@@ -73,7 +79,7 @@ export const RateBusinessPage: FC<
           {shift.businessName}
         </Text>
         <Text style={[styles.cardCaption, { color: colors.textSubtle }]}>
-          {S.businessMeta(shift.isVerified, shift.title)}
+          {RATE_BUSINESS_STRINGS.businessMeta(shift.isVerified, shift.title)}
         </Text>
       </View>
     </View>,
@@ -85,7 +91,7 @@ export const RateBusinessPage: FC<
             <Pressable
               key={n}
               accessibilityRole="button"
-              accessibilityLabel={S.starLabel(n)}
+              accessibilityLabel={RATE_BUSINESS_STRINGS.starLabel(n)}
               accessibilityState={{ selected: n <= rating }}
               hitSlop={4}
               onPress={() => setRating(n)}
@@ -97,13 +103,13 @@ export const RateBusinessPage: FC<
         })}
       </View>
       <Text style={[styles.ratingLabel, { color: colors.text }]}>
-        {S.RATING_LABEL[rating]}
+        {RATE_BUSINESS_STRINGS.RATING_LABEL[rating]}
       </Text>
     </View>,
     <ChipGroup
       key="tags"
-      label={S.WENT_WELL}
-      options={WENT_WELL}
+      label={RATE_BUSINESS_STRINGS.WENT_WELL}
+      options={tagOptions.data ?? []}
       selected={tags}
       onToggle={id =>
         setTags(prev =>
@@ -113,10 +119,10 @@ export const RateBusinessPage: FC<
     />,
     <TextInput
       key="comment"
-      accessibilityLabel={S.COMMENT_PLACEHOLDER}
+      accessibilityLabel={RATE_BUSINESS_STRINGS.COMMENT_PLACEHOLDER}
       value={comment}
       onChangeText={setComment}
-      placeholder={S.COMMENT_PLACEHOLDER}
+      placeholder={RATE_BUSINESS_STRINGS.COMMENT_PLACEHOLDER}
       placeholderTextColor={colors.textSubtle}
       multiline
       textAlignVertical="top"
@@ -132,17 +138,29 @@ export const RateBusinessPage: FC<
     />,
     <View key="actions" style={styles.actions}>
       <PrimaryButton
-        label={S.SUBMIT}
-        disabled={!rating}
-        onPress={done}
+        label={RATE_BUSINESS_STRINGS.SUBMIT}
+        disabled={!rating || action.busy || !shift.assignmentId}
+        onPress={() =>
+          action.run(
+            () =>
+              shiftsApi.rate(shift.assignmentId as string, {
+                stars: rating,
+                tags,
+                review: comment.trim(),
+              }),
+            done,
+            RATE_BUSINESS_STRINGS.SUBMIT_FAILED,
+          )
+        }
         testID="rate-business-submit"
       />
-      <TextButton label={S.SKIP} tone="primary" onPress={done} />
+      <TextButton label={RATE_BUSINESS_STRINGS.SKIP} tone="primary" onPress={done} />
     </View>,
   ];
 
   return (
     <TabScreen
+      busy={action.busy}
       header={
         <BrandAppBar
           onBellPress={() => navigation.navigate(ROUTES.notifications)}
@@ -150,7 +168,7 @@ export const RateBusinessPage: FC<
       }
       blocks={blocks}
       gap={18}
-      isLoading={isLoading}
+      isLoading={tagOptions.isLoading}
       testID="rate-business-page"
     />
   );

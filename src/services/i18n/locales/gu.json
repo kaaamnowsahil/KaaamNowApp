@@ -23,15 +23,17 @@
     "apply": "ભાષા લાગુ કરો"
   },
   "welcome": {
-    "title": "KaaamNow માં આપનું સ્વાગત છે",
-    "subtitle": "તમારા મોબાઇલ નંબરથી સુરક્ષિત રીતે સાઇન ઇન કરો.",
+    "title": "KaaamNowમાં સાઇન ઇન કરો",
+    "subtitle": "ફોન નંબર અને પાસવર્ડથી સાઇન ઇન કરો.",
     "sendCode": "સાઇન-ઇન કોડ મોકલો",
     "createAccount": "એકાઉન્ટ બનાવો",
     "phoneLabel": "મોબાઇલ નંબર",
-    "phoneHelper": "અમે એક-વખતનો કોડ મોકલીશું. સામાન્ય SMS દરો લાગુ થઈ શકે છે.",
+    "phoneHelper": "તમારા ખાતા સાથે નોંધાયેલ મોબાઇલ નંબર વાપરો.",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "કોઈ પાસવર્ડની જરૂર નથી. આગળ વધીને, તમે સેવાની શરતો અને ગોપનીયતા નીતિ સાથે સંમત થાઓ છો."
+    "legalLinked": "આગળ વધીને તમે KaaamNowની <terms>સેવાની શરતો</terms> સ્વીકારો છો.",
+    "legal": "આગળ વધીને તમે KaaamNowની સેવાની શરતો સ્વીકારો છો.",
+    "signIn": "સાઇન ઇન કરો"
   },
   "verifyPhone": {
     "title": "કોડ દાખલ કરો",
@@ -138,7 +140,9 @@
       "security": "સુરક્ષા ગાર્ડ",
       "driver": "ડ્રાઈવર",
       "warehouse": "વેરહાઉસ"
-    }
+    },
+    "locationError": "તમારું સ્થાન મળી શક્યું નથી. સરનામું દાખલ કરો અથવા ફરી પ્રયાસ કરો.",
+    "locationPermissionDenied": "વર્તમાન સ્થાન માટે સ્થાનની મંજૂરી આપો."
   },
   "businessSignup": {
     "title": "તમારી વ્યવસાય પ્રોફાઇલ બનાવો",
@@ -570,7 +574,8 @@
     "waiting": "પ્રથમ અરજદારની રાહ જોવાઈ રહી છે",
     "reviewApplicants": "અરજદારોની સમીક્ષા કરો",
     "openShift": "ખોલો",
-    "editShift": "શિફ્ટ સંપાદિત કરો"
+    "editShift": "શિફ્ટ સંપાદિત કરો",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "લાઇવ · માંગ મુજબ",
@@ -587,7 +592,7 @@
     "locationFetching": "તમારા ઉપકરણનું સ્થાન મેળવી રહ્યા છીએ…",
     "locationUnavailable": "ઉપકરણનું સ્થાન મેળવી શકાયું નથી. સ્થાનની પરવાનગી તપાસો અથવા કામનું સરનામું દાખલ કરો.",
     "locationEditedHint": "કામનું સ્થળ બદલ્યું; સાચવેલી GPS પિન દૂર કરી.",
-    "mapsConfigurationMissing": "Google Maps પ્રિવ્યૂ માટે સ્થાનિક .env.local ફાઇલમાં GOOGLE_MAPS_API_KEY જરૂરી છે.",
+    "mapsConfigurationMissing": "Google Maps પ્રિવ્યૂ માટે સ્થાનિક .env.dev ફાઇલમાં GOOGLE_MAPS_API_KEY જરૂરી છે.",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "જરૂરિયાતો",
     "workers": "જરૂરી કર્મચારીઓ",
@@ -840,5 +845,30 @@
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
     "rateAllWorkers": "Rate all workers"
+  },
+  "auth": {
+    "passwordLabel": "પાસવર્ડ",
+    "passwordPlaceholder": "તમારો પાસવર્ડ દાખલ કરો",
+    "passwordHint": "ઓછામાં ઓછા 8 અક્ષરો, એક અક્ષર અને એક અંક રાખો.",
+    "confirmPassword": "પાસવર્ડની પુષ્ટિ કરો",
+    "confirmPasswordError": "પાસવર્ડની પુષ્ટિ કરો.",
+    "passwordMismatch": "પાસવર્ડ મેળ ખાતા નથી.",
+    "forgotPassword": "પાસવર્ડ ભૂલી ગયા?",
+    "newPassword": "નવો પાસવર્ડ",
+    "working": "કૃપા કરીને રાહ જુઓ…",
+    "loginError": "સાઇન ઇન થઈ શક્યું નથી. વિગતો તપાસીને ફરી પ્રયાસ કરો.",
+    "forgotSubtitle": "રીસેટ માટે નોંધાયેલ મોબાઇલ નંબર દાખલ કરો.",
+    "sendResetCode": "રીસેટ કોડ મોકલો",
+    "resetPassword": "પાસવર્ડ રીસેટ કરો",
+    "resetRequestNotice": "આ નંબર સાથે ખાતું હોય તો ચકાસણી કોડ મોકલ્યો છે.",
+    "resetRequestError": "રીસેટ કોડ માંગી શકાયો નથી. ફરી પ્રયાસ કરો.",
+    "resetError": "કોડ ખોટો અથવા સમય સમાપ્ત થયો છે. નવો કોડ મંગાવો.",
+    "resetComplete": "પાસવર્ડ અપડેટ થયો",
+    "resetSuccess": "પાસવર્ડ રીસેટ થયો. હવે સાઇન ઇન કરી શકો છો.",
+    "backToSignIn": "સાઇન ઇન પર પાછા જાઓ",
+    "sendingCode": "ચકાસણી કોડ મોકલી રહ્યા છીએ…",
+    "retryCode": "કોડ ફરી મોકલવા ટેપ કરો.",
+    "resendResetCode": "બીજો કોડ મોકલો",
+    "loadingOptions": "વિકલ્પો લોડ થઈ રહ્યા છે…"
   }
 }

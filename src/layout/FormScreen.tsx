@@ -24,8 +24,6 @@ type FormScreenProps = {
   /** Pinned bottom bar ("Screen actions"); omitted on read-only screens. */
   actions?: ReactNode;
   onBack?: () => void;
-  /** `plain` shows a bare chevron instead of the outlined circle. */
-  backVariant?: 'outlined' | 'plain';
   /** Small title beside the back button. */
   title?: string;
   /** Second line under `title`, e.g. "Worker mode / Live request". */
@@ -42,8 +40,12 @@ type FormScreenProps = {
   contentContainerStyle?: StyleProp<ViewStyle>;
   /** Shows the brand loader instead of the content and actions. */
   isLoading?: boolean;
+  /** Shows the brand loader over the content while an action runs. */
+  busy?: boolean;
   /** Content sits on a rounded panel with a handle over a filled bar (Finish your shift?). */
   asSheet?: boolean;
+  /** Last child grows to fill the remaining height (centered empty states). */
+  fillLastBlock?: boolean;
   testID?: string;
 };
 
@@ -57,7 +59,6 @@ export const FormScreen: FC<FormScreenProps> = ({
   children,
   actions,
   onBack,
-  backVariant,
   title,
   subtitle,
   compactTitle,
@@ -66,7 +67,9 @@ export const FormScreen: FC<FormScreenProps> = ({
   gap = 20,
   contentContainerStyle,
   isLoading,
+  busy,
   asSheet,
+  fillLastBlock,
   testID,
 }) => {
   const { colors } = useTheme();
@@ -87,7 +90,7 @@ export const FormScreen: FC<FormScreenProps> = ({
         <View style={styles.appBar}>
           {onBack ? (
             <Rise>
-              <BackButton onPress={onBack} variant={backVariant} />
+              <BackButton onPress={onBack} />
             </Rise>
           ) : null}
           {title && subtitle ? (
@@ -142,20 +145,23 @@ export const FormScreen: FC<FormScreenProps> = ({
           {asSheet ? (
             <View style={[styles.handle, { backgroundColor: colors.border }]} />
           ) : null}
-          {isLoading ? (
-            <Loader />
-          ) : (
+          {isLoading ? null : (
             <ScrollView
               contentContainerStyle={[
                 styles.content,
                 asSheet && styles.sheetContent,
+                fillLastBlock && styles.fill,
                 { gap },
                 contentContainerStyle,
               ]}
               keyboardShouldPersistTaps="handled"
             >
               {blocks.map((block, i) => (
-                <Rise key={i} delay={(i + 1) * MOTION.stagger}>
+                <Rise
+                  key={i}
+                  delay={(i + 1) * MOTION.stagger}
+                  style={fillLastBlock && i === blocks.length - 1 ? styles.fill : undefined}
+                >
                   {block}
                 </Rise>
               ))}
@@ -178,12 +184,14 @@ export const FormScreen: FC<FormScreenProps> = ({
           </Rise>
         ) : null}
       </KeyboardAvoidingView>
+      {isLoading || busy ? <Loader /> : null}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
+  fill: { flexGrow: 1 },
   sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   handle: {
     alignSelf: 'center',

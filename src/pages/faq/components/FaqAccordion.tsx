@@ -5,7 +5,7 @@ import ChevronDown from '@/assets/figma/chevron-down.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
-import type { FaqItem } from '../mock';
+import type { FaqItem } from '@/services/content/contentApi';
 
 type FaqAccordionProps = {
   items: FaqItem[];
@@ -72,7 +72,12 @@ const styles = StyleSheet.create({
   item: { paddingHorizontal: 16, paddingVertical: 16, gap: 6 },
   divider: { borderBottomWidth: 1 },
   questionRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  question: { flex: 1, fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 20 },
+  question: {
+    flex: 1,
+    fontFamily: FONTS.semiBold,
+    fontSize: 13,
+    lineHeight: 20,
+  },
   chevronUp: { transform: [{ rotate: '180deg' }] },
   answer: { fontFamily: FONTS.regular, fontSize: 11.5, lineHeight: 18 },
 });

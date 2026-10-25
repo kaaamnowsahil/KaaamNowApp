@@ -1,5 +1,5 @@
 // Exports every top-level frame of the KaaamNow Figma file as PNG plus a JSON summary.
-// Usage: FIGMA_TOKEN in .env.local, then `npm run figma:export`.
+// Usage: FIGMA_TOKEN in .env.dev, then `npm run figma:export`.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -8,9 +8,9 @@ const OUT_DIR = path.resolve('design/figma');
 
 async function loadToken() {
   if (process.env.FIGMA_TOKEN) return process.env.FIGMA_TOKEN;
-  const env = await readFile('.env.local', 'utf8').catch(() => '');
+  const env = await readFile('.env.dev', 'utf8').catch(() => '');
   const match = env.match(/^FIGMA_TOKEN=(.+)$/m);
-  if (!match) throw new Error('FIGMA_TOKEN not found in environment or .env.local');
+  if (!match) throw new Error('FIGMA_TOKEN not found in environment or .env.dev');
   return match[1].trim();
 }
 
