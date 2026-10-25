@@ -63,7 +63,14 @@
     "showPassword": "पासवर्ड दिखाएँ",
     "hidePassword": "पासवर्ड छिपाएँ",
     "newPasswordPlaceholder": "पासवर्ड बनाएं",
-    "confirmPasswordPlaceholder": "पासवर्ड दोबारा दर्ज करें"
+    "confirmPasswordPlaceholder": "पासवर्ड दोबारा दर्ज करें",
+    "otpDelivery": {
+      "sms": "कोड SMS से आएगा।",
+      "smsFrom": "{{sender}} से आया SMS देखें।",
+      "whatsapp": "कोड WhatsApp पर आएगा।",
+      "whatsappFrom": "{{sender}} से आया WhatsApp मैसेज देखें।",
+      "voice": "आपको कोड के लिए एक कॉल आएगी।"
+    }
   },
   "verifyPhone": {
     "title": "कोड दर्ज करें",

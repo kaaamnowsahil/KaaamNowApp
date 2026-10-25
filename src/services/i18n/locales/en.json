@@ -63,7 +63,14 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "newPasswordPlaceholder": "Create a password",
-    "confirmPasswordPlaceholder": "Re-enter your password"
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "otpDelivery": {
+      "sms": "The code comes by SMS.",
+      "smsFrom": "Look for an SMS from {{sender}}.",
+      "whatsapp": "The code comes on WhatsApp.",
+      "whatsappFrom": "Look for a WhatsApp message from {{sender}}.",
+      "voice": "You will get a phone call with the code."
+    }
   },
   "verifyPhone": {
     "title": "Verify your phone",

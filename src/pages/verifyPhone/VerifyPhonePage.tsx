@@ -11,6 +11,7 @@ import {
 } from '@/components/ui';
 import type { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { otpDeliveryNotice } from '@/services/auth';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AuthScreenProps } from '@/types';
 import { formatMmSs, maskIndianPhone } from '@/utils/format';
@@ -38,6 +39,7 @@ export const VerifyPhonePage: FC<
     canSubmit,
     busy,
     otpSent,
+    delivery,
     error,
   } =
     useVerifyPhone(route.params.phone, route.params);
@@ -106,6 +108,9 @@ export const VerifyPhonePage: FC<
         style={styles.codeInput}
         testID="verify-code-input"
       />
+      {otpDeliveryNotice(t, delivery) ? (
+        <BodyNote>{otpDeliveryNotice(t, delivery)}</BodyNote>
+      ) : null}
       {error ? (
         <BodyNote>
           <Text style={{ color: colors.danger }}>{error}</Text>

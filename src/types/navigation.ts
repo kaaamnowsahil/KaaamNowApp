@@ -59,6 +59,8 @@ export type AuthStackParamList = CommonStackParamList & {
     /** Timers from the OTP the sign-up screen already sent. */
     expiresInSeconds: number;
     resendAfterSeconds: number;
+    deliveryChannel: string;
+    senderName?: string | null;
   };
   [ROUTES.roleSelect]: undefined;
   [ROUTES.workerSignup]: undefined;

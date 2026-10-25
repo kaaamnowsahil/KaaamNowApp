@@ -15,3 +15,4 @@ export {
   loadWorkerSignupOptions,
 } from './signupCatalogApi';
 export { logoutAuthSession } from './authSession';
+export { otpDeliveryNotice } from './otpDeliveryNotice';

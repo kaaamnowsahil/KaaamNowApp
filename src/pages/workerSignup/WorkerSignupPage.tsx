@@ -42,6 +42,8 @@ export const WorkerSignupPage: FC<
       intent: 'signUp',
       expiresInSeconds: sent.expires_in_seconds,
       resendAfterSeconds: sent.resend_after_seconds,
+      deliveryChannel: sent.delivery_channel,
+      senderName: sent.sender_name,
     }),
   );
 
