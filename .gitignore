@@ -82,3 +82,7 @@ yarn-error.log
 
 # design exports
 design/figma/
+
+# Firebase config (per-environment, not committed)
+android/app/google-services.json
+ios/KaaamNow/GoogleService-Info.plist
