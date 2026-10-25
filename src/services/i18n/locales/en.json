@@ -5,7 +5,9 @@
     "apply": "Apply",
     "back": "Back",
     "loading": "Loading...",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "viewMore": "View more ({{count}})",
+    "viewLess": "View less"
   },
   "appearance": {
     "title": "Choose your appearance",
@@ -31,7 +33,8 @@
     "phoneHelper": "Use the mobile number registered to your account.",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "By continuing, you agree to KaaamNow’s Terms of Service and Privacy Policy."
+    "legalLinked": "By continuing, you agree to KaaamNow’s <terms>Terms of Service</terms>.",
+    "legal": "By continuing, you agree to KaaamNow’s Terms of Service."
   },
   "auth": {
     "passwordLabel": "Password",
@@ -56,7 +59,11 @@
     "sendingCode": "Sending verification code…",
     "retryCode": "Tap to retry sending the code.",
     "resendResetCode": "Send another code",
-    "loadingOptions": "Loading options…"
+    "loadingOptions": "Loading options…",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "newPasswordPlaceholder": "Create a password",
+    "confirmPasswordPlaceholder": "Re-enter your password"
   },
   "verifyPhone": {
     "title": "Verify your phone",
@@ -90,7 +97,8 @@
     "faq": "FAQ & Help",
     "offline": "Offline access",
     "terms": "Terms & Conditions",
-    "logOut": "Log out"
+    "logOut": "Log out",
+    "roleLabel": "Worker"
   },
   "workerHome": {
     "greeting": "Hello, {{name}} 👋",
@@ -120,24 +128,6 @@
   },
   "terms": {
     "title": "Terms & Conditions"
-  },
-  "privacy": {
-    "title": "Privacy Policy",
-    "updated": "Last updated: October 2026",
-    "sections": {
-      "dataTitle": "Information we collect",
-      "dataBody": "We use the information you provide to create and manage your account, including your phone number, name, email (if provided), age for worker profiles, address, location and work or business preferences.",
-      "useTitle": "How we use information",
-      "useBody": "We use account and profile information to operate KaaamNow, help workers and businesses discover and manage shifts, protect accounts, and respond to support requests.",
-      "locationTitle": "Location",
-      "locationBody": "If you choose to use your current location, the app uses the location you share to fill your address and support nearby shift matching and attendance features. You can enter an address manually instead.",
-      "sharingTitle": "Service providers",
-      "sharingBody": "We share only the information needed with providers that help deliver the service, such as our backend hosting, SMS verification and maps providers. We do not put authentication secrets in the mobile app.",
-      "securityTitle": "Security and retention",
-      "securityBody": "Passwords are sent to the KaaamNow backend and stored using password hashing. We retain account information while needed to provide the service and meet legal obligations. Contact us to ask about your account data.",
-      "contactTitle": "Contact",
-      "contactBody": "For privacy questions or account-data requests, contact {{emails}}."
-    }
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -213,7 +203,8 @@
       "phone": "Enter a valid 10-digit mobile number.",
       "email": "Enter a valid email or leave it empty.",
       "address": "Add your address or use current location.",
-      "businessType": "Pick your business type."
+      "businessType": "Pick your business type.",
+      "maxBusinessTypes": "Choose up to 10 business types."
     },
     "businessTypes": {
       "hospitality": "Hospitality",
@@ -223,7 +214,8 @@
       "household": "Household",
       "office": "Office",
       "other": "Other"
-    }
+    },
+    "businessTypeHint": "Pick all that apply."
   },
   "editProfile": {
     "title": "Edit profile",
@@ -246,7 +238,10 @@
       "nameMax": "Name must be 80 characters or fewer.",
       "address": "Add your address or use current location.",
       "workTypes": "Pick at least one work type."
-    }
+    },
+    "photoFailed": "Couldn’t upload photo",
+    "saveFailed": "Couldn’t save profile",
+    "preferenceFailed": "Couldn’t save preference"
   },
   "workerShifts": {
     "title": "My shifts",
@@ -574,14 +569,26 @@
       "profile": "Profile"
     },
     "distance": "{{distance}} km",
-    "locationPickerHint": "Select business location"
+    "locationPickerHint": "Select business location",
+    "liveComingSoon": "Live requests are coming soon",
+    "unverifiedSubtitle": "{{business}}"
   },
   "businessShifts": {
     "title": "Shifts",
     "scheduled": "Scheduled",
     "rosterTitle": "Manage your confirmed roster",
     "fullyStaffed": "Fully staffed · {{count}} of {{total}}",
-    "viewSelectedOffers": "View selected offers"
+    "viewSelectedOffers": "View selected offers",
+    "loadErrorTitle": "Couldn’t load shifts",
+    "retry": "Retry",
+    "publishDraftTitle": "Publish this draft?",
+    "publishDraftBody": "Nearby workers will be notified and can apply.",
+    "publish": "Publish",
+    "discardDraft": "Discard draft",
+    "discardReason": "Draft discarded",
+    "actionFailed": "Couldn’t update shift",
+    "emptyRosterTitle": "No confirmed workers yet",
+    "emptyRosterBody": "Workers appear here once they confirm a shift."
   },
   "businessShiftCreate": {
     "prompt": "When is the shift?",
@@ -620,14 +627,15 @@
     "postedOverline": "Shift · Scheduled",
     "postedTitle": "Shift posted",
     "scheduledShiftSubtitle": "Scheduled shift",
-    "postedSubtitle": "Workers within 5 km are being notified. Applications will appear here as they arrive.",
+    "postedSubtitle": "Nearby workers are being notified. Applications will appear here as they arrive.",
     "workersNotified": "Workers notified",
     "notificationRadius": "Notification radius",
     "applications": "Applications",
     "waiting": "Waiting for the first applicant",
     "reviewApplicants": "Review applicants",
     "openShift": "Open",
-    "editShift": "Edit shift"
+    "editShift": "Edit shift",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "Live · On demand",
@@ -647,7 +655,7 @@
     "locationFetching": "Getting your device location…",
     "locationUnavailable": "Could not get your device location. Check location permission or enter the workplace address.",
     "locationEditedHint": "Workplace location manually edited; the saved GPS pin was cleared.",
-    "mapsConfigurationMissing": "Google Maps preview needs GOOGLE_MAPS_API_KEY in your local .env.local file.",
+    "mapsConfigurationMissing": "Google Maps preview needs GOOGLE_MAPS_API_KEY in your local .env.dev file.",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "workplaceInstructions": "Workplace instructions",
     "workplaceInstructionsPlaceholder": "Dress code, entrance, and who to ask for",
@@ -780,7 +788,12 @@
     "sortRecent": "Most recent",
     "sortRating": "Highest rated",
     "sortExperience": "Most experience",
-    "close": "Close"
+    "close": "Close",
+    "completedShifts_one": "{{count}} shift",
+    "completedShifts_other": "{{count}} shifts",
+    "distanceAway": "{{distance}} km away",
+    "loadErrorTitle": "Couldn’t load applicants",
+    "retry": "Retry"
   },
   "businessApplicantProfile": {
     "notFoundTitle": "Applicant not found",
@@ -810,7 +823,10 @@
     "confirmed": "Confirmed",
     "shiftTitle": "Café service associate",
     "shiftDate": "Sat, 24 Oct",
-    "shiftTime": "6:00 PM – 10:00 PM"
+    "shiftTime": "6:00 PM – 10:00 PM",
+    "reject": "Reject",
+    "awaitingWorker": "Waiting for worker to confirm",
+    "actionFailed": "Couldn’t update applicant"
   },
   "businessRoster": {
     "sendReminder": "Send team reminder",
@@ -867,7 +883,8 @@
     "rateAllWorkers": "Rate all workers",
     "workerFallback": "worker",
     "workerUnavailable": "Worker not found",
-    "workerUnavailableBody": "This worker is no longer available to rate."
+    "workerUnavailableBody": "This worker is no longer available to rate.",
+    "submitFailed": "Couldn’t submit rating"
   },
   "businessProfile": {
     "sectionBusiness": "Business",

@@ -7,30 +7,37 @@ import { FONTS } from '@/constants/fonts';
 import { FormScreen } from '@/layout/FormScreen';
 import { useTheme } from '@/theme/ThemeProvider';
 
-import { TERMS_STRINGS as S } from './constants';
-import { TERMS_SECTIONS } from './mock';
+import { useTerms } from './hooks/useTerms';
 
-/** Profile / Sign-up → Terms & Conditions (Figma 13 · Account / Terms). Copy: mock/termsMock.ts */
+/** Profile / Sign-up → Terms & Conditions (Figma 13 · Account / Terms). Copy: GET /content/terms (admin-managed). */
 export const TermsPage: FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
   const { colors } = useTheme();
+  const terms = useTerms();
 
   return (
     <FormScreen
       onBack={navigation.goBack}
-      backVariant="plain"
       title={t('terms.title')}
       gap={18}
+      isLoading={terms.isLoading}
       testID="terms-page"
     >
-      <Text style={[styles.updated, { color: colors.textSubtle }]}>
-        {S.LAST_UPDATED}
-      </Text>
-      {TERMS_SECTIONS.map((section, index) => (
+      {terms.lastUpdated ? (
+        <Text style={[styles.updated, { color: colors.textSubtle }]}>
+          {terms.lastUpdated}
+        </Text>
+      ) : null}
+      {terms.emptyMessage ? (
+        <Text style={[styles.body, { color: colors.textMuted }]}>
+          {terms.emptyMessage}
+        </Text>
+      ) : null}
+      {terms.sections.map(section => (
         <View key={section.id} style={styles.section}>
           <Text style={[styles.heading, { color: colors.text }]}>
-            {S.sectionTitle(index + 1, section.title)}
+            {section.title}
           </Text>
           <Text style={[styles.body, { color: colors.textMuted }]}>
             {section.body}

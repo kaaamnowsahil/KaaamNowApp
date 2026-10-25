@@ -1,4 +1,5 @@
-require('dotenv').config({ path: `${__dirname}/.env.local` });
+const appEnv = process.env.APP_ENV || 'dev';
+require('dotenv').config({ path: `${__dirname}/.env.${appEnv}` });
 
 module.exports = {
   presets: ['module:@react-native/babel-preset'],

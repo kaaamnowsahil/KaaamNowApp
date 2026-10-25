@@ -1,6 +1,6 @@
 import { useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 
 import {
   InfoRow,
@@ -10,7 +10,8 @@ import {
 } from '@/components/ui';
 import type { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { errorMessage } from '@/services/api/apiClient';
+import { meApi } from '@/services/api/meApi';
 import { usePreferencesStore } from '@/services/config/usePreferencesStore';
 import type { AppScreenProps } from '@/types';
 
@@ -19,7 +20,6 @@ export const AppearancePage: FC<AppScreenProps<typeof ROUTES.appearance>> = ({
   navigation,
 }) => {
   const { t } = useTranslation();
-  const isLoading = useMockLoading();
   const theme = usePreferencesStore(s => s.theme);
   const setTheme = usePreferencesStore(s => s.setTheme);
   const [selected, setSelected] = useState(theme);
@@ -33,7 +33,6 @@ export const AppearancePage: FC<AppScreenProps<typeof ROUTES.appearance>> = ({
     <FormScreen
       onBack={navigation.goBack}
       gap={20}
-      isLoading={isLoading}
       testID="appearance-page"
       actions={
         <>
@@ -42,6 +41,11 @@ export const AppearancePage: FC<AppScreenProps<typeof ROUTES.appearance>> = ({
             disabled={selected === theme}
             onPress={() => {
               setTheme(selected);
+              meApi
+                .updateProfile({ theme_preference: selected })
+                .catch(error =>
+                  Alert.alert(t('editProfile.preferenceFailed'), errorMessage(error)),
+                );
               navigation.goBack();
             }}
             testID="appearance-save"

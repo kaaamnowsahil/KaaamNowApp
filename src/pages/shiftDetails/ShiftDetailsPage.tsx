@@ -17,44 +17,84 @@ import {
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
-import type { AppScreenProps } from '@/types';
+import { getDevicePosition } from '@/services/maps/devicePosition';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useShiftAction, useWorkerShiftDetail } from '@/services/shifts/useShiftFlow';
+import type { AppScreenProps, BookingStatus, Shift } from '@/types';
 import { formatRupees } from '@/utils/format';
 
 import {
   BOOKING_COPY,
   DETAILS_COPY,
-  SHIFT_DETAILS_STRINGS as S,
+  SHIFT_DETAILS_STRINGS,
 } from './constants';
-import { DEFAULT_SHIFT_INFO, SHIFT_INFO } from './mock';
+
+/** Booking state from the API when the screen was opened without one. */
+const bookingFromShift = (shift: Shift): BookingStatus | undefined => {
+  if (shift.applicationStatus === 'selected') return 'selected';
+  if (shift.applicationStatus === 'applied') return 'applied';
+  if (shift.assignmentStatus === 'cancelled') return 'cancelled';
+  if (shift.assignmentStatus === 'checked_out' || shift.assignmentStatus === 'approved') {
+    return 'completed';
+  }
+  if (shift.assignmentId) return 'confirmed';
+  return undefined;
+};
 
 /**
  * Step 2 of both worker flows. Figma: "Live · Café service associate" and
  * "Scheduled · Event service associate". With a bookingStatus (from My shifts)
  * the overline and primary action follow the booking instead.
- * - data: mock/shiftDetailsMock.ts
+ * - data: GET /worker/shifts/{id}
  */
 export const ShiftDetailsPage: FC<
   AppScreenProps<typeof ROUTES.shiftDetails>
 > = ({ navigation, route }) => {
   const { t } = useTranslation();
-  const { shift, bookingStatus } = route.params;
-  const isLoading = useMockLoading();
+  const detail = useWorkerShiftDetail(route.params.shift);
+  const { shift } = detail;
+  const info = detail.data;
+  const action = useShiftAction();
+  const bookingStatus = route.params.bookingStatus ?? bookingFromShift(shift);
   const copy = DETAILS_COPY[shift.status];
   const booking = bookingStatus ? BOOKING_COPY[bookingStatus] : undefined;
-  const info = { ...DEFAULT_SHIFT_INFO[shift.status], ...SHIFT_INFO[shift.id] };
   const rate = formatRupees(shift.hourlyRate);
+
+  const accept = () =>
+    shift.status === 'live'
+      ? action.run(
+        () => shiftsApi.acceptLive(shift.id),
+        assignment =>
+          navigation.replace(ROUTES.shiftSecured, {
+            shift: { ...shift, assignmentId: assignment.id, assignmentStatus: assignment.status },
+          }),
+        SHIFT_DETAILS_STRINGS.ACCEPT_FAILED,
+      )
+      : action.run(
+        async () => shiftsApi.apply(shift.id, (await getDevicePosition(5000)) ?? undefined),
+        application =>
+          navigation.replace(ROUTES.applicationSubmitted, {
+            shift: {
+              ...shift,
+              applicationId: application.id,
+              applicationStatus: application.status,
+            },
+          }),
+        SHIFT_DETAILS_STRINGS.APPLY_FAILED,
+      );
+
+  const messageBusiness = () =>
+    shift.assignmentId &&
+    action.run(
+      () => shiftsApi.contact(shift.assignmentId as string),
+      contact => Linking.openURL(`sms:${contact.phone}`),
+      SHIFT_DETAILS_STRINGS.CONTACT_FAILED,
+    );
 
   const primary = (() => {
     switch (bookingStatus) {
       case undefined:
-        return {
-          label: copy.accept(rate),
-          onPress: () =>
-            shift.status === 'live'
-              ? navigation.replace(ROUTES.shiftSecured, { shift })
-              : navigation.replace(ROUTES.applicationSubmitted, { shift }),
-        };
+        return { label: copy.accept(rate), onPress: accept };
       case 'selected':
         return {
           label: booking?.action,
@@ -74,28 +114,32 @@ export const ShiftDetailsPage: FC<
 
   return (
     <FormScreen
+      busy={action.busy}
       onBack={navigation.goBack}
-      title={S.HEADER_TITLE}
+      title={SHIFT_DETAILS_STRINGS.HEADER_TITLE}
       compactTitle
-      headerTag={S.HEADER_TAG}
+      headerTag={SHIFT_DETAILS_STRINGS.HEADER_TAG}
       gap={14}
-      isLoading={isLoading}
+      isLoading={detail.isLoading}
       testID="shift-details-page"
       actions={
         <>
           {primary?.label ? (
             <PrimaryButton
               label={primary.label}
-              disabled={primary.isDisabled}
+              disabled={primary.isDisabled || action.busy}
               onPress={primary.onPress}
               testID="shift-details-primary"
             />
           ) : null}
-          <SecondaryButton
-            label={S.MESSAGE}
-            onPress={() => Linking.openURL(`sms:${info.businessPhone}`)}
-            testID="shift-details-message"
-          />
+          {shift.assignmentId ? (
+            <SecondaryButton
+              label={SHIFT_DETAILS_STRINGS.MESSAGE}
+              disabled={action.busy}
+              onPress={messageBusiness}
+              testID="shift-details-message"
+            />
+          ) : null}
         </>
       }
     >
@@ -108,38 +152,55 @@ export const ShiftDetailsPage: FC<
       <BusinessRow
         icon={businessIcon(shift.businessTypeId)}
         name={shift.businessName}
-        meta={S.businessMeta(shift.isVerified, info.rating, info.reviews)}
+        meta={SHIFT_DETAILS_STRINGS.businessMeta(
+          shift.isVerified,
+          info?.business.rating_avg ?? 0,
+          info?.business.rating_count ?? 0,
+        )}
         isVerified={shift.isVerified}
       />
 
       <StatTiles
         items={[
-          { value: S.rate(rate), label: S.AGREED_RATE },
+          { value: SHIFT_DETAILS_STRINGS.rate(rate), label: SHIFT_DETAILS_STRINGS.AGREED_RATE },
           {
             value: formatRupees(shift.hourlyRate * shift.durationHours),
-            label: S.ESTIMATED,
+            label: SHIFT_DETAILS_STRINGS.ESTIMATED,
           },
         ]}
       />
 
       <FactList
         items={[
-          { icon: CalendarIcon, text: S.when(shift.dateLabel, shift.timeLabel) },
+          { icon: CalendarIcon, text: SHIFT_DETAILS_STRINGS.when(shift.dateLabel, shift.timeLabel) },
           {
             icon: ClockIcon,
-            text: `${t('shiftDetails.duration', { hours: shift.durationHours })} · ${info.durationNote}`,
+            text: `${t('shiftDetails.duration', { hours: shift.durationHours })} · ${SHIFT_DETAILS_STRINGS.breakNote(info?.break_minutes ?? 0)}`,
           },
           {
             icon: MapPinIcon,
-            text: `${info.placeLabel} · ${t('shiftDetails.distance', { distance: shift.distanceKm })}`,
+            text: `${shift.addressText || shift.area} · ${t('shiftDetails.distance', { distance: shift.distanceKm })}`,
           },
         ]}
       />
 
-      <TextSection title={S.WHAT_YOU_DO} body={info.whatYouDo} />
-      <TextSection title={S.BEFORE_ACCEPT} body={info.beforeAccept} variant="note" />
+      <TextSection
+        title={SHIFT_DETAILS_STRINGS.WHAT_YOU_DO}
+        body={info?.responsibilities || SHIFT_DETAILS_STRINGS.NO_DETAILS}
+      />
+      {info?.requirements ? (
+        <TextSection
+          title={SHIFT_DETAILS_STRINGS.BEFORE_ACCEPT}
+          body={info.requirements}
+          variant="note"
+        />
+      ) : null}
       <InfoCallout text={copy.callout} />
-      <TextSection title={S.CANCELLATION} body={info.cancellation} variant="fine" />
+      <TextSection
+        title={SHIFT_DETAILS_STRINGS.CANCELLATION}
+        body={SHIFT_DETAILS_STRINGS.cancellation(info?.cancellation_cutoff_hours ?? 12)}
+        variant="fine"
+      />
     </FormScreen>
   );
 };

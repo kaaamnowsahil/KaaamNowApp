@@ -16,4 +16,5 @@ export const RATE_BUSINESS_STRINGS = {
   COMMENT_PLACEHOLDER: 'Share more about your shift (optional)',
   SUBMIT: 'Submit rating',
   SKIP: 'Skip for now',
+  SUBMIT_FAILED: 'Couldn’t send your rating',
 } as const;

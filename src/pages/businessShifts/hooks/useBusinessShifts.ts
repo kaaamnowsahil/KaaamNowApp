@@ -1,116 +1,95 @@
 import { useNavigation } from '@react-navigation/native';
+import { Alert } from 'react-native';
 
 import { ROUTES } from '@/constants/routes';
-import { useBusinessLiveStore } from '@/services/business/useBusinessLiveStore';
-import { useBusinessShiftStore } from '@/services/business/useBusinessShiftStore';
 import i18n from '@/services/i18n/i18n';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { toDashboardShift } from '@/services/shifts/shiftMappers';
+import { shiftsApi, type BusinessShiftItem } from '@/services/shifts/shiftsApi';
+import { useBusinessShiftsData } from '@/services/shifts/useBusinessShiftsData';
+import { useShiftAction } from '@/services/shifts/useShiftFlow';
 import type { TabAppNavigation } from '@/types';
-
-import { useBusinessApplicantStore } from '@/pages/businessApplicants/store/useBusinessApplicantStore';
-import {
-  BUSINESS_DASHBOARD,
-  BUSINESS_ROSTER,
-  createLiveDraftFromDashboardShift,
-  findMockAcceptedWorkers,
-} from '@/pages/businessLive/mock';
-import { toBusinessDashboardShifts } from '@/pages/businessShiftCreate/utils';
 
 export const useBusinessShifts = () => {
   const navigation = useNavigation<TabAppNavigation>();
-  const isLoading = useMockLoading();
-  const draft = useBusinessShiftStore(state => state.draft);
-  const postedShifts = useBusinessShiftStore(state => state.postedShifts);
-  const activeRequest = useBusinessLiveStore(state => state.activeRequest);
-  const publishRequest = useBusinessLiveStore(state => state.publishRequest);
-  const acceptWorkers = useBusinessLiveStore(state => state.acceptWorkers);
-  const confirmedCount = useBusinessApplicantStore(
-    state =>
-      state.applicants.filter(applicant => applicant.status === 'confirmed')
-        .length,
-  );
+  const data = useBusinessShiftsData();
+  const { busy, run } = useShiftAction();
+  const actionFailed = i18n.t('businessShifts.actionFailed');
+  const rosterShift = data.scheduledShifts.find(item => item.booked_count > 0);
 
-  const openLiveShift = (shift: (typeof BUSINESS_DASHBOARD.liveShifts)[number]) => {
-    if (!activeRequest) {
-      const request = publishRequest(createLiveDraftFromDashboardShift(shift));
-      const mockWorkers = findMockAcceptedWorkers(
-        [],
-        Math.min(shift.confirmedCount ?? 0, request.workers),
-      );
-      acceptWorkers(mockWorkers);
-      if (mockWorkers.length >= request.workers && mockWorkers[0]) {
-        navigation.navigate(ROUTES.businessLiveAccepted);
-      } else if (mockWorkers.length > 0) {
-        navigation.navigate(ROUTES.businessLiveStaffing);
-      } else {
-        navigation.navigate(ROUTES.businessLiveFinding);
-      }
+  const openShift = (item: BusinessShiftItem) => {
+    if (item.pending_applications > 0) {
+      navigation.navigate(ROUTES.businessApplicants);
       return;
     }
+    navigation.navigate(ROUTES.businessRoster, { shiftId: item.id });
+  };
 
-    if (activeRequest.acceptedWorkers.length >= activeRequest.workers) {
-      if (activeRequest.acceptedWorkers[0]) {
-        navigation.navigate(ROUTES.businessLiveAccepted);
-      } else {
-        navigation.navigate(ROUTES.businessLive);
-      }
-    } else if (activeRequest.acceptedWorkers.length > 0) {
-      navigation.navigate(ROUTES.businessLiveStaffing);
-    } else {
-      navigation.navigate(ROUTES.businessLiveFinding);
-    }
+  const openDraft = (item: BusinessShiftItem) => {
+    if (busy) return;
+    Alert.alert(
+      i18n.t('businessShifts.publishDraftTitle'),
+      i18n.t('businessShifts.publishDraftBody'),
+      [
+        {
+          text: i18n.t('businessShifts.discardDraft'),
+          style: 'destructive',
+          onPress: () =>
+            run(
+              () =>
+                shiftsApi.cancelShift(
+                  item.id,
+                  i18n.t('businessShifts.discardReason'),
+                ),
+              data.reload,
+              actionFailed,
+            ),
+        },
+        { text: i18n.t('common.cancel'), style: 'cancel' },
+        {
+          text: i18n.t('businessShifts.publish'),
+          onPress: () =>
+            run(
+              () => shiftsApi.publishShift(item.id),
+              data.reload,
+              actionFailed,
+            ),
+        },
+      ],
+    );
   };
 
   return {
-    isLoading,
-    liveShifts: activeRequest
-      ? [
-          {
-            id: activeRequest.id,
-            title: activeRequest.role,
-            date: i18n.t('businessLiveCreate.today'),
-            time: i18n.t('businessLiveCreate.liveNow'),
-            hours: activeRequest.hours,
-            area: activeRequest.location,
-            requirement: activeRequest.requirement,
-            distanceKm: activeRequest.searchRadiusKm,
-            hourlyRate: activeRequest.hourlyRate,
-            estimatedTotal:
-              activeRequest.hourlyRate *
-                activeRequest.hours *
-                activeRequest.workers +
-              Math.round(
-                activeRequest.hourlyRate *
-                  activeRequest.hours *
-                  activeRequest.workers *
-                  0.05,
-              ),
-            confirmedCount: activeRequest.acceptedWorkers.length,
-            totalSpots: activeRequest.workers,
-          },
-        ]
-      : BUSINESS_DASHBOARD.liveShifts,
-    businessName: BUSINESS_DASHBOARD.businessName,
-    isVerified: BUSINESS_DASHBOARD.isVerified,
+    isLoading: data.isLoading,
+    error: data.error,
+    reload: data.reload,
+    businessName: data.businessName,
+    isVerified: data.isVerified,
+    liveShifts: data.liveShifts.map(item => ({
+      item,
+      card: toDashboardShift(item),
+    })),
+    scheduledShifts: data.scheduledShifts.map(item => ({
+      item,
+      card: toDashboardShift(item),
+    })),
+    drafts: data.drafts,
     roster: {
-      staffedCount: confirmedCount,
-      totalCount: Math.max(BUSINESS_ROSTER.totalCount, confirmedCount),
-    },
-    openApplicants: () => navigation.navigate(ROUTES.businessApplicants),
-    openLiveShift,
-    openRoster: () => navigation.navigate(ROUTES.businessRoster),
-    openSchedule: () => navigation.navigate(ROUTES.businessShiftSchedule),
-    resumeDraft: () => {
-      if (draft) {
-        navigation.navigate(ROUTES.businessShiftSchedule, { draft });
-      }
-    },
-    draft,
-    scheduledShifts: [
-      ...BUSINESS_DASHBOARD.scheduledShifts,
-      ...postedShifts.flatMap(shift =>
-        toBusinessDashboardShifts(shift, i18n.language),
+      staffedCount: data.scheduledShifts.reduce(
+        (sum, item) => sum + item.booked_count,
+        0,
       ),
-    ],
+      totalCount: data.scheduledShifts.reduce(
+        (sum, item) => sum + item.workers_required,
+        0,
+      ),
+    },
+    openShift,
+    openDraft,
+    openRoster: () =>
+      navigation.navigate(
+        ROUTES.businessRoster,
+        rosterShift ? { shiftId: rosterShift.id } : undefined,
+      ),
+    openSchedule: () => navigation.navigate(ROUTES.businessShiftSchedule),
   };
 };

@@ -14,7 +14,7 @@ import { FormScreen } from '@/layout/FormScreen';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
-import { OFFLINE_STRINGS as S } from './constants';
+import { OFFLINE_STRINGS } from './constants';
 import { useOffline } from './hooks/useOffline';
 import { LAST_SYNCED_AT, SAVED_CHECK_IN_CODE, SAVED_SHIFT } from './mock';
 
@@ -34,13 +34,13 @@ export const OfflinePage: FC<AppScreenProps<typeof ROUTES.offline>> = ({
       actions={
         <>
           <PrimaryButton
-            label={o.isReconnecting ? S.RECONNECTING : S.TRY_RECONNECTING}
+            label={o.isReconnecting ? OFFLINE_STRINGS.RECONNECTING : OFFLINE_STRINGS.TRY_RECONNECTING}
             disabled={o.isReconnecting}
             onPress={o.reconnect}
             testID="offline-reconnect"
           />
           <SecondaryButton
-            label={S.VIEW_SAVED}
+            label={OFFLINE_STRINGS.VIEW_SAVED}
             onPress={o.viewSaved}
             testID="offline-view-saved"
           />
@@ -61,14 +61,14 @@ export const OfflinePage: FC<AppScreenProps<typeof ROUTES.offline>> = ({
       />
       <View>
         <InfoRow
-          title={S.SAVED_BOOKING}
-          caption={S.savedCaption(SAVED_CHECK_IN_CODE, SAVED_SHIFT.businessName)}
+          title={OFFLINE_STRINGS.SAVED_BOOKING}
+          caption={OFFLINE_STRINGS.savedCaption(SAVED_CHECK_IN_CODE, SAVED_SHIFT.businessName)}
           onPress={o.viewSaved}
           testID="offline-saved-booking"
         />
         <InfoRow
-          title={S.LAST_UPDATED}
-          caption={S.updatedCaption(LAST_SYNCED_AT)}
+          title={OFFLINE_STRINGS.LAST_UPDATED}
+          caption={OFFLINE_STRINGS.updatedCaption(LAST_SYNCED_AT)}
           onPress={o.isReconnecting ? undefined : o.reconnect}
           testID="offline-last-updated"
         />

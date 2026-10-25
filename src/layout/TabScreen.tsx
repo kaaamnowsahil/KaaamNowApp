@@ -20,6 +20,8 @@ type TabScreenProps = {
   gap?: number;
   /** Shows the brand loader instead of the blocks. */
   isLoading?: boolean;
+  /** Shows the brand loader over the blocks while an action runs. */
+  busy?: boolean;
   /** Bar pinned above the tab bar with a top border ("Screen actions"). */
   actions?: ReactNode;
   testID?: string;
@@ -36,6 +38,7 @@ export const TabScreen: FC<TabScreenProps> = ({
   fillLastBlock,
   gap = 8,
   isLoading,
+  busy,
   actions,
   testID,
 }) => {
@@ -56,9 +59,7 @@ export const TabScreen: FC<TabScreenProps> = ({
           </Text>
         )}
       </Rise>
-      {isLoading ? (
-        <Loader />
-      ) : (
+      {isLoading ? null : (
       <ScrollView
         contentContainerStyle={[
           styles.content,
@@ -94,6 +95,7 @@ export const TabScreen: FC<TabScreenProps> = ({
           {actions}
         </Rise>
       ) : null}
+      {isLoading || busy ? <Loader /> : null}
     </SafeAreaView>
   );
 };

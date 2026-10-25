@@ -6,12 +6,15 @@ import { PrimaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useBusinessShiftStore } from '@/services/business/useBusinessShiftStore';
+import { meApi } from '@/services/api/meApi';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useShiftAction } from '@/services/shifts/useShiftFlow';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { getDurationHours, parseLocalDate } from './utils';
+import { getDurationHours, parseLocalDate, toBulkItems } from './utils';
 
 export const BusinessShiftReviewPage: FC<
   AppScreenProps<typeof ROUTES.businessShiftReview>
@@ -19,7 +22,10 @@ export const BusinessShiftReviewPage: FC<
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const { draft } = route.params;
-  const postShift = useBusinessShiftStore(state => state.postShift);
+  const { busy, run } = useShiftAction();
+  const categories = useApiQuery(() => meApi.workCategories(), []);
+  const categoryLabel = (slug: string) =>
+    categories.data?.find(category => category.id === slug)?.label ?? slug;
   const schedules = draft.schedules.map(schedule => ({
     ...schedule,
     date: new Intl.DateTimeFormat(i18n.language, {
@@ -28,13 +34,15 @@ export const BusinessShiftReviewPage: FC<
     time: `${schedule.startTime}–${schedule.endTime}`,
     hours: getDurationHours(schedule.startTime, schedule.endTime),
   }));
-  const post = () => {
-    const postedDraft = postShift(draft);
-    navigation.replace(ROUTES.businessShiftPosted, { draft: postedDraft });
-  };
+  const post = () =>
+    run(
+      () => shiftsApi.createBulk({ publish: true, shifts: toBulkItems(draft) }),
+      () => navigation.replace(ROUTES.businessShiftPosted, { draft }),
+    );
 
   return (
     <FormScreen
+      busy={busy}
       onBack={navigation.goBack}
       title={t('businessApplicants.headerTitle')}
       subtitle={t('businessDashboard.scheduledStatus')}
@@ -45,6 +53,7 @@ export const BusinessShiftReviewPage: FC<
         <PrimaryButton
           label={t('businessShiftCreate.postShift')}
           onPress={post}
+          disabled={busy}
           testID="business-shift-post"
         />
       }
@@ -61,7 +70,7 @@ export const BusinessShiftReviewPage: FC<
           {t('businessShiftCreate.review')}
         </Text>
         <Text style={[styles.subtitle, { color: colors.textSubtle }]}>
-          {draft.role} · {draft.location}
+          {[draft.role, draft.location].filter(Boolean).join(' · ')}
         </Text>
       </View>
 
@@ -88,7 +97,7 @@ export const BusinessShiftReviewPage: FC<
             />
             <ReviewRow
               label={t('businessLiveCreate.category')}
-              value={t(`businessSignup.businessTypes.${schedule.category}`)}
+              value={categoryLabel(schedule.category)}
             />
             <ReviewRow
               label={t('businessLiveCreate.requirement')}

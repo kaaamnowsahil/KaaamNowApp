@@ -7,18 +7,21 @@ import type {
   WorkerSignup,
 } from '@/services/onboarding/useOnboardingStore';
 
-const host = Platform.OS === 'android' ? '10.0.2.2' : 'localhost';
 declare const process: { env: { API_BASE_URL?: string } };
-const API_BASE_URL = (process.env.API_BASE_URL || `http://${host}:8000/api/v1`)
+const API_BASE_URL = (
+  process.env.API_BASE_URL || 'https://kaaamnow-backend.vercel.app/api/v1'
+)
   .trim()
-  .replace(/\/$/, '');
+  .replace(/\/$/, '')
+  // The Android emulator reaches the host machine at 10.0.2.2, not localhost.
+  .replace(
+    /^(https?:\/\/)(localhost|127\.0\.0\.1)(?=[:/]|$)/,
+    (match, scheme: string) =>
+      Platform.OS === 'android' ? `${scheme}10.0.2.2` : match,
+  );
 
 export class AuthApiError extends Error {
-  constructor(
-    message: string,
-    readonly code: string,
-    readonly status: number,
-  ) {
+  constructor(message: string, readonly code: string, readonly status: number) {
     super(message);
     this.name = 'AuthApiError';
   }
@@ -35,13 +38,17 @@ export type AuthResponse = {
   };
 };
 
-type OtpSendResponse = {
+type PhoneCheckResponse = {
   phone: string;
-  expires_in_seconds: number;
-  resend_after_seconds: number;
+  registered: boolean;
+  roles: string[];
 };
 
-async function post<T>(path: string, body: object, accessToken?: string): Promise<T> {
+async function post<T>(
+  path: string,
+  body: object,
+  accessToken?: string,
+): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
@@ -76,18 +83,16 @@ async function post<T>(path: string, body: object, accessToken?: string): Promis
   return payload as T;
 }
 
-export const requestSignupOtp = (phone: string, role: UserRole) =>
-  post<OtpSendResponse>('/auth/otp/send', {
-    phone,
-    intent: 'sign_up',
-    role,
-  });
-
-export const requestPasswordResetOtp = (phone: string) =>
-  post<OtpSendResponse>('/auth/otp/send', {
-    phone,
-    intent: 'password_reset',
-  });
+export async function checkPhoneForSignup(phone: string) {
+  const result = await post<PhoneCheckResponse>('/auth/phone/check', { phone });
+  if (result.roles.length) {
+    throw new AuthApiError(
+      'This number already has an account. Log in instead.',
+      'phone_registered',
+      409,
+    );
+  }
+}
 
 export const loginWithPassword = (phone: string, password: string) =>
   post<AuthResponse>('/auth/password/login', { phone, password });
@@ -127,12 +132,26 @@ export function completeSignup(input: {
       address_text: input.business.address,
       latitude: input.business.location?.lat,
       longitude: input.business.location?.lng,
-      business_type_slug: input.business.businessType,
+      business_type_slugs: input.business.businessTypes,
     };
   }
 
   return post<AuthResponse>('/auth/signup', body);
 }
+
+export type OtpSendResponse = {
+  phone: string;
+  expires_in_seconds: number;
+  resend_after_seconds: number;
+};
+
+export const sendOtp = (
+  phone: string,
+  intent: 'sign_up' | 'password_reset',
+  role?: UserRole,
+) => post<OtpSendResponse>('/auth/otp/send', { phone, intent, role });
+
+export const sendPasswordResetOtp = (phone: string) => sendOtp(phone, 'password_reset');
 
 export const resetPassword = (phone: string, code: string, newPassword: string) =>
   post<void>('/auth/password/reset/confirm', {

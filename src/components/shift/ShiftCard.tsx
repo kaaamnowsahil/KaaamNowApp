@@ -7,7 +7,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { Shift } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { SHIFT_STRINGS as S } from './shiftStrings';
+import { SHIFT_STRINGS } from './shiftStrings';
 
 /** Figma "Shift card" (1:1502). */
 export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
@@ -17,7 +17,7 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
   const { colors } = useTheme();
   const isLive = shift.status === 'live';
   const business = shift.isVerified
-    ? `${shift.businessName} · ${S.VERIFIED}`
+    ? `${shift.businessName} · ${SHIFT_STRINGS.VERIFIED}`
     : shift.businessName;
 
   return (
@@ -40,10 +40,10 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
             { color: isLive ? colors.success : colors.primary },
           ]}
         >
-          {S.STATUS_LABEL[shift.status]}
+          {SHIFT_STRINGS.STATUS_LABEL[shift.status]}
         </Text>
         <Text style={[styles.distance, { color: colors.textSubtle }]}>
-          {S.km(shift.distanceKm)}
+          {SHIFT_STRINGS.km(shift.distanceKm)}
         </Text>
       </View>
 
@@ -62,7 +62,7 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
       </View>
 
       <Text style={[styles.body, { color: colors.textMuted }]}>
-        {`${shift.dateLabel} · ${shift.timeLabel} · ${S.hours(
+        {`${shift.dateLabel} · ${shift.timeLabel} · ${SHIFT_STRINGS.hours(
           shift.durationHours,
         )}`}
       </Text>
@@ -75,17 +75,17 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
           <Text style={[styles.rate, { color: colors.text }]}>
             {formatRupees(shift.hourlyRate)}
             <Text style={[styles.perHour, { color: colors.textSubtle }]}>
-              {S.PER_HOUR}
+              {SHIFT_STRINGS.PER_HOUR}
             </Text>
           </Text>
           <Text style={[styles.estimate, { color: colors.textSubtle }]}>
-            {S.estimated(
+            {SHIFT_STRINGS.estimated(
               formatRupees(shift.hourlyRate * shift.durationHours),
             )}
           </Text>
         </View>
         <Text style={[styles.cta, { color: colors.primary }]}>
-          {isLive ? S.spotsOpen(shift.spotsOpen) : S.APPLY}
+          {isLive ? SHIFT_STRINGS.spotsOpen(shift.spotsOpen) : SHIFT_STRINGS.APPLY}
         </Text>
       </View>
     </Pressable>

@@ -23,7 +23,7 @@ export type BusinessSignup = {
   email?: string;
   address: string;
   location?: GeoPoint;
-  businessType: string;
+  businessTypes: string[];
   /** Kept in memory only until server-side registration completes. */
   password?: string;
 };

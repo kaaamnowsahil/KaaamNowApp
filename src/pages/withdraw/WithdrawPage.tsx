@@ -51,7 +51,6 @@ export const WithdrawPage: FC<AppScreenProps<typeof ROUTES.withdraw>> = ({
   return (
     <FormScreen
       onBack={navigation.goBack}
-      backVariant="plain"
       title={t('withdraw.title')}
       gap={14}
       isLoading={isLoading}

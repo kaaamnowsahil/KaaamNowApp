@@ -6,6 +6,21 @@ import { PermissionsAndroid, Platform } from 'react-native';
 import { reverseGeocode } from '@/services/maps/googleMaps';
 import type { PickedAddress } from '@/types';
 
+const LOCATE_TIMEOUT_MS = 20000;
+const GEOCODE_TIMEOUT_MS = 8000;
+
+const lookupAddress = async (latitude: number, longitude: number) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GEOCODE_TIMEOUT_MS);
+  try {
+    return await reverseGeocode({ latitude, longitude }, controller.signal);
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
 export const useCurrentAddress = (
   onPicked: (picked: PickedAddress) => void,
 ) => {
@@ -18,25 +33,33 @@ export const useCurrentAddress = (
     setIsLocating(true);
     setLocateError(null);
 
-    const onError = () => {
-      setLocateError(t('workerSignup.locationError'));
+    let settled = false;
+    const finish = (error: string | null) => {
+      if (settled) return false;
+      settled = true;
+      clearTimeout(watchdog);
+      setLocateError(error);
       setIsLocating(false);
+      return true;
     };
+    const watchdog = setTimeout(
+      () => finish(t('workerSignup.locationError')),
+      LOCATE_TIMEOUT_MS,
+    );
+
     const getLocation = () =>
       Geolocation.getCurrentPosition(
         async position => {
           const { latitude, longitude } = position.coords;
-          let address = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-          try {
-            address = (await reverseGeocode({ latitude, longitude })) || address;
-          } catch {
-            // Coordinates are still a valid location when reverse geocoding is unavailable.
+          const address =
+            (await lookupAddress(latitude, longitude)) ||
+            `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+          if (finish(null)) {
+            onPicked({ address, lat: latitude, lng: longitude });
           }
-          onPicked({ address, lat: latitude, lng: longitude });
-          setIsLocating(false);
         },
-        onError,
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
+        () => finish(t('workerSignup.locationError')),
+        { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 },
       );
 
     try {
@@ -45,16 +68,13 @@ export const useCurrentAddress = (
           PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
         );
         if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
-          setLocateError(t('workerSignup.locationPermissionDenied'));
-          setIsLocating(false);
+          finish(t('workerSignup.locationPermissionDenied'));
           return;
         }
-        getLocation();
-      } else {
-        Geolocation.requestAuthorization(getLocation, onError);
       }
+      getLocation();
     } catch {
-      onError();
+      finish(t('workerSignup.locationError'));
     }
   };
 

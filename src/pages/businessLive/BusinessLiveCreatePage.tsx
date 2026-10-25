@@ -22,7 +22,6 @@ import { useBusinessLiveStore } from '@/services/business/useBusinessLiveStore';
 import { useOnboardingStore } from '@/services/onboarding/useOnboardingStore';
 import {
   geocodeAddress,
-  isGoogleMapsConfigured,
   reverseGeocode,
 } from '@/services/maps/googleMaps';
 import { FormScreen } from '@/layout/FormScreen';
@@ -41,7 +40,8 @@ export const BusinessLiveCreatePage: FC<
   const saveDraft = useBusinessLiveStore(state => state.saveDraft);
   const businessAddress = useOnboardingStore(state => state.business?.address);
   const businessType =
-    useOnboardingStore(state => state.business?.businessType) ?? 'hospitality';
+    useOnboardingStore(state => state.business?.businessTypes[0]) ??
+    'hospitality';
   const [draft, setDraft] = useState(() => {
     const initialDraft =
       savedDraft ??
@@ -396,9 +396,7 @@ export const BusinessLiveCreatePage: FC<
       />
       <Text style={[styles.locationHint, { color: colors.textSubtle }]}>
         {t(
-          !isGoogleMapsConfigured
-            ? 'businessLiveCreate.mapsConfigurationMissing'
-            : `businessLiveCreate.${
+          `businessLiveCreate.${
                 {
                   locating: 'locationFetching',
                   located: 'locationSourceHint',

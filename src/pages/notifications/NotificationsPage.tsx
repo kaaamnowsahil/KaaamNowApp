@@ -10,7 +10,7 @@ import { useMockLoading } from '@/shared/hooks/useMockLoading';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
-import { NOTIFICATIONS_STRINGS as S } from './constants';
+import { NOTIFICATIONS_STRINGS } from './constants';
 import { NOTIFICATIONS } from './mock';
 
 /** App-bar bell. Tap a row to mark it read. Data: mock/notificationsMock.ts */
@@ -42,7 +42,7 @@ export const NotificationsPage: FC<
             testID="notifications-mark-all"
           >
             <Text style={[styles.action, { color: colors.primary }]}>
-              {S.MARK_ALL}
+              {NOTIFICATIONS_STRINGS.MARK_ALL}
             </Text>
           </Pressable>
         ) : null

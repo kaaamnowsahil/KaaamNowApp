@@ -31,7 +31,8 @@
     "phoneHelper": "ଆପଣଙ୍କ ଖାତାରେ ପଞ୍ଜୀକୃତ ମୋବାଇଲ୍ ନମ୍ବର ବ୍ୟବହାର କରନ୍ତୁ।",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "ଆଗକୁ ବଢ଼ିଲେ KaaamNow ସେବା ସର୍ତ୍ତ ଓ ଗୋପନୀୟତା ନୀତିକୁ ମାନୁଛନ୍ତି।",
+    "legalLinked": "ଆଗକୁ ବଢ଼ିଲେ KaaamNow <terms>ସେବା ସର୍ତ୍ତକୁ</terms> ମାନୁଛନ୍ତି।",
+    "legal": "ଆଗକୁ ବଢ଼ିଲେ KaaamNow ସେବା ସର୍ତ୍ତକୁ ମାନୁଛନ୍ତି।",
     "signIn": "ସାଇନ୍ ଇନ୍"
   },
   "verifyPhone": {
@@ -562,7 +563,8 @@
     "waiting": "ପ୍ରଥମ ଆବେଦନକାରୀଙ୍କ ଅପେକ୍ଷାରେ",
     "reviewApplicants": "ଆବେଦନକାରୀଙ୍କୁ ସମୀକ୍ଷା କରନ୍ତୁ",
     "openShift": "ଖୋଲନ୍ତୁ",
-    "editShift": "ସିଫ୍ଟ ସମ୍ପାଦନ କରନ୍ତୁ"
+    "editShift": "ସିଫ୍ଟ ସମ୍ପାଦନ କରନ୍ତୁ",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "ଲାଇଭ୍ · ଆବଶ୍ୟକତା ଅନୁସାରେ",
@@ -579,7 +581,7 @@
     "locationFetching": "ଆପଣଙ୍କ ଡିଭାଇସ୍ ସ୍ଥାନ ନିଆଯାଉଛି…",
     "locationUnavailable": "ଡିଭାଇସ୍ ସ୍ଥାନ ମିଳିଲା ନାହିଁ। ସ୍ଥାନ ଅନୁମତି ଯାଞ୍ଚ କରନ୍ତୁ କିମ୍ବା କାର୍ଯ୍ୟସ୍ଥଳ ଠିକଣା ଦିଅନ୍ତୁ।",
     "locationEditedHint": "କାର୍ଯ୍ୟସ୍ଥଳ ସମ୍ପାଦନ ହୋଇଛି; ସଞ୍ଚିତ GPS ପିନ୍ ହଟାଯାଇଛି।",
-    "mapsConfigurationMissing": "Google Maps ପ୍ରିଭ୍ୟୁ ପାଇଁ ସ୍ଥାନୀୟ .env.local ଫାଇଲ୍‌ରେ GOOGLE_MAPS_API_KEY ଆବଶ୍ୟକ।",
+    "mapsConfigurationMissing": "Google Maps ପ୍ରିଭ୍ୟୁ ପାଇଁ ସ୍ଥାନୀୟ .env.dev ଫାଇଲ୍‌ରେ GOOGLE_MAPS_API_KEY ଆବଶ୍ୟକ।",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "ଆବଶ୍ୟକତା",
     "workers": "ଆବଶ୍ୟକ କର୍ମଚାରୀ",
@@ -868,8 +870,5 @@
     "retryCode": "କୋଡ୍ ପୁଣି ପଠାଇବାକୁ ଟ୍ୟାପ୍ କରନ୍ତୁ।",
     "resendResetCode": "ଆଉ ଏକ କୋଡ୍ ପଠାନ୍ତୁ",
     "loadingOptions": "ବିକଳ୍ପ ଲୋଡ୍ ହେଉଛି…"
-  },
-  "privacy": {
-    "title": "ଗୋପନୀୟତା ନୀତି"
   }
 }

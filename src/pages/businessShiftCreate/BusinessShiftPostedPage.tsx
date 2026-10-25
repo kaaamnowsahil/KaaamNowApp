@@ -9,7 +9,6 @@ import { FormScreen } from '@/layout/FormScreen';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
-import { BUSINESS_SHIFT_POSTED_MOCK } from './mock/businessShiftPostedMock';
 import { formatShiftTime, parseLocalDate } from './utils';
 
 export const BusinessShiftPostedPage: FC<
@@ -53,11 +52,13 @@ export const BusinessShiftPostedPage: FC<
             testID="business-shift-review-applicants"
           />
           <SecondaryButton
-            label={t('businessShiftCreate.editShift')}
+            label={t('businessShiftCreate.viewShifts')}
             onPress={() =>
-              navigation.replace(ROUTES.businessShiftSchedule, { draft })
+              navigation.navigate(ROUTES.mainTabs, {
+                screen: ROUTES.businessShifts,
+              })
             }
-            testID="business-shift-edit"
+            testID="business-shift-view-shifts"
           />
         </>
       }
@@ -74,17 +75,6 @@ export const BusinessShiftPostedPage: FC<
       <Text style={[styles.subtitle, { color: colors.textSubtle }]}>
         {t('businessShiftCreate.postedSubtitle')}
       </Text>
-
-      <View style={styles.stats}>
-        <StatTile
-          value={String(BUSINESS_SHIFT_POSTED_MOCK.workersNotified)}
-          label={t('businessShiftCreate.workersNotified')}
-        />
-        <StatTile
-          value={`${BUSINESS_SHIFT_POSTED_MOCK.notificationRadiusKm} km`}
-          label={t('businessShiftCreate.notificationRadius')}
-        />
-      </View>
 
       {schedules.map((schedule, index) => (
         <View
@@ -142,23 +132,6 @@ export const BusinessShiftPostedPage: FC<
   );
 };
 
-const StatTile: FC<{ value: string; label: string }> = ({ value, label }) => {
-  const { colors } = useTheme();
-  return (
-    <View
-      style={[
-        styles.statTile,
-        { backgroundColor: colors.fill, borderColor: colors.border },
-      ]}
-    >
-      <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
-      <Text style={[styles.statLabel, { color: colors.textSubtle }]}>
-        {label}
-      </Text>
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
   overline: {
     fontFamily: FONTS.semiBold,
@@ -168,18 +141,6 @@ const styles = StyleSheet.create({
   },
   title: { fontFamily: FONTS.bold, fontSize: 21, lineHeight: 28 },
   subtitle: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
-  stats: { flexDirection: 'row', gap: 8 },
-  statTile: {
-    flex: 1,
-    minHeight: 70,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 10,
-    justifyContent: 'center',
-    gap: 4,
-  },
-  statValue: { fontFamily: FONTS.bold, fontSize: 16, lineHeight: 21 },
-  statLabel: { fontFamily: FONTS.regular, fontSize: 9, lineHeight: 14 },
   card: { borderWidth: 1, borderRadius: 12, padding: 12, gap: 4 },
   shiftCard: {
     minHeight: 52,

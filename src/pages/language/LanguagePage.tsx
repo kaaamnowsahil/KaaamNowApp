@@ -1,11 +1,12 @@
 import { useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
 import { BodyNote, PrimaryButton } from '@/components/ui';
 import type { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { errorMessage } from '@/services/api/apiClient';
+import { meApi } from '@/services/api/meApi';
 import { usePreferencesStore } from '@/services/config/usePreferencesStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
@@ -19,7 +20,6 @@ export const LanguagePage: FC<AppScreenProps<typeof ROUTES.language>> = ({
 }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const isLoading = useMockLoading();
   const language = usePreferencesStore(s => s.language);
   const setLanguage = usePreferencesStore(s => s.setLanguage);
   const [selectedId, setSelectedId] = useState(language.id);
@@ -28,6 +28,11 @@ export const LanguagePage: FC<AppScreenProps<typeof ROUTES.language>> = ({
     const picked = LANGUAGES.find(option => option.id === selectedId);
     if (picked) {
       setLanguage({ id: picked.id, label: picked.caption });
+      meApi
+        .updateProfile({ language_code: picked.id })
+        .catch(error =>
+          Alert.alert(t('editProfile.preferenceFailed'), errorMessage(error)),
+        );
     }
     navigation.goBack();
   };
@@ -35,10 +40,8 @@ export const LanguagePage: FC<AppScreenProps<typeof ROUTES.language>> = ({
   return (
     <FormScreen
       onBack={navigation.goBack}
-      backVariant="plain"
       title={t('language.title')}
       gap={14}
-      isLoading={isLoading}
       testID="language-page"
       actions={
         <PrimaryButton

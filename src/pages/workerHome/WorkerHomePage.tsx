@@ -7,7 +7,6 @@ import SearchIcon from '@/assets/figma/search.svg';
 import SlidersIcon from '@/assets/figma/sliders-horizontal.svg';
 import ZapIcon from '@/assets/figma/zap.svg';
 import {
-  BodyNote,
   BrandAppBar,
   EmptyState,
   ScreenIntro,
@@ -24,25 +23,29 @@ import {
   FilterSheet,
   LocationDropdown,
 } from './components';
-import { WORKER_HOME_STRINGS as S } from './constants';
+import { WORKER_HOME_STRINGS } from './constants';
 import { useWorkerHome } from './hooks/useWorkerHome';
 
 /**
  * Worker home / Discover. Figma: Good afternoon, Aarav · Light (1:1456) / Dark (1:1556).
  * - state + filtering: hooks/useWorkerHome.ts
- * - data: mock/workerHomeMock.ts
+ * - data: GET /worker/feed
  */
 export const WorkerHomePage: FC = () => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const home = useWorkerHome();
-  const emptyState = S.EMPTY_STATE[home.status];
+  const emptyState = WORKER_HOME_STRINGS.EMPTY_STATE[home.status];
 
   const blocks = [
     <ScreenIntro
       key="intro"
-      title={t('workerHome.greeting', { name: home.worker.firstName })}
-      subtitle={S.SUBTITLE}
+      title={
+        home.firstName
+          ? t('workerHome.greeting', { name: home.firstName })
+          : WORKER_HOME_STRINGS.GREETING_FALLBACK
+      }
+      subtitle={WORKER_HOME_STRINGS.SUBTITLE}
     />,
     <LocationDropdown
       key="location"
@@ -102,7 +105,7 @@ export const WorkerHomePage: FC = () => {
     </View>,
     <SegmentedControl
       key="segments"
-      segments={S.SEGMENTS}
+      segments={WORKER_HOME_STRINGS.SEGMENTS}
       value={home.status}
       onChange={home.setStatus}
     />,
@@ -112,45 +115,47 @@ export const WorkerHomePage: FC = () => {
       value={home.categoryId}
       onChange={home.setCategoryId}
     />,
-    ...(home.nearby.length
+    ...(home.error && !home.nearby.length
       ? [
-        <SectionHeading key="nearby" title={t('workerHome.nearbyShifts')} />,
-        ...home.nearby.map(shift => (
-          <ShiftCard
-            key={shift.id}
-            shift={shift}
-            onPress={() => home.openShift(shift)}
-          />
-        )),
-        <SectionHeading
-          key="recommended"
-          title={S.RECOMMENDED_TITLE}
-          action={S.SEE_ALL}
-          onAction={home.openAllShifts}
+        <EmptyState
+          key="error"
+          icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
+          title={WORKER_HOME_STRINGS.LOAD_ERROR_TITLE}
+          body={home.error}
+          action={WORKER_HOME_STRINGS.RETRY}
+          onAction={home.retry}
+          testID="home-error"
         />,
-        ...(home.recommended.length
-          ? home.recommended.map(shift => (
+      ]
+      : home.nearby.length
+        ? [
+          <SectionHeading
+            key="nearby"
+            title={t('workerHome.nearbyShifts')}
+            action={home.status === 'scheduled' ? WORKER_HOME_STRINGS.SEE_ALL : undefined}
+            onAction={home.status === 'scheduled' ? home.openAllShifts : undefined}
+          />,
+          ...home.nearby.map(shift => (
             <ShiftCard
               key={shift.id}
               shift={shift}
               onPress={() => home.openShift(shift)}
             />
-          ))
-          : [<BodyNote key="recommended-empty">{S.EMPTY}</BodyNote>]),
-      ]
-      : [
-        <EmptyState
-          key={`empty-${home.status}`}
-          icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
-          title={emptyState.title}
-          body={emptyState.body}
-          action={emptyState.action}
-          onAction={
-            home.status === 'live' ? home.showScheduled : home.clearFilters
-          }
-          testID={`home-empty-${home.status}`}
-        />,
-      ]),
+          )),
+        ]
+        : [
+          <EmptyState
+            key={`empty-${home.status}`}
+            icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
+            title={emptyState.title}
+            body={emptyState.body}
+            action={emptyState.action}
+            onAction={
+              home.status === 'live' ? home.showScheduled : home.clearFilters
+            }
+            testID={`home-empty-${home.status}`}
+          />,
+        ]),
   ];
 
   return (
@@ -160,15 +165,16 @@ export const WorkerHomePage: FC = () => {
         header={
           <BrandAppBar
             onBellPress={home.openNotifications}
-            hasUnread={home.worker.hasUnreadNotifications}
           />
         }
         blocks={blocks}
+        fillLastBlock={home.nearby.length === 0}
         isLoading={home.isLoading}
       />
       {home.isFilterOpen ? (
         <FilterSheet
           initial={home.filters}
+          businessTypes={home.businessTypes}
           onApply={home.applyFilters}
           onClose={home.closeFilters}
         />

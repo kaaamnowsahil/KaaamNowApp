@@ -69,6 +69,5 @@ export const ROUTES = {
 
   // common (both stacks)
   terms: 'Terms',
-  privacy: 'PrivacyPolicy',
   faq: 'Faq',
 } as const;

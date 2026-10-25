@@ -6,6 +6,9 @@ export const WORKER_HOME_STRINGS = {
     return `Good ${part}, ${name}`;
   },
   SUBTITLE: 'Your next good shift is close by.',
+  GREETING_FALLBACK: 'Find your next shift',
+  LOAD_ERROR_TITLE: 'Couldn’t load shifts',
+  RETRY: 'Try again',
   SEARCH_PLACEHOLDER: 'Role, business or location',
   FILTERS: 'Filters',
   filtersLabel: (n: number) => (n ? `Filters, ${n} active` : 'Filters'),

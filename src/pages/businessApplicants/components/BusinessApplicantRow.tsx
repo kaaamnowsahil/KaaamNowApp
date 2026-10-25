@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
-import type { BusinessApplicant } from '../mock';
+import type { BusinessApplicant } from '@/types';
 
 export const BusinessApplicantRow: FC<{
     applicant: BusinessApplicant;

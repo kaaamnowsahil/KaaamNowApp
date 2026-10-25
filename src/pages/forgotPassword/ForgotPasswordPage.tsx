@@ -1,11 +1,16 @@
 import { useEffect, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { BodyNote, PrimaryButton, ScreenIntro, TextField } from '@/components/ui';
+import {
+  BodyNote,
+  PrimaryButton,
+  ScreenIntro,
+  TextField,
+} from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { AuthApiError, requestPasswordResetOtp, resetPassword } from '@/services/auth/authApi';
+import { resetPassword, sendPasswordResetOtp } from '@/services/auth/authApi';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AuthScreenProps } from '@/types';
 import { toE164India, toLocalDigits } from '@/utils/phone';
@@ -27,7 +32,9 @@ export const ForgotPasswordPage: FC<
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const e164 = toE164India(phone);
-  const resendIn = resendAt ? Math.max(0, Math.ceil((resendAt - now) / 1000)) : 0;
+  const resendIn = resendAt
+    ? Math.max(0, Math.ceil((resendAt - now) / 1000))
+    : 0;
 
   useEffect(() => {
     if (!resendAt) return;
@@ -40,19 +47,21 @@ export const ForgotPasswordPage: FC<
     setBusy(true);
     setError('');
     try {
-      const response = await requestPasswordResetOtp(e164);
-      setResendAt(Date.now() + response.resend_after_seconds * 1000);
+      await sendPasswordResetOtp(e164);
+      setResendAt(Date.now() + 30 * 1000);
       setNow(Date.now());
       setRequested(true);
     } catch (cause) {
-      setError(cause instanceof AuthApiError ? cause.message : t('auth.resetRequestError'));
+      setError(
+        cause instanceof Error ? cause.message : t('auth.resetRequestError'),
+      );
     } finally {
       setBusy(false);
     }
   };
 
   const onResetPassword = async () => {
-    if (!e164 || busy) return;
+    if (!e164 || busy || !requested) return;
     if (password !== confirmPassword) {
       setError(t('auth.passwordMismatch'));
       return;
@@ -67,7 +76,7 @@ export const ForgotPasswordPage: FC<
       await resetPassword(e164, code, password);
       setComplete(true);
     } catch (cause) {
-      setError(cause instanceof AuthApiError ? cause.message : t('auth.resetError'));
+      setError(cause instanceof Error ? cause.message : t('auth.resetError'));
     } finally {
       setBusy(false);
     }
@@ -75,33 +84,51 @@ export const ForgotPasswordPage: FC<
 
   return (
     <FormScreen
+      busy={busy}
       onBack={navigation.goBack}
       testID="forgot-password-page"
-      actions={complete ? undefined : (
-        <PrimaryButton
-          label={busy ? t('auth.working') : requested ? t('auth.resetPassword') : t('auth.sendResetCode')}
-          disabled={busy || !e164 || (requested && (code.length !== OTP_LENGTH || !password || !confirmPassword))}
-          onPress={requested ? onResetPassword : onRequestCode}
-          testID="forgot-password-submit"
-        />
-      )}
+      actions={
+        complete ? undefined : (
+          <PrimaryButton
+            label={
+              busy
+                ? t('auth.working')
+                : requested
+                ? t('auth.resetPassword')
+                : t('auth.sendResetCode')
+            }
+            disabled={
+              busy ||
+              !e164 ||
+              (requested &&
+                (code.length !== OTP_LENGTH || !password || !confirmPassword))
+            }
+            onPress={requested ? onResetPassword : onRequestCode}
+            testID="forgot-password-submit"
+          />
+        )
+      }
     >
       <ScreenIntro
         title={t(complete ? 'auth.resetComplete' : 'auth.forgotPassword')}
         subtitle={t(complete ? 'auth.resetSuccess' : 'auth.forgotSubtitle')}
       />
-      {complete ? (
-        <Pressable onPress={() => navigation.navigate(ROUTES.welcome)} testID="forgot-password-back-to-login">
-          <Text style={[styles.link, { color: colors.primary }]}>{t('auth.backToSignIn')}</Text>
-        </Pressable>
-      ) : (
-        <>
+      {complete ? null : (
+        <View style={styles.fields}>
           <TextField
             label={t('welcome.phoneLabel')}
             prefix={t('welcome.phonePrefix')}
             placeholder={t('welcome.phonePlaceholder')}
             value={phone}
-            onChangeText={value => setPhone(toLocalDigits(value))}
+            onChangeText={value => {
+              const next = toLocalDigits(value);
+              if (next !== phone) {
+                setRequested(false);
+                setCode('');
+                setResendAt(null);
+              }
+              setPhone(next);
+            }}
             keyboardType="number-pad"
             maxLength={10}
             autoComplete="tel-national"
@@ -113,7 +140,9 @@ export const ForgotPasswordPage: FC<
               <TextField
                 label={t('verifyPhone.codeLabel')}
                 value={code}
-                onChangeText={value => setCode(value.replace(/\D/g, '').slice(0, 8))}
+                onChangeText={value =>
+                  setCode(value.replace(/\D/g, '').slice(0, OTP_LENGTH))
+                }
                 keyboardType="number-pad"
                 autoComplete="sms-otp"
                 textContentType="oneTimeCode"
@@ -141,21 +170,38 @@ export const ForgotPasswordPage: FC<
               <BodyNote>{t('auth.resetRequestNotice')}</BodyNote>
             </>
           ) : null}
-          {error ? <BodyNote><Text style={{ color: colors.danger }}>{error}</Text></BodyNote> : null}
+          {error ? (
+            <BodyNote>
+              <Text style={{ color: colors.danger }}>{error}</Text>
+            </BodyNote>
+          ) : null}
           {requested ? (
-            <Pressable disabled={busy || resendIn > 0} onPress={onRequestCode} testID="forgot-password-resend">
-              <Text style={[styles.link, { color: colors.primary }, (busy || resendIn > 0) && styles.disabled]}>
-                {resendIn > 0 ? t('verifyPhone.resendIn', { time: `${resendIn}s` }) : t('auth.resendResetCode')}
+            <Pressable
+              disabled={busy || resendIn > 0}
+              onPress={onRequestCode}
+              testID="forgot-password-resend"
+            >
+              <Text
+                style={[
+                  styles.link,
+                  { color: colors.primary },
+                  (busy || resendIn > 0) && styles.disabled,
+                ]}
+              >
+                {resendIn > 0
+                  ? t('verifyPhone.resendIn', { time: `${resendIn}s` })
+                  : t('auth.resendResetCode')}
               </Text>
             </Pressable>
           ) : null}
-        </>
+        </View>
       )}
     </FormScreen>
   );
 };
 
 const styles = StyleSheet.create({
+  fields: { gap: 12 },
   link: { fontSize: 14, textDecorationLine: 'underline' },
   disabled: { opacity: 0.5 },
 });

@@ -1,5 +1,5 @@
 import { useState, type FC } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
@@ -9,7 +9,6 @@ import {
   PrimaryButton,
   ScreenIntro,
   SecondaryButton,
-  TextButton,
   TextField,
 } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
@@ -46,13 +45,19 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
     setError('');
     try {
       const response = await loginWithPassword(e164, password);
-      const role = response.me.active_role === 'business' || response.me.active_role === 'worker'
-        ? response.me.active_role
-        : (response.me.roles.find(value => value === 'business' || value === 'worker') as UserRole | undefined) ?? 'worker';
+      const role =
+        response.me.active_role === 'business' ||
+        response.me.active_role === 'worker'
+          ? response.me.active_role
+          : (response.me.roles.find(
+              value => value === 'business' || value === 'worker',
+            ) as UserRole | undefined) ?? 'worker';
       await signIn({ phone: e164, role, tokens: response.tokens });
       clearSignup();
     } catch (cause) {
-      setError(cause instanceof AuthApiError ? cause.message : t('auth.loginError'));
+      setError(
+        cause instanceof AuthApiError ? cause.message : t('auth.loginError'),
+      );
     } finally {
       setBusy(false);
     }
@@ -60,7 +65,9 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
 
   return (
     <FormScreen
+      busy={busy}
       testID="welcome-page"
+      gap={16}
       actions={
         <>
           <PrimaryButton
@@ -86,59 +93,75 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
         title={t('welcome.title')}
         subtitle={t('welcome.subtitle')}
       />
-      <TextField
-        label={t('welcome.phoneLabel')}
-        helper={t('welcome.phoneHelper')}
-        prefix={t('welcome.phonePrefix')}
-        placeholder={t('welcome.phonePlaceholder')}
-        value={phone}
-        onChangeText={setPhone}
-        keyboardType="number-pad"
-        autoComplete="tel-national"
-        textContentType="telephoneNumber"
-        testID="welcome-phone-input"
-      />
-      <TextField
-        label={t('auth.passwordLabel')}
-        placeholder={t('auth.passwordPlaceholder')}
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoComplete="current-password"
-        textContentType="password"
-        testID="welcome-password-input"
-      />
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => navigation.navigate(ROUTES.forgotPassword)}
-        style={styles.forgotLink}
-        testID="welcome-forgot-password"
-      >
-        <Text style={[styles.link, { color: colors.primary }]}>{t('auth.forgotPassword')}</Text>
-      </Pressable>
-      {error ? <BodyNote><Text style={{ color: colors.danger }}>{error}</Text></BodyNote> : null}
-      <BodyNote>{t('welcome.legal')}</BodyNote>
-      <View style={styles.legalLinks}>
-        <TextButton
-          label={t('terms.title')}
-          onPress={() => navigation.navigate(ROUTES.terms)}
-          tone="primary"
-          testID="welcome-terms"
+      <View style={styles.fields}>
+        <TextField
+          label={t('welcome.phoneLabel')}
+          prefix={t('welcome.phonePrefix')}
+          placeholder={t('welcome.phonePlaceholder')}
+          value={phone}
+          onChangeText={setPhone}
+          keyboardType="number-pad"
+          autoComplete="tel-national"
+          textContentType="telephoneNumber"
+          testID="welcome-phone-input"
         />
-        <TextButton
-          label={t('privacy.title')}
-          onPress={() => navigation.navigate(ROUTES.privacy)}
-          tone="primary"
-          testID="welcome-privacy"
+        <TextField
+          label={t('auth.passwordLabel')}
+          placeholder={t('auth.passwordPlaceholder')}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoComplete="current-password"
+          textContentType="password"
+          testID="welcome-password-input"
         />
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => navigation.navigate(ROUTES.forgotPassword)}
+          style={styles.forgotLink}
+          testID="welcome-forgot-password"
+        >
+          <Text style={[styles.link, { color: colors.primary }]}>
+            {t('auth.forgotPassword')}
+          </Text>
+        </Pressable>
       </View>
+      {error ? (
+        <BodyNote>
+          <Text style={{ color: colors.danger }}>{error}</Text>
+        </BodyNote>
+      ) : null}
+      <BodyNote>
+        <Trans
+          i18nKey="welcome.legalLinked"
+          components={{
+            terms: (
+              <Text
+                accessibilityRole="link"
+                onPress={() => navigation.navigate(ROUTES.terms)}
+                style={[styles.inlineLink, { color: colors.primary }]}
+                testID="welcome-terms"
+              />
+            ),
+          }}
+        />{' '}
+        <Text
+          accessibilityRole="link"
+          onPress={() => navigation.navigate(ROUTES.faq)}
+          style={[styles.inlineLink, { color: colors.primary }]}
+          testID="welcome-faq"
+        >
+          {t('faq.title')}
+        </Text>
+      </BodyNote>
     </FormScreen>
   );
 };
 
 const styles = StyleSheet.create({
   logoRow: { alignItems: 'center' },
+  fields: { gap: 12 },
   forgotLink: { alignSelf: 'flex-end', paddingVertical: 2 },
   link: { fontSize: 14, textDecorationLine: 'underline' },
-  legalLinks: { flexDirection: 'row', justifyContent: 'center', gap: 22 },
+  inlineLink: { textDecorationLine: 'underline' },
 });

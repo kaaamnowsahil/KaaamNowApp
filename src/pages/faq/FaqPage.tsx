@@ -6,10 +6,10 @@ import { BodyNote } from '@/components/ui';
 import { FormScreen } from '@/layout/FormScreen';
 
 import { FaqAccordion, HelpCard, SearchField } from './components';
-import { FAQ_STRINGS as S } from './constants';
+import { FAQ_STRINGS } from './constants';
 import { useFaq } from './hooks/useFaq';
 
-/** Profile → FAQ & Help (Figma 13 · Account / Help). Questions: mock/faqMock.ts */
+/** Profile → FAQ & Help (Figma 13 · Account / Help). Questions: GET /content/faqs (admin-managed). */
 export const FaqPage: FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
@@ -18,7 +18,6 @@ export const FaqPage: FC = () => {
   return (
     <FormScreen
       onBack={navigation.goBack}
-      backVariant="plain"
       title={t('faq.title')}
       gap={16}
       isLoading={f.isLoading}
@@ -26,20 +25,22 @@ export const FaqPage: FC = () => {
     >
       <SearchField
         value={f.query}
-        placeholder={S.SEARCH_PLACEHOLDER}
+        placeholder={FAQ_STRINGS.SEARCH_PLACEHOLDER}
         onChangeText={f.setQuery}
       />
       {f.items.length ? (
         <FaqAccordion items={f.items} openId={f.openId} onToggle={f.toggle} />
       ) : (
-        <BodyNote>{S.NO_RESULTS}</BodyNote>
+        <BodyNote>{f.emptyMessage}</BodyNote>
       )}
-      <HelpCard
-        title={S.HELP_TITLE}
-        caption={S.HELP_CAPTION}
-        actionLabel={S.CONTACT}
-        onPress={f.contactSupport}
-      />
+      {f.canContactSupport ? (
+        <HelpCard
+          title={FAQ_STRINGS.HELP_TITLE}
+          caption={FAQ_STRINGS.HELP_CAPTION}
+          actionLabel={FAQ_STRINGS.CONTACT}
+          onPress={f.contactSupport}
+        />
+      ) : null}
     </FormScreen>
   );
 };

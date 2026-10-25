@@ -31,7 +31,8 @@
     "phoneHelper": "اپنے اکاؤنٹ میں رجسٹرڈ موبائل نمبر استعمال کریں۔",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "آگے بڑھ کر آپ KaaamNow کی سروس کی شرائط اور رازداری کی پالیسی سے اتفاق کرتے ہیں۔",
+    "legalLinked": "آگے بڑھ کر آپ KaaamNow کی <terms>سروس کی شرائط</terms> سے اتفاق کرتے ہیں۔",
+    "legal": "آگے بڑھ کر آپ KaaamNow کی سروس کی شرائط سے اتفاق کرتے ہیں۔",
     "signIn": "سائن اِن کریں"
   },
   "verifyPhone": {
@@ -562,7 +563,8 @@
     "waiting": "پہلے درخواست دہندہ کا انتظار ہے",
     "reviewApplicants": "درخواست دہندگان کا جائزہ لیں",
     "openShift": "کھولیں",
-    "editShift": "شفٹ میں ترمیم کریں"
+    "editShift": "شفٹ میں ترمیم کریں",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "لائیو · ضرورت کے مطابق",
@@ -579,7 +581,7 @@
     "locationFetching": "آپ کے آلے کی لوکیشن حاصل کی جا رہی ہے…",
     "locationUnavailable": "آلے کی لوکیشن حاصل نہیں ہو سکی۔ لوکیشن کی اجازت دیکھیں یا کام کی جگہ کا پتہ درج کریں۔",
     "locationEditedHint": "کام کی جگہ تبدیل کی گئی؛ محفوظ GPS پن ہٹا دیا گیا ہے۔",
-    "mapsConfigurationMissing": "Google Maps پیش منظر کے لیے مقامی .env.local فائل میں GOOGLE_MAPS_API_KEY درکار ہے۔",
+    "mapsConfigurationMissing": "Google Maps پیش منظر کے لیے مقامی .env.dev فائل میں GOOGLE_MAPS_API_KEY درکار ہے۔",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "ضروریات",
     "workers": "درکار کارکن",
@@ -868,8 +870,5 @@
     "retryCode": "کوڈ دوبارہ بھیجنے کے لیے ٹیپ کریں۔",
     "resendResetCode": "ایک اور کوڈ بھیجیں",
     "loadingOptions": "اختیارات لوڈ ہو رہے ہیں…"
-  },
-  "privacy": {
-    "title": "رازداری کی پالیسی"
   }
 }

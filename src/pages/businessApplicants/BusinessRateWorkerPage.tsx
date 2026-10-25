@@ -16,7 +16,9 @@ import { ROUTES } from '@/constants/routes';
 import { TabScreen } from '@/layout/TabScreen';
 import { useBusinessApplicantStore } from '@/pages/businessApplicants/store/useBusinessApplicantStore';
 import { useBusinessPaymentStore } from '@/services/business/useBusinessPaymentStore';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useShiftAction } from '@/services/shifts/useShiftFlow';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
@@ -27,7 +29,9 @@ export const BusinessRateWorkerPage: FC<
 > = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const isLoading = useMockLoading();
+  const ratingTags = useApiQuery(() => shiftsApi.ratingTags('business_to_worker'), []);
+  const isLoading = ratingTags.isLoading;
+  const { busy, run } = useShiftAction();
   const worker = useBusinessApplicantStore(state =>
     state.applicants.find(item => item.id === route.params.workerId),
   );
@@ -57,6 +61,7 @@ export const BusinessRateWorkerPage: FC<
   if (!worker) {
     return (
       <TabScreen
+        busy={busy}
         header={<BrandAppBar onBellPress={() => navigation.navigate(ROUTES.notifications)} />}
         blocks={[
           <ScreenIntro
@@ -70,27 +75,29 @@ export const BusinessRateWorkerPage: FC<
     );
   }
 
-  const tagsOptions = [
-    'onTime',
-    'skilled',
-    'professional',
-    'wouldHireAgain',
-    'greatAttitude',
-  ].map(id => ({
-    id,
-    label: t(`businessRating.tags.${id}`),
-  }));
+  const tagsOptions = (ratingTags.data ?? []).map(tag => ({ id: tag, label: tag }));
 
   const submit = () => {
     if (!rating) return;
-    rateWorker({
-      workerId: worker.id,
-      rating,
-      tags,
-      comment: comment.trim(),
-      createdAt: Date.now(),
-    });
-    continueRatingFlow();
+    run(
+      () =>
+        shiftsApi.rate(worker.id, {
+          stars: rating,
+          tags,
+          review: comment.trim(),
+        }),
+      () => {
+        rateWorker({
+          workerId: worker.id,
+          rating,
+          tags,
+          comment: comment.trim(),
+          createdAt: Date.now(),
+        });
+        continueRatingFlow();
+      },
+      t('businessRating.submitFailed'),
+    );
   };
 
   const blocks = [
@@ -181,7 +188,7 @@ export const BusinessRateWorkerPage: FC<
     <View key="actions" style={styles.actions}>
       <PrimaryButton
         label={t('businessRating.submit')}
-        disabled={!rating}
+        disabled={!rating || busy}
         onPress={submit}
         testID="business-rate-worker-submit"
       />
@@ -195,6 +202,7 @@ export const BusinessRateWorkerPage: FC<
 
   return (
     <TabScreen
+      busy={busy}
       header={<BrandAppBar onBellPress={() => navigation.navigate(ROUTES.notifications)} />}
       blocks={blocks}
       gap={18}

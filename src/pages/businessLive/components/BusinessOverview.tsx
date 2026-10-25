@@ -7,6 +7,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 
 type BusinessOverviewProps = {
     businessName: string;
+    isVerified: boolean;
     liveConfirmed: number;
     liveTotal: number;
     newApplicants: number;
@@ -14,6 +15,7 @@ type BusinessOverviewProps = {
 
 export const BusinessOverview: FC<BusinessOverviewProps> = ({
     businessName,
+    isVerified,
     liveConfirmed,
     liveTotal,
     newApplicants,
@@ -27,7 +29,12 @@ export const BusinessOverview: FC<BusinessOverviewProps> = ({
                 {t('businessDashboard.heading')}
             </Text>
             <Text style={[styles.subtitle, { color: colors.textSubtle }]}>
-                {t('businessDashboard.verifiedSubtitle', { business: businessName })}
+                {t(
+                    isVerified
+                        ? 'businessDashboard.verifiedSubtitle'
+                        : 'businessDashboard.unverifiedSubtitle',
+                    { business: businessName },
+                )}
             </Text>
             <View style={styles.metrics}>
                 <View style={[styles.metric, { backgroundColor: colors.fill }]}>

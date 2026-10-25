@@ -16,7 +16,6 @@ import { useEditProfile } from './hooks/useEditProfile';
 /**
  * Profile → Edit profile (Figma 13 · Account / Edit profile).
  * - state + validation: hooks/useEditProfile.ts, schema.ts
- * - data: mock/editProfileMock.ts
  */
 export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
   navigation,
@@ -27,7 +26,6 @@ export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
   return (
     <FormScreen
       onBack={navigation.goBack}
-      backVariant="plain"
       title={t('editProfile.title')}
       gap={16}
       isLoading={f.isLoading}
@@ -43,6 +41,8 @@ export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
     >
       <AvatarPicker
         initials={f.initials}
+        imageUri={f.photoUri}
+        isUploading={f.isUploading}
         actionLabel={t('editProfile.changePhoto')}
         accessibilityLabel={t('editProfile.changePhotoA11y')}
         onPress={f.changePhoto}
@@ -77,10 +77,8 @@ export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
       />
       <ChipGroup
         label={t('editProfile.workTypeLabel')}
-        options={f.workTypeOptions.map(option => ({
-          ...option,
-          label: t(`workerSignup.workTypes.${option.id}`),
-        }))}
+        hint={f.loadError || undefined}
+        options={f.workTypeOptions}
         selected={f.form.workTypes}
         onToggle={f.toggleWorkType}
       />

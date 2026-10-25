@@ -1,6 +1,6 @@
 import { useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import {
   FlowHeading,
@@ -12,18 +12,28 @@ import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { ApiError, errorMessage } from '@/services/api/apiClient';
+import { getDevicePosition } from '@/services/maps/devicePosition';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { splitTimeRange } from '@/utils/format';
 
 import { CheckInHelpSheet } from './components';
-import { CHECK_IN } from './mock';
+
+const CHECK_IN_STRINGS = {
+  CODE_LENGTH: 4,
+  WITHIN_METERS: 200,
+  LOCATION_TITLE: 'Location needed',
+  LOCATION_BODY: 'Turn on location so we can confirm you’re at the workplace, then try again.',
+  FAILED: 'Couldn’t check you in',
+} as const;
 
 /**
  * Live shift step 5. Figma: Live · Ready to check in? (light/dark).
  * A correct code replaces this screen with the active shift.
- * - data: mock/shiftCheckInMock.ts
+ * - data: POST /worker/assignments/{id}/check-in with device location + site code
  */
 export const ShiftCheckInPage: FC<
   AppScreenProps<typeof ROUTES.shiftCheckIn>
@@ -32,14 +42,42 @@ export const ShiftCheckInPage: FC<
   const { shift } = route.params;
   const times = splitTimeRange(shift.timeLabel);
   const { colors } = useTheme();
-  const isLoading = useMockLoading();
+  const assignmentId = shift.assignmentId ?? '';
   const [code, setCode] = useState('');
   const [isWrong, setIsWrong] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-  const startShift = () => navigation.replace(ROUTES.activeShift, { shift });
+  const [isVerifying, setIsVerifying] = useState(false);
+  const contact = useApiQuery(
+    async () => (assignmentId ? shiftsApi.contact(assignmentId) : null),
+    [assignmentId],
+  );
 
-  const verify = () =>
-    code === CHECK_IN.code ? startShift() : setIsWrong(true);
+  const verify = async () => {
+    if (isVerifying) return;
+    setIsVerifying(true);
+    try {
+      const position = await getDevicePosition();
+      if (!position) {
+        Alert.alert(CHECK_IN_STRINGS.LOCATION_TITLE, CHECK_IN_STRINGS.LOCATION_BODY);
+        return;
+      }
+      const assignment = await shiftsApi.checkIn(assignmentId, {
+        ...position,
+        check_in_code: code,
+      });
+      navigation.replace(ROUTES.activeShift, {
+        shift: { ...shift, assignmentStatus: assignment.status },
+      });
+    } catch (error) {
+      if (error instanceof ApiError && error.code === 'check_in_code_invalid') {
+        setIsWrong(true);
+      } else {
+        Alert.alert(CHECK_IN_STRINGS.FAILED, errorMessage(error));
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   return (
     <>
@@ -49,13 +87,12 @@ export const ShiftCheckInPage: FC<
         compactTitle
         headerTag={t('workerFlow.checkIn.headerRight')}
         gap={12}
-        isLoading={isLoading}
         testID="shift-check-in-page"
         actions={
           <>
             <PrimaryButton
               label={t('workerFlow.checkIn.verify')}
-              disabled={code.length !== CHECK_IN.code.length}
+              disabled={code.length !== CHECK_IN_STRINGS.CODE_LENGTH || isVerifying || !assignmentId}
               onPress={verify}
               testID="shift-check-in-verify"
             />
@@ -75,7 +112,7 @@ export const ShiftCheckInPage: FC<
           })}
         />
         <InfoCallout
-          text={t('workerFlow.checkIn.within', { meters: CHECK_IN.withinMeters })}
+          text={t('workerFlow.checkIn.within', { meters: CHECK_IN_STRINGS.WITHIN_METERS })}
         />
         <MapPreview
           variant="pin"
@@ -97,7 +134,7 @@ export const ShiftCheckInPage: FC<
             accessibilityLabel={t('workerFlow.checkIn.codeLabel')}
             value={code}
             onChangeText={v => {
-              setCode(v.replace(/\D/g, '').slice(0, CHECK_IN.code.length));
+              setCode(v.replace(/\D/g, '').slice(0, CHECK_IN_STRINGS.CODE_LENGTH));
               setIsWrong(false);
             }}
             keyboardType="number-pad"
@@ -128,10 +165,7 @@ export const ShiftCheckInPage: FC<
       {isHelpOpen ? (
         <CheckInHelpSheet
           shift={shift}
-          onCheckedIn={() => {
-            setIsHelpOpen(false);
-            startShift();
-          }}
+          contact={contact.data ?? null}
           onClose={() => setIsHelpOpen(false)}
         />
       ) : null}

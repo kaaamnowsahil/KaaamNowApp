@@ -21,7 +21,7 @@ import { useActiveShift } from './hooks/useActiveShift';
 /**
  * Live shift step 6. Figma: Live · Active shift (light/dark).
  * - timer: hooks/useActiveShift.ts
- * - data: mock/activeShiftMock.ts
+ * - data: GET /assignments/{id}, GET /assignments/{id}/contact
  */
 export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
   navigation,
@@ -30,7 +30,7 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
   const { t } = useTranslation();
   const { shift } = route.params;
   const { colors } = useTheme();
-  const a = useActiveShift();
+  const a = useActiveShift(shift.assignmentId);
   const times = splitTimeRange(shift.timeLabel);
 
   const report = () =>
@@ -72,7 +72,7 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
         title={t('workerFlow.activeShift.heading')}
         subtitle={t('workerFlow.activeShift.subtitle', {
           role: shift.title,
-          code: a.shift.checkInCode,
+          code: a.reference,
         })}
       />
       <MapPreview
@@ -105,15 +105,17 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
         <DetailRow
           size="compact"
           title={t('workerFlow.activeShift.checkInRecorded')}
-          caption={a.shift.checkInRecorded}
+          caption={a.checkInRecorded}
           onPress={() => navigation.navigate(ROUTES.shiftDetails, { shift, bookingStatus: 'confirmed' })}
         />
-        <DetailRow
-          size="compact"
-          title={t('workerFlow.activeShift.shiftLead')}
-          caption={t('workerFlow.activeShift.lead', { name: a.shift.leadName })}
-          onPress={() => Linking.openURL(`sms:${a.shift.leadPhone}`)}
-        />
+        {a.leadPhone ? (
+          <DetailRow
+            size="compact"
+            title={t('workerFlow.activeShift.shiftLead')}
+            caption={t('workerFlow.activeShift.lead', { name: a.leadName })}
+            onPress={() => Linking.openURL(`sms:${a.leadPhone}`)}
+          />
+        ) : null}
       </View>
     </FormScreen>
   );

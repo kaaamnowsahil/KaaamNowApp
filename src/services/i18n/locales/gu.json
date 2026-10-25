@@ -31,7 +31,8 @@
     "phoneHelper": "તમારા ખાતા સાથે નોંધાયેલ મોબાઇલ નંબર વાપરો.",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "આગળ વધીને તમે KaaamNowની સેવાની શરતો અને ગોપનીયતા નીતિ સ્વીકારો છો.",
+    "legalLinked": "આગળ વધીને તમે KaaamNowની <terms>સેવાની શરતો</terms> સ્વીકારો છો.",
+    "legal": "આગળ વધીને તમે KaaamNowની સેવાની શરતો સ્વીકારો છો.",
     "signIn": "સાઇન ઇન કરો"
   },
   "verifyPhone": {
@@ -573,7 +574,8 @@
     "waiting": "પ્રથમ અરજદારની રાહ જોવાઈ રહી છે",
     "reviewApplicants": "અરજદારોની સમીક્ષા કરો",
     "openShift": "ખોલો",
-    "editShift": "શિફ્ટ સંપાદિત કરો"
+    "editShift": "શિફ્ટ સંપાદિત કરો",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "લાઇવ · માંગ મુજબ",
@@ -590,7 +592,7 @@
     "locationFetching": "તમારા ઉપકરણનું સ્થાન મેળવી રહ્યા છીએ…",
     "locationUnavailable": "ઉપકરણનું સ્થાન મેળવી શકાયું નથી. સ્થાનની પરવાનગી તપાસો અથવા કામનું સરનામું દાખલ કરો.",
     "locationEditedHint": "કામનું સ્થળ બદલ્યું; સાચવેલી GPS પિન દૂર કરી.",
-    "mapsConfigurationMissing": "Google Maps પ્રિવ્યૂ માટે સ્થાનિક .env.local ફાઇલમાં GOOGLE_MAPS_API_KEY જરૂરી છે.",
+    "mapsConfigurationMissing": "Google Maps પ્રિવ્યૂ માટે સ્થાનિક .env.dev ફાઇલમાં GOOGLE_MAPS_API_KEY જરૂરી છે.",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "જરૂરિયાતો",
     "workers": "જરૂરી કર્મચારીઓ",
@@ -868,8 +870,5 @@
     "retryCode": "કોડ ફરી મોકલવા ટેપ કરો.",
     "resendResetCode": "બીજો કોડ મોકલો",
     "loadingOptions": "વિકલ્પો લોડ થઈ રહ્યા છે…"
-  },
-  "privacy": {
-    "title": "ગોપનીયતા નીતિ"
   }
 }

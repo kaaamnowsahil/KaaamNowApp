@@ -22,7 +22,6 @@ export const BusinessEditProfilePage: FC<
     return (
         <FormScreen
             onBack={navigation.goBack}
-            backVariant="plain"
             title={t('businessProfile.editBusinessProfile')}
             gap={16}
             isLoading={form.isLoading}
@@ -38,6 +37,8 @@ export const BusinessEditProfilePage: FC<
         >
             <AvatarPicker
                 initials={form.initials}
+                imageUri={form.photoUri}
+                isUploading={form.isUploading}
                 actionLabel={t('editProfile.changePhoto')}
                 accessibilityLabel={t('editProfile.changePhotoA11y')}
                 onPress={form.changePhoto}
@@ -76,13 +77,10 @@ export const BusinessEditProfilePage: FC<
             />
             <ChipGroup
                 label={t('businessSignup.businessTypeLabel')}
-                hint={form.errors.businessType}
-                options={form.businessTypeOptions.map(option => ({
-                    ...option,
-                    label: t(`businessSignup.businessTypes.${option.id}`),
-                }))}
-                selected={[form.form.businessType]}
-                onToggle={form.selectBusinessType}
+                hint={form.errors.businessTypes || form.loadError || undefined}
+                options={form.businessTypeOptions}
+                selected={form.form.businessTypes}
+                onToggle={form.toggleBusinessType}
             />
         </FormScreen>
     );

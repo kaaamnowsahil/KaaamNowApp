@@ -6,7 +6,13 @@ import {
   useOnboardingStore,
 } from '@/services/onboarding/useOnboardingStore';
 import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
-import { AuthApiError, loadWorkerSignupOptions } from '@/services/auth';
+import {
+  AuthApiError,
+  checkPhoneForSignup,
+  sendOtp,
+  type OtpSendResponse,
+  loadWorkerSignupOptions,
+} from '@/services/auth';
 import { toE164India, toLocalDigits } from '@/utils/phone';
 import { fieldErrors } from '@/utils/validation';
 
@@ -23,13 +29,18 @@ const EMPTY: WorkerSignupForm = {
   confirmPassword: '',
 };
 
-export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
+export const useWorkerSignup = (
+  onDone: (phoneE164: string, sent: OtpSendResponse) => void,
+) => {
   const { t } = useTranslation();
   const workerSignupSchema = createWorkerSignupSchema(t);
   const setWorker = useOnboardingStore(s => s.setWorker);
   const [form, setForm] = useState<WorkerSignupForm>(EMPTY);
   const [location, setLocation] = useState<GeoPoint | undefined>();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Partial<Record<keyof WorkerSignupForm, boolean>>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [workTypeOptions, setWorkTypeOptions] = useState<
     { id: string; label: string; sortOrder: number }[]
   >([]);
@@ -44,34 +55,60 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
       })
       .catch(error => {
         if (active) {
-          setCatalogError(error instanceof AuthApiError ? error.message : t('errors.generic'));
+          setCatalogError(
+            error instanceof AuthApiError ? error.message : t('errors.generic'),
+          );
         }
       })
       .finally(() => {
         if (active) setCatalogReady(true);
       });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [t]);
   const update = <K extends keyof WorkerSignupForm>(
     key: K,
     value: WorkerSignupForm[K],
   ) => {
     setForm(prev => ({ ...prev, [key]: value }));
-    setErrors(prev => ({ ...prev, [key]: '' }));
+    setServerErrors(prev => ({ ...prev, [key]: '' }));
   };
+
+  const parsedForm = workerSignupSchema.safeParse(form);
+  const schemaErrors = parsedForm.success ? {} : fieldErrors(parsedForm.error);
+  const errors: Record<string, string> = {};
+  for (const key of Object.keys(EMPTY) as (keyof WorkerSignupForm)[]) {
+    const message =
+      serverErrors[key] || (submitted || touched[key] ? schemaErrors[key] : '');
+    if (message) errors[key] = message;
+  }
 
   const currentAddress = useCurrentAddress(picked => {
     update('address', picked.address);
     setLocation({ lat: picked.lat, lng: picked.lng });
   });
 
-  const submit = () => {
-    const parsed = workerSignupSchema.safeParse(form);
-    if (!parsed.success) {
-      setErrors(fieldErrors(parsed.error));
+  const submit = async () => {
+    setSubmitted(true);
+    const parsed = parsedForm;
+    if (!parsed.success || busy) {
       return;
     }
     const phone = toE164India(parsed.data.phone) as string;
+    setBusy(true);
+    let sent: OtpSendResponse;
+    try {
+      await checkPhoneForSignup(phone);
+      sent = await sendOtp(phone, 'sign_up', 'worker');
+    } catch (cause) {
+      setBusy(false);
+      setServerErrors(prev => ({
+        ...prev,
+        phone: cause instanceof Error ? cause.message : t('errors.generic'),
+      }));
+      return;
+    }
     setWorker({
       fullName: parsed.data.fullName,
       phone,
@@ -82,13 +119,17 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
       workTypes: parsed.data.workTypes,
       password: parsed.data.password,
     });
-    onDone(phone);
+    setBusy(false);
+    onDone(phone, sent);
   };
 
   return {
     form,
     errors,
-    canSubmit: catalogReady && workTypeOptions.length > 0 && workerSignupSchema.safeParse(form).success,
+    busy,
+    canSubmit: catalogReady && workTypeOptions.length > 0,
+    touch: (key: keyof WorkerSignupForm) =>
+      setTouched(prev => ({ ...prev, [key]: true })),
     catalogError,
     catalogLoading: !catalogReady,
     setFullName: (v: string) => update('fullName', v),
@@ -101,13 +142,15 @@ export const useWorkerSignup = (onDone: (phoneE164: string) => void) => {
       update('address', v);
       setLocation(undefined);
     },
-    toggleWorkType: (id: string) =>
+    toggleWorkType: (id: string) => {
+      setTouched(prev => ({ ...prev, workTypes: true }));
       update(
         'workTypes',
         form.workTypes.includes(id)
           ? form.workTypes.filter(w => w !== id)
           : [...form.workTypes, id],
-      ),
+      );
+    },
     workTypeOptions,
     ...currentAddress,
     submit,

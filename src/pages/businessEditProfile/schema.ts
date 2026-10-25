@@ -8,7 +8,10 @@ export const createBusinessEditProfileSchema = (t: (key: string) => string) =>
             .min(2, t('businessSignup.errors.nameMin'))
             .max(80, t('businessSignup.errors.nameMax')),
         address: z.string().trim().min(3, t('businessSignup.errors.address')),
-        businessType: z.string().min(1, t('businessSignup.errors.businessType')),
+        businessTypes: z
+            .array(z.string())
+            .min(1, t('businessSignup.errors.businessType'))
+            .max(10),
     });
 
 export type BusinessEditProfileForm = z.input<

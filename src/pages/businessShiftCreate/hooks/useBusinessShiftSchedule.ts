@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { useBusinessShiftStore } from '@/services/business/useBusinessShiftStore';
 import type { BusinessShiftDraft } from '@/types';
 
 import {
@@ -13,10 +12,8 @@ export const useBusinessShiftSchedule = (
   initialDraft?: BusinessShiftDraft | null,
   defaults?: { responsibilities: string; role: string; category: string },
 ) => {
-  const savedDraft = useBusinessShiftStore(state => state.draft);
-  const saveDraft = useBusinessShiftStore(state => state.saveDraft);
   const [draft, setDraft] = useState(() => {
-    const existingDraft = initialDraft ?? savedDraft;
+    const existingDraft = initialDraft;
     if (existingDraft) {
       return {
         ...existingDraft,
@@ -144,8 +141,8 @@ export const useBusinessShiftSchedule = (
     updateSchedule,
     setSameForEveryDate,
     validate,
-    save: () => {
-      const saved = {
+    trimmed: () => {
+      return {
         ...draft,
         requirement: draft.requirement.trim(),
         role: draft.role.trim(),
@@ -159,8 +156,6 @@ export const useBusinessShiftSchedule = (
           hourlyRate: schedule.hourlyRate.trim(),
         })),
       };
-      saveDraft(saved);
-      return saved;
     },
   };
 };

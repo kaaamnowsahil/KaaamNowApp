@@ -1,13 +1,17 @@
 export {
   AuthApiError,
   apiBaseUrl,
+  checkPhoneForSignup,
   completeSignup,
   loginWithPassword,
   refreshAuthTokens,
-  requestPasswordResetOtp,
-  requestSignupOtp,
   resetPassword,
   revokeRefreshToken,
+  sendOtp,
+  type OtpSendResponse,
 } from './authApi';
-export { loadBusinessSignupOptions, loadWorkerSignupOptions } from './signupCatalogApi';
+export {
+  loadBusinessSignupOptions,
+  loadWorkerSignupOptions,
+} from './signupCatalogApi';
 export { logoutAuthSession } from './authSession';

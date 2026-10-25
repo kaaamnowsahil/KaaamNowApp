@@ -1,6 +1,6 @@
 import type { FC } from 'react';
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Trans, useTranslation } from 'react-i18next';
+import { StyleSheet, Text } from 'react-native';
 
 import BriefcaseIcon from '@/assets/icons/briefcase.svg';
 import MailIcon from '@/assets/icons/mail.svg';
@@ -13,44 +13,56 @@ import {
   IconField,
   PrimaryButton,
   ScreenIntro,
-  TextButton,
   TextField,
 } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { useTheme } from '@/theme/ThemeProvider';
 import type { AuthScreenProps } from '@/types';
 import { formatLocalPhone } from '@/utils/phone';
 
 import { useBusinessSignup } from './hooks/useBusinessSignup';
 
+const SIGNUP_CHIPS_COLLAPSED = 6;
+
 /**
  * Business sign-up orchestrator. No dedicated Figma frame; built from the
  * Edit business profile frame (25:242 / 25:304) fields and chips.
  * - state + validation: hooks/useBusinessSignup.ts, schema.ts
- * - business types + current address: mock/businessSignupMock.ts
+ * - business types + current address: backend catalog and device location
  */
 export const BusinessSignupPage: FC<
   AuthScreenProps<typeof ROUTES.businessSignup>
 > = ({ navigation }) => {
   const { t } = useTranslation();
-  const f = useBusinessSignup(phone =>
-    navigation.navigate(ROUTES.verifyPhone, { phone, intent: 'signUp' }),
+  const { colors } = useTheme();
+  const f = useBusinessSignup((phone, sent) =>
+    navigation.navigate(ROUTES.verifyPhone, {
+      phone,
+      intent: 'signUp',
+      expiresInSeconds: sent.expires_in_seconds,
+      resendAfterSeconds: sent.resend_after_seconds,
+    }),
   );
 
   return (
     <FormScreen
+      busy={f.busy}
       onBack={navigation.goBack}
       testID="business-signup-page"
       actions={
         <PrimaryButton
           label={t('businessSignup.continue')}
           onPress={f.submit}
-          disabled={!f.canSubmit}
+          disabled={!f.canSubmit || f.busy}
           testID="business-continue"
         />
       }
     >
-      <ScreenIntro title={t('businessSignup.title')} subtitle={t('businessSignup.subtitle')} />
+      <ScreenIntro
+        title={t('businessSignup.title')}
+        subtitle={t('businessSignup.subtitle')}
+      />
       <IconField
         label={t('businessSignup.businessNameLabel')}
         icon={BriefcaseIcon}
@@ -60,6 +72,7 @@ export const BusinessSignupPage: FC<
         autoCapitalize="words"
         autoComplete="organization"
         textContentType="organizationName"
+        onBlur={() => f.touch('businessName')}
         error={f.errors.businessName}
         testID="business-name"
       />
@@ -72,6 +85,7 @@ export const BusinessSignupPage: FC<
         autoCapitalize="words"
         autoComplete="name"
         textContentType="name"
+        onBlur={() => f.touch('contactName')}
         error={f.errors.contactName}
         testID="business-contact"
       />
@@ -85,6 +99,7 @@ export const BusinessSignupPage: FC<
         keyboardType="number-pad"
         autoComplete="tel-national"
         textContentType="telephoneNumber"
+        onBlur={() => f.touch('phone')}
         error={f.errors.phone}
         testID="business-phone"
       />
@@ -95,7 +110,10 @@ export const BusinessSignupPage: FC<
         secureTextEntry
         autoComplete="new-password"
         textContentType="newPassword"
-        helper={f.errors.password || t('auth.passwordHint')}
+        placeholder={t('auth.newPasswordPlaceholder')}
+        onBlur={() => f.touch('password')}
+        helper={t('auth.passwordHint')}
+        error={f.errors.password}
         testID="business-password"
       />
       <TextField
@@ -105,7 +123,9 @@ export const BusinessSignupPage: FC<
         secureTextEntry
         autoComplete="new-password"
         textContentType="newPassword"
-        helper={f.errors.confirmPassword}
+        placeholder={t('auth.confirmPasswordPlaceholder')}
+        onBlur={() => f.touch('confirmPassword')}
+        error={f.errors.confirmPassword}
         testID="business-confirm-password"
       />
       <IconField
@@ -118,6 +138,7 @@ export const BusinessSignupPage: FC<
         autoCapitalize="none"
         autoComplete="email"
         textContentType="emailAddress"
+        onBlur={() => f.touch('email')}
         error={f.errors.email}
         testID="business-email"
       />
@@ -130,31 +151,59 @@ export const BusinessSignupPage: FC<
         autoComplete="street-address"
         textContentType="fullStreetAddress"
         action={{
-          label: f.isLocating ? t('businessSignup.locating') : t('businessSignup.useCurrent'),
+          label: f.isLocating
+            ? t('businessSignup.locating')
+            : t('businessSignup.useCurrent'),
           onPress: f.isLocating ? undefined : f.locate,
         }}
+        onBlur={() => f.touch('address')}
         error={f.errors.address || f.locateError || undefined}
         testID="business-address"
       />
       <ChipGroup
         label={t('businessSignup.businessTypeLabel')}
-        hint={f.catalogError || (f.catalogLoading ? t('auth.loadingOptions') : f.errors.businessType)}
+        hint={
+          f.catalogError ||
+          (f.catalogLoading
+            ? t('auth.loadingOptions')
+            : t('businessSignup.businessTypeHint'))
+        }
+        error={f.errors.businessTypes}
+        collapsedCount={SIGNUP_CHIPS_COLLAPSED}
         options={f.businessTypeOptions.map(option => ({
           ...option,
-          label: t(`businessSignup.businessTypes.${option.id}`, { defaultValue: option.label }),
+          label: t(`businessSignup.businessTypes.${option.id}`, {
+            defaultValue: option.label,
+          }),
         }))}
-        selected={f.form.businessType ? [f.form.businessType] : []}
-        onToggle={f.selectBusinessType}
+        selected={f.form.businessTypes}
+        onToggle={f.toggleBusinessType}
       />
-      <BodyNote>{t('welcome.legal')}</BodyNote>
-      <View style={styles.legalLinks}>
-        <TextButton label={t('terms.title')} onPress={() => navigation.navigate(ROUTES.terms)} tone="primary" />
-        <TextButton label={t('privacy.title')} onPress={() => navigation.navigate(ROUTES.privacy)} tone="primary" />
-      </View>
+      <BodyNote>
+        <Trans
+          i18nKey="welcome.legalLinked"
+          components={{
+            terms: (
+              <Text
+                accessibilityRole="link"
+                onPress={() => navigation.navigate(ROUTES.terms)}
+                style={[styles.inlineLink, { color: colors.primary }]}
+              />
+            ),
+          }}
+        />{' '}
+        <Text
+          accessibilityRole="link"
+          onPress={() => navigation.navigate(ROUTES.faq)}
+          style={[styles.inlineLink, { color: colors.primary }]}
+        >
+          {t('faq.title')}
+        </Text>
+      </BodyNote>
     </FormScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  legalLinks: { flexDirection: 'row', justifyContent: 'center', gap: 22 },
+  inlineLink: { textDecorationLine: 'underline' },
 });

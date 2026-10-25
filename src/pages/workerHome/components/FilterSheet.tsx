@@ -21,13 +21,14 @@ import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import { DEFAULT_FILTERS, type ShiftFilters } from '../hooks/useWorkerHome';
+import type { Option } from '@/types';
+
 import {
   ANY_ID,
-  BUSINESS_TYPE_OPTIONS,
   DISTANCE_OPTIONS,
   LENGTH_OPTIONS,
   PAY_OPTIONS,
-} from '../mock';
+} from '../constants/filterOptions';
 
 /**
  * Bottom sheet behind the Discover filter button. No Figma frame; uses the
@@ -36,9 +37,10 @@ import {
  */
 export const FilterSheet: FC<{
   initial: ShiftFilters;
+  businessTypes: Option[];
   onApply: (filters: ShiftFilters) => void;
   onClose: () => void;
-}> = ({ initial, onApply, onClose }) => {
+}> = ({ initial, businessTypes, onApply, onClose }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -57,13 +59,10 @@ export const FilterSheet: FC<{
           : [...draft.businessTypeIds, id],
     );
 
-  const businessTypeOptions = BUSINESS_TYPE_OPTIONS.map(option => ({
-    ...option,
-    label:
-      option.id === ANY_ID
-        ? t('shiftFilters.any')
-        : t(`shiftFilters.businessTypes.${option.id}`),
-  }));
+  const businessTypeOptions = [
+    { id: ANY_ID, label: t('shiftFilters.any') },
+    ...businessTypes,
+  ];
   const distanceOptions = DISTANCE_OPTIONS.map(option => ({
     ...option,
     label:

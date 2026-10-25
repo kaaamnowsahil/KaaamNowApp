@@ -1,11 +1,11 @@
 import type { FC } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { Option } from '@/types';
 
-/** Figma "Categories" (1:1495): text-only role filters, active one in primary. */
+/** Figma "Categories" (1:1495): horizontally scrolling role filter pills, active one in primary. */
 export const CategoryTabs: FC<{
   options: Option[];
   value: string;
@@ -13,7 +13,12 @@ export const CategoryTabs: FC<{
 }> = ({ options, value, onChange }) => {
   const { colors } = useTheme();
   return (
-    <View style={styles.root}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.root}
+      style={styles.scroll}
+    >
       {options.map(option => {
         const active = option.id === value;
         return (
@@ -21,14 +26,21 @@ export const CategoryTabs: FC<{
             key={option.id}
             accessibilityRole="button"
             accessibilityState={{ selected: active }}
-            hitSlop={6}
             onPress={() => onChange(option.id)}
+            style={[
+              styles.chip,
+              {
+                backgroundColor: active ? colors.primary : colors.fill,
+                borderColor: active ? colors.primary : colors.border,
+              },
+            ]}
             testID={`category-${option.id}`}
           >
             <Text
+              numberOfLines={1}
               style={[
                 styles.label,
-                { color: active ? colors.primary : colors.textSubtle },
+                { color: active ? colors.onPrimary : colors.textMuted },
               ]}
             >
               {option.label}
@@ -36,11 +48,20 @@ export const CategoryTabs: FC<{
           </Pressable>
         );
       })}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  root: { flexDirection: 'row', gap: 7 },
-  label: { fontFamily: FONTS.semiBold, fontSize: 11, lineHeight: 17 },
+  scroll: { marginHorizontal: -20, flexGrow: 0 },
+  root: { flexDirection: 'row', gap: 8, paddingHorizontal: 20 },
+  chip: {
+    height: 32,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 16 },
 });

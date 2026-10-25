@@ -19,7 +19,6 @@ import { useWorkerProfile } from './hooks/useWorkerProfile';
  * Worker "Profile" tab. Figma: Profile · Light (17:2) / Dark (17:518),
  * built from a design screenshot.
  * - state + navigation: hooks/useWorkerProfile.ts
- * - data: mock/workerProfileMock.ts
  */
 export const WorkerProfilePage: FC = () => {
   const { t } = useTranslation();
@@ -29,8 +28,11 @@ export const WorkerProfilePage: FC = () => {
     <ProfileCard
       key="card"
       initials={p.initials}
+      imageUri={p.profile.photoUri}
       name={p.profile.fullName}
-      caption={`${p.profile.roleLabel} · ${p.profile.location}`}
+      caption={[t('workerProfile.roleLabel'), p.profile.location]
+        .filter(Boolean)
+        .join(' · ')}
     />,
     <SettingsGroup key="account" title={t('workerProfile.account')}>
       <SettingsRow
@@ -69,11 +71,6 @@ export const WorkerProfilePage: FC = () => {
         icon={FileTextIcon}
         title={t('workerProfile.terms')}
         onPress={p.openTerms}
-      />
-      <SettingsRow
-        icon={FileTextIcon}
-        title={t('privacy.title')}
-        onPress={p.openPrivacy}
       />
       <SettingsRow
         icon={WifiOffIcon}

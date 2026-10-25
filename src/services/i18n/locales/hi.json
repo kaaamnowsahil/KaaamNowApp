@@ -5,7 +5,9 @@
     "apply": "लागू करें",
     "back": "वापस",
     "loading": "लोड हो रहा है...",
-    "comingSoon": "जल्द आ रहा है"
+    "comingSoon": "जल्द आ रहा है",
+    "viewMore": "और देखें ({{count}})",
+    "viewLess": "कम देखें"
   },
   "appearance": {
     "title": "अपना रूप चुनें",
@@ -31,7 +33,8 @@
     "phoneHelper": "अपने खाते से जुड़ा मोबाइल नंबर दर्ज करें।",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "आगे बढ़कर आप KaaamNow की सेवा शर्तों और गोपनीयता नीति से सहमत होते हैं।"
+    "legalLinked": "आगे बढ़कर आप KaaamNow की <terms>सेवा शर्तों</terms> से सहमत होते हैं।",
+    "legal": "आगे बढ़कर आप KaaamNow की सेवा शर्तों से सहमत होते हैं।"
   },
   "auth": {
     "passwordLabel": "पासवर्ड",
@@ -56,7 +59,11 @@
     "sendingCode": "सत्यापन कोड भेजा जा रहा है…",
     "retryCode": "कोड फिर से भेजने के लिए टैप करें।",
     "resendResetCode": "दूसरा कोड भेजें",
-    "loadingOptions": "विकल्प लोड हो रहे हैं…"
+    "loadingOptions": "विकल्प लोड हो रहे हैं…",
+    "showPassword": "पासवर्ड दिखाएँ",
+    "hidePassword": "पासवर्ड छिपाएँ",
+    "newPasswordPlaceholder": "पासवर्ड बनाएं",
+    "confirmPasswordPlaceholder": "पासवर्ड दोबारा दर्ज करें"
   },
   "verifyPhone": {
     "title": "कोड दर्ज करें",
@@ -90,7 +97,8 @@
     "faq": "FAQ और सहायता",
     "offline": "ऑफलाइन एक्सेस",
     "terms": "नियम और शर्तें",
-    "logOut": "लॉग आउट"
+    "logOut": "लॉग आउट",
+    "roleLabel": "वर्कर"
   },
   "workerHome": {
     "greeting": "नमस्ते, {{name}} 👋",
@@ -120,24 +128,6 @@
   },
   "terms": {
     "title": "नियम और शर्तें"
-  },
-  "privacy": {
-    "title": "गोपनीयता नीति",
-    "updated": "अंतिम अपडेट: अक्टूबर 2026",
-    "sections": {
-      "dataTitle": "हम कौन-सी जानकारी लेते हैं",
-      "dataBody": "खाता बनाने और चलाने के लिए हम आपके दिए गए विवरण इस्तेमाल करते हैं, जैसे फ़ोन नंबर, नाम, ईमेल (यदि दिया हो), कामगार प्रोफ़ाइल की उम्र, पता, स्थान और काम या व्यवसाय की पसंद।",
-      "useTitle": "जानकारी का उपयोग",
-      "useBody": "हम जानकारी का उपयोग KaaamNow चलाने, कामगारों और व्यवसायों को शिफ्ट खोजने और प्रबंधित करने में मदद करने, खातों की सुरक्षा और सहायता अनुरोधों के जवाब के लिए करते हैं।",
-      "locationTitle": "स्थान",
-      "locationBody": "यदि आप वर्तमान स्थान इस्तेमाल करते हैं, तो ऐप आपके साझा किए स्थान से पता भरता है और पास की शिफ्ट तथा उपस्थिति सुविधाओं में मदद करता है। आप पता खुद भी दर्ज कर सकते हैं।",
-      "sharingTitle": "सेवा प्रदाता",
-      "sharingBody": "सेवा चलाने के लिए ज़रूरी जानकारी ही होस्टिंग, SMS सत्यापन और मैप प्रदाताओं के साथ साझा की जाती है। प्रमाणीकरण के गुप्त विवरण मोबाइल ऐप में नहीं रखे जाते।",
-      "securityTitle": "सुरक्षा और जानकारी रखना",
-      "securityBody": "पासवर्ड KaaamNow बैकएंड को भेजे जाते हैं और हैशिंग से सुरक्षित रखे जाते हैं। सेवा और कानूनी ज़रूरतों तक जानकारी रखी जाती है। अपने खाते के डेटा के लिए हमसे संपर्क करें।",
-      "contactTitle": "संपर्क",
-      "contactBody": "गोपनीयता या खाते के डेटा से जुड़े अनुरोधों के लिए {{emails}} पर संपर्क करें।"
-    }
   },
   "errors": {
     "generic": "कुछ गलत हुआ। कृपया दोबारा प्रयास करें।",
@@ -213,7 +203,8 @@
       "phone": "10 अंकों का सही मोबाइल नंबर दर्ज करें।",
       "email": "सही ईमेल दर्ज करें या खाली छोड़ें।",
       "address": "पता दर्ज करें या वर्तमान स्थान का उपयोग करें।",
-      "businessType": "व्यवसाय का प्रकार चुनें।"
+      "businessType": "व्यवसाय का प्रकार चुनें।",
+      "maxBusinessTypes": "अधिकतम 10 व्यवसाय प्रकार चुनें।"
     },
     "businessTypes": {
       "hospitality": "आतिथ्य सेवा",
@@ -223,7 +214,8 @@
       "household": "घरेलू सेवा",
       "office": "कार्यालय",
       "other": "अन्य"
-    }
+    },
+    "businessTypeHint": "लागू होने वाले सभी विकल्प चुनें।"
   },
   "editProfile": {
     "title": "प्रोफ़ाइल संपादित करें",
@@ -246,7 +238,10 @@
       "nameMax": "नाम 80 अक्षरों से अधिक नहीं होना चाहिए।",
       "address": "पता दर्ज करें या वर्तमान स्थान का उपयोग करें।",
       "workTypes": "कम से कम एक काम का प्रकार चुनें।"
-    }
+    },
+    "photoFailed": "फ़ोटो अपलोड नहीं हो सकी",
+    "saveFailed": "प्रोफ़ाइल सेव नहीं हो सकी",
+    "preferenceFailed": "पसंद सेव नहीं हो सकी"
   },
   "workerShifts": {
     "title": "मेरी शिफ्ट",
@@ -567,14 +562,26 @@
       "profile": "प्रोफ़ाइल"
     },
     "distance": "{{distance}} किमी",
-    "locationPickerHint": "व्यवसाय का स्थान चुनें"
+    "locationPickerHint": "व्यवसाय का स्थान चुनें",
+    "liveComingSoon": "लाइव अनुरोध जल्द आ रहे हैं",
+    "unverifiedSubtitle": "{{business}}"
   },
   "businessShifts": {
     "title": "शिफ्ट",
     "scheduled": "निर्धारित",
     "rosterTitle": "पुष्ट टीम प्रबंधित करें",
     "fullyStaffed": "पूरी टीम · {{total}} में से {{count}}",
-    "viewSelectedOffers": "चुने गए ऑफ़र देखें"
+    "viewSelectedOffers": "चुने गए ऑफ़र देखें",
+    "loadErrorTitle": "शिफ्ट लोड नहीं हो सकीं",
+    "retry": "फिर से कोशिश करें",
+    "publishDraftTitle": "यह ड्राफ्ट प्रकाशित करें?",
+    "publishDraftBody": "आस-पास के वर्कर्स को सूचना मिलेगी और वे आवेदन कर सकेंगे।",
+    "publish": "प्रकाशित करें",
+    "discardDraft": "ड्राफ्ट हटाएँ",
+    "discardReason": "Draft discarded",
+    "actionFailed": "शिफ्ट अपडेट नहीं हो सकी",
+    "emptyRosterTitle": "अभी कोई पुष्टि किया हुआ वर्कर नहीं",
+    "emptyRosterBody": "शिफ्ट की पुष्टि करने पर वर्कर्स यहाँ दिखेंगे।"
   },
   "businessShiftCreate": {
     "prompt": "शिफ्ट कब है?",
@@ -613,14 +620,15 @@
     "postedOverline": "शिफ्ट · निर्धारित",
     "postedTitle": "शिफ्ट पोस्ट हो गई",
     "scheduledShiftSubtitle": "निर्धारित शिफ्ट",
-    "postedSubtitle": "5 किमी के भीतर के कर्मचारियों को सूचना दी जा रही है। आवेदन आने पर यहाँ दिखेंगे।",
+    "postedSubtitle": "आस-पास के वर्कर्स को सूचित किया जा रहा है। आवेदन आते ही यहाँ दिखेंगे।",
     "workersNotified": "सूचित कर्मचारी",
     "notificationRadius": "सूचना का दायरा",
     "applications": "आवेदन",
     "waiting": "पहले आवेदक का इंतज़ार है",
     "reviewApplicants": "आवेदकों की समीक्षा करें",
     "openShift": "खोलें",
-    "editShift": "शिफ्ट संपादित करें"
+    "editShift": "शिफ्ट संपादित करें",
+    "viewShifts": "शिफ्ट देखें"
   },
   "businessLiveCreate": {
     "liveOverline": "लाइव · ऑन डिमांड",
@@ -637,7 +645,7 @@
     "locationFetching": "आपके डिवाइस की लोकेशन प्राप्त की जा रही है…",
     "locationUnavailable": "डिवाइस की लोकेशन नहीं मिली। लोकेशन अनुमति जाँचें या कार्यस्थल का पता दर्ज करें।",
     "locationEditedHint": "कार्यस्थल का स्थान संपादित किया गया; सहेजा गया GPS पिन हटा दिया गया है।",
-    "mapsConfigurationMissing": "Google Maps पूर्वावलोकन के लिए स्थानीय .env.local फ़ाइल में GOOGLE_MAPS_API_KEY जोड़ें।",
+    "mapsConfigurationMissing": "Google Maps पूर्वावलोकन के लिए स्थानीय .env.dev फ़ाइल में GOOGLE_MAPS_API_KEY जोड़ें।",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "ज़रूरतें",
     "workers": "ज़रूरी कर्मचारी",
@@ -744,7 +752,12 @@
     "sortRecent": "नवीनतम",
     "sortRating": "सबसे अच्छी रेटिंग",
     "sortExperience": "सबसे अधिक अनुभव",
-    "close": "बंद करें"
+    "close": "बंद करें",
+    "completedShifts_one": "{{count}} शिफ्ट",
+    "completedShifts_other": "{{count}} शिफ्ट",
+    "distanceAway": "{{distance}} किमी दूर",
+    "loadErrorTitle": "आवेदक लोड नहीं हो सके",
+    "retry": "फिर से कोशिश करें"
   },
   "businessApplicantProfile": {
     "notFoundTitle": "आवेदक नहीं मिला",
@@ -774,7 +787,10 @@
     "confirmed": "पुष्ट",
     "shiftTitle": "कैफ़े सेवा सहयोगी",
     "shiftDate": "शनिवार, 24 अक्टूबर",
-    "shiftTime": "शाम 6:00 – 10:00"
+    "shiftTime": "शाम 6:00 – 10:00",
+    "reject": "अस्वीकार करें",
+    "awaitingWorker": "वर्कर की पुष्टि का इंतज़ार",
+    "actionFailed": "आवेदक अपडेट नहीं हो सका"
   },
   "businessRoster": {
     "sendReminder": "टीम को रिमाइंडर भेजें",
@@ -889,6 +905,7 @@
     "workerFallback": "worker",
     "workerUnavailable": "Worker not found",
     "workerUnavailableBody": "This worker is no longer available to rate.",
-    "rateAllWorkers": "Rate all workers"
+    "rateAllWorkers": "Rate all workers",
+    "submitFailed": "रेटिंग सबमिट नहीं हो सकी"
   }
 }

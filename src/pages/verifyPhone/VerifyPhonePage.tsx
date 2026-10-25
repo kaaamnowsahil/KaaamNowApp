@@ -40,10 +40,11 @@ export const VerifyPhonePage: FC<
     otpSent,
     error,
   } =
-    useVerifyPhone(route.params.phone);
+    useVerifyPhone(route.params.phone, route.params);
 
   return (
     <FormScreen
+      busy={busy}
       onBack={navigation.goBack}
       testID="verify-phone-page"
       actions={

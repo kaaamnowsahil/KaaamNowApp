@@ -11,12 +11,13 @@ import {
 import { TabScreen } from '@/layout/TabScreen';
 
 import { MyShiftCard } from './components';
+import { WORKER_SHIFTS_STRINGS } from './constants';
 import { useWorkerShifts } from './hooks/useWorkerShifts';
 
 /**
  * Worker "My shifts" tab. Figma: 08 · WORKER — Main tabs, My shifts (light/dark).
  * - state + sections: hooks/useWorkerShifts.ts
- * - data: mock/workerShiftsMock.ts
+ * - data: GET /worker/my-shifts
  */
 export const WorkerShiftsPage: FC = () => {
   const { t } = useTranslation();
@@ -44,27 +45,36 @@ export const WorkerShiftsPage: FC = () => {
         )),
       ])
       : [
-        <EmptyState
-          key="empty"
-          icon={CalendarDaysIcon}
-          title={t('workerShifts.emptyTitle')}
-          body={t('workerShifts.emptyBody')}
-          action={t('workerShifts.emptyAction')}
-          onAction={shifts.findShifts}
-        />,
+        shifts.error ? (
+          <EmptyState
+            key="error"
+            icon={CalendarDaysIcon}
+            title={WORKER_SHIFTS_STRINGS.LOAD_ERROR_TITLE}
+            body={shifts.error}
+            action={WORKER_SHIFTS_STRINGS.RETRY}
+            onAction={shifts.retry}
+          />
+        ) : (
+          <EmptyState
+            key="empty"
+            icon={CalendarDaysIcon}
+            title={t('workerShifts.emptyTitle')}
+            body={t('workerShifts.emptyBody')}
+            action={t('workerShifts.emptyAction')}
+            onAction={shifts.findShifts}
+          />
+        ),
       ]),
   ];
 
   return (
     <TabScreen
       header={
-        <BrandAppBar
-          onBellPress={shifts.openNotifications}
-          hasUnread={shifts.hasUnread}
-        />
+        <BrandAppBar onBellPress={shifts.openNotifications} />
       }
       blocks={blocks}
       gap={12}
+      fillLastBlock={Boolean(shifts.error) || shifts.sections.length === 0}
       isLoading={shifts.isLoading}
       testID="worker-shifts-page"
     />

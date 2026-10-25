@@ -31,7 +31,8 @@
     "phoneHelper": "உங்கள் கணக்கில் பதிவு செய்த மொபைல் எண்ணைப் பயன்படுத்தவும்.",
     "phonePrefix": "+91",
     "phonePlaceholder": "98765 43210",
-    "legal": "தொடர்வதன் மூலம் KaaamNow சேவை விதிமுறைகள் மற்றும் தனியுரிமைக் கொள்கையை ஏற்கிறீர்கள்.",
+    "legalLinked": "தொடர்வதன் மூலம் KaaamNow <terms>சேவை விதிமுறைகளை</terms> ஏற்கிறீர்கள்.",
+    "legal": "தொடர்வதன் மூலம் KaaamNow சேவை விதிமுறைகளை ஏற்கிறீர்கள்.",
     "signIn": "உள்நுழைக"
   },
   "verifyPhone": {
@@ -567,7 +568,8 @@
     "waiting": "முதல் விண்ணப்பதாரருக்காக காத்திருக்கிறது",
     "reviewApplicants": "விண்ணப்பங்களைப் பரிசீலிக்கவும்",
     "openShift": "திற",
-    "editShift": "ஷிப்டைத் திருத்து"
+    "editShift": "ஷிப்டைத் திருத்து",
+    "viewShifts": "View shifts"
   },
   "businessLiveCreate": {
     "liveOverline": "நேரலை · தேவைக்கேற்ப",
@@ -584,7 +586,7 @@
     "locationFetching": "உங்கள் சாதன இருப்பிடத்தைப் பெறுகிறது…",
     "locationUnavailable": "சாதன இருப்பிடத்தைப் பெற முடியவில்லை. இருப்பிட அனுமதியைச் சரிபார்க்கவும் அல்லது பணியிட முகவரியை உள்ளிடவும்.",
     "locationEditedHint": "பணியிட இருப்பிடம் திருத்தப்பட்டது; சேமித்த GPS குறியீடு நீக்கப்பட்டது.",
-    "mapsConfigurationMissing": "Google Maps முன்னோட்டத்திற்கு உள்ளூர் .env.local கோப்பில் GOOGLE_MAPS_API_KEY தேவை.",
+    "mapsConfigurationMissing": "Google Maps முன்னோட்டத்திற்கு உள்ளூர் .env.dev கோப்பில் GOOGLE_MAPS_API_KEY தேவை.",
     "gpsCoordinates": "GPS: {{latitude}}, {{longitude}}",
     "requirement": "தேவைகள்",
     "workers": "தேவையான பணியாளர்கள்",
@@ -873,8 +875,5 @@
     "retryCode": "குறியீட்டை மீண்டும் அனுப்ப தட்டவும்.",
     "resendResetCode": "மற்றொரு குறியீட்டை அனுப்பு",
     "loadingOptions": "விருப்பங்கள் ஏற்றப்படுகின்றன…"
-  },
-  "privacy": {
-    "title": "தனியுரிமைக் கொள்கை"
   }
 }

@@ -12,41 +12,22 @@ import {
 } from '@/components/ui';
 import { TabScreen } from '@/layout/TabScreen';
 
-import {
-  BusinessLocationPicker,
-  BusinessOverview,
-  BusinessShiftCard,
-} from './components';
-import { BUSINESS_DASHBOARD, BUSINESS_LOCATIONS } from './mock';
+import { BusinessOverview, BusinessShiftCard } from './components';
 import { useBusinessLive } from './hooks';
 
 export const BusinessLivePage: FC = () => {
   const { t } = useTranslation();
   const dashboard = useBusinessLive();
+  const isLive = dashboard.view === 'live';
 
   const blocks = [
     <BusinessOverview
       key="overview"
-      businessName={BUSINESS_DASHBOARD.businessName}
-      liveConfirmed={
-        dashboard.activeRequest ? 0 : BUSINESS_DASHBOARD.liveConfirmed
-      }
-      liveTotal={
-        dashboard.activeRequest
-          ? dashboard.activeRequest.workers
-          : BUSINESS_DASHBOARD.liveTotal
-      }
-      newApplicants={
-        dashboard.activeRequest ? 0 : BUSINESS_DASHBOARD.newApplicants
-      }
-    />,
-    <BusinessLocationPicker
-      key="location"
-      location={dashboard.location}
-      options={BUSINESS_LOCATIONS}
-      isOpen={dashboard.isLocationOpen}
-      onToggle={dashboard.toggleLocation}
-      onSelect={dashboard.selectLocation}
+      businessName={dashboard.businessName}
+      isVerified={dashboard.isVerified}
+      liveConfirmed={dashboard.liveConfirmed}
+      liveTotal={dashboard.liveTotal}
+      newApplicants={dashboard.newApplicants}
     />,
     <SegmentedControl
       key="view-toggle"
@@ -57,29 +38,38 @@ export const BusinessLivePage: FC = () => {
       value={dashboard.view}
       onChange={dashboard.setView}
     />,
-    ...(dashboard.shifts.length > 0
+    ...(dashboard.error
+      ? [
+          <EmptyState
+            key="error"
+            icon={CalendarDaysIcon}
+            title={t('businessShifts.loadErrorTitle')}
+            body={dashboard.error}
+            action={t('businessShifts.retry')}
+            onAction={dashboard.reload}
+          />,
+        ]
+      : dashboard.shifts.length > 0
       ? [
           <SectionHeading
             key="section"
             title={t(
-              dashboard.view === 'live'
+              isLive
                 ? 'businessDashboard.todayLive'
                 : 'businessDashboard.upcoming',
             )}
             action={t('businessDashboard.viewAll')}
             onAction={dashboard.openShifts}
           />,
-          ...dashboard.shifts.map(shift => (
+          ...dashboard.shifts.map(({ item, card }) => (
             <BusinessShiftCard
-              key={shift.id}
-              shift={shift}
+              key={card.id}
+              shift={card}
               view={dashboard.view}
-              businessName={BUSINESS_DASHBOARD.businessName}
-              isVerified={BUSINESS_DASHBOARD.isVerified}
+              businessName={dashboard.businessName}
+              isVerified={dashboard.isVerified}
               onPress={
-                dashboard.view === 'live'
-                  ? () => dashboard.openPostedLiveRequest(shift)
-                  : dashboard.openShifts
+                isLive ? () => dashboard.openRoster(item) : dashboard.openShifts
               }
             />
           )),
@@ -87,15 +77,15 @@ export const BusinessLivePage: FC = () => {
       : [
           <EmptyState
             key="empty"
-            icon={dashboard.view === 'live' ? ZapIcon : CalendarDaysIcon}
+            icon={isLive ? ZapIcon : CalendarDaysIcon}
             title={t(
-              dashboard.view === 'live'
+              isLive
                 ? 'businessDashboard.emptyLiveTitle'
                 : 'businessDashboard.emptyScheduledTitle',
             )}
             body={t(
-              dashboard.view === 'live'
-                ? 'businessDashboard.emptyLiveBody'
+              isLive
+                ? 'businessDashboard.liveComingSoon'
                 : 'businessDashboard.emptyScheduledBody',
             )}
           />,
@@ -107,20 +97,18 @@ export const BusinessLivePage: FC = () => {
       header={<BrandAppBar onBellPress={dashboard.openNotifications} />}
       blocks={blocks}
       gap={12}
+      fillLastBlock={Boolean(dashboard.error) || dashboard.shifts.length === 0}
       isLoading={dashboard.isLoading}
       testID="business-live-page"
       actions={
         <PrimaryButton
           label={t(
-            dashboard.view === 'live'
+            isLive
               ? 'businessDashboard.postLiveRequest'
               : 'businessDashboard.createShift',
           )}
-          onPress={
-            dashboard.view === 'scheduled'
-              ? dashboard.openSchedule
-              : dashboard.openLiveCreate
-          }
+          onPress={dashboard.openSchedule}
+          disabled={isLive}
           testID="business-create-shift"
         />
       }
