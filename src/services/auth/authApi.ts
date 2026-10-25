@@ -143,6 +143,9 @@ export type OtpSendResponse = {
   phone: string;
   expires_in_seconds: number;
   resend_after_seconds: number;
+  /** sms | whatsapp | voice | console */
+  delivery_channel: string;
+  sender_name?: string | null;
 };
 
 export const sendOtp = (

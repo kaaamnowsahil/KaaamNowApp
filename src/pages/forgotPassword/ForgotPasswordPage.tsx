@@ -10,7 +10,12 @@ import {
 } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { resetPassword, sendPasswordResetOtp } from '@/services/auth/authApi';
+import {
+  resetPassword,
+  sendPasswordResetOtp,
+  type OtpSendResponse,
+} from '@/services/auth/authApi';
+import { otpDeliveryNotice } from '@/services/auth/otpDeliveryNotice';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AuthScreenProps } from '@/types';
 import { toE164India, toLocalDigits } from '@/utils/phone';
@@ -26,6 +31,7 @@ export const ForgotPasswordPage: FC<
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [requested, setRequested] = useState(false);
+  const [delivery, setDelivery] = useState<OtpSendResponse | null>(null);
   const [resendAt, setResendAt] = useState<number | null>(null);
   const [now, setNow] = useState(Date.now());
   const [complete, setComplete] = useState(false);
@@ -47,7 +53,7 @@ export const ForgotPasswordPage: FC<
     setBusy(true);
     setError('');
     try {
-      await sendPasswordResetOtp(e164);
+      setDelivery(await sendPasswordResetOtp(e164));
       setResendAt(Date.now() + 30 * 1000);
       setNow(Date.now());
       setRequested(true);
@@ -167,7 +173,11 @@ export const ForgotPasswordPage: FC<
                 textContentType="newPassword"
                 testID="forgot-password-confirm-password"
               />
-              <BodyNote>{t('auth.resetRequestNotice')}</BodyNote>
+              <BodyNote>
+                {[t('auth.resetRequestNotice'), otpDeliveryNotice(t, delivery)]
+                  .filter(Boolean)
+                  .join(' ')}
+              </BodyNote>
             </>
           ) : null}
           {error ? (

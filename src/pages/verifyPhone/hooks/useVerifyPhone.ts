@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { AuthApiError, completeSignup, sendOtp } from '@/services/auth/authApi';
+import {
+  AuthApiError,
+  completeSignup,
+  sendOtp,
+  type OtpSendResponse,
+} from '@/services/auth/authApi';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { usePreferencesStore } from '@/services/config/usePreferencesStore';
 import {
@@ -25,7 +30,12 @@ function responseRole(
 /** `sent` holds the timers of the OTP the sign-up screen already sent. */
 export const useVerifyPhone = (
   phone: string,
-  sent: { expiresInSeconds: number; resendAfterSeconds: number },
+  sent: {
+    expiresInSeconds: number;
+    resendAfterSeconds: number;
+    deliveryChannel: string;
+    senderName?: string | null;
+  },
 ) => {
   const [code, setCodeRaw] = useState('');
   const [sentAt] = useState(() => Date.now());
@@ -38,6 +48,12 @@ export const useVerifyPhone = (
   const [now, setNow] = useState(sentAt);
   const [busy, setBusy] = useState(false);
   const [otpSent, setOtpSent] = useState(true);
+  const [delivery, setDelivery] = useState<
+    Pick<OtpSendResponse, 'delivery_channel' | 'sender_name'>
+  >({
+    delivery_channel: sent.deliveryChannel,
+    sender_name: sent.senderName,
+  });
   const [error, setError] = useState('');
   const signIn = useAuthStore(s => s.signIn);
   const signupRole = useOnboardingStore(s => s.role);
@@ -66,6 +82,7 @@ export const useVerifyPhone = (
       setExpiresAt(resentAt + resent.expires_in_seconds * 1000);
       setResendAt(resentAt + resent.resend_after_seconds * 1000);
       setNow(resentAt);
+      setDelivery(resent);
       setOtpSent(true);
       setCodeRaw('');
     } catch (cause) {
@@ -142,6 +159,7 @@ export const useVerifyPhone = (
     onVerify,
     busy,
     otpSent,
+    delivery,
     error,
     canSubmit: otpSent && code.length === OTP_LENGTH && expiresIn > 0 && !busy,
   };
