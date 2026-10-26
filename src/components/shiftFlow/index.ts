@@ -8,6 +8,7 @@ export { MapPreview } from './MapPreview';
 export { PinSheet } from './PinSheet';
 export { PushPreview } from './PushPreview';
 export { ReasonSheet } from './ReasonSheet';
+export { ShiftRouteMap, type ShiftRoute } from './ShiftRouteMap';
 export { StatTiles, type StatTile } from './StatTiles';
 export { StatusHero } from './StatusHero';
 export { TermsSheet } from './TermsSheet';

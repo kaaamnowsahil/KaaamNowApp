@@ -61,7 +61,10 @@
     "support": "ସହାୟତା",
     "faq": "ପ୍ରଶ୍ନୋତ୍ତର ଏବଂ ସହାୟତା",
     "terms": "ନିୟମ ଏବଂ ସର୍ତ୍ତ",
-    "logOut": "ଲଗ୍ ଆଉଟ୍"
+    "logOut": "ଲଗ୍ ଆଉଟ୍",
+    "ratingCount_one": "{{count}} rating",
+    "ratingCount_other": "{{count}} ratings",
+    "noRatings": "No ratings yet"
   },
   "workerHome": {
     "greeting": "ନମସ୍କାର, {{name}} 👋",

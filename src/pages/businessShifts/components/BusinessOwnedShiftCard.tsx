@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 
 import XIcon from '@/assets/figma/x.svg';
 import { FONTS } from '@/constants/fonts';
+import { BOOKED_WORKERS_STRINGS } from '@/pages/businessApplicants/constants/bookedWorkersStrings';
 import type { ApiShiftStatus, BusinessShiftItem } from '@/services/shifts/shiftsApi';
 import { useTheme } from '@/theme/ThemeProvider';
 import { formatRupees } from '@/utils/format';
@@ -36,6 +37,7 @@ type BusinessOwnedShiftCardProps = {
   onPay: () => void;
   onPublish: () => void;
   onOpenBooked: () => void;
+  onOpenWithdrawn: () => void;
 };
 
 /** Shift card on the business Shifts tab; mirrors web `BusinessShiftCard`. */
@@ -49,6 +51,7 @@ export const BusinessOwnedShiftCard: FC<BusinessOwnedShiftCardProps> = ({
   onPay,
   onPublish,
   onOpenBooked,
+  onOpenWithdrawn,
 }) => {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
@@ -115,16 +118,25 @@ export const BusinessOwnedShiftCard: FC<BusinessOwnedShiftCardProps> = ({
             {` ${t('businessDashboard.perHour')}`}
           </Text>
         </Text>
-        <Pressable
-          accessibilityRole="button"
-          disabled={shift.booked_count === 0}
-          hitSlop={8}
-          onPress={onOpenBooked}
-        >
-          <Text style={[styles.booked, { color: colors.primary }]}>
-            {`${shift.booked_count}/${shift.workers_required} booked`}
-          </Text>
-        </Pressable>
+        <View style={styles.counts}>
+          <Pressable
+            accessibilityRole="button"
+            disabled={shift.booked_count === 0}
+            hitSlop={8}
+            onPress={onOpenBooked}
+          >
+            <Text style={[styles.booked, { color: colors.primary }]}>
+              {`${shift.booked_count}/${shift.workers_required} booked`}
+            </Text>
+          </Pressable>
+          {shift.withdrawn_count ? (
+            <Pressable accessibilityRole="button" hitSlop={8} onPress={onOpenWithdrawn}>
+              <Text style={[styles.withdrawn, { color: colors.danger }]}>
+                {BOOKED_WORKERS_STRINGS.withdrewCount(shift.withdrawn_count)}
+              </Text>
+            </Pressable>
+          ) : null}
+        </View>
       </View>
       <View style={[styles.row, styles.commission]}>
         <Text style={[styles.meta, { color: colors.textMuted }]}>
@@ -239,6 +251,8 @@ const styles = StyleSheet.create({
   rate: { fontFamily: FONTS.bold, fontSize: 20, lineHeight: 26 },
   perHour: { fontFamily: FONTS.semiBold, fontSize: 13 },
   booked: { fontFamily: FONTS.semiBold, fontSize: 14, lineHeight: 20 },
+  counts: { alignItems: 'flex-end', gap: 2 },
+  withdrawn: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 16 },
   commission: { marginTop: -4 },
   commissionValue: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 19.5 },
   total: { marginTop: -8 },

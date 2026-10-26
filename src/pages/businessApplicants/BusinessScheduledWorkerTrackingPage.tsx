@@ -15,7 +15,6 @@ import {
   ChipGroup,
   PrimaryButton,
   SecondaryButton,
-  TextButton,
 } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
@@ -175,7 +174,7 @@ export const BusinessScheduledWorkerTrackingPage: FC<
             onPress={() => setSheet('extend')}
             testID="booking-extend"
           />
-          <TextButton label={S.STOP} tone="danger" onPress={() => setSheet('stop')} />
+          <SecondaryButton label={S.STOP} tone="danger" onPress={() => setSheet('stop')} />
         </>
       );
     }

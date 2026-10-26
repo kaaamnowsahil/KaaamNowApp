@@ -12,6 +12,11 @@ export const BOOKED_WORKERS_STRINGS = {
   rating: (avg: number, count: number) => `★ ${avg.toFixed(1)} (${count})`,
   shiftsDone: (count: number) => `${count} ${count === 1 ? 'shift' : 'shifts'} done`,
   away: (km: number) => `${Math.round(km * 10) / 10} km away`,
+  withdrewHeading: (count: number) => `Withdrew (${count})`,
+  WITHDREW: 'Withdrew',
+  CANCELLED_BOOKING: 'Cancelled booking',
+  DECLINED_OFFER: 'Declined offer',
+  withdrewCount: (count: number) => `${count} withdrew`,
 } as const;
 
 export const WORKER_PROFILE_STRINGS = {

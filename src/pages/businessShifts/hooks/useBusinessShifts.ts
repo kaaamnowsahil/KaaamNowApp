@@ -24,14 +24,16 @@ export type ShiftSection =
   | 'cancelled';
 
 const SHIFT_SECTIONS: { key: ShiftSection; titleKey: string }[] = [
+  { key: 'in_progress', titleKey: 'businessDashboard.shiftStatus.inProgress' },
+  { key: 'upcoming', titleKey: 'businessDashboard.upcoming' },
   { key: 'awaiting_payment', titleKey: 'businessShifts.paymentPending' },
   { key: 'draft', titleKey: 'businessDashboard.shiftStatus.draft' },
   { key: 'completed', titleKey: 'businessDashboard.shiftStatus.completed' },
-  { key: 'upcoming', titleKey: 'businessDashboard.upcoming' },
-  { key: 'in_progress', titleKey: 'businessDashboard.shiftStatus.inProgress' },
   { key: 'expired', titleKey: 'businessDashboard.shiftStatus.expired' },
   { key: 'cancelled', titleKey: 'businessDashboard.shiftStatus.cancelled' },
 ];
+
+const PAST_SECTIONS: ShiftSection[] = ['completed', 'expired', 'cancelled'];
 
 const SECTION_BY_STATUS: Record<ApiShiftStatus, ShiftSection> = {
   awaiting_payment: 'awaiting_payment',
@@ -138,7 +140,9 @@ export const useBusinessShifts = () => {
     hasShifts: shifts.length > 0,
     sections: SHIFT_SECTIONS.map(section => ({
       ...section,
-      shifts: shifts.filter(shift => SECTION_BY_STATUS[shift.status] === section.key),
+      shifts: shifts
+        .filter(shift => SECTION_BY_STATUS[shift.status] === section.key)
+        .sort((a, b) => (PAST_SECTIONS.includes(section.key) ? byStart(b, a) : byStart(a, b))),
     })).filter(section => section.shifts.length > 0),
     cancelTarget,
     cancelPreview,
@@ -157,5 +161,6 @@ export const useBusinessShifts = () => {
     openBooked: (shift: BusinessShiftItem) =>
       navigation.navigate(ROUTES.businessRoster, { shiftId: shift.id }),
     openSchedule: () => navigation.navigate(ROUTES.businessShiftSchedule),
+    openApplicants: () => navigation.navigate(ROUTES.businessApplicants),
   };
 };

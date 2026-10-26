@@ -28,7 +28,39 @@ export const SHIFT_DETAILS_STRINGS = {
   timeConflict: (isLive: boolean) =>
     `${isLive ? 'Live' : 'Scheduled'} · Clashes with your booking`,
   TIME_CONFLICT_ACTION: 'You have a shift at this time',
+  NEXT_STEPS: 'What happens next',
+  ACTIVITY: 'Activity',
+  WITHDRAWN: 'Withdrawn',
+  activity: {
+    APPLIED: 'You applied',
+    selected: (business: string) => `Selected by ${business}`,
+    CONFIRMED: 'You confirmed',
+    ACCEPTED: 'You accepted',
+    ON_THE_WAY: 'You started travelling',
+    CHECKED_IN: 'Checked in',
+    CHECKED_OUT: 'Checked out',
+    approved: (business: string) => `Hours approved by ${business}`,
+    WITHDRAWN: 'You withdrew',
+    cancelledByBusiness: (business: string) => `Cancelled by ${business}`,
+  },
+  travelStep: (time: string) =>
+    `Tap Head to business from ${time} so the business can see you are on the way.`,
+  checkInStep: (time: string) =>
+    `Check in at the workplace from ${time} with the code from the site contact.`,
+  CHECK_OUT_STEP: 'Check out when you finish so your hours are recorded and paid.',
+  HEAD_TO_BUSINESS: 'Head to business',
+  travelOpensAt: (time: string) => `Travel opens ${time}`,
+  CHECK_IN: 'Check in',
+  DIRECTIONS: 'Get directions',
+  EMERGENCY: 'Emergency help',
+  WITHDRAW: 'Withdraw from this shift',
+  TRAVEL_FAILED: 'Couldn’t start travel',
+  PREVIEW_FAILED: 'Couldn’t check the cancellation fee',
+  CANCEL_FAILED: 'Couldn’t withdraw from this shift',
 } as const;
+
+/** Scheduled shifts: "Head to business" unlocks this many hours before the start (same as web). */
+export const TRAVEL_OPENS_HOURS_BEFORE = 3;
 
 /** Figma "Live · Café service associate" vs "Scheduled · Event service associate". */
 export const DETAILS_COPY: Record<

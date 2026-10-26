@@ -24,6 +24,9 @@ export const useWorkerProfile = () => {
       location: worker?.locality || worker?.address_text || '',
       photoUri: mediaUrl(worker?.photo_url ?? account?.photo_url),
     },
+    rating: worker
+      ? { avg: worker.rating_avg, count: worker.rating_count }
+      : undefined,
     initials: initialsOf(fullName),
     theme,
     languageLabel: language.label,

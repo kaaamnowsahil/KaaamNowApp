@@ -3,35 +3,71 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import BadgeCheckIcon from '@/assets/figma/badge-check.svg';
-import { OutlineButton } from '@/components/ui';
+import InfoIcon from '@/assets/icons/info.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
-import type { Booking, BookingStatus } from '@/types';
+import type { Booking, MyShiftStatus } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-/** Figma My shifts (08) booking card: status, shift facts, pay, outlined action. */
+import type { SelectionAction } from '../hooks/useWorkerShifts';
+
+/** My shifts booking card; same layout as the web card. */
 export const MyShiftCard: FC<{
   booking: Booking;
   onPress: () => void;
-  onAction: () => void;
-}> = ({ booking, onPress, onAction }) => {
+  /** Set while this card's confirm or decline request is running. */
+  pendingAction?: SelectionAction;
+  busy?: boolean;
+  onSelection: (action: SelectionAction) => void;
+}> = ({ booking, onPress, pendingAction, busy, onSelection }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { shift, status } = booking;
-  const total = formatRupees(shift.hourlyRate * shift.durationHours);
-  const isFaded = status === 'completed' || status === 'cancelled';
-  const translatedStatus =
-    status === 'confirmed' && booking.checkInCode
-      ? t('workerShifts.status.confirmedCode', { code: booking.checkInCode })
-      : t(`workerShifts.status.${status}`);
+  const translatedStatus = t(`workerShifts.status.${status}`);
 
-  const statusColor: Record<BookingStatus, string> = {
-    confirmed: colors.success,
-    selected: colors.warning,
-    applied: colors.primary,
-    completed: colors.textSubtle,
-    cancelled: colors.danger,
+  const closed = { color: colors.danger, background: colors.dangerSoft };
+  const pill: Record<MyShiftStatus, { color: string; background: string }> = {
+    confirmed: { color: colors.success, background: colors.successSoft },
+    selected: { color: colors.warning, background: colors.primarySoft },
+    applied: { color: colors.primary, background: colors.primarySoft },
+    completed: { color: colors.textMuted, background: colors.primarySoft },
+    cancelled: { color: colors.textMuted, background: colors.primarySoft },
+    declined: closed,
+    rejected: closed,
+    withdrawn: closed,
+    expired: closed,
   };
+
+  const selectionButton = (action: SelectionAction) => (
+    <Pressable
+      key={action}
+      accessibilityRole="button"
+      disabled={busy}
+      onPress={() => onSelection(action)}
+      style={({ pressed }) => [
+        styles.selection,
+        { backgroundColor: colors.primary, borderColor: colors.primary },
+        (busy || pressed) && styles.dimmed,
+      ]}
+      testID={`my-shift-${action}-${booking.id}`}
+    >
+      <Text style={[styles.selectionLabel, { color: colors.onPrimary }]}>
+        {pendingAction === action
+          ? t('workerShifts.actions.working')
+          : t(`workerShifts.actions.${action}Selection`)}
+      </Text>
+    </Pressable>
+  );
+
+  const business = [
+    shift.businessName,
+    shift.isVerified ? t('workerShifts.verifiedTag') : null,
+    booking.businessRating
+      ? `${booking.businessRating.avg.toFixed(1)} (${booking.businessRating.count})`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <Pressable
@@ -45,20 +81,31 @@ export const MyShiftCard: FC<{
       ]}
       testID={`my-shift-${booking.id}`}
     >
-      <Text style={[styles.status, { color: statusColor[status] }]}>
-        {translatedStatus}
-      </Text>
+      <View style={styles.topline}>
+        <Text
+          style={[
+            styles.pill,
+            { color: pill[status].color, backgroundColor: pill[status].background },
+          ]}
+        >
+          {translatedStatus}
+        </Text>
+        <View style={styles.toplineEnd}>
+          <Text style={[styles.category, { color: colors.textMuted }]} numberOfLines={1}>
+            {shift.requirement}
+          </Text>
+          <View style={[styles.info, { backgroundColor: colors.primarySoft }]}>
+            <InfoIcon width={16} height={16} color={colors.primary} />
+          </View>
+        </View>
+      </View>
 
       <Text style={[styles.title, { color: colors.text }]}>{shift.title}</Text>
       <View style={styles.business}>
         {shift.isVerified ? (
           <BadgeCheckIcon width={15} height={15} color={colors.success} />
         ) : null}
-        <Text style={[styles.body, styles.flex, { color: colors.textMuted }]}>
-          {shift.isVerified
-            ? t('workerShifts.verified', { business: shift.businessName })
-            : shift.businessName}
-        </Text>
+        <Text style={[styles.meta, styles.flex, { color: colors.textMuted }]}>{business}</Text>
       </View>
 
       <Text style={[styles.meta, { color: colors.textMuted }]}>
@@ -68,49 +115,45 @@ export const MyShiftCard: FC<{
           hours: shift.durationHours,
         })}
       </Text>
-      <Text style={[styles.meta, { color: colors.textSubtle }]}>
-        {t('workerShifts.where', { area: shift.area, km: shift.distanceKm })}
+      <Text style={[styles.meta, { color: colors.textMuted }]}>
+        {`${shift.area} · ${t('workerShifts.distance', { km: shift.distanceKm })}`}
       </Text>
+      {booking.statusTime ? (
+        <Text style={[styles.meta, { color: colors.textSubtle }]}>
+          {t(`workerShifts.times.${booking.statusTime.key}`, { time: booking.statusTime.at })}
+        </Text>
+      ) : null}
+      {status === 'selected' && booking.confirmBy ? (
+        <Text style={[styles.deadline, { color: colors.warning }]}>
+          {t('workerShifts.confirmBy', { when: booking.confirmBy })}
+        </Text>
+      ) : null}
 
-      {status === 'selected' ? (
-        <>
-          <Text style={[styles.meta, { color: colors.textMuted }]}>
-            {t('workerShifts.offerPay', {
-              rate: formatRupees(shift.hourlyRate),
-              total,
-            })}
-          </Text>
-          {booking.confirmBy ? (
-            <Text style={[styles.deadline, { color: colors.warning }]}>
-              {t('workerShifts.confirmBy', { when: booking.confirmBy })}
-            </Text>
-          ) : null}
-        </>
-      ) : (
-        <View style={styles.pay}>
-          <Text
-            style={[
-              styles.rate,
-              { color: isFaded ? colors.textMuted : colors.text },
-            ]}
+      <View style={[styles.footer, { borderTopColor: colors.border }]}>
+        <Text style={[styles.pay, { color: colors.text }]}>
+          <Text style={styles.rate}>{formatRupees(shift.hourlyRate)}</Text>
+          {` ${t('workerShifts.perHour')} · ${t('workerShifts.estimated', {
+            amount: formatRupees(booking.estimatedPay ?? shift.hourlyRate * shift.durationHours),
+          })}`}
+        </Text>
+        {status === 'selected' && shift.applicationId ? (
+          <View style={styles.selectionRow}>
+            {selectionButton('confirm')}
+            {selectionButton('decline')}
+          </View>
+        ) : (
+          <Pressable
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={onPress}
+            style={({ pressed }) => [styles.action, pressed && styles.pressed]}
+            testID={`my-shift-action-${booking.id}`}
           >
-            {formatRupees(shift.hourlyRate)}
-            <Text style={[styles.perHour, { color: colors.textSubtle }]}>
-              {t('workerShifts.perHour')}
+            <Text style={[styles.actionLabel, { color: colors.primary }]}>
+              {t('workerShifts.actions.viewDetails')}
             </Text>
-          </Text>
-          <Text style={[styles.estimate, { color: colors.textSubtle }]}>
-            {t('workerShifts.estimated', { amount: total })}
-          </Text>
-        </View>
-      )}
-
-      <View style={styles.action}>
-        <OutlineButton
-          label={t(`workerShifts.actions.${status}`)}
-          onPress={onAction}
-          testID={`my-shift-action-${booking.id}`}
-        />
+          </Pressable>
+        )}
       </View>
     </Pressable>
   );
@@ -118,22 +161,51 @@ export const MyShiftCard: FC<{
 
 const styles = StyleSheet.create({
   card: { borderWidth: 1, borderRadius: 16, padding: 16, gap: 4 },
-  pressed: { opacity: 0.9 },
-  status: { fontFamily: FONTS.semiBold, fontSize: 11, lineHeight: 17 },
-  title: {
-    fontFamily: FONTS.regular,
-    fontSize: 18,
-    lineHeight: 26,
-    marginTop: 4,
+  pressed: { opacity: 0.8 },
+  topline: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginBottom: 4,
   },
+  pill: {
+    overflow: 'hidden',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    fontFamily: FONTS.bold,
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  toplineEnd: { flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  category: { flexShrink: 1, fontFamily: FONTS.regular, fontSize: 12, lineHeight: 16 },
+  info: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: { fontFamily: FONTS.semiBold, fontSize: 18, lineHeight: 26 },
   business: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   flex: { flex: 1 },
-  body: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 20 },
-  meta: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
-  deadline: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 18 },
-  pay: { marginTop: 4, gap: 1 },
-  rate: { fontFamily: FONTS.bold, fontSize: 20, lineHeight: 28 },
-  perHour: { fontFamily: FONTS.regular, fontSize: 12 },
-  estimate: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 17 },
-  action: { marginTop: 10 },
+  meta: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 20 },
+  deadline: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 20 },
+  footer: { borderTopWidth: 1, marginTop: 8, paddingTop: 12, gap: 8 },
+  pay: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 26 },
+  rate: { fontFamily: FONTS.bold, fontSize: 20 },
+  action: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
+  actionLabel: { fontFamily: FONTS.semiBold, fontSize: 15 },
+  selectionRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 10 },
+  selection: {
+    minHeight: 44,
+    borderWidth: 1,
+    borderRadius: 11,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  selectionLabel: { fontFamily: FONTS.semiBold, fontSize: 14 },
+  dimmed: { opacity: 0.65 },
 });

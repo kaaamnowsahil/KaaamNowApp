@@ -34,6 +34,7 @@ export const BusinessProfilePage: FC = () => {
           ? t('businessProfile.verifiedLocation', { location: profile.location })
           : profile.location
       }
+      rating={profile.rating}
     />,
     <SettingsGroup key="business" title={t('businessProfile.sectionBusiness')}>
       <SettingsRow

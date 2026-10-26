@@ -3,24 +3,52 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
-import { EmptyState, PrimaryButton } from '@/components/ui';
+import ChevronRightIcon from '@/assets/figma/chevron-right.svg';
+import KeyIcon from '@/assets/figma/key-round.svg';
+import { FlowHeading } from '@/components/shiftFlow';
+import { EmptyState } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import {
-  fromMinor,
-  toRosterMember,
-} from '@/services/shifts/shiftMappers';
+import { toRosterMember } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 import { useBusinessShiftsData } from '@/services/shifts/useBusinessShiftsData';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
+import { WorkerAvatar } from './components';
 import { useBusinessApplicantStore } from './store/useBusinessApplicantStore';
 
-const ROSTER_STRINGS = { ALL_BOOKED: 'All booked workers' } as const;
+const ROSTER_STRINGS = {
+  TITLE: 'Booked workers',
+  booked: (booked: number, required: number) => `${booked}/${required} BOOKED`,
+  shiftsDone: (count: number) => `${count} ${count === 1 ? 'shift' : 'shifts'} done`,
+  code: (code: string) => `Code ${code}`,
+  status: {
+    confirmed: 'Booked',
+    en_route: 'On the way',
+    checked_in: 'Working',
+    checked_out: 'Shift ended',
+    approved: 'Completed',
+    no_show: 'No-show',
+    cancelled: 'Cancelled',
+  } as Record<string, string>,
+} as const;
 
+/** Statuses where the worker still needs the check-in code. */
+const CODE_STATUSES = new Set(['confirmed', 'en_route']);
+const DONE_STATUSES = new Set(['checked_in', 'checked_out', 'approved']);
+const BAD_STATUSES = new Set(['no_show', 'cancelled']);
+
+const dateLabel = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+const timeLabel = (iso: string) =>
+  new Date(iso)
+    .toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true })
+    .toUpperCase();
+
+/** Everyone booked on one shift, as on web; each row opens the worker's booking. */
 export const BusinessRosterPage: FC<
   AppScreenProps<typeof ROUTES.businessRoster>
 > = ({ navigation, route }) => {
@@ -36,55 +64,44 @@ export const BusinessRosterPage: FC<
   const roster = useApiQuery(async () => {
     if (!shift) return null;
     const result = await shiftsApi.roster(shift.id);
-    const members = result.items
-      .filter(
-        entry => entry.status !== 'cancelled' && entry.status !== 'no_show',
-      )
-      .map(entry => toRosterMember(entry, shift.job_title));
-    upsert(members);
-    return { ...result, members };
+    upsert(result.items.map(entry => toRosterMember(entry, shift.job_title)));
+    return result;
   }, [shift?.id]);
-  const confirmedWorkers = roster.data?.members ?? [];
-  const hourlyRate = shift ? fromMinor(shift.hourly_rate_minor) : 0;
-  const hours = shift
-    ? Math.round((shift.estimate.paid_minutes_per_worker / 60) * 10) / 10
-    : 0;
+  const entries = roster.data?.items ?? [];
+  const isFull = roster.data ? roster.data.booked_count >= roster.data.workers_required : false;
+
+  const statusColors = (status: string) =>
+    DONE_STATUSES.has(status)
+      ? { color: colors.success, backgroundColor: colors.successSoft }
+      : BAD_STATUSES.has(status)
+        ? { color: colors.danger, backgroundColor: colors.dangerSoft }
+        : { color: colors.primary, backgroundColor: colors.primarySoft };
 
   return (
     <FormScreen
       onBack={navigation.goBack}
       title={t('businessApplicants.headerTitle')}
-      subtitle={t('businessShiftCreate.scheduledShiftSubtitle')}
+      compactTitle
       headerTag={t('businessApplicants.headerTag')}
-      gap={10}
-      fillLastBlock={confirmedWorkers.length === 0}
+      gap={14}
+      fillLastBlock={entries.length === 0}
       isLoading={data.isLoading || roster.isLoading}
       testID="business-roster-page"
-      actions={
-        <PrimaryButton
-          label={ROSTER_STRINGS.ALL_BOOKED}
-          onPress={() =>
-            navigation.navigate(ROUTES.mainTabs, {
-              screen: ROUTES.businessApplicants,
-            })
-          }
-          testID="business-roster-selected-offers"
-        />
-      }
     >
-      <Text style={[styles.overline, { color: colors.success }]}>
-        {t('businessShifts.fullyStaffed', {
-          count: roster.data?.booked_count ?? 0,
-          total: roster.data?.workers_required ?? 0,
-        })}
-      </Text>
-      <Text
-        accessibilityRole="header"
-        style={[styles.title, { color: colors.text }]}
-      >
-        {t('businessShifts.rosterTitle')}
-      </Text>
-      {confirmedWorkers.length === 0 ? (
+      <FlowHeading
+        overline={ROSTER_STRINGS.booked(
+          roster.data?.booked_count ?? 0,
+          roster.data?.workers_required ?? 0,
+        )}
+        tone={isFull ? 'success' : 'primary'}
+        title={shift?.job_title ?? ROSTER_STRINGS.TITLE}
+        subtitle={
+          shift
+            ? `${dateLabel(shift.starts_at)} · ${timeLabel(shift.starts_at)} – ${timeLabel(shift.ends_at)}`
+            : undefined
+        }
+      />
+      {entries.length === 0 ? (
         <EmptyState
           icon={CalendarDaysIcon}
           title={
@@ -94,62 +111,91 @@ export const BusinessRosterPage: FC<
         />
       ) : (
         <View style={styles.list}>
-          {confirmedWorkers.map((member, index) => (
-            <Pressable
-              key={member.id}
-              accessibilityRole="button"
-              onPress={() =>
-                navigation.navigate(ROUTES.businessScheduledWorkerTracking, {
-                  assignmentId: member.id,
-                })
-              }
-              style={[
-                styles.row,
-                index < confirmedWorkers.length - 1 && {
-                  borderBottomColor: colors.border,
-                  borderBottomWidth: StyleSheet.hairlineWidth,
-                },
-              ]}
-            >
-              <View style={styles.member}>
-                <Text style={[styles.name, { color: colors.text }]}>
-                  {member.name}
+          {entries.map(entry => {
+            const { worker } = entry;
+            const tone = statusColors(entry.status);
+            return (
+              <Pressable
+                key={entry.assignment_id}
+                accessibilityRole="button"
+                onPress={() =>
+                  navigation.navigate(ROUTES.businessScheduledWorkerTracking, {
+                    assignmentId: entry.assignment_id,
+                  })
+                }
+                style={({ pressed }) => [
+                  styles.card,
+                  {
+                    borderColor: pressed ? colors.primary : colors.border,
+                    backgroundColor: colors.surface,
+                  },
+                ]}
+                testID={`business-roster-row-${entry.assignment_id}`}
+              >
+                <WorkerAvatar name={worker.full_name} photoUrl={worker.photo_url} size={44} />
+                <View style={styles.body}>
+                  <Text numberOfLines={1} style={[styles.name, { color: colors.text }]}>
+                    {worker.full_name}
+                  </Text>
+                  <Text style={[styles.meta, { color: colors.textSubtle }]}>
+                    {worker.rating_count > 0
+                      ? `★ ${worker.rating_avg.toFixed(1)} (${worker.rating_count}) · `
+                      : ''}
+                    {ROSTER_STRINGS.shiftsDone(worker.completed_shift_count)}
+                  </Text>
+                  {entry.check_in_code && CODE_STATUSES.has(entry.status) ? (
+                    <View style={[styles.code, { backgroundColor: colors.fill }]}>
+                      <KeyIcon width={12} height={12} color={colors.text} />
+                      <Text style={[styles.codeText, { color: colors.text }]}>
+                        {ROSTER_STRINGS.code(entry.check_in_code)}
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+                <Text style={[styles.status, tone]}>
+                  {ROSTER_STRINGS.status[entry.status] ?? entry.status}
                 </Text>
-                <Text style={[styles.meta, { color: colors.textSubtle }]}>
-                  {t('businessRoster.shiftTrackingHint', {
-                    rate: hourlyRate,
-                    hours,
-                  })}
-                </Text>
-              </View>
-              <Text style={[styles.status, { color: colors.success }]}>
-                {t('businessApplicants.status.confirmed')}
-              </Text>
-            </Pressable>
-          ))}
+                <ChevronRightIcon width={18} height={18} color={colors.textSubtle} />
+              </Pressable>
+            );
+          })}
         </View>
       )}
     </FormScreen>
   );
 };
 
+/** Web `.roster-card`, `.roster-status`, `.roster-code`. */
 const styles = StyleSheet.create({
-  overline: {
-    fontFamily: FONTS.semiBold,
-    fontSize: 9,
-    lineHeight: 14,
-    textTransform: 'uppercase',
-  },
-  title: { fontFamily: FONTS.bold, fontSize: 21, lineHeight: 27 },
-  list: { marginTop: 2 },
-  row: {
-    minHeight: 44,
+  list: { gap: 10 },
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    borderWidth: 1,
+    borderRadius: 16,
+    padding: 14,
   },
-  member: { flex: 1, gap: 2 },
-  name: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 16 },
-  meta: { fontFamily: FONTS.regular, fontSize: 9, lineHeight: 13 },
-  status: { fontFamily: FONTS.semiBold, fontSize: 9, lineHeight: 13 },
+  body: { flex: 1, gap: 3 },
+  name: { fontFamily: FONTS.semiBold, fontSize: 15 },
+  meta: { fontFamily: FONTS.regular, fontSize: 12 },
+  code: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  codeText: { fontFamily: FONTS.semiBold, fontSize: 12, letterSpacing: 0.5 },
+  status: {
+    overflow: 'hidden',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    fontFamily: FONTS.semiBold,
+    fontSize: 12,
+  },
 });

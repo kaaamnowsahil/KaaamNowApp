@@ -1,10 +1,13 @@
 import { useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
 import CalendarIcon from '@/assets/icons/calendar.svg';
 import ClockIcon from '@/assets/icons/clock.svg';
+import KeyRoundIcon from '@/assets/icons/key-round.svg';
+import MessageCircleIcon from '@/assets/icons/message-circle.svg';
+import NavigationIcon from '@/assets/icons/navigation.svg';
 import {
   businessIcon,
   BusinessRow,
@@ -12,27 +15,44 @@ import {
   FlowHeading,
   InfoCallout,
   InfoCard,
+  ReasonSheet,
   StatTiles,
   TermsSheet,
   TextSection,
   WorkerCancellationPolicyCard,
 } from '@/components/shiftFlow';
 import { WORKER_CANCELLATION_STRINGS } from '@/components/shiftFlow/workerCancellationStrings';
-import { PrimaryButton, SecondaryButton } from '@/components/ui';
+import { PrimaryButton, SecondaryButton, TextButton } from '@/components/ui';
+import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import {
+  CANCEL_REASONS,
+  SHIFT_SECURED_STRINGS,
+} from '@/pages/shiftSecured/constants/shiftSecuredStrings';
 import { ApiError } from '@/services/api/apiClient';
 import { getDevicePosition } from '@/services/maps/devicePosition';
-import { shiftsApi } from '@/services/shifts/shiftsApi';
-import { useShiftAction, useWorkerShiftDetail } from '@/services/shifts/useShiftFlow';
+import { formatDateTime, fromMinor } from '@/services/shifts/shiftMappers';
+import { shiftsApi, type CancellationQuote } from '@/services/shifts/shiftsApi';
+import {
+  useAssignment,
+  useShiftAction,
+  useWorkerShiftDetail,
+} from '@/services/shifts/useShiftFlow';
+import { useEmergency } from '@/services/support/useEmergency';
+import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps, BookingStatus, Shift } from '@/types';
 import { formatRupees } from '@/utils/format';
+import { mapsUrl } from '@/utils/links';
 
 import {
   BOOKING_COPY,
   DETAILS_COPY,
   SHIFT_DETAILS_STRINGS,
+  TRAVEL_OPENS_HOURS_BEFORE,
 } from './constants';
+
+const HOUR_MS = 3_600_000;
 
 /** Booking state from the API when the screen was opened without one. */
 const bookingFromShift = (shift: Shift): BookingStatus | undefined => {
@@ -56,6 +76,7 @@ export const ShiftDetailsPage: FC<
   AppScreenProps<typeof ROUTES.shiftDetails>
 > = ({ navigation, route }) => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const detail = useWorkerShiftDetail(route.params.shift);
   const { shift } = detail;
   const info = detail.data;
@@ -113,6 +134,107 @@ export const ShiftDetailsPage: FC<
       SHIFT_DETAILS_STRINGS.CONTACT_FAILED,
     );
 
+  const isBooked = bookingStatus === 'confirmed';
+  const isCancelled = bookingStatus === 'cancelled';
+  const assignment = useAssignment(isBooked || isCancelled ? shift.assignmentId : null);
+  const emergency = useEmergency(isBooked ? shift.assignmentId : null);
+  const [cancelQuote, setCancelQuote] = useState<CancellationQuote | null>(null);
+  const now = Date.now();
+  const startsAt = shift.startsAt ? new Date(shift.startsAt).getTime() : now;
+  const travelOpensAt = startsAt - TRAVEL_OPENS_HOURS_BEFORE * HOUR_MS;
+  const canStartTravel = shift.status !== 'scheduled' || now >= travelOpensAt;
+  const checkInOpensAt = assignment.data?.check_in_opens_at;
+  const isCheckInOpen =
+    Boolean(checkInOpensAt) &&
+    now >= new Date(checkInOpensAt as string).getTime() &&
+    (!shift.endsAt || now < new Date(shift.endsAt).getTime());
+  const workplace = [info?.workplace_name, shift.addressText || shift.area]
+    .filter(Boolean)
+    .join(', ');
+  const a = assignment.data;
+  const activity = a
+    ? (
+      [
+        [a.applied_at, SHIFT_DETAILS_STRINGS.activity.APPLIED],
+        [a.selected_at, SHIFT_DETAILS_STRINGS.activity.selected(shift.businessName)],
+        [
+          a.confirmed_at,
+          shift.status === 'scheduled'
+            ? SHIFT_DETAILS_STRINGS.activity.CONFIRMED
+            : SHIFT_DETAILS_STRINGS.activity.ACCEPTED,
+        ],
+        [a.travel_started_at, SHIFT_DETAILS_STRINGS.activity.ON_THE_WAY],
+        [a.attendance?.checked_in_at, SHIFT_DETAILS_STRINGS.activity.CHECKED_IN],
+        [a.attendance?.checked_out_at, SHIFT_DETAILS_STRINGS.activity.CHECKED_OUT],
+        [a.attendance?.approved_at, SHIFT_DETAILS_STRINGS.activity.approved(shift.businessName)],
+        [
+          a.cancelled_at,
+          a.cancelled_by === 'worker'
+            ? SHIFT_DETAILS_STRINGS.activity.WITHDRAWN
+            : SHIFT_DETAILS_STRINGS.activity.cancelledByBusiness(shift.businessName),
+        ],
+      ] as const
+    )
+      .filter((entry): entry is readonly [string, string] => Boolean(entry[0]))
+      .sort(([x], [y]) => new Date(x).getTime() - new Date(y).getTime())
+    : [];
+  const openDirections = () =>
+    Linking.openURL(mapsUrl(`${shift.businessName}, ${shift.addressText || shift.area}`));
+  const cancelReasons = CANCEL_REASONS.map(reason => ({
+    ...reason,
+    label: t(`shiftSecured.reasons.${reason.id}`),
+  }));
+
+  const headToBusiness = () =>
+    action.run(
+      () => shiftsApi.startTravel(shift.assignmentId as string),
+      () =>
+        navigation.navigate(ROUTES.shiftTravel, {
+          shift: { ...shift, assignmentStatus: 'en_route' },
+        }),
+      SHIFT_DETAILS_STRINGS.TRAVEL_FAILED,
+    );
+  const openCancel = () =>
+    action.run(
+      () => shiftsApi.cancelPreview(shift.assignmentId as string),
+      setCancelQuote,
+      SHIFT_DETAILS_STRINGS.PREVIEW_FAILED,
+    );
+  const cancel = (reasonId: string) => {
+    setCancelQuote(null);
+    const reason = cancelReasons.find(item => item.id === reasonId)?.label ?? reasonId;
+    action.run(
+      () => shiftsApi.cancelAssignment(shift.assignmentId as string, reason),
+      () =>
+        Alert.alert(t('shiftSecured.cancelledTitle'), t('shiftSecured.cancelledBody'), [
+          { text: t('shiftSecured.ok'), onPress: () => navigation.popToTop() },
+        ]),
+      SHIFT_DETAILS_STRINGS.CANCEL_FAILED,
+    );
+  };
+
+  const activityCard = activity.length ? (
+    <View style={[styles.nextSteps, { borderColor: colors.border }]}>
+      <Text style={[styles.nextTitle, { color: colors.text }]}>
+        {SHIFT_DETAILS_STRINGS.ACTIVITY}
+      </Text>
+      {activity.map(([at, label], index) => (
+        <View
+          key={`${label}-${at}`}
+          style={[
+            styles.activityRow,
+            index > 0 && [styles.activityDivider, { borderTopColor: colors.border }],
+          ]}
+        >
+          <Text style={[styles.activityLabel, { color: colors.text }]}>{label}</Text>
+          <Text style={[styles.activityTime, { color: colors.textSubtle }]}>
+            {formatDateTime(at)}
+          </Text>
+        </View>
+      ))}
+    </View>
+  ) : null;
+
   const primary = (() => {
     switch (bookingStatus) {
       case undefined:
@@ -125,10 +247,18 @@ export const ShiftDetailsPage: FC<
           onPress: () => navigation.popTo(ROUTES.shiftSelected, { shift }),
         };
       case 'confirmed':
-        return {
-          label: booking?.action,
-          onPress: () => navigation.popTo(ROUTES.shiftSecured, { shift }),
-        };
+        if (isCheckInOpen) {
+          return {
+            label: SHIFT_DETAILS_STRINGS.CHECK_IN,
+            onPress: () => navigation.navigate(ROUTES.shiftCheckIn, { shift }),
+          };
+        }
+        return canStartTravel
+          ? { label: SHIFT_DETAILS_STRINGS.HEAD_TO_BUSINESS, onPress: headToBusiness }
+          : {
+            label: SHIFT_DETAILS_STRINGS.travelOpensAt(formatDateTime(new Date(travelOpensAt).toISOString())),
+            isDisabled: true,
+          };
       case 'applied':
         return { label: booking?.action, isDisabled: true };
       default:
@@ -157,12 +287,30 @@ export const ShiftDetailsPage: FC<
                 testID="shift-details-primary"
               />
             ) : null}
-            {shift.assignmentId ? (
+            {isBooked ? (
+              <SecondaryButton
+                label={SHIFT_DETAILS_STRINGS.DIRECTIONS}
+                icon={NavigationIcon}
+                onPress={openDirections}
+                testID="shift-details-directions"
+              />
+            ) : null}
+            {shift.assignmentId && !isCancelled ? (
               <SecondaryButton
                 label={SHIFT_DETAILS_STRINGS.MESSAGE}
+                icon={MessageCircleIcon}
                 disabled={action.busy}
                 onPress={messageBusiness}
                 testID="shift-details-message"
+              />
+            ) : null}
+            {isBooked ? (
+              <SecondaryButton
+                label={SHIFT_DETAILS_STRINGS.EMERGENCY}
+                tone="danger"
+                disabled={emergency.busy || !emergency.isAvailable}
+                onPress={emergency.trigger}
+                testID="shift-details-emergency"
               />
             ) : null}
           </>
@@ -170,7 +318,9 @@ export const ShiftDetailsPage: FC<
       >
         <FlowHeading
           overline={
-            booking?.overline ??
+            (isCancelled && a?.cancelled_by === 'worker'
+              ? SHIFT_DETAILS_STRINGS.WITHDRAWN
+              : booking?.overline) ??
             (hasTimeConflict
               ? SHIFT_DETAILS_STRINGS.timeConflict(shift.status === 'live')
               : copy.overline(Math.max(shift.spotsOpen, 1)))
@@ -207,6 +357,7 @@ export const ShiftDetailsPage: FC<
         {shift.status === 'scheduled' ? (
           <View style={styles.cards}>
             <InfoCard
+              icon={CalendarIcon}
               title={SHIFT_DETAILS_STRINGS.when(shift.dateLabel, shift.timeLabel)}
               caption={SHIFT_DETAILS_STRINGS.scheduledDuration(
                 shift.durationHours,
@@ -215,8 +366,9 @@ export const ShiftDetailsPage: FC<
             />
             <InfoCard
               icon={MapPinIcon}
-              title={shift.addressText || shift.area}
+              title={isBooked ? workplace : shift.addressText || shift.area}
               caption={t('shiftDetails.distance', { distance: shift.distanceKm })}
+              onPress={isBooked ? openDirections : undefined}
             />
           </View>
         ) : (
@@ -235,23 +387,81 @@ export const ShiftDetailsPage: FC<
           />
         )}
 
+        {isBooked ? (
+          <View style={[styles.nextSteps, { borderColor: colors.border }]}>
+            <Text style={[styles.nextTitle, { color: colors.text }]}>
+              {SHIFT_DETAILS_STRINGS.NEXT_STEPS}
+            </Text>
+            <FactList
+              accentIcons
+              items={[
+                ...(shift.status === 'scheduled'
+                  ? [{
+                    icon: NavigationIcon,
+                    text: SHIFT_DETAILS_STRINGS.travelStep(
+                      formatDateTime(new Date(travelOpensAt).toISOString()),
+                    ),
+                  }]
+                  : []),
+                ...(checkInOpensAt
+                  ? [{
+                    icon: KeyRoundIcon,
+                    text: SHIFT_DETAILS_STRINGS.checkInStep(formatDateTime(checkInOpensAt)),
+                  }]
+                  : []),
+                { icon: ClockIcon, text: SHIFT_DETAILS_STRINGS.CHECK_OUT_STEP },
+              ]}
+            />
+          </View>
+        ) : null}
         <TextSection
           title={SHIFT_DETAILS_STRINGS.WHAT_YOU_DO}
           body={info?.responsibilities || SHIFT_DETAILS_STRINGS.NO_DETAILS}
         />
-        {info?.requirements ? (
+        {info?.requirements && !isBooked ? (
           <TextSection
             title={SHIFT_DETAILS_STRINGS.BEFORE_ACCEPT}
             body={info.requirements}
             variant="note"
           />
         ) : null}
-        <InfoCallout
-          text={copy.callout}
-          variant={shift.status === 'scheduled' ? 'accent' : 'box'}
-        />
+        {isBooked ? null : (
+          <InfoCallout
+            text={copy.callout}
+            variant={shift.status === 'scheduled' ? 'accent' : 'box'}
+          />
+        )}
         <WorkerCancellationPolicyCard onReadTerms={() => navigation.navigate(ROUTES.terms)} />
+        {isBooked && shift.assignmentId ? (
+          <TextButton
+            label={SHIFT_DETAILS_STRINGS.WITHDRAW}
+            tone="danger"
+            onPress={openCancel}
+            testID="shift-details-withdraw"
+          />
+        ) : null}
+        {activityCard}
       </FormScreen>
+      {cancelQuote ? (
+        <ReasonSheet
+          title={t('shiftSecured.cancelTitle')}
+          subtitle={
+            cancelQuote.fee_minor > 0
+              ? SHIFT_SECURED_STRINGS.feeCancel(
+                formatRupees(fromMinor(cancelQuote.fee_minor)),
+                cancelQuote.strike_weight,
+              )
+              : SHIFT_SECURED_STRINGS.FREE_CANCEL
+          }
+          reasonLabel={t('shiftSecured.cancelReason')}
+          reasons={cancelReasons}
+          confirmLabel={t('shiftSecured.cancelConfirm')}
+          keepLabel={t('shiftSecured.keep')}
+          onConfirm={cancel}
+          onClose={() => setCancelQuote(null)}
+          testID="cancel-shift-sheet"
+        />
+      ) : null}
       {isBookSheetOpen || isTermsOpen ? (
         <TermsSheet
           audience="worker"
@@ -281,4 +491,15 @@ export const ShiftDetailsPage: FC<
 
 const styles = StyleSheet.create({
   cards: { gap: 10 },
+  nextSteps: { borderWidth: 1, borderRadius: 14, padding: 14, gap: 10 },
+  nextTitle: { fontFamily: FONTS.semiBold, fontSize: 14, lineHeight: 20 },
+  activityRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 10,
+  },
+  activityDivider: { borderTopWidth: 1, borderStyle: 'dashed', paddingTop: 8 },
+  activityLabel: { flex: 1, fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 18 },
+  activityTime: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 17 },
 });

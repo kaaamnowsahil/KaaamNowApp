@@ -40,7 +40,11 @@ export const WorkerShiftsPage: FC = () => {
             key={booking.id}
             booking={booking}
             onPress={() => shifts.openBooking(booking)}
-            onAction={() => shifts.runAction(booking)}
+            busy={shifts.pending !== null}
+            pendingAction={
+              shifts.pending?.id === booking.id ? shifts.pending.action : undefined
+            }
+            onSelection={action => shifts.respondToSelection(booking, action)}
           />
         )),
       ])

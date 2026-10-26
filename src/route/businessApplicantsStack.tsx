@@ -3,6 +3,8 @@ import type { FC } from 'react';
 
 import { ROUTES } from '@/constants/routes';
 import { BusinessApplicantsPage } from '@/pages/businessApplicants/BusinessApplicantsPage';
+import { BusinessRateWorkerPage } from '@/pages/businessApplicants/BusinessRateWorkerPage';
+import { BusinessScheduledWorkerTrackingPage } from '@/pages/businessApplicants/BusinessScheduledWorkerTrackingPage';
 import { BusinessWorkerProfilePage } from '@/pages/businessApplicants/BusinessWorkerProfilePage';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppStackParamList } from '@/types';
@@ -25,6 +27,11 @@ export const BusinessApplicantsStack: FC = () => {
     >
       <Stack.Screen name={ROUTES.businessApplicantsHome} component={BusinessApplicantsPage} />
       <Stack.Screen name={ROUTES.businessWorkerProfile} component={BusinessWorkerProfilePage} />
+      <Stack.Screen
+        name={ROUTES.businessScheduledWorkerTracking}
+        component={BusinessScheduledWorkerTrackingPage}
+      />
+      <Stack.Screen name={ROUTES.businessRateWorker} component={BusinessRateWorkerPage} />
     </Stack.Navigator>
   );
 };

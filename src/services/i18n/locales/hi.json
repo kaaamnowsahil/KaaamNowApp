@@ -104,7 +104,10 @@
     "faq": "FAQ और सहायता",
     "terms": "नियम और शर्तें",
     "logOut": "लॉग आउट",
-    "roleLabel": "वर्कर"
+    "roleLabel": "वर्कर",
+    "ratingCount_one": "{{count}} रेटिंग",
+    "ratingCount_other": "{{count}} रेटिंग",
+    "noRatings": "अभी कोई रेटिंग नहीं"
   },
   "workerHome": {
     "greeting": "नमस्ते, {{name}} 👋",

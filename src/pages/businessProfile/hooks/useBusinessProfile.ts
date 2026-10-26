@@ -24,6 +24,9 @@ export const useBusinessProfile = () => {
     businessName,
     location,
     initials: initialsOf(businessName),
+    rating: business
+      ? { avg: business.rating_avg, count: business.rating_count }
+      : undefined,
     theme,
     languageLabel: language.label,
     openLanguage: () => navigation.navigate(ROUTES.language),

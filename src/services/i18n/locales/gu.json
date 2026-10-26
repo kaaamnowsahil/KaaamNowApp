@@ -61,7 +61,10 @@
     "support": "સપોર્ટ અને મદદ",
     "faq": "સામાન્ય પ્રશ્નો અને મદદ",
     "terms": "નિયમો અને શરતો",
-    "logOut": "લૉગ આઉટ"
+    "logOut": "લૉગ આઉટ",
+    "ratingCount_one": "{{count}} rating",
+    "ratingCount_other": "{{count}} ratings",
+    "noRatings": "No ratings yet"
   },
   "workerHome": {
     "greeting": "નમસ્તે, {{name}} 👋",
