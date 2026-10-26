@@ -24,7 +24,7 @@ export const BusinessRow: FC<{
         <Text style={[styles.meta, { color: colors.textSubtle }]}>{meta}</Text>
       </View>
       {isVerified ? (
-        <BadgeCheckIcon width={20} height={20} color={colors.primary} />
+        <BadgeCheckIcon width={20} height={20} color={colors.success} />
       ) : null}
     </View>
   );

@@ -21,6 +21,3 @@ export const LENGTH_OPTIONS = [
   { id: 'half', label: '5–6 hours', min: 5, max: 6 },
   { id: 'long', label: '7+ hours', min: 7, max: Infinity },
 ];
-
-export const CURRENT_LOCATION_ID = 'current';
-export const SAVED_LOCATION_ID = 'saved';

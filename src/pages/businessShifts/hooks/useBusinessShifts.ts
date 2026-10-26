@@ -1,136 +1,161 @@
 import { useNavigation } from '@react-navigation/native';
-import { Alert } from 'react-native';
+import { useState } from 'react';
 
 import { ROUTES } from '@/constants/routes';
-import { payInvoice, PaymentNotCompletedError } from '@/services/billing/billingApi';
-import i18n from '@/services/i18n/i18n';
-import { toDashboardShift } from '@/services/shifts/shiftMappers';
-import { shiftsApi, type BusinessShiftItem } from '@/services/shifts/shiftsApi';
-import { useBusinessShiftsData } from '@/services/shifts/useBusinessShiftsData';
-import { useShiftAction } from '@/services/shifts/useShiftFlow';
+import { errorMessage } from '@/services/api/apiClient';
+import { meApi } from '@/services/api/meApi';
+import { payInvoice } from '@/services/billing/billingApi';
+import {
+  shiftsApi,
+  type ApiShiftStatus,
+  type BusinessShiftItem,
+  type ShiftCancelPreview,
+} from '@/services/shifts/shiftsApi';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import type { TabAppNavigation } from '@/types';
 
-export const UNPAID_STRINGS = {
-  heading: 'Payment pending',
-  status: 'Deposit not paid · not live yet',
-  title: 'Pay deposit to go live',
-  body: 'Workers can book this shift only after the deposit is paid.',
-  pay: 'Pay now',
-  paidTitle: 'Shift is live',
-  paidBody: 'Nearby workers can now book it.',
-  failed: 'Payment didn’t go through',
+export type ShiftSection =
+  | 'awaiting_payment'
+  | 'draft'
+  | 'completed'
+  | 'upcoming'
+  | 'in_progress'
+  | 'expired'
+  | 'cancelled';
+
+const SHIFT_SECTIONS: { key: ShiftSection; titleKey: string }[] = [
+  { key: 'awaiting_payment', titleKey: 'businessShifts.paymentPending' },
+  { key: 'draft', titleKey: 'businessDashboard.shiftStatus.draft' },
+  { key: 'completed', titleKey: 'businessDashboard.shiftStatus.completed' },
+  { key: 'upcoming', titleKey: 'businessDashboard.upcoming' },
+  { key: 'in_progress', titleKey: 'businessDashboard.shiftStatus.inProgress' },
+  { key: 'expired', titleKey: 'businessDashboard.shiftStatus.expired' },
+  { key: 'cancelled', titleKey: 'businessDashboard.shiftStatus.cancelled' },
+];
+
+const SECTION_BY_STATUS: Record<ApiShiftStatus, ShiftSection> = {
+  awaiting_payment: 'awaiting_payment',
+  draft: 'draft',
+  searching: 'upcoming',
+  open: 'upcoming',
+  filled: 'upcoming',
+  in_progress: 'in_progress',
+  completed: 'completed',
+  expired: 'expired',
+  cancelled: 'cancelled',
 };
 
+const byStart = (a: BusinessShiftItem, b: BusinessShiftItem) =>
+  new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime();
+
+/** Business Shifts tab: every live and scheduled shift grouped by status, as on web. */
 export const useBusinessShifts = () => {
   const navigation = useNavigation<TabAppNavigation>();
-  const data = useBusinessShiftsData();
-  const { busy, run } = useShiftAction();
-  const actionFailed = i18n.t('businessShifts.actionFailed');
-  const rosterShift = data.scheduledShifts.find(item => item.booked_count > 0);
-  const isUnpaid = (item: BusinessShiftItem) =>
-    item.status === 'awaiting_payment' && Boolean(item.deposit_invoice_id);
+  const query = useApiQuery(
+    () =>
+      Promise.all([
+        meApi.profile(),
+        shiftsApi.businessShifts({ shift_type: 'live' }),
+        shiftsApi.businessShifts({ shift_type: 'scheduled' }),
+      ]),
+    [],
+  );
+  const [profile, live, scheduled] = query.data ?? [];
+  const shifts = [...(live?.items ?? []), ...(scheduled?.items ?? [])].sort(byStart);
+  const business = profile?.business;
 
-  const payDeposit = (item: BusinessShiftItem) => {
-    if (busy || !item.deposit_invoice_id) return;
-    const invoiceId = item.deposit_invoice_id;
-    Alert.alert(UNPAID_STRINGS.title, UNPAID_STRINGS.body, [
-      { text: i18n.t('common.cancel'), style: 'cancel' },
-      {
-        text: UNPAID_STRINGS.pay,
-        onPress: () =>
-          run(
-            () => payInvoice(invoiceId),
-            () => {
-              data.reload();
-              Alert.alert(UNPAID_STRINGS.paidTitle, UNPAID_STRINGS.paidBody);
-            },
-            UNPAID_STRINGS.failed,
-            error => {
-              if (!(error instanceof PaymentNotCompletedError)) return false;
-              data.reload();
-              return true;
-            },
-          ),
-      },
-    ]);
-  };
+  const [cancelTarget, setCancelTarget] = useState<BusinessShiftItem | null>(null);
+  const [cancelPreview, setCancelPreview] = useState<ShiftCancelPreview | null>(null);
+  const [cancelError, setCancelError] = useState('');
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [payingId, setPayingId] = useState<string | null>(null);
+  const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [cardError, setCardError] = useState<{ shiftId: string; message: string } | null>(
+    null,
+  );
 
-  const openShift = (item: BusinessShiftItem) => {
-    if (item.pending_applications > 0) {
-      navigation.navigate(ROUTES.businessApplicants);
-      return;
+  const openCancel = (shift: BusinessShiftItem) => {
+    setCancelError('');
+    setCancelPreview(null);
+    setCancelTarget(shift);
+    if (shift.shift_type === 'scheduled' && shift.booked_count > 0) {
+      shiftsApi
+        .shiftCancelPreview(shift.id)
+        .then(setCancelPreview)
+        .catch(() => undefined);
     }
-    navigation.navigate(ROUTES.businessRoster, { shiftId: item.id });
   };
 
-  const openDraft = (item: BusinessShiftItem) => {
-    if (busy) return;
-    Alert.alert(
-      i18n.t('businessShifts.publishDraftTitle'),
-      i18n.t('businessShifts.publishDraftBody'),
-      [
-        {
-          text: i18n.t('businessShifts.discardDraft'),
-          style: 'destructive',
-          onPress: () =>
-            run(
-              () =>
-                shiftsApi.cancelShift(
-                  item.id,
-                  i18n.t('businessShifts.discardReason'),
-                ),
-              data.reload,
-              actionFailed,
-            ),
-        },
-        { text: i18n.t('common.cancel'), style: 'cancel' },
-        {
-          text: i18n.t('businessShifts.publish'),
-          onPress: () =>
-            run(
-              () => shiftsApi.publishShift(item.id),
-              data.reload,
-              actionFailed,
-            ),
-        },
-      ],
-    );
+  const confirmCancel = async () => {
+    if (!cancelTarget) return;
+    setIsCancelling(true);
+    setCancelError('');
+    try {
+      await shiftsApi.cancelShift(cancelTarget.id, '');
+      setCancelTarget(null);
+      query.reload();
+    } catch (error) {
+      setCancelError(errorMessage(error));
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const payDeposit = async (shift: BusinessShiftItem) => {
+    if (!shift.deposit_invoice_id || payingId) return;
+    setPayingId(shift.id);
+    setCardError(null);
+    try {
+      await payInvoice(shift.deposit_invoice_id);
+      query.reload();
+    } catch (error) {
+      setCardError({ shiftId: shift.id, message: errorMessage(error) });
+    } finally {
+      setPayingId(null);
+    }
+  };
+
+  const publish = async (shift: BusinessShiftItem) => {
+    if (publishingId) return;
+    setPublishingId(shift.id);
+    setCardError(null);
+    try {
+      await shiftsApi.publishShift(shift.id);
+      query.reload();
+    } catch (error) {
+      setCardError({ shiftId: shift.id, message: errorMessage(error) });
+    } finally {
+      setPublishingId(null);
+    }
   };
 
   return {
-    isLoading: data.isLoading,
-    error: data.error,
-    reload: data.reload,
-    businessName: data.businessName,
-    isVerified: data.isVerified,
-    liveShifts: data.liveShifts.map(item => ({
-      item,
-      card: toDashboardShift(item),
-    })),
-    unpaidShifts: data.scheduledShifts.filter(isUnpaid),
-    payDeposit,
-    scheduledShifts: data.scheduledShifts.filter(item => !isUnpaid(item)).map(item => ({
-      item,
-      card: toDashboardShift(item),
-    })),
-    drafts: data.drafts,
-    roster: {
-      staffedCount: data.scheduledShifts.reduce(
-        (sum, item) => sum + item.booked_count,
-        0,
-      ),
-      totalCount: data.scheduledShifts.reduce(
-        (sum, item) => sum + item.workers_required,
-        0,
-      ),
+    isLoading: query.isLoading,
+    error: query.error,
+    reload: query.reload,
+    businessName: business?.business_name ?? '',
+    isVerified: business?.verification_status === 'verified',
+    hasShifts: shifts.length > 0,
+    sections: SHIFT_SECTIONS.map(section => ({
+      ...section,
+      shifts: shifts.filter(shift => SECTION_BY_STATUS[shift.status] === section.key),
+    })).filter(section => section.shifts.length > 0),
+    cancelTarget,
+    cancelPreview,
+    cancelError,
+    isCancelling,
+    openCancel,
+    closeCancel: () => {
+      if (!isCancelling) setCancelTarget(null);
     },
-    openShift,
-    openDraft,
-    openRoster: () =>
-      navigation.navigate(
-        ROUTES.businessRoster,
-        rosterShift ? { shiftId: rosterShift.id } : undefined,
-      ),
+    confirmCancel,
+    payingId,
+    publishingId,
+    cardError,
+    payDeposit,
+    publish,
+    openBooked: (shift: BusinessShiftItem) =>
+      navigation.navigate(ROUTES.businessRoster, { shiftId: shift.id }),
     openSchedule: () => navigation.navigate(ROUTES.businessShiftSchedule),
   };
 };

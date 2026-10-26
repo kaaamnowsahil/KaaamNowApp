@@ -52,7 +52,7 @@ export const MyShiftCard: FC<{
       <Text style={[styles.title, { color: colors.text }]}>{shift.title}</Text>
       <View style={styles.business}>
         {shift.isVerified ? (
-          <BadgeCheckIcon width={15} height={15} color={colors.primary} />
+          <BadgeCheckIcon width={15} height={15} color={colors.success} />
         ) : null}
         <Text style={[styles.body, styles.flex, { color: colors.textMuted }]}>
           {shift.isVerified

@@ -76,8 +76,11 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.addRole]: { role: 'worker' | 'business' };
   [ROUTES.businessEditProfile]: undefined;
   [ROUTES.businessProfileHome]: undefined;
+  [ROUTES.businessApplicantsHome]: undefined;
   [ROUTES.workerProfileHome]: undefined;
   [ROUTES.workerEarningsHome]: undefined;
+  [ROUTES.workerDiscoverHome]: undefined;
+  [ROUTES.workerShiftsHome]: undefined;
   [ROUTES.businessShiftSchedule]: { draft?: BusinessShiftDraft } | undefined;
   [ROUTES.businessShiftReview]: { draft: BusinessShiftDraft };
   /** unpaidInvoiceIds: deposits that still need paying before workers can book. */
@@ -109,6 +112,7 @@ export type AppStackParamList = CommonStackParamList & {
     workerIds?: string[];
   };
   [ROUTES.businessApplicantProfile]: { applicantId: string };
+  [ROUTES.businessWorkerProfile]: { workerId: string };
   [ROUTES.businessRoster]: { shiftId?: string } | undefined;
   [ROUTES.language]: undefined;
   [ROUTES.appearance]: undefined;

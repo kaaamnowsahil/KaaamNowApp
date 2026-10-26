@@ -13,8 +13,17 @@ export const FlowHeading: FC<{
   subtitle?: string;
   /** Request screens: 11px overline, 23px title. */
   isLarge?: boolean;
-}> = ({ overline, tone = 'primary', title, subtitle, isLarge }) => {
+  /** Overline as a soft rounded badge (web `.worker-scheduled-shift-application-status`). */
+  isPill?: boolean;
+}> = ({ overline, tone = 'primary', title, subtitle, isLarge, isPill }) => {
   const { colors } = useTheme();
+  const pillBg = {
+    default: colors.fill,
+    primary: colors.primarySoft,
+    success: colors.successSoft,
+    warning: colors.fill,
+    danger: colors.dangerSoft,
+  }[tone];
   return (
     <View style={[styles.root, isLarge && styles.rootLarge]}>
       {overline ? (
@@ -22,6 +31,7 @@ export const FlowHeading: FC<{
           style={[
             styles.overline,
             isLarge && styles.overlineLarge,
+            isPill && [styles.pill, { backgroundColor: pillBg }],
             { color: toneColor(colors, tone) },
           ]}
         >
@@ -57,6 +67,16 @@ const styles = StyleSheet.create({
   },
   rootLarge: { marginTop: 6 },
   overlineLarge: { fontSize: 11, lineHeight: 15.4 },
+  pill: {
+    alignSelf: 'flex-start',
+    overflow: 'hidden',
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0,
+  },
   title: { fontFamily: FONTS.bold, fontSize: 22, lineHeight: 28 },
   titleLarge: { fontSize: 23, lineHeight: 29 },
   subtitle: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 16.8 },

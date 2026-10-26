@@ -47,8 +47,11 @@ export const ROUTES = {
   businessApplicants: 'BusinessApplicants',
   businessProfile: 'BusinessProfile',
   businessProfileHome: 'BusinessProfileHome',
+  businessApplicantsHome: 'BusinessApplicantsHome',
   workerProfileHome: 'WorkerProfileHome',
   workerEarningsHome: 'WorkerEarningsHome',
+  workerDiscoverHome: 'WorkerDiscoverHome',
+  workerShiftsHome: 'WorkerShiftsHome',
   businessEditProfile: 'BusinessEditProfile',
   businessShiftSchedule: 'BusinessShiftSchedule',
   businessShiftReview: 'BusinessShiftReview',
@@ -68,6 +71,7 @@ export const ROUTES = {
   businessScheduledWorkerTracking: 'BusinessScheduledWorkerTracking',
   businessRateWorker: 'BusinessRateWorker',
   businessApplicantProfile: 'BusinessApplicantProfile',
+  businessWorkerProfile: 'BusinessWorkerProfile',
   businessRoster: 'BusinessRoster',
 
   // common (both stacks)

@@ -143,6 +143,15 @@ export const toApplicant = (
   skills: [],
   assignmentId: item.assignment_id ?? undefined,
   distanceKm: item.distance_km ?? undefined,
+  workerId: item.worker.id,
+  photoUrl: item.worker.photo_url ?? undefined,
+  isVerified: item.worker.verification_status === 'verified',
+  ratingCount: item.worker.rating_count,
+  completedShifts: item.worker.completed_shift_count,
+  shiftId: item.shift.id,
+  workplace: item.shift.workplace_name,
+  startsAt: item.shift.starts_at,
+  endsAt: item.shift.ends_at,
 });
 
 /** Roster rows are keyed by assignment id so tracking and rating can call assignment endpoints. */

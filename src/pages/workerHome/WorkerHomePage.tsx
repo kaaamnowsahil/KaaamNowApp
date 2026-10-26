@@ -9,6 +9,7 @@ import ZapIcon from '@/assets/figma/zap.svg';
 import {
   BrandAppBar,
   EmptyState,
+  OutlineButton,
   ScreenIntro,
   SegmentedControl,
 } from '@/components/ui';
@@ -20,7 +21,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 import {
   AvailabilityCard,
   FilterSheet,
-  LocationDropdown,
+  LocationButton,
   LocationPromptSheet,
 } from './components';
 import { WORKER_HOME_STRINGS } from './constants';
@@ -53,14 +54,12 @@ export const WorkerHomePage: FC = () => {
       error={home.availabilityError}
       onToggle={home.toggleAvailability}
     />,
-    <LocationDropdown
+    <LocationButton
       key="location"
       label={home.locationLabel}
-      options={home.locations}
-      value={home.locationId}
-      isOpen={home.isLocationOpen}
-      onToggle={home.toggleLocation}
-      onSelect={home.selectLocation}
+      isLoading={home.isLocating}
+      error={home.locationError}
+      onPress={home.refreshLocation}
     />,
     <View key="search" style={styles.searchRow}>
       <View
@@ -136,6 +135,24 @@ export const WorkerHomePage: FC = () => {
               onPress={() => home.openShift(shift)}
             />
           )),
+          ...(home.hasMore || home.loadMoreError
+            ? [
+              <View key="load-more" style={styles.loadMore}>
+                {home.loadMoreError ? (
+                  <Text style={[styles.loadMoreError, { color: colors.danger }]}>
+                    {home.loadMoreError}
+                  </Text>
+                ) : null}
+                <OutlineButton
+                  label={home.isLoadingMore ? t('common.loading') : t('workerHome.loadMore')}
+                  tone="primary"
+                  disabled={home.isLoadingMore}
+                  onPress={home.loadMore}
+                  testID="home-load-more"
+                />
+              </View>,
+            ]
+            : []),
         ]
         : [
           <EmptyState
@@ -209,6 +226,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   pressed: { opacity: 0.7 },
+  loadMore: { gap: 8 },
+  loadMoreError: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 16, textAlign: 'center' },
   badge: {
     position: 'absolute',
     top: -4,

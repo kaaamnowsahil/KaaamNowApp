@@ -14,6 +14,7 @@ import {
 } from '@/pages/businessShiftCreate';
 import { BusinessApplicantProfilePage } from '@/pages/businessApplicants/BusinessApplicantProfilePage';
 import { BusinessRosterPage } from '@/pages/businessApplicants/BusinessRosterPage';
+import { BusinessWorkerProfilePage } from '@/pages/businessApplicants/BusinessWorkerProfilePage';
 import { BusinessScheduledWorkerTrackingPage } from '@/pages/businessApplicants/BusinessScheduledWorkerTrackingPage';
 import { BusinessRateWorkerPage } from '@/pages/businessApplicants/BusinessRateWorkerPage';
 import { BusinessLiveCreatePage } from '@/pages/businessLive/BusinessLiveCreatePage';
@@ -131,6 +132,10 @@ export const AfterLoginRoutes: FC = () => {
       <Stack.Screen
         name={ROUTES.businessApplicantProfile}
         component={BusinessApplicantProfilePage}
+      />
+      <Stack.Screen
+        name={ROUTES.businessWorkerProfile}
+        component={BusinessWorkerProfilePage}
       />
       <Stack.Screen
         name={ROUTES.businessRoster}

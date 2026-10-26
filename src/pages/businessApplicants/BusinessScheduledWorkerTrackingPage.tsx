@@ -1,6 +1,7 @@
 import { useEffect, useState, type FC } from 'react';
 import { Linking, StyleSheet, Text, View } from 'react-native';
 
+import PhoneIcon from '@/assets/figma/phone.svg';
 import {
   FlowHeading,
   InfoCallout,
@@ -201,7 +202,7 @@ export const BusinessScheduledWorkerTrackingPage: FC<
       <FormScreen
         busy={action.busy || emergency.busy}
         onBack={navigation.goBack}
-        title={S.TITLE}
+        title={S.status[status] ?? S.TITLE}
         compactTitle
         gap={12}
         isLoading={assignment.isLoading}
@@ -222,8 +223,6 @@ export const BusinessScheduledWorkerTrackingPage: FC<
         }
       >
         <FlowHeading
-          overline={S.status[status] ?? status}
-          tone={isEnded ? 'success' : 'primary'}
           title={detail?.worker.full_name ?? ''}
           subtitle={
             shift
@@ -281,11 +280,14 @@ export const BusinessScheduledWorkerTrackingPage: FC<
               {`${formatRupees(fromMinor(detail.hourly_rate_minor))}/hr · ${shift.workplace_name || shift.address_text}`}
             </Text>
             {phone ? (
-              <TextButton
-                label={phone}
-                tone="primary"
-                onPress={() => Linking.openURL(`tel:${phone}`)}
-              />
+              <View style={styles.callButton}>
+                <SecondaryButton
+                  label={S.call(phone)}
+                  icon={PhoneIcon}
+                  onPress={() => Linking.openURL(`tel:${phone}`)}
+                  testID="booking-call-worker"
+                />
+              </View>
             ) : null}
           </View>
         ) : null}
@@ -368,6 +370,7 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   summary: { borderRadius: 14, padding: 12, gap: 4 },
+  callButton: { marginTop: 8 },
   summaryTitle: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 17 },
   meta: { fontFamily: FONTS.regular, fontSize: 10, lineHeight: 15 },
   sheetBody: { gap: 16, marginTop: 8 },
