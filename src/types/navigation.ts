@@ -77,6 +77,7 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.businessEditProfile]: undefined;
   [ROUTES.businessProfileHome]: undefined;
   [ROUTES.businessApplicantsHome]: undefined;
+  [ROUTES.businessShiftsHome]: undefined;
   [ROUTES.workerProfileHome]: undefined;
   [ROUTES.workerEarningsHome]: undefined;
   [ROUTES.workerDiscoverHome]: undefined;

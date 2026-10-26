@@ -152,6 +152,9 @@ export const toApplicant = (
   workplace: item.shift.workplace_name,
   startsAt: item.shift.starts_at,
   endsAt: item.shift.ends_at,
+  hourlyRateMinor: item.shift.hourly_rate_minor,
+  applicationStatus: item.status,
+  respondedAt: item.responded_at ?? undefined,
 });
 
 /** Roster rows are keyed by assignment id so tracking and rating can call assignment endpoints. */

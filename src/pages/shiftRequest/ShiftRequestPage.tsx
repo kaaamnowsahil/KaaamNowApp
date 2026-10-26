@@ -58,8 +58,9 @@ export const ShiftRequestPage: FC<
       ? action.run(
         () => shiftsApi.acceptLive(shift.id),
         assignment =>
-          navigation.replace(ROUTES.shiftSecured, {
+          navigation.replace(ROUTES.shiftDetails, {
             shift: { ...shift, assignmentId: assignment.id, assignmentStatus: assignment.status },
+            bookingStatus: 'confirmed',
           }),
         SHIFT_REQUEST_STRINGS.ACCEPT_FAILED,
       )

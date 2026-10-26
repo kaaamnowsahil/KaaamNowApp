@@ -12,13 +12,13 @@ import WalletIcon from '@/assets/figma/wallet.svg';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { BusinessLivePage } from '@/pages/businessLive/BusinessLivePage';
-import { BusinessShiftsPage } from '@/pages/businessShifts/BusinessShiftsPage';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { TabParamList } from '@/types';
 
 import { BusinessApplicantsStack } from './businessApplicantsStack';
 import { BusinessProfileStack } from './businessProfileStack';
+import { BusinessShiftsStack } from './businessShiftsStack';
 import { WorkerEarningsStack } from './workerEarningsStack';
 import { WorkerProfileStack } from './workerProfileStack';
 import { WorkerDiscoverStack, WorkerShiftsStack } from './workerShiftFlowStack';
@@ -75,7 +75,7 @@ const BUSINESS_TABS: TabDef[] = [
   {
     name: ROUTES.businessShifts,
     title: 'shifts',
-    component: BusinessShiftsPage,
+    component: BusinessShiftsStack,
     icon: tabIcon(CalendarDaysIcon),
   },
   {

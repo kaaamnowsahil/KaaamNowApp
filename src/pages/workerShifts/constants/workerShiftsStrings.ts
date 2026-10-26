@@ -1,16 +1,28 @@
 import type { BookingStatus } from '@/types';
 
-export type ShiftsSection = 'today' | 'confirm' | 'upcoming' | 'applied' | 'past';
+/** Same order and keys as the web My shifts sections. */
+export type ShiftsSection =
+  | 'inProgress'
+  | 'today'
+  | 'confirm'
+  | 'upcoming'
+  | 'past'
+  | 'waiting'
+  | 'declinedByBusiness'
+  | 'declinedByYou';
 
 export const WORKER_SHIFTS_STRINGS = {
   TITLE: 'My shifts',
   SUBTITLE: 'Your confirmed shifts and selected offers.',
   SECTION_TITLE: {
+    inProgress: 'In progress',
     today: 'Today',
     confirm: 'Needs confirmation',
-    upcoming: 'Upcoming',
-    applied: 'Applied',
+    upcoming: 'Confirmed',
     past: 'Completed',
+    waiting: 'Waiting for business',
+    declinedByBusiness: 'Declined by business',
+    declinedByYou: 'Declined by you',
   } as Record<ShiftsSection, string>,
   status: (status: BookingStatus, code?: string) =>
     ({

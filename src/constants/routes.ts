@@ -48,6 +48,7 @@ export const ROUTES = {
   businessProfile: 'BusinessProfile',
   businessProfileHome: 'BusinessProfileHome',
   businessApplicantsHome: 'BusinessApplicantsHome',
+  businessShiftsHome: 'BusinessShiftsHome',
   workerProfileHome: 'WorkerProfileHome',
   workerEarningsHome: 'WorkerEarningsHome',
   workerDiscoverHome: 'WorkerDiscoverHome',

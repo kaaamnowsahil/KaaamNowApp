@@ -61,7 +61,10 @@
     "support": "ਸਹਾਇਤਾ",
     "faq": "ਅਕਸਰ ਪੁੱਛੇ ਜਾਂਦੇ ਸਵਾਲ",
     "terms": "ਨਿਯਮ ਅਤੇ ਸ਼ਰਤਾਂ",
-    "logOut": "ਲਾਗ ਆਉਟ ਕਰੋ"
+    "logOut": "ਲਾਗ ਆਉਟ ਕਰੋ",
+    "ratingCount_one": "{{count}} rating",
+    "ratingCount_other": "{{count}} ratings",
+    "noRatings": "No ratings yet"
   },
   "workerHome": {
     "greeting": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ, {{name}} 👋",

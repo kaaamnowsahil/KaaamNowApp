@@ -46,10 +46,11 @@ const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
       assignmentId: assignment.id,
       assignmentStatus: assignment.status,
     };
-    navigationRef.navigate(
-      assignment.status === 'checked_in' ? ROUTES.activeShift : ROUTES.shiftSecured,
-      { shift },
-    );
+    if (assignment.status === 'checked_in') {
+      navigationRef.navigate(ROUTES.activeShift, { shift });
+    } else {
+      navigationRef.navigate(ROUTES.shiftDetails, { shift, bookingStatus: 'confirmed' });
+    }
   } catch {
     navigationRef.navigate(ROUTES.notifications);
   }

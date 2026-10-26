@@ -79,6 +79,7 @@ export const BusinessShiftsPage: FC = () => {
                 onPay={() => shifts.payDeposit(shift)}
                 onPublish={() => shifts.publish(shift)}
                 onOpenBooked={() => shifts.openBooked(shift)}
+                onOpenWithdrawn={shifts.openApplicants}
               />
             ))}
           </View>

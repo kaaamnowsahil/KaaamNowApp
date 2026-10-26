@@ -39,13 +39,14 @@ export const ShiftSelectedPage: FC<
     action.run(
       () => shiftsApi.confirmSelection(applicationId),
       application =>
-        navigation.replace(ROUTES.shiftSecured, {
+        navigation.replace(ROUTES.shiftDetails, {
           shift: {
             ...shift,
             applicationStatus: application.status,
             assignmentId: application.assignment_id ?? shift.assignmentId,
             assignmentStatus: 'confirmed',
           },
+          bookingStatus: 'confirmed',
         }),
       SHIFT_SELECTED_STRINGS.CONFIRM_FAILED,
     );

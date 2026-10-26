@@ -66,6 +66,10 @@ export type MyShiftItem = {
   application_status?: string | null;
   confirm_by?: string | null;
   applied_at?: string | null;
+  /** When the business selected, rejected or it expired. */
+  decided_at?: string | null;
+  /** When the worker confirmed, declined or withdrew. */
+  responded_at?: string | null;
   earned_minor?: number | null;
   shift: WorkerShiftCard;
 };
@@ -93,6 +97,7 @@ export type AttendanceSummary = {
   checked_out_at?: string | null;
   recorded_minutes?: number | null;
   approved_minutes?: number | null;
+  approved_at?: string | null;
 };
 
 export type RatingView = {
@@ -119,6 +124,12 @@ export type AssignmentDetail = {
   hourly_rate_minor: number;
   confirmed_at: string;
   travel_started_at?: string | null;
+  cancelled_at?: string | null;
+  /** worker or business */
+  cancelled_by?: string | null;
+  cancel_reason?: string | null;
+  applied_at?: string | null;
+  selected_at?: string | null;
   shift: WorkerShiftCard;
   worker: WorkerSummary;
   business: BusinessCard;
@@ -233,6 +244,8 @@ export type BusinessShiftItem = {
   booked_count: number;
   checked_in_count: number;
   pending_applications: number;
+  /** Workers who withdrew their application or booking, or declined. */
+  withdrawn_count?: number;
   hourly_rate_minor: number;
   currency: string;
   starts_at: string;
@@ -269,12 +282,15 @@ export type ShiftBulkItem = {
   arrival_instructions?: string | null;
 };
 
-export type ApplicantStatus = 'applied' | 'selected' | 'confirmed' | 'rejected';
+/** `withdrawn` also covers workers who declined an offer. */
+export type ApplicantStatus = 'applied' | 'selected' | 'confirmed' | 'rejected' | 'withdrawn';
 
 export type BusinessApplicantItem = {
   application_id: string;
   status: string;
   applied_at: string;
+  /** When the worker confirmed, declined or withdrew. */
+  responded_at?: string | null;
   confirm_by?: string | null;
   distance_km?: number | null;
   cover_note: string;
@@ -351,12 +367,14 @@ export const shiftsApi = {
     limit?: number;
     offset?: number;
   }) => apiRequest<Page<WorkerShiftCard>>('GET', '/worker/feed', { query }),
-  myShifts: (tab: MyShiftsTab) =>
+  myShifts: (tab: MyShiftsTab, coords?: { latitude: number; longitude: number } | null) =>
     apiRequest<Page<MyShiftItem> & { tab: MyShiftsTab }>('GET', '/worker/my-shifts', {
-      query: { tab, limit: 50 },
+      query: { tab, limit: 50, lat: coords?.latitude, lng: coords?.longitude },
     }),
-  shiftDetail: (shiftId: string) =>
-    apiRequest<WorkerShiftDetail>('GET', `/worker/shifts/${shiftId}`),
+  shiftDetail: (shiftId: string, coords?: { latitude: number; longitude: number } | null) =>
+    apiRequest<WorkerShiftDetail>('GET', `/worker/shifts/${shiftId}`, {
+      query: { lat: coords?.latitude, lng: coords?.longitude },
+    }),
   apply: (shiftId: string, coords?: { latitude: number; longitude: number }) =>
     apiRequest<ApplicationResponse>('POST', `/worker/shifts/${shiftId}/applications`, {
       body: { cover_note: '', ...coords },
@@ -421,6 +439,8 @@ export const shiftsApi = {
     latitude?: number | null;
     longitude?: number | null;
   }) => apiRequest<{ is_available: boolean }>('PUT', '/me/availability', { body }),
+  updateLocation: (body: { latitude: number; longitude: number; accuracy_m?: number }) =>
+    apiRequest<{ is_available: boolean }>('PUT', '/me/location', { body }),
 
   // business
   businessShifts: (query: { shift_type?: ApiShiftType; group?: BusinessShiftGroup }) =>

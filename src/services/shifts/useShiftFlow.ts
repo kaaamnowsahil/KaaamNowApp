@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Alert } from 'react-native';
 
 import { errorMessage } from '@/services/api/apiClient';
+import { getDevicePosition } from '@/services/maps/devicePosition';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import type { Shift } from '@/types';
 
@@ -28,7 +29,10 @@ export const mergeShift = (shift: Shift, card?: WorkerShiftDetail | AssignmentDe
 };
 
 export const useWorkerShiftDetail = (shift: Shift) => {
-  const query = useApiQuery(() => shiftsApi.shiftDetail(shift.id), [shift.id]);
+  const query = useApiQuery(
+    async () => shiftsApi.shiftDetail(shift.id, await getDevicePosition(5000)),
+    [shift.id],
+  );
   return { ...query, shift: mergeShift(shift, query.data) };
 };
 

@@ -8,13 +8,20 @@ import { useTheme } from '@/theme/ThemeProvider';
 export type Fact = { icon: FC<SvgProps>; text: string };
 
 /** Icon + one-line facts (date, duration, place) under the pay tiles. */
-export const FactList: FC<{ items: Fact[] }> = ({ items }) => {
+export const FactList: FC<{ items: Fact[]; accentIcons?: boolean }> = ({
+  items,
+  accentIcons = false,
+}) => {
   const { colors } = useTheme();
   return (
     <View style={styles.list}>
       {items.map(({ icon: Icon, text }) => (
         <View key={text} style={styles.row}>
-          <Icon width={15} height={15} color={colors.textSubtle} />
+          <Icon
+            width={15}
+            height={15}
+            color={accentIcons ? colors.primary : colors.textSubtle}
+          />
           <Text style={[styles.text, { color: colors.textMuted }]}>{text}</Text>
         </View>
       ))}

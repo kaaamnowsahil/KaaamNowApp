@@ -7,10 +7,13 @@ export type BookingStatus =
   | 'completed'
   | 'cancelled';
 
+/** My shifts also lists applications that ended before a booking. */
+export type MyShiftStatus = BookingStatus | 'declined' | 'rejected' | 'withdrawn' | 'expired';
+
 /** A worker's relationship to one shift. */
 export type Booking = {
   id: string;
-  status: BookingStatus;
+  status: MyShiftStatus;
   shift: Shift;
   /** Shown to the business on arrival; confirmed bookings only. */
   checkInCode?: string;
@@ -20,6 +23,11 @@ export type Booking = {
   isToday?: boolean;
   /** Business rating out of 5, completed bookings only. */
   ratingGiven?: number;
+  /** Last status change, e.g. "26 Oct, 12:27"; key picks the label (applied, confirmed…). */
+  statusTime?: { key: string; at: string };
+  /** Earned or estimated pay in rupees. */
+  estimatedPay?: number;
+  businessRating?: { avg: number; count: number };
 };
 
 /** Result of a withdrawal request (12 · Withdrawal initiated). */

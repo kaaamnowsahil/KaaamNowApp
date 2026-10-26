@@ -105,7 +105,10 @@
     "faq": "FAQ & Help",
     "terms": "Terms & Conditions",
     "logOut": "Log out",
-    "roleLabel": "Worker"
+    "roleLabel": "Worker",
+    "ratingCount_one": "{{count}} rating",
+    "ratingCount_other": "{{count}} ratings",
+    "noRatings": "No ratings yet"
   },
   "workerHome": {
     "greeting": "Hello, {{name}} 👋",
@@ -251,11 +254,14 @@
     "title": "My shifts",
     "subtitle": "Your confirmed shifts and selected offers.",
     "sections": {
+      "inProgress": "In progress",
       "today": "Today",
       "confirm": "Needs confirmation",
-      "upcoming": "Upcoming",
-      "applied": "Applied",
-      "past": "Completed"
+      "upcoming": "Confirmed",
+      "past": "Completed",
+      "waiting": "Waiting for business",
+      "declinedByBusiness": "Declined by business",
+      "declinedByYou": "Declined by you"
     },
     "status": {
       "confirmed": "Confirmed",
@@ -263,21 +269,40 @@
       "selected": "Selected · Confirmation needed",
       "applied": "Applied · Waiting for the business",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "declined": "Declined by you",
+      "rejected": "Declined by business",
+      "withdrawn": "Application withdrawn",
+      "expired": "Application expired"
     },
     "verified": "{{business}} · Verified",
+    "verifiedTag": "Verified",
     "when": "{{date}} · {{time}} · {{hours}} h",
     "where": "{{area}} · {{km}} km",
+    "distance": "{{km}} km away",
     "perHour": "/hour",
     "estimated": "Estimated {{amount}} earnings",
     "offerPay": "{{rate}}/hour · {{total}} estimated earnings",
     "confirmBy": "Confirm by {{when}}",
     "actions": {
-      "confirmed": "View my shift",
+      "confirmed": "View shift details",
       "selected": "Review selected offer",
       "applied": "Withdraw application",
-      "completed": "View details",
-      "cancelled": "View details"
+      "completed": "View shift details",
+      "cancelled": "View shift details",
+      "viewDetails": "View shift details",
+      "confirmSelection": "Confirm this shift",
+      "declineSelection": "Decline offer",
+      "working": "Updating…"
+    },
+    "times": {
+      "applied": "Applied · {{time}}",
+      "selected": "Selected by business · {{time}}",
+      "rejected": "Declined by business · {{time}}",
+      "expired": "Expired · {{time}}",
+      "declined": "Declined by you · {{time}}",
+      "withdrawn": "Withdrawn · {{time}}",
+      "confirmed": "Confirmed · {{time}}"
     },
     "emptyTitle": "No shifts yet",
     "emptyBody": "Shifts you accept and offers businesses send you will show up here.",
@@ -839,6 +864,12 @@
     "sortRecent": "Most recent",
     "sortRating": "Highest rated",
     "sortExperience": "Most experience",
+    "sortTime": "Shift time",
+    "sortNearest": "Nearest",
+    "sortPay": "Highest pay",
+    "sortBy": "Sort by",
+    "shiftFilter": "Shift",
+    "allShifts": "All shifts",
     "close": "Close",
     "completedShifts_one": "{{count}} shift",
     "completedShifts_other": "{{count}} shifts",

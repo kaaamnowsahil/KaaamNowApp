@@ -22,6 +22,8 @@ export type MyWorkerProfile = {
   category_slugs: string[];
   is_available: boolean;
   verification_status: 'pending' | 'verified' | 'rejected';
+  rating_avg: number;
+  rating_count: number;
 };
 
 export type MyBusinessProfile = {
@@ -35,6 +37,8 @@ export type MyBusinessProfile = {
   latitude: number | null;
   longitude: number | null;
   business_type_slugs: string[];
+  rating_avg: number;
+  rating_count: number;
 };
 
 export type MyAccount = {

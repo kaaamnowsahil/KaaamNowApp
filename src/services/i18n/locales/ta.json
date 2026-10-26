@@ -66,7 +66,10 @@
     "support": "ஆதரவு",
     "faq": "அடிக்கடி கேட்கப்படும் கேள்விகள்",
     "terms": "விதிமுறைகள் மற்றும் நிபந்தனைகள்",
-    "logOut": "வெளியேறு"
+    "logOut": "வெளியேறு",
+    "ratingCount_one": "{{count}} rating",
+    "ratingCount_other": "{{count}} ratings",
+    "noRatings": "No ratings yet"
   },
   "workerHome": {
     "greeting": "வணக்கம், {{name}} 👋",

@@ -75,4 +75,10 @@ export type BusinessApplicant = {
   workplace?: string;
   startsAt?: string;
   endsAt?: string;
+  /** Shift's hourly pay in paise. */
+  hourlyRateMinor?: number;
+  /** Raw application status, e.g. withdrawn or declined. */
+  applicationStatus?: string;
+  /** When the worker confirmed, declined or withdrew. */
+  respondedAt?: string;
 };

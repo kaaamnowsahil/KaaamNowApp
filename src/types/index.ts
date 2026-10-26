@@ -1,6 +1,7 @@
 export type {
   Booking,
   BookingStatus,
+  MyShiftStatus,
   Payout,
   PayoutMethod,
   PayoutStatus,

@@ -33,6 +33,7 @@ export const WorkerProfilePage: FC = () => {
       caption={[t('workerProfile.roleLabel'), p.profile.location]
         .filter(Boolean)
         .join(' · ')}
+      rating={p.rating}
     />,
     <SettingsGroup key="account" title={t('workerProfile.account')}>
       <SettingsRow
