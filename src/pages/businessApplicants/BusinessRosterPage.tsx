@@ -8,7 +8,6 @@ import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import {
-  formatDateLabel,
   fromMinor,
   toRosterMember,
 } from '@/services/shifts/shiftMappers';
@@ -19,6 +18,8 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
 import { useBusinessApplicantStore } from './store/useBusinessApplicantStore';
+
+const ROSTER_STRINGS = { ALL_BOOKED: 'All booked workers' } as const;
 
 export const BusinessRosterPage: FC<
   AppScreenProps<typeof ROUTES.businessRoster>
@@ -61,11 +62,10 @@ export const BusinessRosterPage: FC<
       testID="business-roster-page"
       actions={
         <PrimaryButton
-          label={t('businessRoster.viewSelectedOffers')}
+          label={ROSTER_STRINGS.ALL_BOOKED}
           onPress={() =>
             navigation.navigate(ROUTES.mainTabs, {
               screen: ROUTES.businessApplicants,
-              params: { status: 'selected' },
             })
           }
           testID="business-roster-selected-offers"
@@ -100,12 +100,7 @@ export const BusinessRosterPage: FC<
               accessibilityRole="button"
               onPress={() =>
                 navigation.navigate(ROUTES.businessScheduledWorkerTracking, {
-                  applicantId: member.id,
-                  role: shift?.job_title ?? '',
-                  business: data.businessName,
-                  hourlyRate,
-                  hours,
-                  date: shift ? formatDateLabel(shift.starts_at) : '',
+                  assignmentId: member.id,
                 })
               }
               style={[

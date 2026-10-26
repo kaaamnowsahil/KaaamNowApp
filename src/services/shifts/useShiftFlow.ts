@@ -38,19 +38,24 @@ export const useAssignment = (assignmentId?: string | null) =>
     [assignmentId],
   );
 
-/** Runs one mutation at a time and shows API errors in an alert. */
+/**
+ * Runs one mutation at a time and shows API errors in an alert.
+ * `onError` returning true means the caller handled the error itself.
+ */
 export const useShiftAction = () => {
   const [busy, setBusy] = useState(false);
   const run = async <T,>(
     action: () => Promise<T>,
     onDone: (result: T) => void,
     errorTitle = 'Couldn’t complete that',
+    onError?: (error: unknown) => boolean,
   ) => {
     if (busy) return;
     setBusy(true);
     try {
       onDone(await action());
     } catch (error) {
+      if (onError?.(error)) return;
       Alert.alert(errorTitle, errorMessage(error));
     } finally {
       setBusy(false);

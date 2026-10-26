@@ -13,6 +13,7 @@ export type {
   BusinessApplicantStatus,
   BusinessDashboardShift,
   BusinessShiftDraft,
+  BusinessShiftSlot,
 } from './businessShift';
 export type {
   BusinessLiveWorker,

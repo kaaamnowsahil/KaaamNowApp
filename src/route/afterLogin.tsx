@@ -7,7 +7,6 @@ import { WorkerEarningDetailPage } from '@/pages/earningsHistory/WorkerEarningDe
 import { WithdrawPage } from '@/pages/withdraw/WithdrawPage';
 import { WithdrawSuccessPage } from '@/pages/withdrawSuccess/WithdrawSuccessPage';
 import { EditProfilePage } from '@/pages/editProfile/EditProfilePage';
-import { BusinessEditProfilePage } from '@/pages/businessEditProfile/BusinessEditProfilePage';
 import {
   BusinessShiftPostedPage,
   BusinessShiftReviewPage,
@@ -27,11 +26,8 @@ import { BusinessLivePaymentPage } from '@/pages/businessLive/BusinessLivePaymen
 import { BusinessPaymentMethodPage } from '@/pages/businessPayments/BusinessPaymentMethodPage';
 import { BusinessPaymentScanPage } from '@/pages/businessPayments/BusinessPaymentScanPage';
 import { BusinessPaymentSuccessPage } from '@/pages/businessPayments/BusinessPaymentSuccessPage';
-import { BusinessPaymentHistoryPage } from '@/pages/businessPayments/BusinessPaymentHistoryPage';
-import { BusinessPaymentDetailPage } from '@/pages/businessPayments/BusinessPaymentDetailPage';
 import { LanguagePage } from '@/pages/language/LanguagePage';
 import { AppearancePage } from '@/pages/appearance/AppearancePage';
-import { OfflinePage } from '@/pages/offline/OfflinePage';
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { PayoutAccountPage } from '@/pages/payoutAccount/PayoutAccountPage';
 import { ShiftListPage } from '@/pages/shiftList/ShiftListPage';
@@ -48,6 +44,8 @@ import { ShiftCompletePage } from '@/pages/shiftComplete/ShiftCompletePage';
 import { RateBusinessPage } from '@/pages/rateBusiness/RateBusinessPage';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppStackParamList } from '@/types';
+
+import { AddRolePage } from '@/pages/addRole/AddRolePage';
 
 import { BottomTabRoutes } from './bottomTabs';
 import { COMMON_SCREENS } from './commonRoutes';
@@ -69,10 +67,7 @@ export const AfterLoginRoutes: FC = () => {
       <Stack.Screen name={ROUTES.shiftList} component={ShiftListPage} />
       <Stack.Screen name={ROUTES.notifications} component={NotificationsPage} />
       <Stack.Screen name={ROUTES.editProfile} component={EditProfilePage} />
-      <Stack.Screen
-        name={ROUTES.businessEditProfile}
-        component={BusinessEditProfilePage}
-      />
+      <Stack.Screen name={ROUTES.addRole} component={AddRolePage} />
       <Stack.Screen
         name={ROUTES.businessShiftSchedule}
         component={BusinessShiftSchedulePage}
@@ -126,14 +121,6 @@ export const AfterLoginRoutes: FC = () => {
         component={BusinessPaymentSuccessPage}
       />
       <Stack.Screen
-        name={ROUTES.businessPaymentHistory}
-        component={BusinessPaymentHistoryPage}
-      />
-      <Stack.Screen
-        name={ROUTES.businessPaymentDetail}
-        component={BusinessPaymentDetailPage}
-      />
-      <Stack.Screen
         name={ROUTES.businessScheduledWorkerTracking}
         component={BusinessScheduledWorkerTrackingPage}
       />
@@ -151,7 +138,6 @@ export const AfterLoginRoutes: FC = () => {
       />
       <Stack.Screen name={ROUTES.language} component={LanguagePage} />
       <Stack.Screen name={ROUTES.appearance} component={AppearancePage} />
-      <Stack.Screen name={ROUTES.offline} component={OfflinePage} />
       <Stack.Screen name={ROUTES.payoutAccount} component={PayoutAccountPage} />
       <Stack.Screen
         name={ROUTES.earningsHistory}

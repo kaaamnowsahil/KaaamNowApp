@@ -10,11 +10,16 @@ import type { TabAppNavigation } from '@/types';
 export type BusinessView = 'live' | 'scheduled';
 
 const DASHBOARD_PREVIEW_COUNT = 2;
+const DASHBOARD_REFRESH_MS = 5 * 60 * 1000;
 
 export const useBusinessLive = () => {
   const navigation = useNavigation<TabAppNavigation>();
-  const data = useBusinessShiftsData();
-  const [view, setView] = useState<BusinessView>('live');
+  const data = useBusinessShiftsData({ pollIntervalMs: DASHBOARD_REFRESH_MS });
+  const [view, setViewState] = useState<BusinessView>('live');
+  const setView = (next: BusinessView) => {
+    setViewState(next);
+    data.reload();
+  };
   const items = view === 'live' ? data.liveShifts : data.scheduledShifts;
   const sum = (
     list: BusinessShiftItem[],
@@ -23,17 +28,15 @@ export const useBusinessLive = () => {
 
   return {
     isLoading: data.isLoading,
+    isRefreshing: data.isRefreshing,
     error: data.error,
     reload: data.reload,
     businessName: data.businessName,
     isVerified: data.isVerified,
     location: data.location,
-    liveConfirmed: sum(data.liveShifts, item => item.booked_count),
-    liveTotal: sum(data.liveShifts, item => item.workers_required),
-    newApplicants: sum(
-      [...data.liveShifts, ...data.scheduledShifts],
-      item => item.pending_applications,
-    ),
+    confirmedWorkers: sum(items, item => item.booked_count),
+    workersRequired: sum(items, item => item.workers_required),
+    newApplicants: sum(items, item => item.pending_applications),
     view,
     setView,
     shifts: items

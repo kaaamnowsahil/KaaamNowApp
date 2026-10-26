@@ -7,7 +7,9 @@ const byStart = (a: BusinessShiftItem, b: BusinessShiftItem) =>
   new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime();
 
 /** Business profile plus its in-progress, upcoming and draft shifts. */
-export const useBusinessShiftsData = () => {
+export const useBusinessShiftsData = (
+  options?: Parameters<typeof useApiQuery>[2],
+) => {
   const query = useApiQuery(
     () =>
       Promise.all([
@@ -17,6 +19,7 @@ export const useBusinessShiftsData = () => {
         shiftsApi.businessShifts({ group: 'draft' }),
       ]),
     [],
+    options,
   );
   const [profile, inProgress, upcoming, drafts] = query.data ?? [];
   const active = [

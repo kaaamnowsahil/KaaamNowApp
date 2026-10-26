@@ -1,4 +1,6 @@
-import { Children, type FC, type ReactNode } from 'react';
+import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
+import { Children, useContext, type FC, type ReactNode } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -14,10 +16,13 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 
-import { BackButton, Loader, Rise } from '@/components/ui';
+import { BackButton, BrandAppBar, Loader, Rise } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { MOTION } from '@/constants/motion';
+import { ROUTES } from '@/constants/routes';
+import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
+import type { AppStackParamList } from '@/types';
 
 type FormScreenProps = {
   children: ReactNode;
@@ -46,6 +51,8 @@ type FormScreenProps = {
   asSheet?: boolean;
   /** Last child grows to fill the remaining height (centered empty states). */
   fillLastBlock?: boolean;
+  /** Signed-in screens show the logo + bell bar above the back bar (same as web); opt out here. */
+  hideBrandBar?: boolean;
   testID?: string;
 };
 
@@ -70,10 +77,15 @@ export const FormScreen: FC<FormScreenProps> = ({
   busy,
   asSheet,
   fillLastBlock,
+  hideBrandBar,
   testID,
 }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const isInTabs = useContext(BottomTabBarHeightContext) !== undefined;
+  const navigation = useNavigation<NavigationProp<AppStackParamList>>();
+  const isAuth = useAuthStore(s => s.isAuth);
+  const showBrandBar = isAuth && !asSheet && !hideBrandBar;
   const blocks = Children.toArray(children);
   const outerBg = asSheet ? colors.fill : colors.background;
 
@@ -87,6 +99,13 @@ export const FormScreen: FC<FormScreenProps> = ({
         style={styles.root}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
+        {showBrandBar ? (
+          <View style={styles.appBar}>
+            <BrandAppBar
+              onBellPress={() => navigation.navigate(ROUTES.notifications)}
+            />
+          </View>
+        ) : null}
         <View style={styles.appBar}>
           {onBack ? (
             <Rise>
@@ -176,7 +195,7 @@ export const FormScreen: FC<FormScreenProps> = ({
               {
                 backgroundColor: colors.background,
                 borderTopColor: colors.border,
-                paddingBottom: 24 + insets.bottom,
+                paddingBottom: isInTabs ? 16 : 24 + insets.bottom,
               },
             ]}
           >

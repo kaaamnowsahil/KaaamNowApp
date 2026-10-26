@@ -21,6 +21,7 @@ export type MyWorkerProfile = {
   longitude: number | null;
   category_slugs: string[];
   is_available: boolean;
+  verification_status: 'pending' | 'verified' | 'rejected';
 };
 
 export type MyBusinessProfile = {

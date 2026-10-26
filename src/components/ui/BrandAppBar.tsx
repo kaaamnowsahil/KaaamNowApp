@@ -11,7 +11,7 @@ import { BrandLogo } from './BrandLogo';
 const APP_NAME = BRAND.NAME;
 const NOTIFICATIONS = 'Notifications';
 
-/** Figma "App bar" contents (1:1466): KaaamNow logo, 22px bold wordmark, bell. */
+/** App bar contents: KaaamNow logo, 22px bold wordmark, outlined bell on the right. */
 export const BrandAppBar: FC<{ onBellPress?: () => void; hasUnread?: boolean }> = ({
   onBellPress,
   hasUnread,
@@ -27,9 +27,14 @@ export const BrandAppBar: FC<{ onBellPress?: () => void; hasUnread?: boolean }> 
         disabled={!onBellPress}
         hitSlop={10}
         onPress={onBellPress}
+        style={({ pressed }) => [
+          styles.bell,
+          { borderColor: colors.outline },
+          pressed && styles.pressed,
+        ]}
         testID="app-bar-bell"
       >
-        <BellIcon width={22} height={22} color={colors.text} />
+        <BellIcon width={20} height={20} color={colors.text} />
         {hasUnread ? (
           <View
             style={[
@@ -45,10 +50,20 @@ export const BrandAppBar: FC<{ onBellPress?: () => void; hasUnread?: boolean }> 
 
 const styles = StyleSheet.create({
   name: { fontFamily: FONTS.bold, fontSize: 22, lineHeight: 30.8 },
+  bell: {
+    width: 44,
+    height: 44,
+    marginLeft: 'auto',
+    borderWidth: 1,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pressed: { opacity: 0.7 },
   dot: {
     position: 'absolute',
-    top: 0,
-    right: 0,
+    top: 9,
+    right: 10,
     width: 9,
     height: 9,
     borderRadius: 4.5,

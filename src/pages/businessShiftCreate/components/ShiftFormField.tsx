@@ -10,14 +10,18 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
+import { ShiftFieldError } from './ShiftFieldError';
+
 type ShiftFormFieldProps = TextInputProps & {
   label: string;
   prefix?: string;
+  error?: string;
 };
 
 export const ShiftFormField: FC<ShiftFormFieldProps> = ({
   label,
   prefix,
+  error,
   style,
   ...inputProps
 }) => {
@@ -29,7 +33,10 @@ export const ShiftFormField: FC<ShiftFormFieldProps> = ({
       <View
         style={[
           styles.inputBox,
-          { backgroundColor: colors.surface, borderColor: colors.border },
+          {
+            backgroundColor: colors.surface,
+            borderColor: error ? colors.danger : colors.border,
+          },
         ]}
       >
         {prefix ? (
@@ -37,11 +44,13 @@ export const ShiftFormField: FC<ShiftFormFieldProps> = ({
         ) : null}
         <TextInput
           accessibilityLabel={label}
+          accessibilityHint={error}
           placeholderTextColor={colors.textSubtle}
           style={[styles.value, styles.input, { color: colors.text }, style]}
           {...inputProps}
         />
       </View>
+      <ShiftFieldError message={error} />
     </View>
   );
 };

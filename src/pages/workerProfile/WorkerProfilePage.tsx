@@ -8,7 +8,7 @@ import LogOutIcon from '@/assets/icons/log-out.svg';
 import PaletteIcon from '@/assets/icons/palette.svg';
 import UserRoundIcon from '@/assets/figma/user-round.svg';
 import WalletIcon from '@/assets/figma/wallet.svg';
-import WifiOffIcon from '@/assets/icons/wifi-off.svg';
+import { RoleSwitchRow } from '@/components/roleSwitch/RoleSwitchRow';
 import { BrandAppBar } from '@/components/ui';
 import { TabScreen } from '@/layout/TabScreen';
 
@@ -45,6 +45,7 @@ export const WorkerProfilePage: FC = () => {
         title={t('workerProfile.payoutAccount')}
         onPress={p.openPayouts}
       />
+      <RoleSwitchRow />
     </SettingsGroup>,
     <SettingsGroup key="preferences" title={t('workerProfile.preferences')}>
       <SettingsRow
@@ -71,11 +72,6 @@ export const WorkerProfilePage: FC = () => {
         icon={FileTextIcon}
         title={t('workerProfile.terms')}
         onPress={p.openTerms}
-      />
-      <SettingsRow
-        icon={WifiOffIcon}
-        title={t('workerProfile.offline')}
-        onPress={p.openOffline}
       />
     </SettingsGroup>,
     <SettingsGroup key="logout">

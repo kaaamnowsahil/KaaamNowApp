@@ -9,11 +9,20 @@ export const SectionHeading: FC<{
   title: string;
   action?: string;
   onAction?: () => void;
-}> = ({ title, action, onAction }) => {
+  /** Status-coloured section title (web `.business-shift-section h2`). */
+  statusColor?: string;
+}> = ({ title, action, onAction, statusColor }) => {
   const { colors } = useTheme();
   return (
     <View style={styles.root}>
-      <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>
+      <Text
+        accessibilityRole="header"
+        style={
+          statusColor
+            ? [styles.statusTitle, { color: statusColor }]
+            : [styles.title, { color: colors.text }]
+        }
+      >
         {title}
       </Text>
       {action ? (
@@ -34,5 +43,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: { fontFamily: FONTS.regular, fontSize: 18, lineHeight: 26 },
+  statusTitle: { fontFamily: FONTS.bold, fontSize: 16, lineHeight: 24 },
   action: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 18 },
 });

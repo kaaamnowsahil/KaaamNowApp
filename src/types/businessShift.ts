@@ -2,17 +2,8 @@ export type BusinessShiftDraft = {
   id?: string;
   seriesId?: string;
   sameForEveryDate?: boolean;
-  schedules: {
-    date: string;
-    startTime: string;
-    endTime: string;
-    role: string;
-    category: string;
-    requirement: string;
-    responsibilities: string;
-    workers: string;
-    hourlyRate: string;
-  }[];
+  /** One entry per shift; a date can hold several shifts. */
+  schedules: BusinessShiftSlot[];
   hourlyRate: string;
   workers: string;
   responsibilities: string;
@@ -20,6 +11,22 @@ export type BusinessShiftDraft = {
   role: string;
   category: string;
   location: string;
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
+export type BusinessShiftSlot = {
+  id?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  role: string;
+  category: string;
+  requirement: string;
+  responsibilities: string;
+  workers: string;
+  hourlyRate: string;
+  breakMinutes?: string;
 };
 
 export type BusinessDashboardShift = {
@@ -54,6 +61,8 @@ export type BusinessApplicant = {
   about: string;
   skills: string[];
   confirmedAt?: string;
+  /** Booked seat; opens the booking detail. */
+  assignmentId?: string;
   distanceKm?: number;
   arrivalMinutes?: number;
 };

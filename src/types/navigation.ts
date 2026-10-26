@@ -7,6 +7,7 @@ import type {
 } from '@react-navigation/native';
 
 import type { ROUTES } from '@/constants/routes';
+import type { PaymentHistoryItem } from '@/services/billing/billingApi';
 
 import type { BookingStatus } from './booking';
 import type { Shift } from './shift';
@@ -72,10 +73,15 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.shiftList]: undefined;
   [ROUTES.notifications]: undefined;
   [ROUTES.editProfile]: undefined;
+  [ROUTES.addRole]: { role: 'worker' | 'business' };
   [ROUTES.businessEditProfile]: undefined;
+  [ROUTES.businessProfileHome]: undefined;
+  [ROUTES.workerProfileHome]: undefined;
+  [ROUTES.workerEarningsHome]: undefined;
   [ROUTES.businessShiftSchedule]: { draft?: BusinessShiftDraft } | undefined;
   [ROUTES.businessShiftReview]: { draft: BusinessShiftDraft };
-  [ROUTES.businessShiftPosted]: { draft: BusinessShiftDraft };
+  /** unpaidInvoiceIds: deposits that still need paying before workers can book. */
+  [ROUTES.businessShiftPosted]: { draft: BusinessShiftDraft; unpaidInvoiceIds?: string[] };
   [ROUTES.businessLiveCreate]: undefined;
   [ROUTES.businessLiveReview]: undefined;
   [ROUTES.businessLiveFinding]: undefined;
@@ -94,15 +100,8 @@ export type AppStackParamList = CommonStackParamList & {
     payment?: BusinessPaymentDetails;
   };
   [ROUTES.businessPaymentHistory]: undefined;
-  [ROUTES.businessPaymentDetail]: { payment: BusinessPaymentRecord };
-  [ROUTES.businessScheduledWorkerTracking]: {
-    applicantId: string;
-    role: string;
-    business: string;
-    hourlyRate: number;
-    hours: number;
-    date: string;
-  };
+  [ROUTES.businessPaymentDetail]: { item: PaymentHistoryItem };
+  [ROUTES.businessScheduledWorkerTracking]: { assignmentId: string };
   [ROUTES.businessRateWorker]: {
     workerId: string;
     role: string;
@@ -113,7 +112,6 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.businessRoster]: { shiftId?: string } | undefined;
   [ROUTES.language]: undefined;
   [ROUTES.appearance]: undefined;
-  [ROUTES.offline]: undefined;
   [ROUTES.payoutAccount]: undefined;
   [ROUTES.earningsHistory]: undefined;
   [ROUTES.workerEarningDetail]: { earning: WorkerEarningDetails };
@@ -146,7 +144,17 @@ export type TabParamList = {
   [ROUTES.businessApplicants]:
     | { status?: 'applied' | 'selected' | 'confirmed' }
     | undefined;
-  [ROUTES.businessProfile]: undefined;
+  [ROUTES.businessProfile]:
+    | NavigatorScreenParams<BusinessProfileStackParamList>
+    | undefined;
+};
+
+/** Business Profile tab stack; sub-pages keep the bottom tabs visible. */
+export type BusinessProfileStackParamList = {
+  [ROUTES.businessProfileHome]: undefined;
+  [ROUTES.businessEditProfile]: undefined;
+  [ROUTES.businessPaymentHistory]: undefined;
+  [ROUTES.businessPaymentDetail]: { item: PaymentHistoryItem };
 };
 
 export type AuthScreenProps<T extends keyof AuthStackParamList> =

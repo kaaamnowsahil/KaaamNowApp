@@ -11,12 +11,14 @@ import {
   SegmentedControl,
 } from '@/components/ui';
 import { TabScreen } from '@/layout/TabScreen';
+import { useTheme } from '@/theme/ThemeProvider';
 
-import { BusinessOverview, BusinessShiftCard } from './components';
+import { BusinessMetrics, BusinessOverview, BusinessShiftCard } from './components';
 import { useBusinessLive } from './hooks';
 
 export const BusinessLivePage: FC = () => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const dashboard = useBusinessLive();
   const isLive = dashboard.view === 'live';
 
@@ -25,9 +27,6 @@ export const BusinessLivePage: FC = () => {
       key="overview"
       businessName={dashboard.businessName}
       isVerified={dashboard.isVerified}
-      liveConfirmed={dashboard.liveConfirmed}
-      liveTotal={dashboard.liveTotal}
-      newApplicants={dashboard.newApplicants}
     />,
     <SegmentedControl
       key="view-toggle"
@@ -38,6 +37,16 @@ export const BusinessLivePage: FC = () => {
       value={dashboard.view}
       onChange={dashboard.setView}
     />,
+    ...(dashboard.error
+      ? []
+      : [
+          <BusinessMetrics
+            key="metrics"
+            confirmedWorkers={dashboard.confirmedWorkers}
+            workersRequired={dashboard.workersRequired}
+            newApplicants={dashboard.newApplicants}
+          />,
+        ]),
     ...(dashboard.error
       ? [
           <EmptyState
@@ -58,6 +67,7 @@ export const BusinessLivePage: FC = () => {
                 ? 'businessDashboard.todayLive'
                 : 'businessDashboard.upcoming',
             )}
+            statusColor={isLive ? undefined : colors.primary}
             action={t('businessDashboard.viewAll')}
             onAction={dashboard.openShifts}
           />,
@@ -85,7 +95,7 @@ export const BusinessLivePage: FC = () => {
             )}
             body={t(
               isLive
-                ? 'businessDashboard.liveComingSoon'
+                ? 'businessDashboard.emptyLiveBody'
                 : 'businessDashboard.emptyScheduledBody',
             )}
           />,
@@ -99,6 +109,7 @@ export const BusinessLivePage: FC = () => {
       gap={12}
       fillLastBlock={Boolean(dashboard.error) || dashboard.shifts.length === 0}
       isLoading={dashboard.isLoading}
+      busy={dashboard.isRefreshing}
       testID="business-live-page"
       actions={
         <PrimaryButton

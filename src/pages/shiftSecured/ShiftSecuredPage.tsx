@@ -6,12 +6,14 @@ import { DetailRow, ReasonSheet, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { shiftsApi } from '@/services/shifts/shiftsApi';
+import { fromMinor } from '@/services/shifts/shiftMappers';
+import { shiftsApi, type CancellationQuote } from '@/services/shifts/shiftsApi';
 import {
   bookingRef,
   useShiftAction,
   useWorkerShiftDetail,
 } from '@/services/shifts/useShiftFlow';
+import { useEmergency } from '@/services/support/useEmergency';
 import type { AppScreenProps } from '@/types';
 import { formatRupees, splitTimeRange } from '@/utils/format';
 import { mapsUrl } from '@/utils/links';
@@ -30,7 +32,8 @@ export const ShiftSecuredPage: FC<
   const detail = useWorkerShiftDetail(route.params.shift);
   const { shift } = detail;
   const action = useShiftAction();
-  const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [cancelQuote, setCancelQuote] = useState<CancellationQuote | null>(null);
+  const emergency = useEmergency(shift.assignmentId);
   const workplace = shift.addressText || shift.area;
   const contactName = detail.data?.site_contact_name || SHIFT_SECURED_STRINGS.SHIFT_LEAD;
   const cancelReasons = CANCEL_REASONS.map(reason => ({
@@ -42,8 +45,16 @@ export const ShiftSecuredPage: FC<
   const openMaps = () =>
     Linking.openURL(mapsUrl(`${shift.businessName}, ${workplace}`));
 
+  const openCancel = () =>
+    shift.assignmentId &&
+    action.run(
+      () => shiftsApi.cancelPreview(shift.assignmentId as string),
+      setCancelQuote,
+      SHIFT_SECURED_STRINGS.PREVIEW_FAILED,
+    );
+
   const cancel = (reasonId: string) => {
-    setIsCancelOpen(false);
+    setCancelQuote(null);
     if (!shift.assignmentId) return;
     const reason = cancelReasons.find(item => item.id === reasonId)?.label ?? reasonId;
     action.run(
@@ -59,7 +70,7 @@ export const ShiftSecuredPage: FC<
   return (
     <>
       <FormScreen
-        busy={action.busy}
+        busy={action.busy || emergency.busy}
         onBack={navigation.goBack}
         title={t('shiftSecured.headerTitle')}
         compactTitle
@@ -82,8 +93,15 @@ export const ShiftSecuredPage: FC<
             <SecondaryButton
               label={t('shiftSecured.cancelLink')}
               disabled={action.busy || !shift.assignmentId}
-              onPress={() => setIsCancelOpen(true)}
+              onPress={openCancel}
               testID="shift-secured-cancel"
+            />
+            <SecondaryButton
+              label={SHIFT_SECURED_STRINGS.EMERGENCY}
+              tone="danger"
+              disabled={emergency.busy || !emergency.isAvailable}
+              onPress={emergency.trigger}
+              testID="shift-secured-emergency"
             />
           </>
         }
@@ -135,20 +153,23 @@ export const ShiftSecuredPage: FC<
           />
         </View>
       </FormScreen>
-      {isCancelOpen ? (
+      {cancelQuote ? (
         <ReasonSheet
           title={t('shiftSecured.cancelTitle')}
-          subtitle={t('shiftSecured.cancelBody', {
-            window: SHIFT_SECURED_STRINGS.lateCancelWindow(
-              detail.data?.cancellation_cutoff_hours ?? 12,
-            ),
-          })}
+          subtitle={
+            cancelQuote.fee_minor > 0
+              ? SHIFT_SECURED_STRINGS.feeCancel(
+                formatRupees(fromMinor(cancelQuote.fee_minor)),
+                cancelQuote.strike_weight,
+              )
+              : SHIFT_SECURED_STRINGS.FREE_CANCEL
+          }
           reasonLabel={t('shiftSecured.cancelReason')}
           reasons={cancelReasons}
           confirmLabel={t('shiftSecured.cancelConfirm')}
           keepLabel={t('shiftSecured.keep')}
           onConfirm={cancel}
-          onClose={() => setIsCancelOpen(false)}
+          onClose={() => setCancelQuote(null)}
           testID="cancel-shift-sheet"
         />
       ) : null}

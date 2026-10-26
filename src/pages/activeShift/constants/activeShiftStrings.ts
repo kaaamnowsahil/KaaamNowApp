@@ -1,0 +1,20 @@
+export const ACTIVE_SHIFT_STRINGS = {
+  END_EARLY: 'End shift early',
+  EMERGENCY: 'Emergency help',
+  endsAt: (time: string, extra: number) => (extra > 0 ? `${time} (+${extra} min)` : time),
+  extensionTitle: (minutes: number) => `The business asked you to stay ${minutes} more minutes`,
+  EXTENSION_BODY: 'Extra time is paid at the overtime rate. Accept only if you can stay.',
+  ACCEPT: 'Accept extra time',
+  DECLINE: 'Decline',
+  EXTENSION_FAILED: 'Couldn’t answer the request',
+  pinForBusiness: (pin: string) =>
+    `The business wants to end your shift early. If you agree, tell them this PIN: ${pin}`,
+  PIN_TITLE: 'Enter the PIN from the business',
+  PIN_BODY: 'We’ve asked the business to end early. Their app now shows a 4-digit PIN; enter it here to finish. Your pay is for the time you actually worked.',
+  PIN_CONFIRM: 'End shift',
+  PIN_CLOSE: 'Keep working',
+  END_FAILED: 'Couldn’t end the shift',
+  ENDED_TITLE: 'Shift ended',
+  ENDED_BODY: 'The business has ended this shift.',
+  OK: 'OK',
+} as const;

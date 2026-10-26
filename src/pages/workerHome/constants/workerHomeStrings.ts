@@ -5,7 +5,6 @@ export const WORKER_HOME_STRINGS = {
     const part = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
     return `Good ${part}, ${name}`;
   },
-  SUBTITLE: 'Your next good shift is close by.',
   GREETING_FALLBACK: 'Find your next shift',
   LOAD_ERROR_TITLE: 'Couldn’t load shifts',
   RETRY: 'Try again',
@@ -35,18 +34,35 @@ export const WORKER_HOME_STRINGS = {
     scheduled: 'Nearby, coming up',
   } as Record<ShiftStatus, string>,
   RECOMMENDED_TITLE: 'Recommended for you',
-  SEE_ALL: 'See all',
   EMPTY: 'No shifts match right now. Try another role or search.',
   EMPTY_STATE: {
     live: {
-      title: 'No live requests nearby',
-      body: 'We’ll notify you the moment a business within 5 km posts a live request. Keep alerts on.',
+      title: 'No live shifts nearby',
+      body: 'There are no live shifts in your area right now.',
       action: 'Browse scheduled shifts',
     },
     scheduled: {
       title: 'No scheduled shifts found',
-      body: 'Try a wider area and different filters. New shifts in this area will appear here.',
-      action: 'Clear filters',
+      body: 'There are no scheduled shifts in your area right now.',
     },
-  } as Record<ShiftStatus, { title: string; body: string; action: string }>,
+  } as Record<ShiftStatus, { title: string; body: string; action?: string }>,
+  AVAILABILITY: {
+    TITLE: 'Availability',
+    ON: 'LIVE',
+    OFF: 'You’re offline',
+    GO_ONLINE: 'Go live',
+    GO_OFFLINE: 'Go offline',
+    LOCATION_DENIED:
+      'We couldn’t get your location. Allow location access in your phone settings and check that location services are on, then try again.',
+    VERIFICATION_PENDING:
+      'Your worker profile is awaiting verification. You can go online once it’s approved.',
+    VERIFICATION_REJECTED:
+      'Your worker profile was not approved. Please update your details or contact support.',
+    PROMPT_TITLE: 'Share your location to go online',
+    PROMPT_BODY:
+      'We use your current location to show nearby shifts and help businesses find available workers. Your location is shared only after you allow it.',
+    PROMPT_CANCEL: 'Cancel',
+    PROMPT_SHARE: 'Share location',
+    PROMPT_LOADING: 'Loading…',
+  },
 } as const;

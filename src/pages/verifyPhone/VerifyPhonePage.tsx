@@ -48,6 +48,7 @@ export const VerifyPhonePage: FC<
     <FormScreen
       busy={busy}
       onBack={navigation.goBack}
+      title={t('verifyPhone.title')}
       testID="verify-phone-page"
       actions={
         <>
@@ -68,7 +69,6 @@ export const VerifyPhonePage: FC<
       }
     >
       <ScreenIntro
-        title={t('verifyPhone.title')}
         subtitle={
           t('verifyPhone.subtitle', {
             phone: maskIndianPhone(route.params.phone),

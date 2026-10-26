@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useEffect, useMemo, useState } from 'react';
 
 import { ROUTES } from '@/constants/routes';
+import { errorMessage } from '@/services/api/apiClient';
 import { meApi } from '@/services/api/meApi';
 import { getDevicePosition, type DevicePosition } from '@/services/maps/devicePosition';
 import { reverseGeocode } from '@/services/maps/googleMaps';
@@ -11,7 +12,6 @@ import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import type { Option, Shift, ShiftStatus, TabAppNavigation } from '@/types';
 
 import {
-  ALL_CATEGORIES_ID,
   ANY_ID,
   CURRENT_LOCATION_ID,
   DISTANCE_OPTIONS,
@@ -19,6 +19,7 @@ import {
   PAY_OPTIONS,
   SAVED_LOCATION_ID,
 } from '../constants/filterOptions';
+import { WORKER_HOME_STRINGS } from '../constants/workerHomeStrings';
 
 export type ShiftFilters = {
   distanceId: string;
@@ -59,7 +60,6 @@ const firstName = (fullName?: string | null) => fullName?.trim().split(/\s+/)[0]
 export const useWorkerHome = () => {
   const navigation = useNavigation<TabAppNavigation>();
   const [status, setStatus] = useState<ShiftStatus>('live');
-  const [categoryId, setCategoryId] = useState(ALL_CATEGORIES_ID);
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
@@ -69,11 +69,15 @@ export const useWorkerHome = () => {
   const [position, setPosition] = useState<DevicePosition | null>(null);
   const [positionResolved, setPositionResolved] = useState(false);
   const [currentLabel, setCurrentLabel] = useState('');
+  const [availability, setAvailability] = useState<boolean | null>(null);
+  const [availabilityPending, setAvailabilityPending] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null);
+  const [isLocationPromptOpen, setIsLocationPromptOpen] = useState(false);
 
   const profile = useApiQuery(() => meApi.profile(), []);
-  const categories = useApiQuery(() => meApi.workCategories(), []);
   const businessTypes = useApiQuery(() => meApi.businessTypes(), []);
   const worker = profile.data?.worker;
+  const isAvailable = availability ?? worker?.is_available ?? false;
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query.trim()), 400);
@@ -106,7 +110,6 @@ export const useWorkerHome = () => {
       if (!positionResolved) return null;
       const page = await shiftsApi.feed({
         shift_type: status,
-        category: categoryId === ALL_CATEGORIES_ID ? undefined : categoryId,
         q: debouncedQuery || undefined,
         lat: coords?.latitude,
         lng: coords?.longitude,
@@ -121,7 +124,6 @@ export const useWorkerHome = () => {
     [
       positionResolved,
       status,
-      categoryId,
       debouncedQuery,
       coords?.latitude,
       coords?.longitude,
@@ -143,6 +145,54 @@ export const useWorkerHome = () => {
     [feed.data, filters],
   );
 
+  const runAvailability = async (task: () => Promise<void>) => {
+    setAvailabilityPending(true);
+    setAvailabilityError(null);
+    try {
+      await task();
+    } catch (cause) {
+      setAvailabilityError(errorMessage(cause));
+    } finally {
+      setAvailabilityPending(false);
+    }
+  };
+
+  const toggleAvailability = () =>
+    runAvailability(async () => {
+      if (isAvailable) {
+        const response = await shiftsApi.setAvailability({ is_available: false });
+        setAvailability(response.is_available);
+        return;
+      }
+      const verification = (await meApi.profile()).worker?.verification_status;
+      if (verification !== 'verified') {
+        setAvailabilityError(
+          verification === 'rejected'
+            ? WORKER_HOME_STRINGS.AVAILABILITY.VERIFICATION_REJECTED
+            : WORKER_HOME_STRINGS.AVAILABILITY.VERIFICATION_PENDING,
+        );
+        return;
+      }
+      setIsLocationPromptOpen(true);
+    });
+
+  const shareLocationAndGoOnline = () =>
+    runAvailability(async () => {
+      const location = await getDevicePosition();
+      if (!location) {
+        setAvailabilityError(WORKER_HOME_STRINGS.AVAILABILITY.LOCATION_DENIED);
+        return;
+      }
+      setPosition(location);
+      const response = await shiftsApi.setAvailability({
+        is_available: true,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      });
+      setAvailability(response.is_available);
+      setIsLocationPromptOpen(false);
+    });
+
   const openShift = (shift: Shift) =>
     shift.status === 'live'
       ? navigation.navigate(ROUTES.shiftRequest, { shift })
@@ -153,8 +203,21 @@ export const useWorkerHome = () => {
     error: feed.error,
     retry: feed.reload,
     firstName: firstName(worker?.full_name),
+    isAvailable,
+    availabilityPending,
+    availabilityError,
+    toggleAvailability: () => {
+      toggleAvailability().catch(() => undefined);
+    },
+    isLocationPromptOpen,
+    shareLocationAndGoOnline: () => {
+      shareLocationAndGoOnline().catch(() => undefined);
+    },
+    closeLocationPrompt: () => {
+      setIsLocationPromptOpen(false);
+      setAvailabilityError(null);
+    },
     openShift,
-    openAllShifts: () => navigation.navigate(ROUTES.shiftList),
     openNotifications: () => navigation.navigate(ROUTES.notifications),
     locations,
     locationId,
@@ -165,15 +228,9 @@ export const useWorkerHome = () => {
       setLocationId(id);
       setIsLocationOpen(false);
     },
-    categories: [
-      { id: ALL_CATEGORIES_ID, label: 'All roles' },
-      ...(categories.data ?? []),
-    ],
     businessTypes: businessTypes.data ?? [],
     status,
     setStatus,
-    categoryId,
-    setCategoryId,
     query,
     setQuery,
     nearby,
@@ -183,11 +240,6 @@ export const useWorkerHome = () => {
     openFilters: () => setIsFilterOpen(true),
     closeFilters: () => setIsFilterOpen(false),
     showScheduled: () => setStatus('scheduled'),
-    clearFilters: () => {
-      setFilters(DEFAULT_FILTERS);
-      setQuery('');
-      setCategoryId(ALL_CATEGORIES_ID);
-    },
     applyFilters: (next: ShiftFilters) => {
       setFilters(next);
       setIsFilterOpen(false);

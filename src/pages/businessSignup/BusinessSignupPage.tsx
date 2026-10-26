@@ -51,6 +51,7 @@ export const BusinessSignupPage: FC<
     <FormScreen
       busy={f.busy}
       onBack={navigation.goBack}
+      title={t('businessSignup.title')}
       testID="business-signup-page"
       actions={
         <PrimaryButton
@@ -61,10 +62,7 @@ export const BusinessSignupPage: FC<
         />
       }
     >
-      <ScreenIntro
-        title={t('businessSignup.title')}
-        subtitle={t('businessSignup.subtitle')}
-      />
+      <ScreenIntro subtitle={t('businessSignup.subtitle')} />
       <IconField
         label={t('businessSignup.businessNameLabel')}
         icon={BriefcaseIcon}
