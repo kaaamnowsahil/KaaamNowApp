@@ -65,4 +65,14 @@ export type BusinessApplicant = {
   assignmentId?: string;
   distanceKm?: number;
   arrivalMinutes?: number;
+  /** Worker profile id for GET /me/workers/{id}. */
+  workerId?: string;
+  photoUrl?: string;
+  isVerified?: boolean;
+  ratingCount?: number;
+  completedShifts?: number;
+  shiftId?: string;
+  workplace?: string;
+  startsAt?: string;
+  endsAt?: string;
 };

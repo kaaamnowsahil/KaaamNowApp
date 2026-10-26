@@ -1,5 +1,4 @@
 export { AvailabilityCard } from './AvailabilityCard';
 export { FilterSheet } from './FilterSheet';
-export { LocationDropdown } from './LocationDropdown';
+export { LocationButton } from './LocationButton';
 export { LocationPromptSheet } from './LocationPromptSheet';
-export { OptionMenu } from './OptionMenu';

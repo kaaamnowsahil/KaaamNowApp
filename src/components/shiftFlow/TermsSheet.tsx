@@ -16,15 +16,28 @@ const TERMS_SHEET_STRINGS = {
 } as const;
 
 /**
- * Shown when the API answers 403 `terms_required`. Not in Figma.
- * Mount it only while open; `onAccepted` retries the blocked action.
+ * Records terms acceptance, then calls `onAccepted` (which runs the blocked action).
+ * Mount it only while open. Copy can be overridden (e.g. the worker "Book this shift" sheet).
  */
 export const TermsSheet: FC<{
   audience: TermsAudience;
   onAccepted: () => void;
   onRead: () => void;
   onClose: () => void;
-}> = ({ audience, onAccepted, onRead, onClose }) => {
+  title?: string;
+  body?: string;
+  acceptLabel?: string;
+  readLabel?: string;
+}> = ({
+  audience,
+  onAccepted,
+  onRead,
+  onClose,
+  title = TERMS_SHEET_STRINGS.TITLE,
+  body = TERMS_SHEET_STRINGS[audience],
+  acceptLabel = TERMS_SHEET_STRINGS.ACCEPT,
+  readLabel = TERMS_SHEET_STRINGS.READ,
+}) => {
   const [busy, setBusy] = useState(false);
 
   const accept = async () => {
@@ -41,20 +54,20 @@ export const TermsSheet: FC<{
 
   return (
     <BottomSheet
-      title={TERMS_SHEET_STRINGS.TITLE}
-      subtitle={TERMS_SHEET_STRINGS[audience]}
+      title={title}
+      subtitle={body}
       onClose={onClose}
       closeLabel={TERMS_SHEET_STRINGS.LATER}
       testID="terms-sheet"
     >
       <View style={styles.actions}>
         <PrimaryButton
-          label={TERMS_SHEET_STRINGS.ACCEPT}
+          label={acceptLabel}
           disabled={busy}
           onPress={accept}
           testID="terms-sheet-accept"
         />
-        <TextButton label={TERMS_SHEET_STRINGS.READ} tone="primary" onPress={onRead} />
+        <TextButton label={readLabel} tone="primary" onPress={onRead} />
         <TextButton label={TERMS_SHEET_STRINGS.LATER} onPress={onClose} />
       </View>
     </BottomSheet>

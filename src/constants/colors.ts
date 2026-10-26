@@ -26,6 +26,8 @@ export type ThemeColors = {
   /** Log out label and icon (Profile 17:2). */
   danger: string;
   dangerSoft: string;
+  /** "In progress" shift section heading (matches web). */
+  info: string;
   /** Dim layer behind bottom sheets. */
   backdrop: string;
 };
@@ -48,6 +50,7 @@ export const LIGHT_COLORS: ThemeColors = {
   primarySoft: '#F5F3FF',
   danger: '#DC2626',
   dangerSoft: '#FEE2E2',
+  info: '#0891B2',
   backdrop: 'rgba(11, 16, 32, 0.45)',
 };
 
@@ -69,6 +72,7 @@ export const DARK_COLORS: ThemeColors = {
   primarySoft: '#261F48',
   danger: '#DC2626',
   dangerSoft: '#451B1F',
+  info: '#0891B2',
   backdrop: 'rgba(0, 0, 0, 0.6)',
 };
 

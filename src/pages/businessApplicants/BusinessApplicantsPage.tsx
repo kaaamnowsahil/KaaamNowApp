@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import {
-    BackButton,
     BrandAppBar,
     EmptyState,
     PrimaryButton,
@@ -20,15 +19,37 @@ import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { BusinessApplicant, TabParamList } from '@/types';
 
-const BOOKED_STRINGS = {
-    TITLE: 'Booked workers',
-    SUBTITLE: 'Workers book open seats directly. Tap someone to see their booking and check-in code.',
-    EMPTY_TITLE: 'No bookings yet',
-    EMPTY_BODY: 'When workers book your shifts, they’ll appear here.',
-} as const;
+import { formatDateLabel, formatTimeRange } from '@/services/shifts/shiftMappers';
 
 import { ApplicantsSortSheet, BusinessApplicantRow } from './components';
+import { BOOKED_WORKERS_STRINGS as BOOKED_STRINGS } from './constants/bookedWorkersStrings';
 import { useBusinessApplicants } from './hooks';
+
+/** One section per shift: which job and when, then the workers booked on it. */
+const groupByShift = (items: BusinessApplicant[]) => {
+    const groups = new Map<
+        string,
+        { key: string; title: string; meta: string; items: BusinessApplicant[] }
+    >();
+    for (const item of items) {
+        const key = item.shiftId ?? item.id;
+        const group = groups.get(key) ?? {
+            key,
+            title: item.category,
+            meta: [
+                item.startsAt ? formatDateLabel(item.startsAt) : '',
+                item.startsAt && item.endsAt ? formatTimeRange(item.startsAt, item.endsAt) : '',
+                item.workplace ?? '',
+            ]
+                .filter(Boolean)
+                .join(' · '),
+            items: [],
+        };
+        group.items.push(item);
+        groups.set(key, group);
+    }
+    return [...groups.values()];
+};
 
 export const BusinessApplicantsPage: FC = () => {
     const { t } = useTranslation();
@@ -55,15 +76,6 @@ export const BusinessApplicantsPage: FC = () => {
     );
 
     const blocks = [
-        <View key="back" style={styles.backRow}>
-            <BackButton onPress={() => navigation.navigate(ROUTES.businessLive)} />
-            <Text accessibilityRole="header" style={[styles.headerTitle, { color: colors.text }]}>
-                {t('businessApplicants.headerTitle')}
-            </Text>
-            <Text style={[styles.headerTag, { color: colors.textSubtle }]}>
-                {t('businessApplicants.headerTag')}
-            </Text>
-        </View>,
         <Text key="title" accessibilityRole="header" style={[styles.title, { color: colors.text }]}>
             {BOOKED_STRINGS.TITLE}
         </Text>,
@@ -71,13 +83,44 @@ export const BusinessApplicantsPage: FC = () => {
             {BOOKED_STRINGS.SUBTITLE}
         </Text>,
         ...(applicants.applicants.length
-            ? applicants.applicants.map((applicant, index) => (
-                  <BusinessApplicantRow
-                      key={applicant.id}
-                      applicant={applicant}
-                      isLast={index === applicants.applicants.length - 1}
-                      onPress={() => openBooking(applicant)}
-                  />
+            ? groupByShift(applicants.applicants).map(group => (
+                  <View key={group.key} style={styles.group}>
+                      <View style={styles.groupHeader}>
+                          <View style={styles.groupCopy}>
+                              <Text style={[styles.groupTitle, { color: colors.text }]}>
+                                  {group.title}
+                              </Text>
+                              <Text style={[styles.groupMeta, { color: colors.textSubtle }]}>
+                                  {group.meta}
+                              </Text>
+                          </View>
+                          <Text
+                              style={[
+                                  styles.groupCount,
+                                  { color: colors.primary, backgroundColor: colors.primarySoft },
+                              ]}
+                          >
+                              {BOOKED_STRINGS.bookedCount(group.items.length)}
+                          </Text>
+                      </View>
+                      {group.items.map(applicant => (
+                          <BusinessApplicantRow
+                              key={applicant.id}
+                              applicant={applicant}
+                              onOpenProfile={
+                                  applicant.workerId
+                                      ? () =>
+                                            navigation.navigate(ROUTES.businessWorkerProfile, {
+                                                workerId: applicant.workerId as string,
+                                            })
+                                      : undefined
+                              }
+                              onOpenBooking={
+                                  applicant.assignmentId ? () => openBooking(applicant) : undefined
+                              }
+                          />
+                      ))}
+                  </View>
               ))
             : applicants.error
             ? [
@@ -137,10 +180,21 @@ export const BusinessApplicantsPage: FC = () => {
 };
 
 const styles = StyleSheet.create({
-    backRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 6 },
-    headerTitle: { flex: 1, fontFamily: FONTS.semiBold, fontSize: 14, lineHeight: 21 },
-    headerTag: { fontFamily: FONTS.regular, fontSize: 10, lineHeight: 15 },
     title: { fontFamily: FONTS.bold, fontSize: 18, lineHeight: 25 },
     subtitle: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
     actions: { gap: 8 },
+    group: { gap: 10, marginTop: 6 },
+    groupHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+    groupCopy: { flex: 1, gap: 2 },
+    groupTitle: { fontFamily: FONTS.bold, fontSize: 16, lineHeight: 22 },
+    groupMeta: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 17 },
+    groupCount: {
+        overflow: 'hidden',
+        borderRadius: 999,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        fontFamily: FONTS.semiBold,
+        fontSize: 11,
+        lineHeight: 15,
+    },
 });

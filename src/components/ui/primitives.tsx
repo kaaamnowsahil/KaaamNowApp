@@ -8,6 +8,7 @@ import {
   View,
   type TextInputProps,
 } from 'react-native';
+import type { SvgProps } from 'react-native-svg';
 
 import ChevronLeft from '@/assets/figma/chevron-left.svg';
 import ChevronRight from '@/assets/figma/chevron-right.svg';
@@ -134,6 +135,11 @@ type ButtonProps = {
   testID?: string;
 };
 
+type SecondaryButtonProps = ButtonProps & {
+  /** Leading icon, tinted with the button's accent colour. */
+  icon?: FC<SvgProps>;
+};
+
 /** Figma "Primary action" (1:72): 52px, radius 12, filled primary. */
 export const PrimaryButton: FC<ButtonProps> = ({
   label,
@@ -165,12 +171,13 @@ export const PrimaryButton: FC<ButtonProps> = ({
 };
 
 /** Figma "Secondary action" (1:74): 52px, radius 12, filled outline (primary colour). */
-export const SecondaryButton: FC<ButtonProps> = ({
+export const SecondaryButton: FC<SecondaryButtonProps> = ({
   label,
   onPress,
   disabled,
   tone = 'default',
   testID,
+  icon: Icon,
 }) => {
   const { colors } = useTheme();
   const isDanger = tone === 'danger';
@@ -188,9 +195,11 @@ export const SecondaryButton: FC<ButtonProps> = ({
           backgroundColor: 'transparent',
           borderColor: accentColor,
         },
+        Icon && styles.buttonWithIcon,
         (pressed || disabled) && styles.dimmed,
       ]}
     >
+      {Icon ? <Icon width={18} height={18} color={accentColor} /> : null}
       <Text
         style={[
           styles.buttonLabel,
@@ -332,6 +341,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   buttonLabel: { fontFamily: FONTS.semiBold, fontSize: 15 },
+  buttonWithIcon: { flexDirection: 'row', gap: 8 },
   dimmed: { opacity: 0.7 },
   field: { width: '100%', gap: 7 },
   fieldLabel: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18 },

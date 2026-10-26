@@ -1,6 +1,8 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import ArrowRightIcon from '@/assets/figma/arrow-right.svg';
 import BadgeCheckIcon from '@/assets/figma/badge-check.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -14,6 +16,7 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
   shift,
   onPress,
 }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const isLive = shift.status === 'live';
   const business = shift.isVerified
@@ -53,7 +56,7 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
         </Text>
         <View style={styles.business}>
           {shift.isVerified ? (
-            <BadgeCheckIcon width={15} height={15} color={colors.primary} />
+            <BadgeCheckIcon width={15} height={15} color={colors.success} />
           ) : null}
           <Text style={[styles.body, styles.flex, { color: colors.textMuted }]}>
             {business}
@@ -84,9 +87,18 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
             )}
           </Text>
         </View>
-        <Text style={[styles.cta, { color: colors.primary }]}>
-          {isLive ? SHIFT_STRINGS.spotsOpen(shift.spotsOpen) : SHIFT_STRINGS.APPLY}
-        </Text>
+        {isLive ? (
+          <Text style={[styles.cta, { color: colors.primary }]}>
+            {SHIFT_STRINGS.spotsOpen(shift.spotsOpen)}
+          </Text>
+        ) : (
+          <View style={styles.open}>
+            <Text style={[styles.cta, { color: colors.primary }]}>
+              {t('businessShiftCreate.openShift')}
+            </Text>
+            <ArrowRightIcon width={14} height={14} color={colors.primary} />
+          </View>
+        )}
       </View>
     </Pressable>
   );
@@ -120,4 +132,5 @@ const styles = StyleSheet.create({
   perHour: { fontFamily: FONTS.bold, fontSize: 12 },
   estimate: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 17 },
   cta: { fontFamily: FONTS.semiBold, fontSize: 11, lineHeight: 17 },
+  open: { flexDirection: 'row', alignItems: 'center', gap: 5 },
 });

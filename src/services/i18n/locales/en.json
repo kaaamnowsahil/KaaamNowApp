@@ -112,7 +112,8 @@
     "searchPlaceholder": "Search shifts...",
     "nearbyShifts": "Nearby shifts",
     "noShifts": "No shifts available right now.",
-    "filter": "Filter"
+    "filter": "Filter",
+    "loadMore": "Load more"
   },
   "shiftDetails": {
     "apply": "Apply for shift",
@@ -575,7 +576,17 @@
     "distance": "{{distance}} km",
     "locationPickerHint": "Select business location",
     "liveComingSoon": "Live requests are coming soon",
-    "unverifiedSubtitle": "{{business}}"
+    "unverifiedSubtitle": "{{business}}",
+    "shiftStatus": {
+      "draft": "Draft",
+      "searching": "Live · searching",
+      "open": "Open",
+      "filled": "Filled",
+      "inProgress": "In progress",
+      "completed": "Completed",
+      "expired": "Expired",
+      "cancelled": "Cancelled"
+    }
   },
   "businessShifts": {
     "title": "Shifts",
@@ -592,7 +603,19 @@
     "discardReason": "Draft discarded",
     "actionFailed": "Couldn’t update shift",
     "emptyRosterTitle": "No confirmed workers yet",
-    "emptyRosterBody": "Workers appear here once they confirm a shift."
+    "emptyRosterBody": "Workers appear here once they confirm a shift.",
+    "postShift": "Post shift",
+    "posting": "Posting...",
+    "cancelShift": "Cancel shift",
+    "cancelCutoffPassed": "Cancellation is only available at least {{hours}} hours before the shift starts.",
+    "commission": "Commission ({{rate}}%)",
+    "totalPayable": "Total payable",
+    "confirmCancelTitle": "Cancel this shift?",
+    "confirmCancelBody": "This will cancel the shift and notify assigned workers. You can cancel at least {{hours}} hours before it starts.",
+    "confirmCancel": "Yes, cancel shift",
+    "keepShift": "Keep shift",
+    "cancelling": "Cancelling…",
+    "paymentPending": "Payment pending"
   },
   "businessShiftCreate": {
     "prompt": "When is the shift?",

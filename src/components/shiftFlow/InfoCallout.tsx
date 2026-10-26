@@ -6,12 +6,23 @@ import InfoIcon from '@/assets/icons/info.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
-/** Soft bordered note with a leading icon (Live details, Check in, Finish — 10). */
-export const InfoCallout: FC<{ text: string; icon?: FC<SvgProps> }> = ({
-  text,
-  icon: Icon = InfoIcon,
-}) => {
+/**
+ * Soft bordered note with a leading icon (Live details, Check in, Finish — 10).
+ * `accent`: purple left rule, no box (web `.worker-scheduled-shift-application-note`).
+ */
+export const InfoCallout: FC<{
+  text: string;
+  icon?: FC<SvgProps>;
+  variant?: 'box' | 'accent';
+}> = ({ text, icon: Icon = InfoIcon, variant = 'box' }) => {
   const { colors } = useTheme();
+  if (variant === 'accent') {
+    return (
+      <View style={[styles.accent, { borderLeftColor: colors.primary }]}>
+        <Text style={[styles.accentText, { color: colors.textMuted }]}>{text}</Text>
+      </View>
+    );
+  }
   return (
     <View
       style={[
@@ -35,4 +46,6 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   text: { flex: 1, fontFamily: FONTS.regular, fontSize: 12, lineHeight: 17 },
+  accent: { borderLeftWidth: 3, paddingVertical: 4, paddingLeft: 12 },
+  accentText: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 20.8 },
 });

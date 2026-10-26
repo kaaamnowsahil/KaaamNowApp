@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { ROUTES } from '@/constants/routes';
 import { errorMessage } from '@/services/api/apiClient';
@@ -9,15 +9,13 @@ import { reverseGeocode } from '@/services/maps/googleMaps';
 import { toShift } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
-import type { Option, Shift, ShiftStatus, TabAppNavigation } from '@/types';
+import type { Shift, ShiftStatus, TabAppNavigation } from '@/types';
 
 import {
   ANY_ID,
-  CURRENT_LOCATION_ID,
   DISTANCE_OPTIONS,
   LENGTH_OPTIONS,
   PAY_OPTIONS,
-  SAVED_LOCATION_ID,
 } from '../constants/filterOptions';
 import { WORKER_HOME_STRINGS } from '../constants/workerHomeStrings';
 
@@ -55,6 +53,8 @@ const countActive = (f: ShiftFilters) =>
   (f.businessTypeIds.length ? 1 : 0) +
   (f.verifiedOnly ? 1 : 0);
 
+const FEED_PAGE_SIZE = 10;
+
 const firstName = (fullName?: string | null) => fullName?.trim().split(/\s+/)[0] ?? '';
 
 export const useWorkerHome = () => {
@@ -64,11 +64,12 @@ export const useWorkerHome = () => {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [locationId, setLocationId] = useState(CURRENT_LOCATION_ID);
-  const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [position, setPosition] = useState<DevicePosition | null>(null);
   const [positionResolved, setPositionResolved] = useState(false);
   const [currentLabel, setCurrentLabel] = useState('');
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
+  const isMounted = useRef(true);
   const [availability, setAvailability] = useState<boolean | null>(null);
   const [availabilityPending, setAvailabilityPending] = useState(false);
   const [availabilityError, setAvailabilityError] = useState<string | null>(null);
@@ -84,43 +85,60 @@ export const useWorkerHome = () => {
     return () => clearTimeout(timer);
   }, [query]);
 
-  useEffect(() => {
-    let active = true;
-    getDevicePosition().then(async next => {
-      if (!active) return;
+  const locate = useCallback(async () => {
+    setIsLocating(true);
+    setLocationError('');
+    const next = await getDevicePosition();
+    if (!isMounted.current) return;
+    if (next) {
       setPosition(next);
-      setPositionResolved(true);
-      if (!next) {
-        setLocationId(SAVED_LOCATION_ID);
-        return;
-      }
       const label = await reverseGeocode(next).catch(() => null);
-      if (active && label) setCurrentLabel(label);
-    });
-    return () => {
-      active = false;
-    };
+      if (isMounted.current) setCurrentLabel(label ?? '');
+    } else {
+      setLocationError(WORKER_HOME_STRINGS.AVAILABILITY.LOCATION_DENIED);
+    }
+    if (isMounted.current) {
+      setPositionResolved(true);
+      setIsLocating(false);
+    }
   }, []);
 
-  const coords = locationId === CURRENT_LOCATION_ID ? position : null;
+  useEffect(() => {
+    isMounted.current = true;
+    locate().catch(() => undefined);
+    return () => {
+      isMounted.current = false;
+    };
+  }, [locate]);
+
+  const savedCoords =
+    worker?.latitude != null && worker?.longitude != null
+      ? { latitude: worker.latitude, longitude: worker.longitude }
+      : null;
+  const coords = position ?? savedCoords;
   const radius = DISTANCE_OPTIONS.find(o => o.id === filters.distanceId)?.max;
 
+  const fetchPage = async (offset: number) => {
+    const page = await shiftsApi.feed({
+      shift_type: status,
+      q: debouncedQuery || undefined,
+      lat: coords?.latitude,
+      lng: coords?.longitude,
+      radius_km: radius && Number.isFinite(radius) ? radius : undefined,
+      limit: FEED_PAGE_SIZE,
+      offset,
+      ...(filters.businessTypeIds.length
+        ? { business_type_slugs: filters.businessTypeIds.join(',') }
+        : {}),
+    });
+    return {
+      shifts: page.items.map(toShift),
+      hasMore: page.items.length === FEED_PAGE_SIZE,
+    };
+  };
+
   const feed = useApiQuery(
-    async () => {
-      if (!positionResolved) return null;
-      const page = await shiftsApi.feed({
-        shift_type: status,
-        q: debouncedQuery || undefined,
-        lat: coords?.latitude,
-        lng: coords?.longitude,
-        radius_km: radius && Number.isFinite(radius) ? radius : undefined,
-        limit: 50,
-        ...(filters.businessTypeIds.length
-          ? { business_type_slugs: filters.businessTypeIds.join(',') }
-          : {}),
-      });
-      return page.items.map(toShift);
-    },
+    async () => (positionResolved ? fetchPage(0) : null),
     [
       positionResolved,
       status,
@@ -132,17 +150,43 @@ export const useWorkerHome = () => {
     ],
   );
 
-  const savedLabel = worker?.locality || worker?.address_text || 'Saved address';
-  const locations: Option[] = [
-    ...(position
-      ? [{ id: CURRENT_LOCATION_ID, label: currentLabel || 'Current location' }]
-      : []),
-    { id: SAVED_LOCATION_ID, label: savedLabel },
-  ];
+  const savedLabel = worker?.address_text || worker?.locality || '';
+
+  const [extra, setExtra] = useState<{ shifts: Shift[]; hasMore: boolean } | null>(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState('');
+
+  useEffect(() => {
+    setExtra(null);
+    setLoadMoreError('');
+  }, [feed.data]);
+
+  const loaded = useMemo(
+    () => [...(feed.data?.shifts ?? []), ...(extra?.shifts ?? [])],
+    [feed.data, extra],
+  );
+  const hasMore = extra ? extra.hasMore : (feed.data?.hasMore ?? false);
+
+  const loadMore = async () => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+    setLoadMoreError('');
+    try {
+      const next = await fetchPage(loaded.length);
+      setExtra(prev => ({
+        shifts: [...(prev?.shifts ?? []), ...next.shifts],
+        hasMore: next.hasMore,
+      }));
+    } catch (cause) {
+      setLoadMoreError(errorMessage(cause));
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const nearby = useMemo(
-    () => (feed.data ?? []).filter(shift => matchesLocalFilters(shift, filters)),
-    [feed.data, filters],
+    () => loaded.filter(shift => matchesLocalFilters(shift, filters)),
+    [loaded, filters],
   );
 
   const runAvailability = async (task: () => Promise<void>) => {
@@ -219,14 +263,11 @@ export const useWorkerHome = () => {
     },
     openShift,
     openNotifications: () => navigation.navigate(ROUTES.notifications),
-    locations,
-    locationId,
-    locationLabel: locations.find(l => l.id === locationId)?.label ?? savedLabel,
-    isLocationOpen,
-    toggleLocation: () => setIsLocationOpen(prev => !prev),
-    selectLocation: (id: string) => {
-      setLocationId(id);
-      setIsLocationOpen(false);
+    locationLabel: (position ? currentLabel : '') || savedLabel,
+    isLocating,
+    locationError,
+    refreshLocation: () => {
+      locate().catch(() => undefined);
     },
     businessTypes: businessTypes.data ?? [],
     status,
@@ -234,6 +275,12 @@ export const useWorkerHome = () => {
     query,
     setQuery,
     nearby,
+    hasMore,
+    isLoadingMore,
+    loadMoreError,
+    loadMore: () => {
+      loadMore().catch(() => undefined);
+    },
     filters,
     activeFilterCount: countActive(filters),
     isFilterOpen,

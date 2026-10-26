@@ -27,6 +27,7 @@ export const BOOKING_DETAIL_STRINGS = {
   STOP: 'Stop work now',
   CANCEL: 'Cancel booking',
   EMERGENCY: 'Emergency help',
+  call: (phone: string) => `Call ${phone}`,
   RATE: 'Rate worker',
   ACTION_FAILED: 'Couldn’t update the booking',
   pinForWorker: (pin: string) =>

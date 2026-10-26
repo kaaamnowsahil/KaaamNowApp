@@ -13,27 +13,28 @@ import {
 } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { TabScreen } from '@/layout/TabScreen';
+import { BusinessIdentity } from '@/pages/businessLive/components';
+import { useTheme } from '@/theme/ThemeProvider';
 import type { TabAppNavigation } from '@/types';
-import { BusinessIdentity, BusinessShiftCard } from '@/pages/businessLive/components';
-import {
-  formatDateLabel,
-  formatTimeRange,
-} from '@/services/shifts/shiftMappers';
 
-import { BusinessDraftCard, BusinessRosterCard } from './components';
-import { useBusinessShifts } from './hooks';
-import { UNPAID_STRINGS } from './hooks/useBusinessShifts';
+import { BusinessOwnedShiftCard, BusinessShiftCancelSheet } from './components';
+import { useBusinessShifts, type ShiftSection } from './hooks/useBusinessShifts';
 
 export const BusinessShiftsPage: FC = () => {
   const { t } = useTranslation();
+  const { colors } = useTheme();
   const navigation = useNavigation<TabAppNavigation>();
   const shifts = useBusinessShifts();
-  const hasAnyShift =
-    shifts.liveShifts.length +
-      shifts.scheduledShifts.length +
-      shifts.unpaidShifts.length +
-      shifts.drafts.length >
-    0;
+
+  const sectionColor: Record<ShiftSection, string> = {
+    awaiting_payment: colors.text,
+    draft: colors.textMuted,
+    completed: colors.success,
+    upcoming: colors.primary,
+    in_progress: colors.info,
+    expired: colors.danger,
+    cancelled: colors.warning,
+  };
 
   const blocks = [
     <View key="intro" style={styles.intro}>
@@ -42,131 +43,85 @@ export const BusinessShiftsPage: FC = () => {
         <BusinessIdentity businessName={shifts.businessName} isVerified={shifts.isVerified} />
       ) : null}
     </View>,
-    ...(shifts.error
-      ? [
-          <EmptyState
-            key="error"
-            icon={CalendarDaysIcon}
-            title={t('businessShifts.loadErrorTitle')}
-            body={shifts.error}
-            action={t('businessShifts.retry')}
-            onAction={shifts.reload}
-          />,
-        ]
-      : !hasAnyShift
-      ? [
-          <EmptyState
-            key="empty"
-            icon={CalendarDaysIcon}
-            title={t('businessDashboard.emptyScheduledTitle')}
-            body={t('businessDashboard.emptyScheduledBody')}
-          />,
-        ]
-      : [
-          ...(shifts.liveShifts.length
-            ? [
-                <SectionHeading
-                  key="live-heading"
-                  title={t('businessDashboard.todayLive')}
-                />,
-                ...shifts.liveShifts.map(({ item, card }) => (
-                  <BusinessShiftCard
-                    key={card.id}
-                    shift={card}
-                    view="live"
-                    businessName={shifts.businessName}
-                    isVerified={shifts.isVerified}
-                    onPress={() => shifts.openShift(item)}
-                  />
-                )),
-              ]
-            : []),
-          ...(shifts.unpaidShifts.length
-            ? [
-                <SectionHeading key="unpaid-heading" title={UNPAID_STRINGS.heading} />,
-                ...shifts.unpaidShifts.map(item => (
-                  <BusinessDraftCard
-                    key={item.id}
-                    title={item.job_title}
-                    status={UNPAID_STRINGS.status}
-                    date={`${formatDateLabel(
-                      item.starts_at,
-                    )} · ${formatTimeRange(item.starts_at, item.ends_at)}`}
-                    onPress={() => shifts.payDeposit(item)}
-                  />
-                )),
-              ]
-            : []),
-          ...(shifts.drafts.length
-            ? [
-                <SectionHeading
-                  key="draft-heading"
-                  title={t('businessShiftCreate.savedDraft')}
-                />,
-                ...shifts.drafts.map(draft => (
-                  <BusinessDraftCard
-                    key={draft.id}
-                    title={draft.job_title}
-                    date={`${formatDateLabel(
-                      draft.starts_at,
-                    )} · ${formatTimeRange(draft.starts_at, draft.ends_at)}`}
-                    onPress={() => shifts.openDraft(draft)}
-                  />
-                )),
-              ]
-            : []),
-          ...(shifts.scheduledShifts.length
-            ? [
-                <SectionHeading
-                  key="scheduled-heading"
-                  title={t('businessShifts.scheduled')}
-                />,
-                <BusinessRosterCard
-                  key="roster"
-                  staffedCount={shifts.roster.staffedCount}
-                  totalCount={shifts.roster.totalCount}
-                  onPress={shifts.openRoster}
-                />,
-                <SectionHeading
-                  key="upcoming-heading"
-                  title={t('businessDashboard.upcoming')}
-                />,
-                ...shifts.scheduledShifts.map(({ item, card }) => (
-                  <BusinessShiftCard
-                    key={card.id}
-                    shift={card}
-                    view="scheduled"
-                    businessName={shifts.businessName}
-                    isVerified={shifts.isVerified}
-                    onPress={() => shifts.openShift(item)}
-                  />
-                )),
-              ]
-            : []),
-        ]),
+    shifts.error ? (
+      <EmptyState
+        key="error"
+        icon={CalendarDaysIcon}
+        title={t('businessShifts.loadErrorTitle')}
+        body={shifts.error}
+        action={t('businessShifts.retry')}
+        onAction={shifts.reload}
+      />
+    ) : !shifts.hasShifts ? (
+      <EmptyState
+        key="empty"
+        icon={CalendarDaysIcon}
+        title={t('businessDashboard.emptyScheduledTitle')}
+        body={t('businessDashboard.emptyScheduledBody')}
+      />
+    ) : (
+      <View key="sections" style={styles.sections}>
+        {shifts.sections.map(section => (
+          <View key={section.key} style={styles.section}>
+            <SectionHeading
+              title={t(section.titleKey)}
+              statusColor={sectionColor[section.key]}
+            />
+            {section.shifts.map(shift => (
+              <BusinessOwnedShiftCard
+                key={shift.id}
+                shift={shift}
+                titleColor={sectionColor[section.key]}
+                isPaying={shifts.payingId === shift.id}
+                isPublishing={shifts.publishingId === shift.id}
+                error={shifts.cardError?.shiftId === shift.id ? shifts.cardError.message : ''}
+                onCancel={() => shifts.openCancel(shift)}
+                onPay={() => shifts.payDeposit(shift)}
+                onPublish={() => shifts.publish(shift)}
+                onOpenBooked={() => shifts.openBooked(shift)}
+              />
+            ))}
+          </View>
+        ))}
+      </View>
+    ),
   ];
 
   return (
-    <TabScreen
-      header={
-        <BrandAppBar onBellPress={() => navigation.navigate(ROUTES.notifications)} />
-      }
-      blocks={blocks}
-      gap={12}
-      fillLastBlock={Boolean(shifts.error) || !hasAnyShift}
-      isLoading={shifts.isLoading}
-      testID="business-shifts-page"
-      actions={
-        <PrimaryButton
-          label={t('businessDashboard.createShift')}
-          onPress={shifts.openSchedule}
-          testID="business-create-shift"
+    <>
+      <TabScreen
+        header={
+          <BrandAppBar onBellPress={() => navigation.navigate(ROUTES.notifications)} />
+        }
+        blocks={blocks}
+        gap={12}
+        fillLastBlock={Boolean(shifts.error) || !shifts.hasShifts}
+        isLoading={shifts.isLoading}
+        testID="business-shifts-page"
+        actions={
+          <PrimaryButton
+            label={t('businessDashboard.createShift')}
+            onPress={shifts.openSchedule}
+            testID="business-create-shift"
+          />
+        }
+      />
+      {shifts.cancelTarget ? (
+        <BusinessShiftCancelSheet
+          cutoffHours={shifts.cancelTarget.cancellation_cutoff_hours}
+          preview={shifts.cancelPreview}
+          error={shifts.cancelError}
+          isCancelling={shifts.isCancelling}
+          onClose={shifts.closeCancel}
+          onConfirm={shifts.confirmCancel}
         />
-      }
-    />
+      ) : null}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   intro: { gap: 4 },
+  sections: { gap: 24 },
+  section: { gap: 12 },
 });

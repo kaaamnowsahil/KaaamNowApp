@@ -12,4 +12,6 @@ export { StatTiles, type StatTile } from './StatTiles';
 export { StatusHero } from './StatusHero';
 export { TermsSheet } from './TermsSheet';
 export { TextSection } from './TextSection';
+export { WorkerCancellationPolicyCard } from './WorkerCancellationPolicyCard';
+export { WORKER_CANCELLATION_STRINGS } from './workerCancellationStrings';
 export { businessIcon } from './businessIcon';

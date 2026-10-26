@@ -13,16 +13,15 @@ import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { BusinessLivePage } from '@/pages/businessLive/BusinessLivePage';
 import { BusinessShiftsPage } from '@/pages/businessShifts/BusinessShiftsPage';
-import { BusinessApplicantsPage } from '@/pages/businessApplicants/BusinessApplicantsPage';
-import { WorkerHomePage } from '@/pages/workerHome/WorkerHomePage';
-import { WorkerShiftsPage } from '@/pages/workerShifts/WorkerShiftsPage';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { TabParamList } from '@/types';
 
+import { BusinessApplicantsStack } from './businessApplicantsStack';
 import { BusinessProfileStack } from './businessProfileStack';
 import { WorkerEarningsStack } from './workerEarningsStack';
 import { WorkerProfileStack } from './workerProfileStack';
+import { WorkerDiscoverStack, WorkerShiftsStack } from './workerShiftFlowStack';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -43,13 +42,13 @@ const WORKER_TABS: TabDef[] = [
   {
     name: ROUTES.workerHome,
     title: 'Discover',
-    component: WorkerHomePage,
+    component: WorkerDiscoverStack,
     icon: tabIcon(HouseIcon),
   },
   {
     name: ROUTES.workerShifts,
     title: 'My shifts',
-    component: WorkerShiftsPage,
+    component: WorkerShiftsStack,
     icon: tabIcon(CalendarDaysIcon),
   },
   {
@@ -82,7 +81,7 @@ const BUSINESS_TABS: TabDef[] = [
   {
     name: ROUTES.businessApplicants,
     title: 'applicants',
-    component: BusinessApplicantsPage,
+    component: BusinessApplicantsStack,
     icon: tabIcon(UsersRoundIcon),
   },
   {
@@ -109,6 +108,7 @@ export const BottomTabRoutes: FC = () => {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        popToTopOnBlur: true,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textSubtle,
         tabBarStyle: {

@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import type { SvgProps } from 'react-native-svg';
 
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -11,9 +12,10 @@ export const InfoCard: FC<{
   caption: string;
   badge?: string;
   badgeTone?: Tone;
+  icon?: FC<SvgProps>;
   onPress?: () => void;
   testID?: string;
-}> = ({ title, caption, badge, badgeTone = 'primary', onPress, testID }) => {
+}> = ({ title, caption, badge, badgeTone = 'primary', icon: Icon, onPress, testID }) => {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -27,6 +29,7 @@ export const InfoCard: FC<{
         pressed && { backgroundColor: colors.fill },
       ]}
     >
+      {Icon ? <Icon width={20} height={20} color={colors.primary} /> : null}
       <View style={styles.text}>
         <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
         <Text style={[styles.caption, { color: colors.textSubtle }]}>

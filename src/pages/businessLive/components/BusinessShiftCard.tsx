@@ -51,7 +51,7 @@ export const BusinessShiftCard: FC<BusinessShiftCardProps> = ({
             </View>
             <Text style={[styles.title, { color: colors.text }]}>{shift.title}</Text>
             <View style={styles.business}>
-                {isVerified ? <BadgeCheckIcon width={14} height={14} color={colors.primary} /> : null}
+                {isVerified ? <BadgeCheckIcon width={14} height={14} color={colors.success} /> : null}
                 <Text style={[styles.meta, { color: colors.textSubtle }]}>
                     {businessName}{isVerified ? ` · ${t('businessDashboard.verified')}` : ''}
                 </Text>

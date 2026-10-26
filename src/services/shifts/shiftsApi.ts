@@ -53,6 +53,7 @@ export type WorkerShiftDetail = WorkerShiftCard & {
   arrival_instructions: string;
   site_contact_name: string;
   cancellation_cutoff_hours: number;
+  has_time_conflict: boolean;
 };
 
 export type MyShiftsTab = 'upcoming' | 'active' | 'completed' | 'applications';
@@ -239,6 +240,7 @@ export type BusinessShiftItem = {
   estimate: ShiftCostEstimate;
   workplace_name: string;
   address_text: string;
+  cancellation_cutoff_hours: number;
   invoice_status?: string | null;
   deposit_invoice_id?: string | null;
   deposit_status?: string | null;
@@ -293,6 +295,27 @@ export type BusinessApplicantItem = {
   };
 };
 
+/** GET /me/workers/{id}: what a business sees about a booked worker. */
+export type WorkerPublicProfile = {
+  id: string;
+  full_name: string;
+  photo_url?: string | null;
+  locality: string;
+  category_slugs: string[];
+  verification_status: string;
+  rating_avg: number;
+  rating_count: number;
+  completed_shift_count: number;
+  member_since: string;
+  recent_reviews: {
+    stars: number;
+    tags: string[];
+    review: string;
+    rater_name: string;
+    created_at: string;
+  }[];
+};
+
 export type RosterEntry = {
   assignment_id: string;
   status: string;
@@ -326,6 +349,7 @@ export const shiftsApi = {
     business_type_slugs?: string;
     sort?: 'distance' | 'starts_at' | 'pay';
     limit?: number;
+    offset?: number;
   }) => apiRequest<Page<WorkerShiftCard>>('GET', '/worker/feed', { query }),
   myShifts: (tab: MyShiftsTab) =>
     apiRequest<Page<MyShiftItem> & { tab: MyShiftsTab }>('GET', '/worker/my-shifts', {
@@ -427,6 +451,8 @@ export const shiftsApi = {
   rejectApplicant: (applicationId: string) =>
     apiRequest<unknown>('POST', `/business/applications/${applicationId}/reject`),
   roster: (shiftId: string) => apiRequest<Roster>('GET', `/business/shifts/${shiftId}/roster`),
+  workerProfile: (workerProfileId: string) =>
+    apiRequest<WorkerPublicProfile>('GET', `/me/workers/${workerProfileId}`),
 
   // day of shift; `party` picks the /worker or /business route
   requestEarlyEnd: (party: Party, assignmentId: string) =>
