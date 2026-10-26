@@ -4,6 +4,7 @@
     "cancel": "Cancel",
     "apply": "Apply",
     "back": "Back",
+    "close": "Close",
     "loading": "Loading...",
     "comingSoon": "Coming soon",
     "viewMore": "View more ({{count}})",
@@ -102,7 +103,6 @@
     "themeDark": "Dark",
     "support": "Support",
     "faq": "FAQ & Help",
-    "offline": "Offline access",
     "terms": "Terms & Conditions",
     "logOut": "Log out",
     "roleLabel": "Worker"
@@ -125,10 +125,6 @@
   "notifications": {
     "title": "Notifications",
     "empty": "No notifications yet."
-  },
-  "offline": {
-    "title": "Offline access",
-    "subtitle": "Downloaded content is available without internet."
   },
   "faq": {
     "title": "FAQ & Help"
@@ -546,6 +542,7 @@
     "heading": "Your team, at a glance",
     "verifiedSubtitle": "{{business}} · Verified business",
     "liveConfirmed": "Live confirmed",
+    "confirmedWorkers": "Workers confirmed",
     "newApplicants": "New applicants",
     "changeLocation": "Change business location: {{location}}",
     "liveNow": "Live Now",
@@ -566,7 +563,7 @@
     "emptyLiveTitle": "No live shifts right now",
     "emptyLiveBody": "Post a live request and workers within 3–5 km are notified instantly.",
     "emptyScheduledTitle": "No scheduled shifts yet",
-    "emptyScheduledBody": "Create a shift in advance and workers within 5 km can apply.",
+    "emptyScheduledBody": "Create a shift in advance and workers up to 30 km away can apply.",
     "createShift": "+ Create shift",
     "postLiveRequest": "+ Post live request",
     "tabs": {
@@ -613,6 +610,30 @@
     "defaultRole": "Event service associate",
     "perDateSchedule": "Hours for each date",
     "sameForEveryDate": "Same details for every selected date",
+    "sameShiftsForEveryDate": "Use the same shifts for every selected date",
+    "sameShiftsForSelectedDates_one": "Shift details for the selected date",
+    "sameShiftsForSelectedDates_other": "Shift details for all {{count}} selected dates",
+    "shiftNumber": "Shift {{count}}",
+    "addAnotherShift": "Add another shift for this date",
+    "removeShift": "Remove shift",
+    "breakMinutes": "Break time (minutes)",
+    "breakMinutesPlaceholder": "e.g. 30",
+    "workersPlaceholder": "e.g. 2",
+    "hourlyPayPlaceholder": "e.g. 175",
+    "responsibilitiesPlaceholder": "e.g. Welcome guests, serve refreshments and support event setup.",
+    "timePlaceholder": "Select time",
+    "breakMinutesSummary": "Break: {{count}} min",
+    "invalidBreak": "Enter break time in minutes. It must be shorter than the shift; enter 0 if there is no break.",
+    "confirmLocation": "Set the work location before posting this shift.",
+    "confirmWorkLocation": "Is this the correct work location?",
+    "confirmWorkLocationHint": "Workers will use this location to find and reach the shift. Edit the address or choose the exact spot on the map.",
+    "useCurrentLocation": "Use current location",
+    "chooseOnMap": "Choose on map",
+    "hideMap": "Hide map",
+    "tapMapToSetLocation": "Tap the map or drag the pin to set the exact workplace.",
+    "findingLocation": "Finding this location…",
+    "locationCoordinates": "Map pin: {{latitude}}, {{longitude}}",
+    "locationNeedsPin": "Set the map pin before posting so workers are sent to the right place.",
     "sameDetailsForSelectedDates_one": "Details for all {{count}} date",
     "sameDetailsForSelectedDates_other": "Details for all {{count}} dates",
     "hoursDuration": "{{hours}} hours",
@@ -948,7 +969,30 @@
     "historyMeta": "{{date}} · {{method}}",
     "status": {
       "paid": "Paid",
-      "pending": "Pending"
-    }
+      "pending": "Pending",
+      "void": "Cancelled"
+    },
+    "pendingAmount": "{{amount}} pending",
+    "awaitingPayment": "Awaiting payment",
+    "workersCount_one": "{{count}} worker",
+    "workersCount_other": "{{count}} workers",
+    "emptyTitle": "No payments yet",
+    "emptyBody": "You pay for a shift when you post it. Your payments will appear here.",
+    "loadErrorTitle": "Couldn't load payments",
+    "retry": "Try again",
+    "shiftDate": "Shift date",
+    "workers": "Workers",
+    "breakdown": "Breakdown",
+    "workerPay": "Worker pay",
+    "serviceFee": "Service fee ({{pct}}%)",
+    "gatewayFee": "Gateway charge ({{pct}}%)",
+    "promoSavings": "Promo {{code}} savings",
+    "total": "Total",
+    "paidAtPosting": "Paid at posting",
+    "refundDue": "Refund due",
+    "paymentInfo": "Payment",
+    "paidOn": "Paid on",
+    "invoice": "Invoice",
+    "feeNote": "Worker pay is held safely until the shift is done. The gateway charge is not refunded on cancellation."
   }
 }

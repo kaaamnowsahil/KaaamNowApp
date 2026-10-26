@@ -28,7 +28,6 @@ export const useWorkerProfile = () => {
     theme,
     languageLabel: language.label,
     openAppearance: () => navigation.navigate(ROUTES.appearance),
-    openOffline: () => navigation.navigate(ROUTES.offline),
     openNotifications: () => navigation.navigate(ROUTES.notifications),
     openEditProfile: () => navigation.navigate(ROUTES.editProfile),
     openPayouts: () => navigation.navigate(ROUTES.payoutAccount),

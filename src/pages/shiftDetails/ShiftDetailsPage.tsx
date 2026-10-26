@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking } from 'react-native';
 
@@ -12,11 +12,13 @@ import {
   FlowHeading,
   InfoCallout,
   StatTiles,
+  TermsSheet,
   TextSection,
 } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { ApiError } from '@/services/api/apiClient';
 import { getDevicePosition } from '@/services/maps/devicePosition';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 import { useShiftAction, useWorkerShiftDetail } from '@/services/shifts/useShiftFlow';
@@ -59,6 +61,12 @@ export const ShiftDetailsPage: FC<
   const copy = DETAILS_COPY[shift.status];
   const booking = bookingStatus ? BOOKING_COPY[bookingStatus] : undefined;
   const rate = formatRupees(shift.hourlyRate);
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const needsTerms = (error: unknown) => {
+    const isTerms = error instanceof ApiError && error.code === 'terms_required';
+    if (isTerms) setIsTermsOpen(true);
+    return isTerms;
+  };
 
   const accept = () =>
     shift.status === 'live'
@@ -69,18 +77,22 @@ export const ShiftDetailsPage: FC<
             shift: { ...shift, assignmentId: assignment.id, assignmentStatus: assignment.status },
           }),
         SHIFT_DETAILS_STRINGS.ACCEPT_FAILED,
+        needsTerms,
       )
       : action.run(
         async () => shiftsApi.apply(shift.id, (await getDevicePosition(5000)) ?? undefined),
         application =>
-          navigation.replace(ROUTES.applicationSubmitted, {
+          navigation.replace(ROUTES.shiftSecured, {
             shift: {
               ...shift,
               applicationId: application.id,
               applicationStatus: application.status,
+              assignmentId: application.assignment_id ?? undefined,
+              assignmentStatus: 'confirmed',
             },
           }),
         SHIFT_DETAILS_STRINGS.APPLY_FAILED,
+        needsTerms,
       );
 
   const messageBusiness = () =>
@@ -113,94 +125,108 @@ export const ShiftDetailsPage: FC<
   })();
 
   return (
-    <FormScreen
-      busy={action.busy}
-      onBack={navigation.goBack}
-      title={SHIFT_DETAILS_STRINGS.HEADER_TITLE}
-      compactTitle
-      headerTag={SHIFT_DETAILS_STRINGS.HEADER_TAG}
-      gap={14}
-      isLoading={detail.isLoading}
-      testID="shift-details-page"
-      actions={
-        <>
-          {primary?.label ? (
-            <PrimaryButton
-              label={primary.label}
-              disabled={primary.isDisabled || action.busy}
-              onPress={primary.onPress}
-              testID="shift-details-primary"
-            />
-          ) : null}
-          {shift.assignmentId ? (
-            <SecondaryButton
-              label={SHIFT_DETAILS_STRINGS.MESSAGE}
-              disabled={action.busy}
-              onPress={messageBusiness}
-              testID="shift-details-message"
-            />
-          ) : null}
-        </>
-      }
-    >
-      <FlowHeading
-        overline={booking?.overline ?? copy.overline(Math.max(shift.spotsOpen, 1))}
-        tone={booking?.tone ?? 'primary'}
-        title={shift.title}
-      />
+    <>
+      <FormScreen
+        busy={action.busy}
+        hideBrandBar
+        onBack={navigation.goBack}
+        title={SHIFT_DETAILS_STRINGS.HEADER_TITLE}
+        compactTitle
+        headerTag={SHIFT_DETAILS_STRINGS.HEADER_TAG}
+        gap={14}
+        isLoading={detail.isLoading}
+        testID="shift-details-page"
+        actions={
+          <>
+            {primary?.label ? (
+              <PrimaryButton
+                label={primary.label}
+                disabled={primary.isDisabled || action.busy}
+                onPress={primary.onPress}
+                testID="shift-details-primary"
+              />
+            ) : null}
+            {shift.assignmentId ? (
+              <SecondaryButton
+                label={SHIFT_DETAILS_STRINGS.MESSAGE}
+                disabled={action.busy}
+                onPress={messageBusiness}
+                testID="shift-details-message"
+              />
+            ) : null}
+          </>
+        }
+      >
+        <FlowHeading
+          overline={booking?.overline ?? copy.overline(Math.max(shift.spotsOpen, 1))}
+          tone={booking?.tone ?? 'primary'}
+          title={shift.title}
+        />
 
-      <BusinessRow
-        icon={businessIcon(shift.businessTypeId)}
-        name={shift.businessName}
-        meta={SHIFT_DETAILS_STRINGS.businessMeta(
-          shift.isVerified,
-          info?.business.rating_avg ?? 0,
-          info?.business.rating_count ?? 0,
-        )}
-        isVerified={shift.isVerified}
-      />
+        <BusinessRow
+          icon={businessIcon(shift.businessTypeId)}
+          name={shift.businessName}
+          meta={SHIFT_DETAILS_STRINGS.businessMeta(
+            shift.isVerified,
+            info?.business.rating_avg ?? 0,
+            info?.business.rating_count ?? 0,
+          )}
+          isVerified={shift.isVerified}
+        />
 
-      <StatTiles
-        items={[
-          { value: SHIFT_DETAILS_STRINGS.rate(rate), label: SHIFT_DETAILS_STRINGS.AGREED_RATE },
-          {
-            value: formatRupees(shift.hourlyRate * shift.durationHours),
-            label: SHIFT_DETAILS_STRINGS.ESTIMATED,
-          },
-        ]}
-      />
+        <StatTiles
+          items={[
+            { value: SHIFT_DETAILS_STRINGS.rate(rate), label: SHIFT_DETAILS_STRINGS.AGREED_RATE },
+            {
+              value: formatRupees(shift.hourlyRate * shift.durationHours),
+              label: SHIFT_DETAILS_STRINGS.ESTIMATED,
+            },
+          ]}
+        />
 
-      <FactList
-        items={[
-          { icon: CalendarIcon, text: SHIFT_DETAILS_STRINGS.when(shift.dateLabel, shift.timeLabel) },
-          {
-            icon: ClockIcon,
-            text: `${t('shiftDetails.duration', { hours: shift.durationHours })} · ${SHIFT_DETAILS_STRINGS.breakNote(info?.break_minutes ?? 0)}`,
-          },
-          {
-            icon: MapPinIcon,
-            text: `${shift.addressText || shift.area} · ${t('shiftDetails.distance', { distance: shift.distanceKm })}`,
-          },
-        ]}
-      />
+        <FactList
+          items={[
+            { icon: CalendarIcon, text: SHIFT_DETAILS_STRINGS.when(shift.dateLabel, shift.timeLabel) },
+            {
+              icon: ClockIcon,
+              text: `${t('shiftDetails.duration', { hours: shift.durationHours })} · ${SHIFT_DETAILS_STRINGS.breakNote(info?.break_minutes ?? 0)}`,
+            },
+            {
+              icon: MapPinIcon,
+              text: `${shift.addressText || shift.area} · ${t('shiftDetails.distance', { distance: shift.distanceKm })}`,
+            },
+          ]}
+        />
 
-      <TextSection
-        title={SHIFT_DETAILS_STRINGS.WHAT_YOU_DO}
-        body={info?.responsibilities || SHIFT_DETAILS_STRINGS.NO_DETAILS}
-      />
-      {info?.requirements ? (
         <TextSection
-          title={SHIFT_DETAILS_STRINGS.BEFORE_ACCEPT}
-          body={info.requirements}
-          variant="note"
+          title={SHIFT_DETAILS_STRINGS.WHAT_YOU_DO}
+          body={info?.responsibilities || SHIFT_DETAILS_STRINGS.NO_DETAILS}
+        />
+        {info?.requirements ? (
+          <TextSection
+            title={SHIFT_DETAILS_STRINGS.BEFORE_ACCEPT}
+            body={info.requirements}
+            variant="note"
+          />
+        ) : null}
+        <InfoCallout text={copy.callout} />
+        <TextSection
+          title={SHIFT_DETAILS_STRINGS.CANCELLATION}
+          body={SHIFT_DETAILS_STRINGS.cancellation(info?.cancellation_cutoff_hours ?? 12)}
+          variant="fine"
+        />
+      </FormScreen>
+      {isTermsOpen ? (
+        <TermsSheet
+          audience="worker"
+          onRead={() => navigation.navigate(ROUTES.terms)}
+          onClose={() => setIsTermsOpen(false)}
+          onAccepted={() => {
+            setIsTermsOpen(false);
+            accept();
+          }}
         />
       ) : null}
-      <InfoCallout text={copy.callout} />
-      <TextSection
-        title={SHIFT_DETAILS_STRINGS.CANCELLATION}
-        body={SHIFT_DETAILS_STRINGS.cancellation(info?.cancellation_cutoff_hours ?? 12)}
-        variant="fine"
-      />
-    </FormScreen>
+    </>
   );
 };

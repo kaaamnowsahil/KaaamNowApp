@@ -52,6 +52,7 @@ export const RoleSelectPage: FC<AuthScreenProps<typeof ROUTES.roleSelect>> = ({
   return (
     <FormScreen
       onBack={navigation.goBack}
+      title={t('roleSelect.title')}
       testID="role-select-page"
       actions={
         <>
@@ -75,10 +76,7 @@ export const RoleSelectPage: FC<AuthScreenProps<typeof ROUTES.roleSelect>> = ({
         </>
       }
     >
-      <ScreenIntro
-        title={t('roleSelect.title')}
-        subtitle={t('roleSelect.subtitle')}
-      />
+      <ScreenIntro subtitle={t('roleSelect.subtitle')} />
       <View>
         {options.map(option => (
           <InfoRow

@@ -1,85 +1,59 @@
 import type { FC } from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { SegmentedControl } from '@/components/ui';
+import ChevronRightIcon from '@/assets/figma/chevron-right.svg';
+import WalletIcon from '@/assets/figma/wallet.svg';
+import { EmptyState, SegmentedControl } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import ChevronRightIcon from '@/assets/figma/chevron-right.svg';
-import { useBusinessPaymentStore } from '@/services/business/useBusinessPaymentStore';
+import {
+  billingApi,
+  type PaymentHistoryItem,
+  type PaymentHistoryStatus,
+} from '@/services/billing/billingApi';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
-import type { AppScreenProps, BusinessPaymentRecord } from '@/types';
-import { formatRupees } from '@/utils/format';
+import type { AppScreenProps } from '@/types';
 
-type Filter = 'all' | 'paid' | 'pending';
+import { formatDay, formatMinor, methodKey } from './paymentHistoryFormat';
 
-const SAMPLE_PAYMENTS: BusinessPaymentRecord[] = [
-  {
-    id: 'KN-48213',
-    role: 'Café service',
-    business: 'Third Wave Coffee',
-    date: '18 Oct',
-    amount: 1890,
-    method: 'googlePay',
-    status: 'paid',
-  },
-  {
-    id: 'KN-48208',
-    role: 'Event service',
-    business: 'Third Wave Coffee',
-    date: '14 Oct',
-    amount: 3200,
-    method: 'upiQr',
-    status: 'paid',
-  },
-  {
-    id: 'KN-48197',
-    role: 'Café service',
-    business: 'Third Wave Coffee',
-    date: '10 Oct',
-    amount: 1450,
-    method: 'cards',
-    status: 'paid',
-  },
-  {
-    id: 'KN-48184',
-    role: 'Guest service',
-    business: 'Third Wave Coffee',
-    date: '8 Oct',
-    amount: 980,
-    method: 'paytm',
-    status: 'pending',
-  },
-];
+type Filter = 'all' | PaymentHistoryStatus;
 
 export const BusinessPaymentHistoryPage: FC<
   AppScreenProps<typeof ROUTES.businessPaymentHistory>
 > = ({ navigation }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const records = useBusinessPaymentStore(state => state.records);
   const [filter, setFilter] = useState<Filter>('all');
-  const allPayments = useMemo(
-    () => [...records, ...SAMPLE_PAYMENTS.filter(sample => !records.some(record => record.id === sample.id))],
-    [records],
+  const query = useApiQuery(
+    () => billingApi.history(filter === 'all' ? undefined : filter),
+    [filter],
   );
-  const visiblePayments = allPayments.filter(
-    payment => filter === 'all' || payment.status === filter,
-  );
-  const paidTotal = allPayments
-    .filter(payment => payment.status === 'paid')
-    .reduce((total, payment) => total + payment.amount, 0);
-  const pendingCount = allPayments.filter(
-    payment => payment.status === 'pending',
-  ).length;
+  const summary = query.data?.summary;
+  const items = query.data?.items ?? [];
+  const statusColor = (status: PaymentHistoryItem['status']) =>
+    status === 'paid' ? colors.success : status === 'pending' ? colors.warning : colors.textSubtle;
+  const rowMeta = (item: PaymentHistoryItem) => {
+    const method = methodKey(item.payment_method);
+    return t('businessPayment.historyMeta', {
+      date: formatDay(item.shift_starts_at),
+      method: method
+        ? t(method)
+        : t('businessPayment.workersCount', { count: item.worker_count }),
+    });
+  };
 
   return (
     <FormScreen
       onBack={navigation.goBack}
       title={t('businessPayment.historyTitle')}
       gap={12}
+      isLoading={query.isLoading}
+      busy={query.isRefreshing}
+      fillLastBlock={!items.length}
       testID="business-payment-history-page"
     >
       <View style={[styles.summary, { backgroundColor: colors.fill }]}>
@@ -87,14 +61,15 @@ export const BusinessPaymentHistoryPage: FC<
           {t('businessPayment.paidThisMonth')}
         </Text>
         <Text style={[styles.total, { color: colors.text }]}>
-          {formatRupees(paidTotal)}
+          {formatMinor(summary?.paid_this_month_minor ?? 0)}
         </Text>
-        <Text style={[styles.meta, { color: colors.textSubtle }]}>
-          {t('businessPayment.paymentCounts', {
-            paid: allPayments.length - pendingCount,
-            pending: pendingCount,
-          })}
-        </Text>
+        {summary?.pending_minor ? (
+          <Text style={[styles.meta, { color: colors.warning }]}>
+            {t('businessPayment.pendingAmount', {
+              amount: formatMinor(summary.pending_minor),
+            })}
+          </Text>
+        ) : null}
       </View>
 
       <SegmentedControl
@@ -107,81 +82,75 @@ export const BusinessPaymentHistoryPage: FC<
         onChange={setFilter}
       />
 
-      <View style={[styles.list, { borderColor: colors.border }]}>
-        {visiblePayments.map((payment, index) => (
-          <Pressable
-            key={payment.id}
-            accessibilityRole="button"
-            accessibilityLabel={t('businessPayment.openPaymentDetails', {
-              role: payment.role,
-              amount: formatRupees(payment.amount),
-            })}
-            onPress={() =>
-              navigation.navigate(ROUTES.businessPaymentDetail, { payment })
-            }
-            style={[
-              styles.row,
-              { borderBottomColor: colors.border },
-              index > 0 && {
-                borderTopWidth: StyleSheet.hairlineWidth,
-                borderTopColor: colors.border,
-              },
-            ]}
-            testID={`business-payment-history-${payment.id}`}
-          >
-            <View style={styles.copy}>
-              <Text style={[styles.role, { color: colors.text }]}>
-                {payment.role}
-              </Text>
-              <Text style={[styles.meta, { color: colors.textSubtle }]}>
-                {t('businessPayment.historyMeta', {
-                  date: payment.date,
-                  method: t(`businessPayment.methods.${payment.method}`),
-                })}
-              </Text>
-            </View>
-            <View style={styles.amountCopy}>
-              <Text style={[styles.role, { color: colors.text }]}>
-                {formatRupees(payment.amount)}
-              </Text>
-              <Text
-                style={[
-                  styles.status,
-                  {
-                    color:
-                      payment.status === 'paid'
-                        ? colors.success
-                        : colors.warning,
-                  },
-                ]}
-              >
-                {t(`businessPayment.status.${payment.status}`)}
-              </Text>
-            </View>
-            <ChevronRightIcon width={16} height={16} color={colors.textSubtle} />
-          </Pressable>
-        ))}
-      </View>
+      {query.error ? (
+        <EmptyState
+          icon={WalletIcon}
+          title={t('businessPayment.loadErrorTitle')}
+          body={query.error}
+          action={t('businessPayment.retry')}
+          onAction={query.reload}
+        />
+      ) : items.length ? (
+        <View style={[styles.list, { borderColor: colors.border }]}>
+          {items.map(item => (
+            <Pressable
+              key={item.invoice_id}
+              accessibilityRole="button"
+              accessibilityLabel={t('businessPayment.openPaymentDetails', {
+                role: item.job_title,
+                amount: formatMinor(item.total_minor),
+              })}
+              onPress={() => navigation.navigate(ROUTES.businessPaymentDetail, { item })}
+              style={[styles.row, { borderBottomColor: colors.border }]}
+              testID={`business-payment-history-${item.invoice_id}`}
+            >
+              <View style={styles.copy}>
+                <Text style={[styles.role, { color: colors.text }]} numberOfLines={1}>
+                  {item.job_title}
+                </Text>
+                <Text style={[styles.meta, { color: colors.textSubtle }]}>
+                  {rowMeta(item)}
+                </Text>
+              </View>
+              <View style={styles.amountCopy}>
+                <Text style={[styles.role, { color: colors.text }]}>
+                  {formatMinor(item.total_minor)}
+                </Text>
+                <Text style={[styles.status, { color: statusColor(item.status) }]}>
+                  {t(`businessPayment.status.${item.status}`)}
+                </Text>
+              </View>
+              <ChevronRightIcon width={16} height={16} color={colors.textSubtle} />
+            </Pressable>
+          ))}
+        </View>
+      ) : (
+        <EmptyState
+          icon={WalletIcon}
+          title={t('businessPayment.emptyTitle')}
+          body={t('businessPayment.emptyBody')}
+        />
+      )}
     </FormScreen>
   );
 };
 
 const styles = StyleSheet.create({
   summary: { borderRadius: 14, padding: 13, gap: 2 },
-  meta: { fontFamily: FONTS.regular, fontSize: 9, lineHeight: 13 },
+  meta: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15 },
   total: { fontFamily: FONTS.bold, fontSize: 22, lineHeight: 28 },
   list: { borderTopWidth: StyleSheet.hairlineWidth },
   row: {
-    minHeight: 48,
+    minHeight: 56,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 7,
+    paddingVertical: 9,
   },
-  copy: { flex: 1, gap: 1 },
-  amountCopy: { alignItems: 'flex-end', gap: 1 },
-  role: { fontFamily: FONTS.semiBold, fontSize: 10, lineHeight: 14 },
-  status: { fontFamily: FONTS.semiBold, fontSize: 8, lineHeight: 12 },
+  copy: { flex: 1, gap: 2 },
+  amountCopy: { alignItems: 'flex-end', gap: 2 },
+  role: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 18 },
+  status: { fontFamily: FONTS.semiBold, fontSize: 11, lineHeight: 15 },
 });

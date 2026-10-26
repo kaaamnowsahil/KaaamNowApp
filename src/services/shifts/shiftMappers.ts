@@ -141,6 +141,7 @@ export const toApplicant = (
       : item.shift.workplace_name,
   about: item.cover_note,
   skills: [],
+  assignmentId: item.assignment_id ?? undefined,
   distanceKm: item.distance_km ?? undefined,
 });
 
@@ -161,5 +162,6 @@ export const toRosterMember = (
   location: '',
   about: '',
   skills: [],
+  assignmentId: entry.assignment_id,
   confirmedAt: formatDateTime(entry.confirmed_at),
 });

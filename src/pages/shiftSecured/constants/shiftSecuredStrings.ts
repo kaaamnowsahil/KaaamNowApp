@@ -5,6 +5,11 @@ export const SHIFT_SECURED_STRINGS = {
   SHIFT_LEAD: 'the shift lead',
   lateCancelWindow: (hours: number) => `${hours} ${hours === 1 ? 'hour' : 'hours'}`,
   CANCEL_FAILED: 'Couldn’t cancel this shift',
+  PREVIEW_FAILED: 'Couldn’t check the cancellation fee',
+  FREE_CANCEL: 'Cancelling now is free. The seat goes back to other workers.',
+  feeCancel: (fee: string, strikes: number) =>
+    `Cancelling now costs ${fee}, taken from your next payout${strikes > 0 ? `, and adds ${strikes === 1 ? 'a strike' : `${strikes} strikes`} to your account` : ''}.`,
+  EMERGENCY: 'Emergency help',
 } as const;
 
 /** Labels are translated with shiftSecured.reasons.<id>. */

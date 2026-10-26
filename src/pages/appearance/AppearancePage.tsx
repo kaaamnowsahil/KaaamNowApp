@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Alert, View } from 'react-native';
 
 import {
+  BodyNote,
   InfoRow,
   PrimaryButton,
-  ScreenIntro,
   SecondaryButton,
 } from '@/components/ui';
 import type { ROUTES } from '@/constants/routes';
@@ -32,7 +32,8 @@ export const AppearancePage: FC<AppScreenProps<typeof ROUTES.appearance>> = ({
   return (
     <FormScreen
       onBack={navigation.goBack}
-      gap={20}
+      title={t('appearance.title')}
+      gap={14}
       testID="appearance-page"
       actions={
         <>
@@ -58,7 +59,7 @@ export const AppearancePage: FC<AppScreenProps<typeof ROUTES.appearance>> = ({
         </>
       }
     >
-      <ScreenIntro title={t('appearance.title')} subtitle={t('appearance.subtitle')} />
+      <BodyNote>{t('appearance.subtitle')}</BodyNote>
       <View>
         {options.map(option => (
           <InfoRow

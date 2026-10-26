@@ -4,10 +4,17 @@ import { StatusBar } from 'react-native';
 
 import { SPLASH_DURATION_MS, SplashPage } from '@/pages/splash/SplashPage';
 import { useAuthStore } from '@/services/auth/useAuthStore';
+import { usePushNotifications } from '@/services/push/usePushNotifications';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import { AfterLoginRoutes } from './afterLogin';
 import { BeforeLoginRoutes } from './beforeLogin';
+import { navigationRef } from './navigationRef';
+
+const PushBridge: FC = () => {
+  usePushNotifications(useAuthStore(s => s.role));
+  return null;
+};
 
 /** Root: splash, then the login stack or the app stack depending on isAuth. */
 export const AppRoutes: FC = () => {
@@ -29,7 +36,8 @@ export const AppRoutes: FC = () => {
       {isBooting || !hasHydrated ? (
         <SplashPage />
       ) : (
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
+          {isAuth ? <PushBridge /> : null}
           {isAuth ? <AfterLoginRoutes /> : <BeforeLoginRoutes />}
         </NavigationContainer>
       )}

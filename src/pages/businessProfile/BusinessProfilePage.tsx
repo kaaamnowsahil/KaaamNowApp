@@ -8,6 +8,7 @@ import GlobeIcon from '@/assets/icons/globe.svg';
 import LogOutIcon from '@/assets/icons/log-out.svg';
 import PaletteIcon from '@/assets/icons/palette.svg';
 import WalletIcon from '@/assets/figma/wallet.svg';
+import { RoleSwitchRow } from '@/components/roleSwitch/RoleSwitchRow';
 import { BrandAppBar } from '@/components/ui';
 import { TabScreen } from '@/layout/TabScreen';
 import {
@@ -45,6 +46,7 @@ export const BusinessProfilePage: FC = () => {
         title={t('businessProfile.paymentHistory')}
         onPress={profile.openPaymentHistory}
       />
+      <RoleSwitchRow />
     </SettingsGroup>,
     <SettingsGroup key="preferences" title={t('workerProfile.preferences')}>
       <SettingsRow

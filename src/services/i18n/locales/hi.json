@@ -102,7 +102,6 @@
     "themeDark": "गहरा",
     "support": "सहायता",
     "faq": "FAQ और सहायता",
-    "offline": "ऑफलाइन एक्सेस",
     "terms": "नियम और शर्तें",
     "logOut": "लॉग आउट",
     "roleLabel": "वर्कर"
@@ -125,10 +124,6 @@
   "notifications": {
     "title": "सूचनाएं",
     "empty": "अभी कोई सूचना नहीं।"
-  },
-  "offline": {
-    "title": "ऑफलाइन एक्सेस",
-    "subtitle": "डाउनलोड की गई सामग्री बिना इंटरनेट के उपलब्ध है।"
   },
   "faq": {
     "title": "FAQ और सहायता"
@@ -539,6 +534,7 @@
     "heading": "आपकी टीम एक नज़र में",
     "verifiedSubtitle": "{{business}} · सत्यापित व्यवसाय",
     "liveConfirmed": "पुष्ट लाइव शिफ्ट",
+    "confirmedWorkers": "पुष्ट कर्मचारी",
     "newApplicants": "नए आवेदन",
     "changeLocation": "व्यवसाय का स्थान बदलें: {{location}}",
     "liveNow": "अभी लाइव",
@@ -559,7 +555,7 @@
     "emptyLiveTitle": "अभी कोई लाइव शिफ्ट नहीं",
     "emptyLiveBody": "लाइव अनुरोध पोस्ट करें; 3–5 किमी के कर्मचारी तुरंत सूचना पाएँगे।",
     "emptyScheduledTitle": "अभी कोई निर्धारित शिफ्ट नहीं",
-    "emptyScheduledBody": "पहले से शिफ्ट बनाएँ ताकि 5 किमी के कर्मचारी आवेदन कर सकें।",
+    "emptyScheduledBody": "पहले से शिफ्ट बनाएँ ताकि 30 किमी के कर्मचारी आवेदन कर सकें।",
     "createShift": "+ शिफ्ट बनाएँ",
     "postLiveRequest": "+ लाइव अनुरोध पोस्ट करें",
     "tabs": {

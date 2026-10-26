@@ -27,5 +27,29 @@ target 'KaaamNow' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Dynamic frameworks don't auto-link the system frameworks react-native-image-picker uses.
+    installer.pods_project.targets.each do |target|
+      if target.name == 'react-native-razorpay'
+        target.build_configurations.each do |build_config|
+          build_config.build_settings['OTHER_LDFLAGS'] = [
+            '$(inherited)',
+            '-framework', 'Razorpay',
+            '-framework', 'RazorpayCore',
+          ]
+        end
+      end
+
+      next unless target.name == 'react-native-image-picker'
+      target.build_configurations.each do |build_config|
+        build_config.build_settings['OTHER_LDFLAGS'] = [
+          '$(inherited)',
+          '-framework', 'UniformTypeIdentifiers',
+          '-framework', 'MobileCoreServices',
+          '-framework', 'Photos',
+          '-framework', 'PhotosUI',
+        ]
+      end
+    end
   end
 end

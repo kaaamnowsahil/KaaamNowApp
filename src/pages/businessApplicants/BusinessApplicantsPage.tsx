@@ -3,10 +3,11 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import type { RouteProp } from '@react-navigation/native';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import {
     BackButton,
+    BrandAppBar,
     EmptyState,
     PrimaryButton,
     SecondaryButton,
@@ -17,7 +18,14 @@ import { TabScreen } from '@/layout/TabScreen';
 import type { TabAppNavigation } from '@/types';
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import { useTheme } from '@/theme/ThemeProvider';
-import type { TabParamList } from '@/types';
+import type { BusinessApplicant, TabParamList } from '@/types';
+
+const BOOKED_STRINGS = {
+    TITLE: 'Booked workers',
+    SUBTITLE: 'Workers book open seats directly. Tap someone to see their booking and check-in code.',
+    EMPTY_TITLE: 'No bookings yet',
+    EMPTY_BODY: 'When workers book your shifts, they’ll appear here.',
+} as const;
 
 import { ApplicantsSortSheet, BusinessApplicantRow } from './components';
 import { useBusinessApplicants } from './hooks';
@@ -28,29 +36,26 @@ export const BusinessApplicantsPage: FC = () => {
     const navigation = useNavigation<TabAppNavigation>();
     const route =
         useRoute<RouteProp<TabParamList, typeof ROUTES.businessApplicants>>();
-    const applicants = useBusinessApplicants(route.params?.status ?? 'applied');
-    const setApplicantStatus = applicants.setStatus;
+    const applicants = useBusinessApplicants('confirmed');
     useEffect(() => {
-        const requestedStatus = route.params?.status;
-        if (requestedStatus) {
-            setApplicantStatus(currentStatus =>
-                currentStatus === requestedStatus ? currentStatus : requestedStatus,
-            );
-            navigation.setParams({ status: undefined });
-        }
-    }, [navigation, route.params?.status, setApplicantStatus]);
+        if (route.params?.status) navigation.setParams({ status: undefined });
+    }, [navigation, route.params?.status]);
 
-    const openApplicant = () => {
-        if (!applicants.activeApplicant) return;
-        navigation.navigate(ROUTES.businessApplicantProfile, {
-            applicantId: applicants.activeApplicant.id,
-        });
-    };
+    const openBooking = (applicant: BusinessApplicant) =>
+        applicant.assignmentId
+            ? navigation.navigate(ROUTES.businessScheduledWorkerTracking, {
+                  assignmentId: applicant.assignmentId,
+              })
+            : navigation.navigate(ROUTES.businessApplicantProfile, { applicantId: applicant.id });
 
     const openRoster = () => navigation.navigate(ROUTES.businessRoster);
 
     const header = (
-        <>
+        <BrandAppBar onBellPress={() => navigation.navigate(ROUTES.notifications)} />
+    );
+
+    const blocks = [
+        <View key="back" style={styles.backRow}>
             <BackButton onPress={() => navigation.navigate(ROUTES.businessLive)} />
             <Text accessibilityRole="header" style={[styles.headerTitle, { color: colors.text }]}>
                 {t('businessApplicants.headerTitle')}
@@ -58,40 +63,20 @@ export const BusinessApplicantsPage: FC = () => {
             <Text style={[styles.headerTag, { color: colors.textSubtle }]}>
                 {t('businessApplicants.headerTag')}
             </Text>
-        </>
-    );
-
-    const blocks = [
-        <Text key="title" accessibilityRole="header" style={[styles.title, { color: colors.text }]}>
-            {t('businessApplicants.title')}
-        </Text>,
-        <View key="tabs" style={[styles.tabs, { backgroundColor: colors.fill, borderColor: colors.border }]}>
-            {(['applied', 'selected', 'confirmed'] as const).map(status => {
-                const active = applicants.status === status;
-                return (
-                    <Pressable
-                        key={status}
-                        accessibilityRole="tab"
-                        accessibilityState={{ selected: active }}
-                        onPress={() => applicants.setStatus(status)}
-                        style={[styles.tab, active && { backgroundColor: colors.primary }]}
-                    >
-                        <Text style={{ color: active ? colors.onPrimary : colors.textMuted }}>
-                            {t(`businessApplicants.tabs.${status}`)}
-                        </Text>
-                    </Pressable>
-                );
-            })}
         </View>,
+        <Text key="title" accessibilityRole="header" style={[styles.title, { color: colors.text }]}>
+            {BOOKED_STRINGS.TITLE}
+        </Text>,
+        <Text key="subtitle" style={[styles.subtitle, { color: colors.textSubtle }]}>
+            {BOOKED_STRINGS.SUBTITLE}
+        </Text>,
         ...(applicants.applicants.length
             ? applicants.applicants.map((applicant, index) => (
                   <BusinessApplicantRow
                       key={applicant.id}
                       applicant={applicant}
                       isLast={index === applicants.applicants.length - 1}
-                      onPress={() => navigation.navigate(ROUTES.businessApplicantProfile, {
-                          applicantId: applicant.id,
-                      })}
+                      onPress={() => openBooking(applicant)}
                   />
               ))
             : applicants.error
@@ -109,8 +94,8 @@ export const BusinessApplicantsPage: FC = () => {
                   <EmptyState
                       key="empty"
                       icon={CalendarDaysIcon}
-                      title={t('businessApplicants.emptyTitle')}
-                      body={t('businessApplicants.emptyBody')}
+                      title={BOOKED_STRINGS.EMPTY_TITLE}
+                      body={BOOKED_STRINGS.EMPTY_BODY}
                   />,
               ]),
     ];
@@ -127,20 +112,8 @@ export const BusinessApplicantsPage: FC = () => {
                 actions={
                     <View style={styles.actions}>
                         <PrimaryButton
-                            label={t(
-                                applicants.status === 'confirmed'
-                                    ? 'businessShifts.rosterTitle'
-                                    : 'businessApplicantProfile.reviewApplicant',
-                            )}
-                            onPress={
-                                applicants.status === 'confirmed'
-                                    ? openRoster
-                                    : openApplicant
-                            }
-                            disabled={
-                                applicants.status !== 'confirmed' &&
-                                !applicants.activeApplicant
-                            }
+                            label={t('businessShifts.rosterTitle')}
+                            onPress={openRoster}
                         />
                         <SecondaryButton
                             label={t('businessApplicants.filterSort')}
@@ -164,10 +137,10 @@ export const BusinessApplicantsPage: FC = () => {
 };
 
 const styles = StyleSheet.create({
+    backRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 6 },
     headerTitle: { flex: 1, fontFamily: FONTS.semiBold, fontSize: 14, lineHeight: 21 },
     headerTag: { fontFamily: FONTS.regular, fontSize: 10, lineHeight: 15 },
     title: { fontFamily: FONTS.bold, fontSize: 18, lineHeight: 25 },
-    tabs: { flexDirection: 'row', gap: 4, padding: 4, borderWidth: 1, borderRadius: 10 },
-    tab: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 34, borderRadius: 7 },
+    subtitle: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
     actions: { gap: 8 },
 });

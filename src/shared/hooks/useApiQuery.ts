@@ -3,8 +3,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { errorMessage } from '@/services/api/apiClient';
 
+type ApiQueryOptions = {
+  /** Silently reloads on this interval while the screen is focused. */
+  pollIntervalMs?: number;
+};
+
 /** Loads on mount and whenever the screen regains focus; the loader shows only until the first result. */
-export const useApiQuery = <T>(load: () => Promise<T>, deps: unknown[]) => {
+export const useApiQuery = <T>(
+  load: () => Promise<T>,
+  deps: unknown[],
+  { pollIntervalMs }: ApiQueryOptions = {},
+) => {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -47,6 +56,14 @@ export const useApiQuery = <T>(load: () => Promise<T>, deps: unknown[]) => {
       }
       run('silent');
     }, [run]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!pollIntervalMs) return undefined;
+      const timer = setInterval(() => run('silent'), pollIntervalMs);
+      return () => clearInterval(timer);
+    }, [pollIntervalMs, run]),
   );
 
   return {

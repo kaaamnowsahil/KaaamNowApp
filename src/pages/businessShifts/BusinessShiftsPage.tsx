@@ -1,6 +1,7 @@
 import type { FC } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
-import { Alert } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import {
@@ -10,8 +11,10 @@ import {
   SectionHeading,
   ScreenIntro,
 } from '@/components/ui';
+import { ROUTES } from '@/constants/routes';
 import { TabScreen } from '@/layout/TabScreen';
-import { BusinessShiftCard } from '@/pages/businessLive/components';
+import type { TabAppNavigation } from '@/types';
+import { BusinessIdentity, BusinessShiftCard } from '@/pages/businessLive/components';
 import {
   formatDateLabel,
   formatTimeRange,
@@ -19,31 +22,26 @@ import {
 
 import { BusinessDraftCard, BusinessRosterCard } from './components';
 import { useBusinessShifts } from './hooks';
+import { UNPAID_STRINGS } from './hooks/useBusinessShifts';
 
 export const BusinessShiftsPage: FC = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation<TabAppNavigation>();
   const shifts = useBusinessShifts();
   const hasAnyShift =
     shifts.liveShifts.length +
       shifts.scheduledShifts.length +
+      shifts.unpaidShifts.length +
       shifts.drafts.length >
     0;
 
   const blocks = [
-    <ScreenIntro
-      key="intro"
-      title={t('businessShifts.title')}
-      subtitle={
-        shifts.businessName
-          ? t(
-              shifts.isVerified
-                ? 'businessDashboard.verifiedSubtitle'
-                : 'businessDashboard.unverifiedSubtitle',
-              { business: shifts.businessName },
-            )
-          : undefined
-      }
-    />,
+    <View key="intro" style={styles.intro}>
+      <ScreenIntro title={t('businessShifts.title')} />
+      {shifts.businessName ? (
+        <BusinessIdentity businessName={shifts.businessName} isVerified={shifts.isVerified} />
+      ) : null}
+    </View>,
     ...(shifts.error
       ? [
           <EmptyState
@@ -79,6 +77,22 @@ export const BusinessShiftsPage: FC = () => {
                     businessName={shifts.businessName}
                     isVerified={shifts.isVerified}
                     onPress={() => shifts.openShift(item)}
+                  />
+                )),
+              ]
+            : []),
+          ...(shifts.unpaidShifts.length
+            ? [
+                <SectionHeading key="unpaid-heading" title={UNPAID_STRINGS.heading} />,
+                ...shifts.unpaidShifts.map(item => (
+                  <BusinessDraftCard
+                    key={item.id}
+                    title={item.job_title}
+                    status={UNPAID_STRINGS.status}
+                    date={`${formatDateLabel(
+                      item.starts_at,
+                    )} · ${formatTimeRange(item.starts_at, item.ends_at)}`}
+                    onPress={() => shifts.payDeposit(item)}
                   />
                 )),
               ]
@@ -135,7 +149,7 @@ export const BusinessShiftsPage: FC = () => {
   return (
     <TabScreen
       header={
-        <BrandAppBar onBellPress={() => Alert.alert(t('common.comingSoon'))} />
+        <BrandAppBar onBellPress={() => navigation.navigate(ROUTES.notifications)} />
       }
       blocks={blocks}
       gap={12}
@@ -152,3 +166,7 @@ export const BusinessShiftsPage: FC = () => {
     />
   );
 };
+
+const styles = StyleSheet.create({
+  intro: { gap: 4 },
+});

@@ -44,19 +44,21 @@ export const BackButton: FC<{
 };
 
 /** Figma "Screen introduction" (1:61): 25px bold title + 15px muted subtitle. */
-export const ScreenIntro: FC<{ title: string; subtitle?: string }> = ({
+export const ScreenIntro: FC<{ title?: string; subtitle?: string }> = ({
   title,
   subtitle,
 }) => {
   const { colors } = useTheme();
   return (
     <View style={styles.intro}>
-      <Text
-        accessibilityRole="header"
-        style={[styles.introTitle, { color: colors.text }]}
-      >
-        {title}
-      </Text>
+      {title ? (
+        <Text
+          accessibilityRole="header"
+          style={[styles.introTitle, { color: colors.text }]}
+        >
+          {title}
+        </Text>
+      ) : null}
       {subtitle ? (
         <Text style={[styles.introSubtitle, { color: colors.textMuted }]}>
           {subtitle}

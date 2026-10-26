@@ -13,16 +13,20 @@ export const OutlineButton: FC<{
   onPress: () => void;
   /** `primary` draws a purple outline (empty states); default is the card border. */
   tone?: 'neutral' | 'primary';
+  disabled?: boolean;
   testID?: string;
-}> = ({ label, onPress, tone = 'neutral', testID }) => {
+}> = ({ label, onPress, tone = 'neutral', disabled = false, testID }) => {
   const { colors } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
       testID={testID}
       style={({ pressed }) => [
         styles.button,
+        disabled && styles.disabled,
         {
           borderColor: tone === 'primary' ? colors.primary : colors.border,
           backgroundColor: pressed ? colors.primarySoft : 'transparent',
@@ -43,5 +47,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
+  disabled: { opacity: 0.5 },
   label: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 18.2 },
 });

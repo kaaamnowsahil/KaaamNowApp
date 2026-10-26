@@ -1,5 +1,3 @@
-export const ALL_CATEGORIES_ID = 'all';
-
 export const ANY_ID = 'any';
 
 /** Filter sheet options. `max`/`min` are read by the filter logic. */

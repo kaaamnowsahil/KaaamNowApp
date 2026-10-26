@@ -10,7 +10,6 @@ import {
   BrandAppBar,
   EmptyState,
   ScreenIntro,
-  SectionHeading,
   SegmentedControl,
 } from '@/components/ui';
 import { ShiftCard } from '@/components/shift';
@@ -19,9 +18,10 @@ import { TabScreen } from '@/layout/TabScreen';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import {
-  CategoryTabs,
+  AvailabilityCard,
   FilterSheet,
   LocationDropdown,
+  LocationPromptSheet,
 } from './components';
 import { WORKER_HOME_STRINGS } from './constants';
 import { useWorkerHome } from './hooks/useWorkerHome';
@@ -45,7 +45,13 @@ export const WorkerHomePage: FC = () => {
           ? t('workerHome.greeting', { name: home.firstName })
           : WORKER_HOME_STRINGS.GREETING_FALLBACK
       }
-      subtitle={WORKER_HOME_STRINGS.SUBTITLE}
+    />,
+    <AvailabilityCard
+      key="availability"
+      isAvailable={home.isAvailable}
+      isPending={home.availabilityPending}
+      error={home.availabilityError}
+      onToggle={home.toggleAvailability}
     />,
     <LocationDropdown
       key="location"
@@ -109,12 +115,6 @@ export const WorkerHomePage: FC = () => {
       value={home.status}
       onChange={home.setStatus}
     />,
-    <CategoryTabs
-      key="categories"
-      options={home.categories}
-      value={home.categoryId}
-      onChange={home.setCategoryId}
-    />,
     ...(home.error && !home.nearby.length
       ? [
         <EmptyState
@@ -129,12 +129,6 @@ export const WorkerHomePage: FC = () => {
       ]
       : home.nearby.length
         ? [
-          <SectionHeading
-            key="nearby"
-            title={t('workerHome.nearbyShifts')}
-            action={home.status === 'scheduled' ? WORKER_HOME_STRINGS.SEE_ALL : undefined}
-            onAction={home.status === 'scheduled' ? home.openAllShifts : undefined}
-          />,
           ...home.nearby.map(shift => (
             <ShiftCard
               key={shift.id}
@@ -150,9 +144,7 @@ export const WorkerHomePage: FC = () => {
             title={emptyState.title}
             body={emptyState.body}
             action={emptyState.action}
-            onAction={
-              home.status === 'live' ? home.showScheduled : home.clearFilters
-            }
+            onAction={home.status === 'live' ? home.showScheduled : undefined}
             testID={`home-empty-${home.status}`}
           />,
         ]),
@@ -177,6 +169,14 @@ export const WorkerHomePage: FC = () => {
           businessTypes={home.businessTypes}
           onApply={home.applyFilters}
           onClose={home.closeFilters}
+        />
+      ) : null}
+      {home.isLocationPromptOpen ? (
+        <LocationPromptSheet
+          isPending={home.availabilityPending}
+          error={home.availabilityError}
+          onShare={home.shareLocationAndGoOnline}
+          onClose={home.closeLocationPrompt}
         />
       ) : null}
     </>

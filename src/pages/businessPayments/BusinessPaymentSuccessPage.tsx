@@ -47,10 +47,15 @@ export const BusinessPaymentSuccessPage: FC<
     (payment?.workerId ? [payment.workerId] : []);
   const amount = payment?.amount ?? 0;
   const method = t(`businessPayment.methods.${route.params.method}`);
+  const openHistory = () =>
+    navigation.navigate(ROUTES.mainTabs, {
+      screen: ROUTES.businessProfile,
+      params: { screen: ROUTES.businessPaymentHistory },
+    });
 
   return (
     <FormScreen
-      onBack={() => navigation.navigate(ROUTES.businessPaymentHistory)}
+      onBack={() => openHistory()}
       title={t('businessPayment.successTitle')}
       gap={14}
       testID="business-payment-success-page"
@@ -80,7 +85,7 @@ export const BusinessPaymentSuccessPage: FC<
           ) : null}
           <PrimaryButton
             label={t('businessPayment.paymentHistory')}
-            onPress={() => navigation.navigate(ROUTES.businessPaymentHistory)}
+            onPress={() => openHistory()}
           />
           <SecondaryButton
             label={t('businessPayment.backToBusiness')}

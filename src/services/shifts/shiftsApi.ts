@@ -3,6 +3,7 @@ import { apiRequest } from '@/services/api/apiClient';
 export type ApiShiftType = 'live' | 'scheduled';
 export type ApiShiftStatus =
   | 'draft'
+  | 'awaiting_payment'
   | 'searching'
   | 'open'
   | 'filled'
@@ -101,6 +102,16 @@ export type RatingView = {
   created_at: string;
 };
 
+export type ShiftExtension = {
+  id: string;
+  extra_minutes: number;
+  status: 'requested' | 'accepted' | 'declined' | 'cancelled' | 'expired';
+  requested_at: string;
+  responded_at?: string | null;
+};
+
+export type EndedReason = 'scheduled_end' | 'mutual' | 'business_stopped' | 'worker_left';
+
 export type AssignmentDetail = {
   id: string;
   status: string;
@@ -114,6 +125,42 @@ export type AssignmentDetail = {
   ratings?: RatingView[];
   can_rate?: boolean;
   check_in_opens_at: string;
+  /** Per-booking code; only the business sees it. */
+  check_in_code?: string | null;
+  /** Booked end plus accepted extensions. */
+  ends_at: string;
+  extended_minutes: number;
+  /** End time reached: either side may end without a PIN. */
+  can_end: boolean;
+  ended_reason?: EndedReason | null;
+  early_end_requested_by?: Party | null;
+  /** Shown only to the side that did NOT ask to end early. */
+  early_end_pin?: string | null;
+  pending_extension?: ShiftExtension | null;
+};
+
+export type CancellationQuote = {
+  party: 'worker' | 'business' | 'system';
+  event: 'cancel' | 'no_show' | 'walk_off' | 'unfilled';
+  hours_before: number;
+  booking_minor: number;
+  fee_minor: number;
+  worker_compensation_minor: number;
+  business_refund_minor: number;
+  strike_weight: number;
+  business_voucher: boolean;
+  seat_reopens: boolean;
+  currency: string;
+};
+
+export type ShiftCancelPreview = {
+  shift_id: string;
+  booked_workers: number;
+  fee_minor: number;
+  worker_compensation_minor: number;
+  business_refund_minor: number;
+  currency: string;
+  seats: CancellationQuote[];
 };
 
 export type ApplicationResponse = {
@@ -124,6 +171,30 @@ export type ApplicationResponse = {
   assignment_id?: string | null;
 };
 
+export type CancellationTier = {
+  party: 'business' | 'worker';
+  event: 'cancel' | 'no_show' | 'walk_off';
+  hours_from: number;
+  hours_to: number | null;
+  flat_fee_minor: number;
+  booking_pct: number;
+  fee_cap_minor: number | null;
+  worker_share_pct: number;
+  strike_weight: number;
+  business_voucher: boolean;
+};
+
+export type CancellationPolicy = {
+  version: number;
+  strike_window_days: number;
+  strikes_to_limit: number;
+  limit_days: number;
+  strikes_to_ban: number;
+  voucher_valid_days: number;
+  unfilled_cutoff_hours: number;
+  tiers: CancellationTier[];
+};
+
 export type ShiftCostEstimate = {
   currency: string;
   paid_minutes_per_worker: number;
@@ -132,7 +203,14 @@ export type ShiftCostEstimate = {
   worker_subtotal_minor: number;
   fee_percentage: number;
   platform_fee_minor: number;
+  gateway_fee_percentage: number;
+  gateway_fee_minor: number;
   total_minor: number;
+  worker_fee_percentage: number;
+  worker_fee_per_worker_minor: number;
+  worker_net_per_worker_minor: number;
+  promo_code?: string | null;
+  promo_discount_minor: number;
 };
 
 export type BusinessShiftGroup =
@@ -162,6 +240,8 @@ export type BusinessShiftItem = {
   workplace_name: string;
   address_text: string;
   invoice_status?: string | null;
+  deposit_invoice_id?: string | null;
+  deposit_status?: string | null;
   group: BusinessShiftGroup;
 };
 
@@ -197,6 +277,8 @@ export type BusinessApplicantItem = {
   distance_km?: number | null;
   cover_note: string;
   worker: WorkerSummary;
+  /** Set once the seat is booked. */
+  assignment_id?: string | null;
   shift: {
     id: string;
     shift_type: string;
@@ -218,6 +300,9 @@ export type RosterEntry = {
   travel_started_at?: string | null;
   worker: WorkerSummary;
   attendance?: AttendanceSummary | null;
+  check_in_code?: string | null;
+  extended_minutes: number;
+  ended_reason?: EndedReason | null;
 };
 
 export type Roster = {
@@ -267,6 +352,8 @@ export const shiftsApi = {
     apiRequest<AssignmentDetail>('GET', `/assignments/${assignmentId}`),
   startTravel: (assignmentId: string) =>
     apiRequest<AssignmentDetail>('POST', `/worker/assignments/${assignmentId}/start-travel`),
+  cancelPreview: (assignmentId: string) =>
+    apiRequest<CancellationQuote>('GET', `/worker/assignments/${assignmentId}/cancel-preview`),
   cancelAssignment: (assignmentId: string, reason: string) =>
     apiRequest<AssignmentDetail>('POST', `/worker/assignments/${assignmentId}/cancel`, {
       body: { reason },
@@ -293,6 +380,8 @@ export const shiftsApi = {
         query: { direction },
       })
     ).flatMap(group => group.tags),
+  cancellationPolicy: () =>
+    apiRequest<CancellationPolicy>('GET', '/catalog/cancellation-policy'),
   tracking: (assignmentId: string) =>
     apiRequest<{ distance_km?: number | null; eta_minutes?: number | null }>(
       'GET',
@@ -312,8 +401,19 @@ export const shiftsApi = {
   // business
   businessShifts: (query: { shift_type?: ApiShiftType; group?: BusinessShiftGroup }) =>
     apiRequest<ShiftPage>('GET', '/business/shifts', { query: { ...query, limit: 100 } }),
-  createBulk: (body: { publish: boolean; shifts: ShiftBulkItem[] }) =>
-    apiRequest<{ items: { id: string }[] }>('POST', '/business/shifts/bulk', { body }),
+  estimate: (body: {
+    hourly_rate_minor: number;
+    workers_required: number;
+    starts_at: string;
+    ends_at: string;
+    break_minutes?: number;
+    promo_code?: string;
+  }) => apiRequest<ShiftCostEstimate>('POST', '/business/shifts/estimate', { body }),
+  /** Published scheduled shifts wait in awaiting_payment until their deposit invoice is paid. */
+  createBulk: (body: { publish: boolean; promo_code?: string; shifts: ShiftBulkItem[] }) =>
+    apiRequest<{
+      items: { id: string; status: ApiShiftStatus; deposit_invoice_id?: string | null }[];
+    }>('POST', '/business/shifts/bulk', { body }),
   cancelShift: (shiftId: string, reason: string) =>
     apiRequest<unknown>('POST', `/business/shifts/${shiftId}/cancel`, { body: { reason } }),
   publishShift: (shiftId: string) =>
@@ -327,4 +427,42 @@ export const shiftsApi = {
   rejectApplicant: (applicationId: string) =>
     apiRequest<unknown>('POST', `/business/applications/${applicationId}/reject`),
   roster: (shiftId: string) => apiRequest<Roster>('GET', `/business/shifts/${shiftId}/roster`),
+
+  // day of shift; `party` picks the /worker or /business route
+  requestEarlyEnd: (party: Party, assignmentId: string) =>
+    apiRequest<AssignmentDetail>('POST', `/${party}/assignments/${assignmentId}/early-end/request`),
+  endEarly: (party: Party, assignmentId: string, pin: string) =>
+    apiRequest<AssignmentDetail>('POST', `/${party}/assignments/${assignmentId}/early-end`, {
+      body: { pin },
+    }),
+  acceptExtension: (assignmentId: string, extensionId: string) =>
+    apiRequest<AssignmentDetail>(
+      'POST',
+      `/worker/assignments/${assignmentId}/extensions/${extensionId}/accept`,
+    ),
+  declineExtension: (assignmentId: string, extensionId: string) =>
+    apiRequest<AssignmentDetail>(
+      'POST',
+      `/worker/assignments/${assignmentId}/extensions/${extensionId}/decline`,
+    ),
+  businessEnd: (assignmentId: string) =>
+    apiRequest<AssignmentDetail>('POST', `/business/assignments/${assignmentId}/end`),
+  stopWork: (assignmentId: string, reason: 'business_stopped' | 'worker_left', note = '') =>
+    apiRequest<AssignmentDetail>('POST', `/business/assignments/${assignmentId}/stop`, {
+      body: { reason, note },
+    }),
+  requestExtension: (assignmentId: string, extraMinutes: number) =>
+    apiRequest<ShiftExtension>('POST', `/business/assignments/${assignmentId}/extensions`, {
+      body: { extra_minutes: extraMinutes },
+    }),
+  businessCancelAssignment: (assignmentId: string, reason: string) =>
+    apiRequest<unknown>('POST', `/business/assignments/${assignmentId}/cancel`, {
+      body: { reason },
+    }),
+  businessCancelPreview: (assignmentId: string) =>
+    apiRequest<CancellationQuote>('GET', `/business/assignments/${assignmentId}/cancel-preview`),
+  shiftCancelPreview: (shiftId: string) =>
+    apiRequest<ShiftCancelPreview>('GET', `/business/shifts/${shiftId}/cancel-preview`),
 };
+
+export type Party = 'worker' | 'business';

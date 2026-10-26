@@ -58,6 +58,7 @@ export const BusinessShiftCalendar: FC<BusinessShiftCalendarProps> = ({
   }).format(month);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  today.setDate(today.getDate() + 1);
 
   const changeMonth = (amount: number) => {
     setMonth(
@@ -107,7 +108,7 @@ export const BusinessShiftCalendar: FC<BusinessShiftCalendarProps> = ({
           const date = new Date(month.getFullYear(), month.getMonth(), day);
           const dateString = toLocalDateString(date);
           const isSelected = value.includes(dateString);
-          const isPast = date < today;
+          const isPast = date <= today;
           return (
             <Pressable
               key={dateString}

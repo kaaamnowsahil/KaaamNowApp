@@ -37,6 +37,9 @@ PODS:
   - hermes-engine (260318099.0.4):
     - hermes-engine/Pre-built (= 260318099.0.4)
   - hermes-engine/Pre-built (260318099.0.4)
+  - razorpay-core-pod (1.0.9)
+  - razorpay-pod (1.5.8):
+    - razorpay-core-pod (= 1.0.9)
   - RCT-Folly (2024.11.18.00):
     - RCT-Folly/Default (= 2024.11.18.00)
     - ReactNativeDependencies
@@ -1418,6 +1421,30 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - react-native-razorpay (3.0.0):
+    - hermes-engine
+    - razorpay-pod
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - react-native-safe-area-context (5.10.1):
     - hermes-engine
     - RCTRequired
@@ -1481,6 +1508,29 @@ PODS:
     - React-ImageManager
     - React-jsi
     - react-native-safe-area-context/common
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
+  - react-native-webview (14.0.1):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1929,6 +1979,30 @@ PODS:
     - ReactNativeDependencies
     - RNFBApp
     - Yoga
+  - RNFBMessaging (27.0.0):
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-bridging
+    - React-Core
+    - React-Core-prebuilt
+    - React-cxxstableapi
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - RNFBApp
+    - Yoga
   - RNKeychain (10.0.0):
     - hermes-engine
     - RCTRequired
@@ -2105,7 +2179,9 @@ DEPENDENCIES:
   - React-mutationobservernativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/mutationobserver`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-razorpay (from `../node_modules/react-native-razorpay`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-networking (from `../node_modules/react-native/ReactCommon/react/networking`)
   - React-oscompat (from `../node_modules/react-native/ReactCommon/oscompat`)
@@ -2145,11 +2221,17 @@ DEPENDENCIES:
   - ReactNativeDependencies (from `../node_modules/react-native/third-party-podspecs/ReactNativeDependencies.podspec`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
+  - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - SocketRocket (from `build/rndeps-facades/SocketRocket`)
   - Yoga (from `build/rncore-facades/Yoga`)
+
+SPEC REPOS:
+  trunk:
+    - razorpay-core-pod
+    - razorpay-pod
 
 EXTERNAL SOURCES:
   AsyncStorage:
@@ -2253,8 +2335,12 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/geolocation"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-razorpay:
+    :path: "../node_modules/react-native-razorpay"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-webview:
+    :path: "../node_modules/react-native-webview"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-networking:
@@ -2333,6 +2419,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/app"
   RNFBAuth:
     :path: "../node_modules/@react-native-firebase/auth"
+  RNFBMessaging:
+    :path: "../node_modules/@react-native-firebase/messaging"
   RNKeychain:
     :path: "../node_modules/react-native-keychain"
   RNScreens:
@@ -2353,6 +2441,8 @@ SPEC CHECKSUMS:
   fmt: ba0886e864ebb21d14c98b2e12e164b8002f5b93
   glog: 3cf7cb46f743c4bc758ae3e6d9c15bd1b4cfd6d4
   hermes-engine: a1158910bb7e300b9e3d2f1e2d433f817ec1a4b5
+  razorpay-core-pod: 7ecea8ed3c47751e6a958f6c88126ea068f8c8fc
+  razorpay-pod: 3fc296eacb28a059c55144286ea7c04d33d894f5
   RCT-Folly: 82921e585c0400eda46fac1068297aa9dfb035e4
   RCTDeprecation: e134f2a2c096a6450f5fcbbe949531f913a2ff04
   RCTRequired: f1a68295837ee8f91e112ed1b5694d12e7ff1784
@@ -2363,7 +2453,7 @@ SPEC CHECKSUMS:
   React-bridging: 7c54be133225720d355418ec645943262a1aa5bb
   React-callinvoker: b76a26472ac4f42362f18393379740ea003b2bc6
   React-Core: a831be15fcea0e345a24cb10d6cc0b87e9913d03
-  React-Core-prebuilt: 9e4e8e87cae574b60a941e4ce6b621911e4d5cf3
+  React-Core-prebuilt: 0fd2555a42f40e7770ced1c7dfc5ee1dbfe041cd
   React-CoreModules: a86fbe698fd817c17b3936832dc1106a130c4694
   React-cxxreact: 48ca56bd4f26de869478a803a5544b101a57cde6
   React-cxxstableapi: fea1bdba65658838a2582e2d211fc5b0fd1d31d8
@@ -2395,7 +2485,9 @@ SPEC CHECKSUMS:
   React-mutationobservernativemodule: 7284a91b3c7d7fb85b5d4ac04f7f8da811b22977
   react-native-geolocation: 2c5f29e0098223d8fa2c18813f6acbf882563424
   react-native-image-picker: 013a2ce199129e2cb46ab064d34242a9f086d879
+  react-native-razorpay: 0592aa32d055fc3591f77614ee364105dedd621f
   react-native-safe-area-context: 7b143af09becaf26ba247b9a82d355f91b77b9b0
+  react-native-webview: 0350e63d9eff606d9923619409987b6cd1ac58f5
   React-NativeModulesApple: 52f3def085f129de1307e3eb78e26729ff70f421
   React-networking: e97a095de90a95bf811b887e2dfdb225f20fd493
   React-oscompat: 6865eead03a4aeba8d15b74cf168c7db3377cb63
@@ -2435,12 +2527,13 @@ SPEC CHECKSUMS:
   ReactNativeDependencies: d3b7423ba1e52525e42085c8470109abde583d2e
   RNFBApp: b62f31e8023bc43afe0b5151fa10ebeab4865444
   RNFBAuth: 5d3f2bec192496301932d13383fce19dc16349e0
+  RNFBMessaging: 3913af05e078b48b07ad03496c85595a0add2666
   RNKeychain: c151043ce48ce98b038cff539b916f5e2fb7456a
   RNScreens: 96c6d636ee9b2b4c3f062db05eecc59217e7f7df
   RNSVG: c3f9498aa208ae99a217dd3d698251677b224890
   SocketRocket: 37aec555668fb852ec12e3c0de59a86ca58f0871
   Yoga: d1c536142c5ff8ec8cd856ab2a7c227a1d875c8e
 
-PODFILE CHECKSUM: 64c69abdd19df4980cfd49e6d1db22aeb95d27a9
+PODFILE CHECKSUM: 71befbb998ff1fdddc7c6bf270210eb6831f87ee
 
 COCOAPODS: 1.16.2

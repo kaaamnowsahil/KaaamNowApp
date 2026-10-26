@@ -3,24 +3,26 @@ import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { SvgProps } from 'react-native-svg';
 
+import BuildingIcon from '@/assets/figma/building-2.svg';
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import HouseIcon from '@/assets/figma/house.svg';
 import UserRoundIcon from '@/assets/figma/user-round.svg';
-import UserIcon from '@/assets/figma/user.svg';
+import UsersRoundIcon from '@/assets/figma/users-round.svg';
 import WalletIcon from '@/assets/figma/wallet.svg';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { BusinessLivePage } from '@/pages/businessLive/BusinessLivePage';
 import { BusinessShiftsPage } from '@/pages/businessShifts/BusinessShiftsPage';
 import { BusinessApplicantsPage } from '@/pages/businessApplicants/BusinessApplicantsPage';
-import { BusinessProfilePage } from '@/pages/businessProfile/BusinessProfilePage';
-import { WorkerEarningsPage } from '@/pages/workerEarnings/WorkerEarningsPage';
 import { WorkerHomePage } from '@/pages/workerHome/WorkerHomePage';
-import { WorkerProfilePage } from '@/pages/workerProfile/WorkerProfilePage';
 import { WorkerShiftsPage } from '@/pages/workerShifts/WorkerShiftsPage';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { TabParamList } from '@/types';
+
+import { BusinessProfileStack } from './businessProfileStack';
+import { WorkerEarningsStack } from './workerEarningsStack';
+import { WorkerProfileStack } from './workerProfileStack';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -53,13 +55,13 @@ const WORKER_TABS: TabDef[] = [
   {
     name: ROUTES.workerEarnings,
     title: 'Earnings',
-    component: WorkerEarningsPage,
+    component: WorkerEarningsStack,
     icon: tabIcon(WalletIcon),
   },
   {
     name: ROUTES.workerProfile,
     title: 'Profile',
-    component: WorkerProfilePage,
+    component: WorkerProfileStack,
     icon: tabIcon(UserRoundIcon),
   },
 ];
@@ -81,13 +83,13 @@ const BUSINESS_TABS: TabDef[] = [
     name: ROUTES.businessApplicants,
     title: 'applicants',
     component: BusinessApplicantsPage,
-    icon: tabIcon(UserRoundIcon),
+    icon: tabIcon(UsersRoundIcon),
   },
   {
     name: ROUTES.businessProfile,
     title: 'profile',
-    component: BusinessProfilePage,
-    icon: tabIcon(UserIcon),
+    component: BusinessProfileStack,
+    icon: tabIcon(BuildingIcon),
   },
 ];
 

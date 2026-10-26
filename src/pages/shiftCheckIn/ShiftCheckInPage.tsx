@@ -134,10 +134,13 @@ export const ShiftCheckInPage: FC<
             accessibilityLabel={t('workerFlow.checkIn.codeLabel')}
             value={code}
             onChangeText={v => {
-              setCode(v.replace(/\D/g, '').slice(0, CHECK_IN_STRINGS.CODE_LENGTH));
+              setCode(
+                v.replace(/[^0-9a-z]/gi, '').toUpperCase().slice(0, CHECK_IN_STRINGS.CODE_LENGTH),
+              );
               setIsWrong(false);
             }}
-            keyboardType="number-pad"
+            autoCapitalize="characters"
+            autoCorrect={false}
             placeholder={t('workerFlow.checkIn.codePlaceholder')}
             placeholderTextColor={colors.textSubtle}
             style={[

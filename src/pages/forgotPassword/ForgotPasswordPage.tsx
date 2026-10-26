@@ -92,6 +92,7 @@ export const ForgotPasswordPage: FC<
     <FormScreen
       busy={busy}
       onBack={navigation.goBack}
+      title={t(complete ? 'auth.resetComplete' : 'auth.forgotPassword')}
       testID="forgot-password-page"
       actions={
         complete ? undefined : (
@@ -116,7 +117,6 @@ export const ForgotPasswordPage: FC<
       }
     >
       <ScreenIntro
-        title={t(complete ? 'auth.resetComplete' : 'auth.forgotPassword')}
         subtitle={t(complete ? 'auth.resetSuccess' : 'auth.forgotSubtitle')}
       />
       {complete ? null : (

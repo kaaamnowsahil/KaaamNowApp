@@ -10,12 +10,15 @@ type BusinessDraftCardProps = {
   title: string;
   date: string;
   onPress: () => void;
+  /** Defaults to the "Draft" label. */
+  status?: string;
 };
 
 export const BusinessDraftCard: FC<BusinessDraftCardProps> = ({
   title,
   date,
   onPress,
+  status,
 }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -32,7 +35,7 @@ export const BusinessDraftCard: FC<BusinessDraftCardProps> = ({
     >
       <View style={styles.copy}>
         <Text style={[styles.status, { color: colors.primary }]}>
-          {t('businessShiftCreate.draftStatus')}
+          {status ?? t('businessShiftCreate.draftStatus')}
         </Text>
         <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
         <Text style={[styles.meta, { color: colors.textSubtle }]}>{date}</Text>
