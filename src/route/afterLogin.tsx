@@ -17,22 +17,13 @@ import { BusinessRosterPage } from '@/pages/businessApplicants/BusinessRosterPag
 import { BusinessWorkerProfilePage } from '@/pages/businessApplicants/BusinessWorkerProfilePage';
 import { BusinessScheduledWorkerTrackingPage } from '@/pages/businessApplicants/BusinessScheduledWorkerTrackingPage';
 import { BusinessRateWorkerPage } from '@/pages/businessApplicants/BusinessRateWorkerPage';
-import { BusinessLiveCreatePage } from '@/pages/businessLive/BusinessLiveCreatePage';
-import { BusinessLiveReviewPage } from '@/pages/businessLive/BusinessLiveReviewPage';
-import { BusinessLiveFindingPage } from '@/pages/businessLive/BusinessLiveFindingPage';
-import { BusinessLiveStaffingPage } from '@/pages/businessLive/BusinessLiveStaffingPage';
-import { BusinessLiveAcceptedPage } from '@/pages/businessLive/BusinessLiveAcceptedPage';
-import { BusinessLiveTrackingPage } from '@/pages/businessLive/BusinessLiveTrackingPage';
-import { BusinessLivePaymentPage } from '@/pages/businessLive/BusinessLivePaymentPage';
-import { BusinessPaymentMethodPage } from '@/pages/businessPayments/BusinessPaymentMethodPage';
-import { BusinessPaymentScanPage } from '@/pages/businessPayments/BusinessPaymentScanPage';
-import { BusinessPaymentSuccessPage } from '@/pages/businessPayments/BusinessPaymentSuccessPage';
+import { BusinessLiveWorkPage } from '@/pages/liveWork/BusinessLiveWorkPage';
+import { BusinessLiveWorkPostPage } from '@/pages/liveWork/BusinessLiveWorkPostPage';
 import { LanguagePage } from '@/pages/language/LanguagePage';
 import { AppearancePage } from '@/pages/appearance/AppearancePage';
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { PayoutAccountPage } from '@/pages/payoutAccount/PayoutAccountPage';
 import { ShiftListPage } from '@/pages/shiftList/ShiftListPage';
-import { ShiftRequestPage } from '@/pages/shiftRequest/ShiftRequestPage';
 import { ShiftDetailsPage } from '@/pages/shiftDetails/ShiftDetailsPage';
 import { ApplicationSubmittedPage } from '@/pages/applicationSubmitted/ApplicationSubmittedPage';
 import { ShiftSelectedPage } from '@/pages/shiftSelected/ShiftSelectedPage';
@@ -46,7 +37,13 @@ import { RateBusinessPage } from '@/pages/rateBusiness/RateBusinessPage';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppStackParamList } from '@/types';
 
+import {
+  WorkerLiveBookingRedirect,
+  WorkerLiveWorkRedirect,
+} from './workerLiveRedirects';
+
 import { AddRolePage } from '@/pages/addRole/AddRolePage';
+import { ApplyCouponPage } from '@/pages/applyCoupon/ApplyCouponPage';
 
 import { BottomTabRoutes } from './bottomTabs';
 import { COMMON_SCREENS } from './commonRoutes';
@@ -81,45 +78,22 @@ export const AfterLoginRoutes: FC = () => {
         name={ROUTES.businessShiftPosted}
         component={BusinessShiftPostedPage}
       />
+      <Stack.Screen name={ROUTES.applyCoupon} component={ApplyCouponPage} />
       <Stack.Screen
-        name={ROUTES.businessLiveCreate}
-        component={BusinessLiveCreatePage}
+        name={ROUTES.businessLiveWorkPost}
+        component={BusinessLiveWorkPostPage}
       />
       <Stack.Screen
-        name={ROUTES.businessLiveReview}
-        component={BusinessLiveReviewPage}
+        name={ROUTES.businessLiveWork}
+        component={BusinessLiveWorkPage}
       />
       <Stack.Screen
-        name={ROUTES.businessLiveFinding}
-        component={BusinessLiveFindingPage}
+        name={ROUTES.workerLiveWork}
+        component={WorkerLiveWorkRedirect}
       />
       <Stack.Screen
-        name={ROUTES.businessLiveStaffing}
-        component={BusinessLiveStaffingPage}
-      />
-      <Stack.Screen
-        name={ROUTES.businessLiveAccepted}
-        component={BusinessLiveAcceptedPage}
-      />
-      <Stack.Screen
-        name={ROUTES.businessLiveTracking}
-        component={BusinessLiveTrackingPage}
-      />
-      <Stack.Screen
-        name={ROUTES.businessLivePayment}
-        component={BusinessLivePaymentPage}
-      />
-      <Stack.Screen
-        name={ROUTES.businessPaymentMethod}
-        component={BusinessPaymentMethodPage}
-      />
-      <Stack.Screen
-        name={ROUTES.businessPaymentScan}
-        component={BusinessPaymentScanPage}
-      />
-      <Stack.Screen
-        name={ROUTES.businessPaymentSuccess}
-        component={BusinessPaymentSuccessPage}
+        name={ROUTES.workerLiveBooking}
+        component={WorkerLiveBookingRedirect}
       />
       <Stack.Screen
         name={ROUTES.businessScheduledWorkerTracking}
@@ -158,7 +132,6 @@ export const AfterLoginRoutes: FC = () => {
         component={WithdrawSuccessPage}
         options={{ gestureEnabled: false }}
       />
-      <Stack.Screen name={ROUTES.shiftRequest} component={ShiftRequestPage} />
       <Stack.Screen name={ROUTES.shiftDetails} component={ShiftDetailsPage} />
       <Stack.Screen
         name={ROUTES.applicationSubmitted}

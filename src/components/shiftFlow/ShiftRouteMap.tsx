@@ -4,7 +4,11 @@ import { WebView } from 'react-native-webview';
 
 import { LEAFLET_CSS, LEAFLET_JS } from '@/assets/leaflet/leafletSource';
 import { FONTS } from '@/constants/fonts';
-import { getDevicePosition, type DevicePosition } from '@/services/maps/devicePosition';
+import { tr } from '@/services/i18n/tr';
+import {
+  getDevicePosition,
+  type DevicePosition,
+} from '@/services/maps/devicePosition';
 import { useTheme } from '@/theme/ThemeProvider';
 
 /** The package's default generic (`undefined`) collapses every prop to `never`. */
@@ -17,14 +21,25 @@ type RouteState = {
   path: [number, number][];
 };
 
-const STRINGS = {
-  LOADING: 'Loading map and your location…',
-  NO_LOCATION: 'Could not determine your location. Check your device location settings and try again.',
-  NO_ROUTE: 'Could not load driving directions. Please try again.',
-  RETRY: 'Try again',
-} as const;
+const k = (key: string) => tr(`shiftRouteMap.${key}`);
 
-const inlineScript = (source: string) => source.replace(/<\/script/gi, '<\\/script');
+const STRINGS = {
+  get LOADING() {
+    return k('loading');
+  },
+  get NO_LOCATION() {
+    return k('noLocation');
+  },
+  get NO_ROUTE() {
+    return k('noRoute');
+  },
+  get RETRY() {
+    return k('retry');
+  },
+};
+
+const inlineScript = (source: string) =>
+  source.replace(/<\/script/gi, '<\\/script');
 
 const buildHtml = (
   target: DevicePosition,
@@ -62,7 +77,11 @@ if (origin) {
 
 type OsrmResult = {
   code: string;
-  routes?: { distance: number; duration: number; geometry: { coordinates: [number, number][] } }[];
+  routes?: {
+    distance: number;
+    duration: number;
+    geometry: { coordinates: [number, number][] };
+  }[];
 };
 
 const fetchRoute = async (from: DevicePosition, to: DevicePosition) => {
@@ -73,7 +92,8 @@ const fetchRoute = async (from: DevicePosition, to: DevicePosition) => {
   if (!response.ok) throw new Error(STRINGS.NO_ROUTE);
   const result = (await response.json()) as OsrmResult;
   const route = result.routes?.[0];
-  if (result.code !== 'Ok' || !route?.geometry.coordinates.length) throw new Error(STRINGS.NO_ROUTE);
+  if (result.code !== 'Ok' || !route?.geometry.coordinates.length)
+    throw new Error(STRINGS.NO_ROUTE);
   return route;
 };
 
@@ -129,10 +149,15 @@ export const ShiftRouteMap: FC<{
   return (
     <View style={styles.root}>
       {busy ? (
-        <Text style={[styles.note, { color: colors.textSubtle }]}>{STRINGS.LOADING}</Text>
+        <Text style={[styles.note, { color: colors.textSubtle }]}>
+          {STRINGS.LOADING}
+        </Text>
       ) : null}
       {error ? (
-        <Text style={[styles.note, { color: colors.danger }]} accessibilityRole="alert">
+        <Text
+          style={[styles.note, { color: colors.danger }]}
+          accessibilityRole="alert"
+        >
           {error}
         </Text>
       ) : null}
@@ -155,7 +180,9 @@ export const ShiftRouteMap: FC<{
           onPress={load}
           style={[styles.retry, { borderColor: colors.primary }]}
         >
-          <Text style={[styles.retryText, { color: colors.primary }]}>{STRINGS.RETRY}</Text>
+          <Text style={[styles.retryText, { color: colors.primary }]}>
+            {STRINGS.RETRY}
+          </Text>
         </Pressable>
       ) : null}
     </View>

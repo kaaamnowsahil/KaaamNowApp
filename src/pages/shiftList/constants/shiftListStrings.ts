@@ -1,8 +1,24 @@
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string) => tr(`shiftList.${key}`);
+
 export const SHIFT_LIST_STRINGS = {
-  TITLE: 'Scheduled shifts near you',
-  SUBTITLE: 'Upcoming shifts from businesses in your area, soonest first.',
-  EMPTY_TITLE: 'No scheduled shifts yet',
-  EMPTY_BODY: 'New shifts in your area will appear here.',
-  ERROR_TITLE: 'Couldn’t load shifts',
-  RETRY: 'Try again',
-} as const;
+  get TITLE() {
+    return k('title');
+  },
+  get SUBTITLE() {
+    return k('subtitle');
+  },
+  get EMPTY_TITLE() {
+    return k('emptyTitle');
+  },
+  get EMPTY_BODY() {
+    return k('emptyBody');
+  },
+  get ERROR_TITLE() {
+    return k('errorTitle');
+  },
+  get RETRY() {
+    return k('retry');
+  },
+};

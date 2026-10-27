@@ -1,25 +1,30 @@
 import { useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { TermsSheet } from '@/components/shiftFlow';
-import { OutlineButton, PrimaryButton, SecondaryButton, TextButton } from '@/components/ui';
+import { TermsCheckbox } from '@/components/shiftFlow';
+import { CouponRow } from '@/components/coupon/CouponRow';
+import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { ApiError, errorMessage } from '@/services/api/apiClient';
 import { meApi } from '@/services/api/meApi';
 import { payInvoice } from '@/services/billing/billingApi';
-import { promoApi } from '@/services/promos/promoApi';
+import {
+  couponErrorKey,
+  isCouponRejected,
+} from '@/services/promos/couponLogic';
+import { useCouponSession } from '@/services/promos/useCouponSession';
 import { fromMinor } from '@/services/shifts/shiftMappers';
 import { shiftsApi, type ShiftCostEstimate } from '@/services/shifts/shiftsApi';
 import { useShiftAction } from '@/services/shifts/useShiftFlow';
+import { termsApi } from '@/services/terms/termsApi';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps, BusinessShiftSlot } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-import { ShiftFieldError } from './components';
 import { CancellationPolicyCard } from './components/CancellationPolicyCard';
 import { SHIFT_REVIEW_STRINGS as S } from './constants/shiftReviewStrings';
 import {
@@ -31,6 +36,13 @@ import {
 } from './utils';
 
 const rupees = (minor: number) => formatRupees(fromMinor(minor));
+
+/** Estimates priced since tax was introduced also carry the tax line. */
+type PricedEstimate = ShiftCostEstimate & {
+  tax_label?: string;
+  tax_percentage?: number;
+  tax_minor?: number;
+};
 
 /**
  * Scheduled post: review, cost breakdown with promo, then pay the deposit.
@@ -44,63 +56,79 @@ export const BusinessShiftReviewPage: FC<
   const { colors } = useTheme();
   const { draft } = route.params;
   const { busy, run } = useShiftAction();
-  const [promoInput, setPromoInput] = useState('');
   const [promoCode, setPromoCode] = useState('');
-  const [isCheckingPromo, setIsCheckingPromo] = useState(false);
-  const [isTermsOpen, setIsTermsOpen] = useState(false);
-  const [promoError, setPromoError] = useState('');
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [termsError, setTermsError] = useState('');
+  const startCouponSession = useCouponSession(state => state.start);
   const [postError, setPostError] = useState('');
   const categories = useApiQuery(() => meApi.workCategories(), []);
   const categoryLabel = (slug: string) =>
     categories.data?.find(category => category.id === slug)?.label ?? slug;
 
-  const estimates = useApiQuery(
-    () =>
-      Promise.all(
-        toBulkItems(draft).map(item =>
-          shiftsApi.estimate({
-            hourly_rate_minor: item.hourly_rate_minor,
-            workers_required: item.workers_required,
-            starts_at: item.starts_at,
-            ends_at: item.ends_at ?? item.starts_at,
-            break_minutes: item.break_minutes,
-            promo_code: promoCode || undefined,
-          }),
-        ),
+  const priceShifts = (code: string): Promise<PricedEstimate[]> =>
+    Promise.all(
+      toBulkItems(draft).map(item =>
+        shiftsApi.estimate({
+          hourly_rate_minor: item.hourly_rate_minor,
+          workers_required: item.workers_required,
+          starts_at: item.starts_at,
+          ends_at: item.ends_at ?? item.starts_at,
+          break_minutes: item.break_minutes,
+          promo_code: code || undefined,
+        }),
       ),
-    [promoCode],
+    );
+  const estimates = useApiQuery(() => priceShifts(promoCode), [promoCode]);
+  const total = (estimates.data ?? []).reduce(
+    (sum, e) => sum + e.total_minor,
+    0,
   );
-  const total = (estimates.data ?? []).reduce((sum, e) => sum + e.total_minor, 0);
   const saved = (estimates.data ?? []).reduce(
     (sum, e) => sum + (e.promo_discount_minor ?? 0),
     0,
   );
 
-  const applyPromo = async () => {
-    const code = promoInput.trim();
-    if (!code || isCheckingPromo) return;
-    setIsCheckingPromo(true);
-    setPromoError('');
-    try {
-      await promoApi.validate(code);
-      setPromoCode(code);
-    } catch (error) {
-      setPromoError(errorMessage(error));
-    } finally {
-      setIsCheckingPromo(false);
-    }
+  const openCoupons = () => {
+    const subtotals = (estimates.data ?? []).map(e => e.worker_subtotal_minor);
+    startCouponSession({
+      bookingType: 'shift',
+      amountMinor: subtotals.length ? Math.min(...subtotals) : null,
+      appliedCode: promoCode || null,
+      apply: async code => {
+        await priceShifts(code);
+        setPromoCode(code);
+      },
+      remove: async () => setPromoCode(''),
+    });
+    navigation.navigate(ROUTES.applyCoupon);
   };
 
-  const handlePostError = (error: unknown) => {
-    if (error instanceof ApiError && error.code === 'terms_required') {
-      setIsTermsOpen(true);
+  const handlePostError = (error: unknown, termsRecorded: boolean) => {
+    if (
+      error instanceof ApiError &&
+      error.code === 'terms_required' &&
+      !termsRecorded
+    ) {
+      termsApi
+        .accept('business')
+        .then(() => post(true))
+        .catch(acceptError =>
+          setPostError(`${S.POST_FAILED}: ${errorMessage(acceptError)}`),
+        );
+    } else if (isCouponRejected(error)) {
+      setPromoCode('');
+      setPostError(`${t('coupons.removedTitle')}: ${t(couponErrorKey(error))}`);
     } else {
       setPostError(`${S.POST_FAILED}: ${errorMessage(error)}`);
     }
     return true;
   };
 
-  const post = () => {
+  const post = (termsRecorded = false) => {
+    if (!acceptTerms) {
+      setTermsError(t('businessShiftCreate.acceptTermsError'));
+      return;
+    }
     setPostError('');
     run(
       async () => {
@@ -121,9 +149,12 @@ export const BusinessShiftReviewPage: FC<
         return unpaidInvoiceIds;
       },
       unpaidInvoiceIds =>
-        navigation.replace(ROUTES.businessShiftPosted, { draft, unpaidInvoiceIds }),
+        navigation.replace(ROUTES.businessShiftPosted, {
+          draft,
+          unpaidInvoiceIds,
+        }),
       S.POST_FAILED,
-      handlePostError,
+      error => handlePostError(error, termsRecorded),
     );
   };
 
@@ -140,7 +171,10 @@ export const BusinessShiftReviewPage: FC<
     return (
       <View
         key={slot.id ?? index}
-        style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        style={[
+          styles.card,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
       >
         <View style={styles.details}>
           <Text style={[styles.role, { color: colors.text }]}>{slot.role}</Text>
@@ -148,12 +182,15 @@ export const BusinessShiftReviewPage: FC<
             {categoryLabel(slot.category)}
           </Text>
           <Text style={[styles.detail, { color: colors.textMuted }]}>
-            {`${formatShiftTime(slot.startTime, i18n.language)} – ${formatShiftTime(
-              slot.endTime,
+            {`${formatShiftTime(
+              slot.startTime,
               i18n.language,
-            )} · ${t('businessShiftCreate.hoursDuration', {
-              hours: roundedHours(slot.startTime, slot.endTime),
-            })}`}
+            )} – ${formatShiftTime(slot.endTime, i18n.language)} · ${t(
+              'businessShiftCreate.hoursDuration',
+              {
+                hours: roundedHours(slot.startTime, slot.endTime),
+              },
+            )}`}
           </Text>
           <Text style={[styles.detail, { color: colors.textMuted }]}>
             {t('businessShiftCreate.breakMinutesSummary', {
@@ -170,7 +207,9 @@ export const BusinessShiftReviewPage: FC<
             {slot.responsibilities}
           </Text>
         </View>
-        {estimate ? <EstimateRows estimate={estimate} promoCode={promoCode} /> : null}
+        {estimate ? (
+          <EstimateRows estimate={estimate} promoCode={promoCode} />
+        ) : null}
       </View>
     );
   };
@@ -196,9 +235,11 @@ export const BusinessShiftReviewPage: FC<
           <>
             <PrimaryButton
               label={
-                estimates.data ? S.payAndPost(rupees(total)) : t('businessShiftCreate.postShift')
+                estimates.data
+                  ? S.payAndPost(rupees(total))
+                  : t('businessShiftCreate.postShift')
               }
-              onPress={post}
+              onPress={() => post()}
               disabled={busy || !estimates.data}
               testID="business-shift-post"
             />
@@ -213,17 +254,26 @@ export const BusinessShiftReviewPage: FC<
       >
         <View style={styles.heading}>
           <Text style={[styles.overline, { color: colors.primary }]}>
-            {t('businessDashboard.scheduledStatus')} · {t('businessShiftCreate.draftStatus')}
+            {t('businessDashboard.scheduledStatus')} ·{' '}
+            {t('businessShiftCreate.draftStatus')}
           </Text>
-          <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>
+          <Text
+            accessibilityRole="header"
+            style={[styles.title, { color: colors.text }]}
+          >
             {t('businessShiftCreate.review')}
           </Text>
           <Text style={[styles.subtitle, { color: colors.textSubtle }]}>
-            {[draft.schedules[0]?.role || draft.role, draft.location].filter(Boolean).join(' · ')}
+            {[draft.schedules[0]?.role || draft.role, draft.location]
+              .filter(Boolean)
+              .join(' · ')}
           </Text>
         </View>
         {postError ? (
-          <Text accessibilityLiveRegion="polite" style={[styles.note, { color: colors.danger }]}>
+          <Text
+            accessibilityLiveRegion="polite"
+            style={[styles.note, { color: colors.danger }]}
+          >
             {postError}
           </Text>
         ) : null}
@@ -243,60 +293,13 @@ export const BusinessShiftReviewPage: FC<
           </Text>
         ) : null}
 
-        <View
-          style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
-        >
-          <Text style={[styles.promoLabel, { color: colors.textSubtle }]}>{S.PROMO_LABEL}</Text>
-          {promoCode ? (
-            <View style={styles.promoRow}>
-              <Text style={[styles.promoApplied, { color: colors.success }]}>
-                {S.promoApplied(promoCode)}
-                {saved > 0 ? S.promoSaved(rupees(saved)) : ''}
-              </Text>
-              <TextButton
-                label={S.PROMO_REMOVE}
-                tone="danger"
-                onPress={() => {
-                  setPromoCode('');
-                  setPromoInput('');
-                }}
-              />
-            </View>
-          ) : (
-            <View style={styles.promoRow}>
-              <TextInput
-                accessibilityLabel={S.PROMO_LABEL}
-                value={promoInput}
-                onChangeText={text => {
-                  setPromoInput(text);
-                  setPromoError('');
-                }}
-                autoCapitalize="characters"
-                autoCorrect={false}
-                maxLength={32}
-                placeholder={S.PROMO_PLACEHOLDER}
-                placeholderTextColor={colors.textSubtle}
-                style={[
-                  styles.promoInput,
-                  {
-                    color: colors.text,
-                    backgroundColor: colors.background,
-                    borderColor: promoError ? colors.danger : colors.border,
-                  },
-                ]}
-                testID="business-shift-promo-input"
-              />
-              <OutlineButton
-                label={S.PROMO_APPLY}
-                tone="primary"
-                disabled={busy || isCheckingPromo || !promoInput.trim()}
-                onPress={applyPromo}
-                testID="business-shift-promo-apply"
-              />
-            </View>
-          )}
-          <ShiftFieldError message={promoError && `${S.PROMO_FAILED}: ${promoError}`} />
-        </View>
+        <CouponRow
+          appliedCode={promoCode || null}
+          savedMinor={saved}
+          disabled={busy || !estimates.data}
+          onOpen={openCoupons}
+          onRemove={() => setPromoCode('')}
+        />
 
         <View
           style={[
@@ -305,33 +308,43 @@ export const BusinessShiftReviewPage: FC<
             { backgroundColor: colors.surface, borderColor: colors.border },
           ]}
         >
-          <Text style={[styles.detail, { color: colors.textMuted }]}>{S.ESTIMATED_TOTAL}</Text>
-          <Text style={[styles.totalValue, { color: colors.text }]}>{rupees(total)}</Text>
+          <Text style={[styles.detail, { color: colors.textMuted }]}>
+            {S.ESTIMATED_TOTAL}
+          </Text>
+          <Text style={[styles.totalValue, { color: colors.text }]}>
+            {rupees(total)}
+          </Text>
         </View>
 
-        <CancellationPolicyCard onReadTerms={() => navigation.navigate(ROUTES.terms)} />
+        <CancellationPolicyCard
+          onReadTerms={() => navigation.navigate(ROUTES.terms)}
+        />
 
-        <Text style={[styles.note, { color: colors.textSubtle }]}>{S.DEPOSIT_NOTE}</Text>
+        <TermsCheckbox
+          checked={acceptTerms}
+          onToggle={() => {
+            setAcceptTerms(value => !value);
+            setTermsError('');
+          }}
+          label={t('businessShiftCreate.termsAgree')}
+          linkLabel={t('businessShiftCreate.termsLink')}
+          onReadTerms={() => navigation.navigate(ROUTES.terms)}
+          error={termsError}
+          testID="business-shift-terms"
+        />
+
+        <Text style={[styles.note, { color: colors.textSubtle }]}>
+          {S.DEPOSIT_NOTE}
+        </Text>
         <Text style={[styles.note, { color: colors.textSubtle }]}>
           {t('businessShiftCreate.reviewNote')}
         </Text>
       </FormScreen>
-      {isTermsOpen ? (
-        <TermsSheet
-          audience="business"
-          onRead={() => navigation.navigate(ROUTES.terms)}
-          onClose={() => setIsTermsOpen(false)}
-          onAccepted={() => {
-            setIsTermsOpen(false);
-            post();
-          }}
-        />
-      ) : null}
     </>
   );
 };
 
-const EstimateRows: FC<{ estimate: ShiftCostEstimate; promoCode: string }> = ({
+const EstimateRows: FC<{ estimate: PricedEstimate; promoCode: string }> = ({
   estimate,
   promoCode,
 }) => {
@@ -339,7 +352,10 @@ const EstimateRows: FC<{ estimate: ShiftCostEstimate; promoCode: string }> = ({
   const discount = estimate.promo_discount_minor ?? 0;
   return (
     <View style={[styles.estimate, { borderTopColor: colors.border }]}>
-      <CostRow label={S.WORKERS_PAY} value={rupees(estimate.worker_subtotal_minor)} />
+      <CostRow
+        label={S.WORKERS_PAY}
+        value={rupees(estimate.worker_subtotal_minor)}
+      />
       {estimate.gateway_fee_minor > 0 ? (
         <CostRow
           label={S.gatewayFee(estimate.gateway_fee_percentage)}
@@ -350,10 +366,27 @@ const EstimateRows: FC<{ estimate: ShiftCostEstimate; promoCode: string }> = ({
         label={S.platformCommission(estimate.fee_percentage)}
         value={rupees(estimate.platform_fee_minor)}
       />
-      {promoCode && discount > 0 ? (
-        <CostRow label={S.promoDiscount(promoCode)} value={`−${rupees(discount)}`} tone="success" />
+      {estimate.tax_minor ? (
+        <CostRow
+          label={S.taxLine(
+            estimate.tax_label ?? '',
+            estimate.tax_percentage ?? 0,
+          )}
+          value={rupees(estimate.tax_minor)}
+        />
       ) : null}
-      <CostRow label={S.SHIFT_TOTAL} value={rupees(estimate.total_minor)} isTotal />
+      {promoCode && discount > 0 ? (
+        <CostRow
+          label={S.promoDiscount(promoCode)}
+          value={`−${rupees(discount)}`}
+          tone="success"
+        />
+      ) : null}
+      <CostRow
+        label={S.SHIFT_TOTAL}
+        value={rupees(estimate.total_minor)}
+        isTotal
+      />
     </View>
   );
 };
@@ -376,7 +409,12 @@ const CostRow: FC<{
       >
         {label}
       </Text>
-      <Text style={[isTotal ? styles.totalText : styles.costValue, { color: valueColor }]}>
+      <Text
+        style={[
+          isTotal ? styles.totalText : styles.costValue,
+          { color: valueColor },
+        ]}
+      >
         {value}
       </Text>
     </View>
@@ -401,22 +439,19 @@ const styles = StyleSheet.create({
   detail: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 19 },
   estimate: { borderTopWidth: 1, paddingTop: 10, gap: 6 },
   costRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
-  costLabel: { flex: 1, fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
+  costLabel: {
+    flex: 1,
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    lineHeight: 18,
+  },
   costValue: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 18 },
   totalText: { fontFamily: FONTS.bold, fontSize: 14, lineHeight: 20 },
-  promoLabel: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 16 },
-  promoRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  promoInput: {
-    flex: 1,
-    height: 44,
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    fontFamily: FONTS.regular,
-    fontSize: 14,
+  totalCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  promoApplied: { flex: 1, fontFamily: FONTS.semiBold, fontSize: 13 },
-  totalCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   totalValue: { fontFamily: FONTS.bold, fontSize: 16 },
   note: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 16 },
 });

@@ -138,7 +138,7 @@ export const ShiftSecuredPage: FC<
             title={t('shiftSecured.agreedRate')}
             caption={t('shiftSecured.rate', {
               rate: formatRupees(shift.hourlyRate),
-              total: formatRupees(shift.hourlyRate * shift.durationHours),
+              total: formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
             })}
             onPress={openDetails}
           />

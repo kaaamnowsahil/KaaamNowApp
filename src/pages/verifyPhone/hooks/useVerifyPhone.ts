@@ -8,6 +8,7 @@ import {
 } from '@/services/auth/authApi';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { usePreferencesStore } from '@/services/config/usePreferencesStore';
+import { tr } from '@/services/i18n/tr';
 import {
   useOnboardingStore,
   type UserRole,
@@ -71,7 +72,7 @@ export const useVerifyPhone = (
 
   const requestCode = useCallback(async () => {
     if (!signupRole) {
-      setError('Signup details are missing. Please start again.');
+      setError(tr('verifyPhone.signupMissing'));
       return;
     }
     setBusy(true);
@@ -91,7 +92,7 @@ export const useVerifyPhone = (
           ? cause.message
           : cause instanceof Error
           ? cause.message
-          : 'Could not send a verification code.',
+          : tr('verifyPhone.sendFailed'),
       );
     } finally {
       setBusy(false);
@@ -106,13 +107,13 @@ export const useVerifyPhone = (
       (signupRole === 'worker' && !worker) ||
       (signupRole === 'business' && !business)
     ) {
-      setError('Signup details are missing. Please start again.');
+      setError(tr('verifyPhone.signupMissing'));
       return;
     }
     const signupPassword =
       signupRole === 'worker' ? worker?.password : business?.password;
     if (!signupPassword) {
-      setError('Signup details are missing. Please start again.');
+      setError(tr('verifyPhone.signupMissing'));
       return;
     }
     setBusy(true);
@@ -143,7 +144,7 @@ export const useVerifyPhone = (
           ? cause.message
           : cause instanceof Error
           ? cause.message
-          : 'Could not complete signup. Please try again.',
+          : tr('verifyPhone.signupFailed'),
       );
     } finally {
       setBusy(false);

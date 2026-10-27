@@ -33,6 +33,8 @@ import {
 import { ApiError } from '@/services/api/apiClient';
 import { getDevicePosition } from '@/services/maps/devicePosition';
 import { formatDateTime, fromMinor } from '@/services/shifts/shiftMappers';
+import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
+import { isLiveWorkNotFound } from '@/services/liveWork/liveWorkFormat';
 import { shiftsApi, type CancellationQuote } from '@/services/shifts/shiftsApi';
 import {
   useAssignment,
@@ -102,13 +104,25 @@ export const ShiftDetailsPage: FC<
   const accept = () =>
     shift.status === 'live'
       ? action.run(
-        () => shiftsApi.acceptLive(shift.id),
-        assignment =>
-          showBooked({
-            ...shift,
-            assignmentId: assignment.id,
-            assignmentStatus: assignment.status,
-          }),
+        async () => {
+          try {
+            const live = await liveWorkApi.accept(shift.id);
+            return { kind: 'live', assignmentId: live.assignment_id } as const;
+          } catch (error) {
+            if (!isLiveWorkNotFound(error)) throw error;
+          }
+          return { kind: 'shift', assignment: await shiftsApi.acceptLive(shift.id) } as const;
+        },
+        result =>
+          result.kind === 'live'
+            ? navigation.replace(ROUTES.workerLiveBooking, {
+              assignmentId: result.assignmentId,
+            })
+            : showBooked({
+              ...shift,
+              assignmentId: result.assignment.id,
+              assignmentStatus: result.assignment.status,
+            }),
         SHIFT_DETAILS_STRINGS.ACCEPT_FAILED,
         needsTerms,
       )
@@ -330,6 +344,7 @@ export const ShiftDetailsPage: FC<
             (hasTimeConflict ? 'danger' : shift.status === 'scheduled' ? 'success' : 'primary')
           }
           isPill={shift.status === 'scheduled'}
+          isCaps={shift.status === 'live'}
           title={shift.title}
         />
 
@@ -348,7 +363,7 @@ export const ShiftDetailsPage: FC<
           items={[
             { value: SHIFT_DETAILS_STRINGS.rate(rate), label: SHIFT_DETAILS_STRINGS.AGREED_RATE },
             {
-              value: formatRupees(shift.hourlyRate * shift.durationHours),
+              value: formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
               label: SHIFT_DETAILS_STRINGS.ESTIMATED,
             },
           ]}

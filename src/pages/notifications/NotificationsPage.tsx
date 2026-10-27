@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -6,27 +6,48 @@ import { BodyNote } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import type { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { useMockLoading } from '@/shared/hooks/useMockLoading';
+import { notificationsApi } from '@/services/notifications/notificationsApi';
+import { formatDateTime } from '@/services/shifts/shiftMappers';
+import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
 import { NOTIFICATIONS_STRINGS } from './constants';
-import { NOTIFICATIONS } from './mock';
-
-/** App-bar bell. Tap a row to mark it read. Data: mock/notificationsMock.ts */
+/**
+ * App-bar bell. Tap a row to mark it read.
+ * - data: GET /notifications; POST /notifications/{id}/read and /notifications/read-all
+ */
 export const NotificationsPage: FC<
   AppScreenProps<typeof ROUTES.notifications>
 > = ({ navigation }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const isLoading = useMockLoading();
-  const [items, setItems] = useState(NOTIFICATIONS);
-  const hasUnread = items.some(n => n.isUnread);
+  const query = useApiQuery(() => notificationsApi.list(), []);
+  const items = query.data?.items ?? [];
+  const hasUnread = items.some(n => !n.read_at);
 
-  const markRead = (id?: string) =>
-    setItems(prev =>
-      prev.map(n => (id === undefined || n.id === id ? { ...n, isUnread: false } : n)),
-    );
+  const markRead = (id?: string) => {
+    const page = query.data;
+    if (
+      !page ||
+      !items.some(n => !n.read_at && (id === undefined || n.id === id))
+    ) {
+      return;
+    }
+    const now = new Date().toISOString();
+    query.setData({
+      ...page,
+      items: page.items.map(n =>
+        id === undefined || n.id === id
+          ? { ...n, read_at: n.read_at ?? now }
+          : n,
+      ),
+    });
+    (id === undefined
+      ? notificationsApi.markAllRead()
+      : notificationsApi.markRead(id)
+    ).catch(query.reload);
+  };
 
   return (
     <FormScreen
@@ -47,15 +68,17 @@ export const NotificationsPage: FC<
           </Pressable>
         ) : null
       }
-      isLoading={isLoading}
+      isLoading={query.isLoading}
       testID="notifications-page"
     >
-      {items.length ? (
+      {query.error && !query.data ? (
+        <BodyNote>{query.error}</BodyNote>
+      ) : items.length ? (
         items.map(n => (
           <Pressable
             key={n.id}
             accessibilityRole="button"
-            accessibilityState={{ selected: n.isUnread }}
+            accessibilityState={{ selected: !n.read_at }}
             onPress={() => markRead(n.id)}
             style={({ pressed }) => [
               styles.row,
@@ -67,7 +90,7 @@ export const NotificationsPage: FC<
             <View
               style={[
                 styles.dot,
-                n.isUnread && { backgroundColor: colors.primary },
+                !n.read_at && { backgroundColor: colors.primary },
               ]}
             />
             <View style={styles.text}>
@@ -75,14 +98,14 @@ export const NotificationsPage: FC<
                 <Text
                   style={[
                     styles.title,
-                    n.isUnread && styles.unread,
+                    !n.read_at && styles.unread,
                     { color: colors.text },
                   ]}
                 >
                   {n.title}
                 </Text>
                 <Text style={[styles.time, { color: colors.textSubtle }]}>
-                  {n.timeLabel}
+                  {formatDateTime(n.created_at)}
                 </Text>
               </View>
               <Text style={[styles.body, { color: colors.textMuted }]}>

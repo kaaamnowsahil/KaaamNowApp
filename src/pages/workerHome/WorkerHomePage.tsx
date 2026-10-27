@@ -16,6 +16,7 @@ import {
 import { ShiftCard } from '@/components/shift';
 import { FONTS } from '@/constants/fonts';
 import { TabScreen } from '@/layout/TabScreen';
+import { WorkerLiveWorkEntry } from '@/pages/liveWork/components/WorkerLiveWorkEntry';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import {
@@ -54,6 +55,7 @@ export const WorkerHomePage: FC = () => {
       error={home.availabilityError}
       onToggle={home.toggleAvailability}
     />,
+    <WorkerLiveWorkEntry key="live-work" />,
     <LocationButton
       key="location"
       label={home.locationLabel}
@@ -116,18 +118,18 @@ export const WorkerHomePage: FC = () => {
     />,
     ...(home.error && !home.nearby.length
       ? [
-        <EmptyState
-          key="error"
-          icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
-          title={WORKER_HOME_STRINGS.LOAD_ERROR_TITLE}
-          body={home.error}
-          action={WORKER_HOME_STRINGS.RETRY}
-          onAction={home.retry}
-          testID="home-error"
-        />,
-      ]
+          <EmptyState
+            key="error"
+            icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
+            title={WORKER_HOME_STRINGS.LOAD_ERROR_TITLE}
+            body={home.error}
+            action={WORKER_HOME_STRINGS.RETRY}
+            onAction={home.retry}
+            testID="home-error"
+          />,
+        ]
       : home.nearby.length
-        ? [
+      ? [
           ...home.nearby.map(shift => (
             <ShiftCard
               key={shift.id}
@@ -137,24 +139,30 @@ export const WorkerHomePage: FC = () => {
           )),
           ...(home.hasMore || home.loadMoreError
             ? [
-              <View key="load-more" style={styles.loadMore}>
-                {home.loadMoreError ? (
-                  <Text style={[styles.loadMoreError, { color: colors.danger }]}>
-                    {home.loadMoreError}
-                  </Text>
-                ) : null}
-                <OutlineButton
-                  label={home.isLoadingMore ? t('common.loading') : t('workerHome.loadMore')}
-                  tone="primary"
-                  disabled={home.isLoadingMore}
-                  onPress={home.loadMore}
-                  testID="home-load-more"
-                />
-              </View>,
-            ]
+                <View key="load-more" style={styles.loadMore}>
+                  {home.loadMoreError ? (
+                    <Text
+                      style={[styles.loadMoreError, { color: colors.danger }]}
+                    >
+                      {home.loadMoreError}
+                    </Text>
+                  ) : null}
+                  <OutlineButton
+                    label={
+                      home.isLoadingMore
+                        ? t('common.loading')
+                        : t('workerHome.loadMore')
+                    }
+                    tone="primary"
+                    disabled={home.isLoadingMore}
+                    onPress={home.loadMore}
+                    testID="home-load-more"
+                  />
+                </View>,
+              ]
             : []),
         ]
-        : [
+      : [
           <EmptyState
             key={`empty-${home.status}`}
             icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
@@ -171,11 +179,7 @@ export const WorkerHomePage: FC = () => {
     <>
       <TabScreen
         testID="worker-home-page"
-        header={
-          <BrandAppBar
-            onBellPress={home.openNotifications}
-          />
-        }
+        header={<BrandAppBar onBellPress={home.openNotifications} />}
         blocks={blocks}
         fillLastBlock={home.nearby.length === 0}
         isLoading={home.isLoading}
@@ -227,7 +231,12 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.7 },
   loadMore: { gap: 8 },
-  loadMoreError: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 16, textAlign: 'center' },
+  loadMoreError: {
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    lineHeight: 16,
+    textAlign: 'center',
+  },
   badge: {
     position: 'absolute',
     top: -4,

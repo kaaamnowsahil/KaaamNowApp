@@ -1,1 +1,1 @@
-export { PayoutOptionRow } from './PayoutOptionRow';
+export { PayoutOptionRow, type PayoutOption } from './PayoutOptionRow';

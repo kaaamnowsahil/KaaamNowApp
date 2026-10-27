@@ -1,20 +1,53 @@
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`workerFlow.activeShift.${key}`, values);
+
 export const ACTIVE_SHIFT_STRINGS = {
-  END_EARLY: 'End shift early',
-  EMERGENCY: 'Emergency help',
-  endsAt: (time: string, extra: number) => (extra > 0 ? `${time} (+${extra} min)` : time),
-  extensionTitle: (minutes: number) => `The business asked you to stay ${minutes} more minutes`,
-  EXTENSION_BODY: 'Extra time is paid at the overtime rate. Accept only if you can stay.',
-  ACCEPT: 'Accept extra time',
-  DECLINE: 'Decline',
-  EXTENSION_FAILED: 'Couldn’t answer the request',
-  pinForBusiness: (pin: string) =>
-    `The business wants to end your shift early. If you agree, tell them this PIN: ${pin}`,
-  PIN_TITLE: 'Enter the PIN from the business',
-  PIN_BODY: 'We’ve asked the business to end early. Their app now shows a 4-digit PIN; enter it here to finish. Your pay is for the time you actually worked.',
-  PIN_CONFIRM: 'End shift',
-  PIN_CLOSE: 'Keep working',
-  END_FAILED: 'Couldn’t end the shift',
-  ENDED_TITLE: 'Shift ended',
-  ENDED_BODY: 'The business has ended this shift.',
-  OK: 'OK',
-} as const;
+  get END_EARLY() {
+    return k('endEarly');
+  },
+  get EMERGENCY() {
+    return k('emergency');
+  },
+  endsAt: (time: string, extra: number) =>
+    extra > 0 ? k('endsAtExtra', { time, extra }) : time,
+  extensionTitle: (minutes: number) => k('extensionTitle', { minutes }),
+  get EXTENSION_BODY() {
+    return k('extensionBody');
+  },
+  get ACCEPT() {
+    return k('acceptExtra');
+  },
+  get DECLINE() {
+    return k('decline');
+  },
+  get EXTENSION_FAILED() {
+    return k('extensionFailed');
+  },
+  pinForBusiness: (pin: string) => k('pinForBusiness', { pin }),
+  get PIN_TITLE() {
+    return k('pinTitle');
+  },
+  get PIN_BODY() {
+    return k('pinBody');
+  },
+  get PIN_CONFIRM() {
+    return k('pinConfirm');
+  },
+  get PIN_CLOSE() {
+    return k('pinClose');
+  },
+  get END_FAILED() {
+    return k('endFailed');
+  },
+  get ENDED_TITLE() {
+    return k('endedTitle');
+  },
+  get ENDED_BODY() {
+    return k('endedBody');
+  },
+  get OK() {
+    return k('ok');
+  },
+};

@@ -83,6 +83,11 @@ export const FormScreen: FC<FormScreenProps> = ({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const isInTabs = useContext(BottomTabBarHeightContext) !== undefined;
+  const actionsChrome = {
+    backgroundColor: colors.background,
+    borderTopColor: colors.border,
+    paddingBottom: isInTabs ? 16 : 24 + insets.bottom,
+  };
   const navigation = useNavigation<NavigationProp<AppStackParamList>>();
   const isAuth = useAuthStore(s => s.isAuth);
   const showBrandBar = isAuth && !asSheet && !hideBrandBar;
@@ -192,11 +197,7 @@ export const FormScreen: FC<FormScreenProps> = ({
             delay={(blocks.length + 1) * MOTION.stagger}
             style={[
               styles.actions,
-              {
-                backgroundColor: colors.background,
-                borderTopColor: colors.border,
-                paddingBottom: isInTabs ? 16 : 24 + insets.bottom,
-              },
+              actionsChrome,
             ]}
           >
             {actions}

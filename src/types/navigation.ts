@@ -8,41 +8,12 @@ import type {
 
 import type { ROUTES } from '@/constants/routes';
 import type { PaymentHistoryItem } from '@/services/billing/billingApi';
+import type { Withdrawal } from '@/services/earnings/earningsApi';
 
 import type { BookingStatus } from './booking';
 import type { Shift } from './shift';
-import type { WithdrawalReceipt } from './booking';
 import type { BusinessShiftDraft } from './businessShift';
 import type { WorkerEarningDetails } from './booking';
-
-export type BusinessPaymentMethod =
-  | 'googlePay'
-  | 'paytm'
-  | 'applePay'
-  | 'upiQr'
-  | 'cards';
-
-export type BusinessPaymentRecord = {
-  id: string;
-  role: string;
-  business: string;
-  date: string;
-  amount: number;
-  method: BusinessPaymentMethod;
-  status: 'paid' | 'pending';
-  workerName?: string;
-  workerId?: string;
-};
-
-export type BusinessPaymentDetails = {
-  role: string;
-  business: string;
-  amount: number;
-  date?: string;
-  workerId?: string;
-  workerName?: string;
-  workerIds?: string[];
-};
 
 /** Screens reachable both before and after login. */
 export type CommonStackParamList = {
@@ -78,6 +49,7 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.businessProfileHome]: undefined;
   [ROUTES.businessApplicantsHome]: undefined;
   [ROUTES.businessShiftsHome]: undefined;
+  [ROUTES.businessLiveHome]: undefined;
   [ROUTES.workerProfileHome]: undefined;
   [ROUTES.workerEarningsHome]: undefined;
   [ROUTES.workerDiscoverHome]: undefined;
@@ -85,24 +57,15 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.businessShiftSchedule]: { draft?: BusinessShiftDraft } | undefined;
   [ROUTES.businessShiftReview]: { draft: BusinessShiftDraft };
   /** unpaidInvoiceIds: deposits that still need paying before workers can book. */
-  [ROUTES.businessShiftPosted]: { draft: BusinessShiftDraft; unpaidInvoiceIds?: string[] };
-  [ROUTES.businessLiveCreate]: undefined;
-  [ROUTES.businessLiveReview]: undefined;
-  [ROUTES.businessLiveFinding]: undefined;
-  [ROUTES.businessLiveStaffing]: undefined;
-  [ROUTES.businessLiveAccepted]: undefined;
-  [ROUTES.businessLiveTracking]: { applicantId?: string } | undefined;
-  [ROUTES.businessLivePayment]: undefined;
-  [ROUTES.businessPaymentMethod]: { payment?: BusinessPaymentDetails } | undefined;
-  [ROUTES.businessPaymentScan]: {
-    method: BusinessPaymentMethod;
-    payment?: BusinessPaymentDetails;
+  [ROUTES.businessShiftPosted]: {
+    draft: BusinessShiftDraft;
+    unpaidInvoiceIds?: string[];
   };
-  [ROUTES.businessPaymentSuccess]: {
-    method: BusinessPaymentMethod;
-    reference: string;
-    payment?: BusinessPaymentDetails;
-  };
+  [ROUTES.businessLiveWorkPost]: undefined;
+  [ROUTES.applyCoupon]: undefined;
+  [ROUTES.businessLiveWork]: { bookingId: string };
+  [ROUTES.workerLiveWork]: undefined;
+  [ROUTES.workerLiveBooking]: { assignmentId: string };
   [ROUTES.businessPaymentHistory]: undefined;
   [ROUTES.businessPaymentDetail]: { item: PaymentHistoryItem };
   [ROUTES.businessScheduledWorkerTracking]: { assignmentId: string };
@@ -121,8 +84,8 @@ export type AppStackParamList = CommonStackParamList & {
   [ROUTES.earningsHistory]: undefined;
   [ROUTES.workerEarningDetail]: { earning: WorkerEarningDetails };
   [ROUTES.withdraw]: undefined;
-  [ROUTES.withdrawSuccess]: WithdrawalReceipt;
-  [ROUTES.shiftRequest]: { shift: Shift };
+  /** `withdrawal` only paints the first frame; the screen re-reads the server record. */
+  [ROUTES.withdrawSuccess]: { withdrawalId: string; withdrawal?: Withdrawal };
   /** bookingStatus is set when opened from My shifts or an offer. */
   [ROUTES.shiftDetails]: { shift: Shift; bookingStatus?: BookingStatus };
   [ROUTES.applicationSubmitted]: { shift: Shift };

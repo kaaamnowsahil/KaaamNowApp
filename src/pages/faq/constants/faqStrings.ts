@@ -1,11 +1,33 @@
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string) => tr(`faq.${key}`);
+
 export const FAQ_STRINGS = {
-  TITLE: 'FAQ & Help',
-  SEARCH_PLACEHOLDER: 'Search questions',
-  NO_RESULTS: 'No questions match your search.',
-  EMPTY: 'No FAQs have been published yet.',
-  LOAD_ERROR: 'Could not load FAQs. Please try again later.',
-  HELP_TITLE: 'Still need help?',
-  HELP_CAPTION: 'Our team replies within 24 hours.',
-  CONTACT: 'Contact support',
-  MAIL_SUBJECT: 'KaaamNow support',
-} as const;
+  get TITLE() {
+    return k('title');
+  },
+  get SEARCH_PLACEHOLDER() {
+    return k('searchPlaceholder');
+  },
+  get NO_RESULTS() {
+    return k('noResults');
+  },
+  get EMPTY() {
+    return k('empty');
+  },
+  get LOAD_ERROR() {
+    return k('loadError');
+  },
+  get HELP_TITLE() {
+    return k('helpTitle');
+  },
+  get HELP_CAPTION() {
+    return k('helpCaption');
+  },
+  get CONTACT() {
+    return k('contact');
+  },
+  get MAIL_SUBJECT() {
+    return k('mailSubject');
+  },
+};

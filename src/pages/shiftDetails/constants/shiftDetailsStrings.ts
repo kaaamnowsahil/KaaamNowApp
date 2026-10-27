@@ -1,63 +1,130 @@
 import { WORKER_CANCELLATION_STRINGS } from '@/components/shiftFlow/workerCancellationStrings';
+import { tr } from '@/services/i18n/tr';
 import type { BookingStatus, ShiftStatus } from '@/types';
 import type { Tone } from '@/theme/tone';
 
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`shiftDetails.${key}`, values);
+
 export const SHIFT_DETAILS_STRINGS = {
-  HEADER_TITLE: 'Worker mode',
-  HEADER_TAG: 'Worker',
+  get HEADER_TITLE() {
+    return k('headerTitle');
+  },
+  get HEADER_TAG() {
+    return k('headerTag');
+  },
   businessMeta: (verified: boolean, rating: number, reviews: number) =>
-    `${verified ? 'Verified business · ' : ''}${rating} (${reviews} reviews)`,
-  rate: (rate: string) => `${rate}/hr`,
-  AGREED_RATE: 'Agreed rate',
-  ESTIMATED: 'Estimated earnings',
+    k(verified ? 'businessMetaVerified' : 'businessMeta', { rating, reviews }),
+  rate: (rate: string) => k('rate', { rate }),
+  get AGREED_RATE() {
+    return k('agreedRate');
+  },
+  get ESTIMATED() {
+    return k('estimated');
+  },
   when: (date: string, time: string) => `${date} · ${time}`,
   duration: (hours: number, note: string) =>
-    `${hours} ${hours === 1 ? 'hour' : 'hours'} · ${note}`,
-  where: (place: string, km: number) => `${place} · ${km} km`,
-  WHAT_YOU_DO: 'What you’ll do',
-  BEFORE_ACCEPT: 'Before you accept',
-  MESSAGE: 'Message business',
-  breakNote: (minutes: number) =>
-    minutes ? `includes ${minutes} min break` : 'no break',
-  scheduledDuration: (hours: number, breakMinutes: number) =>
-    `${hours} hours${breakMinutes ? ` · includes ${breakMinutes}-min paid break` : ''}`,
-  NO_DETAILS: 'The business hasn’t added details yet.',
-  ACCEPT_FAILED: 'Couldn’t accept this shift',
-  APPLY_FAILED: 'Couldn’t book this shift',
-  CONTACT_FAILED: 'Couldn’t reach the business',
-  timeConflict: (isLive: boolean) =>
-    `${isLive ? 'Live' : 'Scheduled'} · Clashes with your booking`,
-  TIME_CONFLICT_ACTION: 'You have a shift at this time',
-  NEXT_STEPS: 'What happens next',
-  ACTIVITY: 'Activity',
-  WITHDRAWN: 'Withdrawn',
-  activity: {
-    APPLIED: 'You applied',
-    selected: (business: string) => `Selected by ${business}`,
-    CONFIRMED: 'You confirmed',
-    ACCEPTED: 'You accepted',
-    ON_THE_WAY: 'You started travelling',
-    CHECKED_IN: 'Checked in',
-    CHECKED_OUT: 'Checked out',
-    approved: (business: string) => `Hours approved by ${business}`,
-    WITHDRAWN: 'You withdrew',
-    cancelledByBusiness: (business: string) => `Cancelled by ${business}`,
+    k('durationHours', { count: hours, note }),
+  where: (place: string, km: number) => k('where', { place, km }),
+  get WHAT_YOU_DO() {
+    return k('whatYouDo');
   },
-  travelStep: (time: string) =>
-    `Tap Head to business from ${time} so the business can see you are on the way.`,
-  checkInStep: (time: string) =>
-    `Check in at the workplace from ${time} with the code from the site contact.`,
-  CHECK_OUT_STEP: 'Check out when you finish so your hours are recorded and paid.',
-  HEAD_TO_BUSINESS: 'Head to business',
-  travelOpensAt: (time: string) => `Travel opens ${time}`,
-  CHECK_IN: 'Check in',
-  DIRECTIONS: 'Get directions',
-  EMERGENCY: 'Emergency help',
-  WITHDRAW: 'Withdraw from this shift',
-  TRAVEL_FAILED: 'Couldn’t start travel',
-  PREVIEW_FAILED: 'Couldn’t check the cancellation fee',
-  CANCEL_FAILED: 'Couldn’t withdraw from this shift',
-} as const;
+  get BEFORE_ACCEPT() {
+    return k('beforeAccept');
+  },
+  get MESSAGE() {
+    return k('message');
+  },
+  breakNote: (minutes: number) =>
+    minutes ? k('breakNote', { minutes }) : k('noBreak'),
+  scheduledDuration: (hours: number, breakMinutes: number) =>
+    breakMinutes
+      ? k('scheduledDurationBreak', { hours, minutes: breakMinutes })
+      : k('scheduledDuration', { hours }),
+  get NO_DETAILS() {
+    return k('noDetails');
+  },
+  get ACCEPT_FAILED() {
+    return k('acceptFailed');
+  },
+  get APPLY_FAILED() {
+    return k('applyFailed');
+  },
+  get CONTACT_FAILED() {
+    return k('contactFailed');
+  },
+  timeConflict: (isLive: boolean) =>
+    k(isLive ? 'timeConflictLive' : 'timeConflictScheduled'),
+  get TIME_CONFLICT_ACTION() {
+    return k('timeConflictAction');
+  },
+  get NEXT_STEPS() {
+    return k('nextSteps');
+  },
+  get ACTIVITY() {
+    return k('activityTitle');
+  },
+  get WITHDRAWN() {
+    return k('withdrawn');
+  },
+  activity: {
+    get APPLIED() {
+      return k('activity.applied');
+    },
+    selected: (business: string) => k('activity.selected', { business }),
+    get CONFIRMED() {
+      return k('activity.confirmed');
+    },
+    get ACCEPTED() {
+      return k('activity.accepted');
+    },
+    get ON_THE_WAY() {
+      return k('activity.onTheWay');
+    },
+    get CHECKED_IN() {
+      return k('activity.checkedIn');
+    },
+    get CHECKED_OUT() {
+      return k('activity.checkedOut');
+    },
+    approved: (business: string) => k('activity.approved', { business }),
+    get WITHDRAWN() {
+      return k('activity.withdrawn');
+    },
+    cancelledByBusiness: (business: string) =>
+      k('activity.cancelledByBusiness', { business }),
+  },
+  travelStep: (time: string) => k('travelStep', { time }),
+  checkInStep: (time: string) => k('checkInStep', { time }),
+  get CHECK_OUT_STEP() {
+    return k('checkOutStep');
+  },
+  get HEAD_TO_BUSINESS() {
+    return k('headToBusiness');
+  },
+  travelOpensAt: (time: string) => k('travelOpensAt', { time }),
+  get CHECK_IN() {
+    return k('checkIn');
+  },
+  get DIRECTIONS() {
+    return k('directions');
+  },
+  get EMERGENCY() {
+    return k('emergency');
+  },
+  get WITHDRAW() {
+    return k('withdraw');
+  },
+  get TRAVEL_FAILED() {
+    return k('travelFailed');
+  },
+  get PREVIEW_FAILED() {
+    return k('previewFailed');
+  },
+  get CANCEL_FAILED() {
+    return k('cancelFailed');
+  },
+};
 
 /** Scheduled shifts: "Head to business" unlocks this many hours before the start (same as web). */
 export const TRAVEL_OPENS_HOURS_BEFORE = 3;
@@ -72,16 +139,18 @@ export const DETAILS_COPY: Record<
   }
 > = {
   live: {
-    overline: spots =>
-      `Live · ${spots} ${spots === 1 ? 'spot' : 'spots'} available`,
-    callout:
-      'First-come-first-served for eligible workers. Your place is confirmed only when availability is secured.',
-    accept: rate => `Accept shift · ${rate}/hour`,
+    overline: spots => k('detailsCopy.live.overline', { count: spots }),
+    get callout() {
+      return k('detailsCopy.live.callout');
+    },
+    accept: rate => k('detailsCopy.live.accept', { rate }),
   },
   scheduled: {
-    overline: () => 'Scheduled · Open for booking',
-    callout: WORKER_CANCELLATION_STRINGS.BOOKING_NOTE,
-    accept: () => 'Book this shift',
+    overline: () => k('detailsCopy.scheduled.overline'),
+    get callout() {
+      return WORKER_CANCELLATION_STRINGS.BOOKING_NOTE;
+    },
+    accept: () => k('detailsCopy.scheduled.accept'),
   },
 };
 
@@ -91,20 +160,42 @@ export const BOOKING_COPY: Record<
   { overline: string; tone: Tone; action?: string }
 > = {
   confirmed: {
-    overline: 'Confirmed · You’re booked',
+    get overline() {
+      return k('bookingCopy.confirmed.overline');
+    },
     tone: 'success',
-    action: 'View my shift',
+    get action() {
+      return k('bookingCopy.confirmed.action');
+    },
   },
   selected: {
-    overline: 'Selected · Confirmation needed',
+    get overline() {
+      return k('bookingCopy.selected.overline');
+    },
     tone: 'warning',
-    action: 'Review offer',
+    get action() {
+      return k('bookingCopy.selected.action');
+    },
   },
   applied: {
-    overline: 'Applied · Waiting for the business',
+    get overline() {
+      return k('bookingCopy.applied.overline');
+    },
     tone: 'primary',
-    action: 'Application submitted',
+    get action() {
+      return k('bookingCopy.applied.action');
+    },
   },
-  completed: { overline: 'Completed', tone: 'success' },
-  cancelled: { overline: 'Cancelled', tone: 'danger' },
+  completed: {
+    get overline() {
+      return k('bookingCopy.completed.overline');
+    },
+    tone: 'success',
+  },
+  cancelled: {
+    get overline() {
+      return k('bookingCopy.cancelled.overline');
+    },
+    tone: 'danger',
+  },
 };

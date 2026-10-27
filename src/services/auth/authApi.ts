@@ -1,5 +1,7 @@
 import { Platform } from 'react-native';
 
+import { tr } from '@/services/i18n/tr';
+
 import type { AuthTokens } from './useAuthStore';
 import type {
   BusinessSignup,
@@ -61,11 +63,7 @@ async function post<T>(
       body: JSON.stringify(body),
     });
   } catch {
-    throw new AuthApiError(
-      'Could not reach KaaamNow. Check your connection and try again.',
-      'network_error',
-      0,
-    );
+    throw new AuthApiError(tr('errors.unreachable'), 'network_error', 0);
   }
 
   if (response.status === 204) return undefined as T;
@@ -75,7 +73,7 @@ async function post<T>(
   };
   if (!response.ok) {
     throw new AuthApiError(
-      payload.message || 'Request failed. Please try again.',
+      payload.message || tr('errors.requestFailed'),
       payload.code || 'request_failed',
       response.status,
     );
@@ -87,7 +85,7 @@ export async function checkPhoneForSignup(phone: string) {
   const result = await post<PhoneCheckResponse>('/auth/phone/check', { phone });
   if (result.roles.length) {
     throw new AuthApiError(
-      'This number already has an account. Log in instead.',
+      tr('errors.phoneRegistered'),
       'phone_registered',
       409,
     );
@@ -154,9 +152,14 @@ export const sendOtp = (
   role?: UserRole,
 ) => post<OtpSendResponse>('/auth/otp/send', { phone, intent, role });
 
-export const sendPasswordResetOtp = (phone: string) => sendOtp(phone, 'password_reset');
+export const sendPasswordResetOtp = (phone: string) =>
+  sendOtp(phone, 'password_reset');
 
-export const resetPassword = (phone: string, code: string, newPassword: string) =>
+export const resetPassword = (
+  phone: string,
+  code: string,
+  newPassword: string,
+) =>
   post<void>('/auth/password/reset/confirm', {
     phone,
     code,

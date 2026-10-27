@@ -6,17 +6,17 @@ import {
   type RemoteMessage,
 } from '@react-native-firebase/messaging';
 import { useEffect } from 'react';
-import { Alert } from 'react-native';
+import { Alert, AppState } from 'react-native';
 
 import { ROUTES } from '@/constants/routes';
 import { navigationRef } from '@/route/navigationRef';
+import { tr } from '@/services/i18n/tr';
 import type { UserRole } from '@/services/onboarding/useOnboardingStore';
 import { toShift } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 
 import { registerForPush } from './pushService';
 
-const PUSH_STRINGS = { CLOSE: 'Close', VIEW: 'View' } as const;
 const READY_RETRIES = 20;
 const READY_DELAY_MS = 250;
 
@@ -28,7 +28,7 @@ const waitForNavigation = async () => {
 };
 
 /** Booking pushes open the booking; everything else opens the inbox. */
-const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
+export const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
   if (!(await waitForNavigation())) return;
   const assignmentId = message.data?.assignment_id;
   if (typeof assignmentId !== 'string' || !assignmentId) {
@@ -36,7 +36,9 @@ const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
     return;
   }
   if (role === 'business') {
-    navigationRef.navigate(ROUTES.businessScheduledWorkerTracking, { assignmentId });
+    navigationRef.navigate(ROUTES.businessScheduledWorkerTracking, {
+      assignmentId,
+    });
     return;
   }
   try {
@@ -49,7 +51,10 @@ const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
     if (assignment.status === 'checked_in') {
       navigationRef.navigate(ROUTES.activeShift, { shift });
     } else {
-      navigationRef.navigate(ROUTES.shiftDetails, { shift, bookingStatus: 'confirmed' });
+      navigationRef.navigate(ROUTES.shiftDetails, {
+        shift,
+        bookingStatus: 'confirmed',
+      });
     }
   } catch {
     navigationRef.navigate(ROUTES.notifications);
@@ -62,29 +67,49 @@ export const usePushNotifications = (role: UserRole | null) => {
     const messaging = getMessaging();
     let stopTokenRefresh: (() => void) | undefined;
     let isActive = true;
+    let isSettled = false;
+    let isRegistering = false;
 
-    registerForPush()
-      .then(stop => {
-        if (isActive) stopTokenRefresh = stop;
-        else stop();
-      })
-      .catch(error => console.warn('Push registration failed.', error));
+    // Retried each time the app returns to the foreground until it succeeds or
+    // the user declines, so an offline sign-in still registers later.
+    const register = () => {
+      if (isSettled || isRegistering) return;
+      isRegistering = true;
+      registerForPush()
+        .then(stop => {
+          isSettled = true;
+          if (!stop) return;
+          if (isActive) stopTokenRefresh = stop;
+          else stop();
+        })
+        .catch(error => console.warn('Push registration failed; will retry.', error))
+        .finally(() => {
+          isRegistering = false;
+        });
+    };
+    register();
+    const appState = AppState.addEventListener('change', state => {
+      if (state === 'active') register();
+    });
 
     getInitialNotification(messaging).then(message => {
       if (message && isActive) openFromPush(message, role);
     });
-    const stopOpened = onNotificationOpenedApp(messaging, message => openFromPush(message, role));
+    const stopOpened = onNotificationOpenedApp(messaging, message =>
+      openFromPush(message, role),
+    );
     const stopForeground = onMessage(messaging, message => {
       const { title, body } = message.notification ?? {};
       if (!title) return;
       Alert.alert(title, body ?? '', [
-        { text: PUSH_STRINGS.CLOSE, style: 'cancel' },
-        { text: PUSH_STRINGS.VIEW, onPress: () => openFromPush(message, role) },
+        { text: tr('common.close'), style: 'cancel' },
+        { text: tr('common.view'), onPress: () => openFromPush(message, role) },
       ]);
     });
 
     return () => {
       isActive = false;
+      appState.remove();
       stopTokenRefresh?.();
       stopOpened();
       stopForeground();

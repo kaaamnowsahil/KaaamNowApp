@@ -29,7 +29,7 @@ export const PinSheet: FC<{
           value={pin}
           onChangeText={v => setPin(v.replace(/\D/g, '').slice(0, PIN_LENGTH))}
           keyboardType="number-pad"
-          placeholder="••••"
+          placeholder={'•'.repeat(PIN_LENGTH)}
           placeholderTextColor={colors.textSubtle}
           style={[
             styles.input,

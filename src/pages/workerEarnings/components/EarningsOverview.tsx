@@ -6,7 +6,7 @@ import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 import { formatRupees } from '@/utils/format';
 
-import type { EarningsSummary } from '../mock';
+import type { EarningsSummary } from '../types';
 
 /**
  * Figma SH-17 Worker earnings: Pending / Processing tiles over the completed-payouts card.

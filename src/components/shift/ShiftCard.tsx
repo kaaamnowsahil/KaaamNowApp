@@ -83,7 +83,7 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
           </Text>
           <Text style={[styles.estimate, { color: colors.textSubtle }]}>
             {SHIFT_STRINGS.estimated(
-              formatRupees(shift.hourlyRate * shift.durationHours),
+              formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
             )}
           </Text>
         </View>

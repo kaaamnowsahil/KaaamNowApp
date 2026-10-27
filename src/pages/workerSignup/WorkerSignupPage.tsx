@@ -8,7 +8,7 @@ import MapPinIcon from '@/assets/figma/map-pin.svg';
 import PhoneIcon from '@/assets/figma/phone.svg';
 import UserIcon from '@/assets/figma/user.svg';
 import {
-  ChipGroup,
+  SelectSheetField,
   BodyNote,
   IconField,
   PrimaryButton,
@@ -22,8 +22,6 @@ import type { AuthScreenProps } from '@/types';
 import { formatLocalPhone } from '@/utils/phone';
 
 import { useWorkerSignup } from './hooks/useWorkerSignup';
-
-const SIGNUP_CHIPS_COLLAPSED = 6;
 
 /**
  * Worker sign-up orchestrator. No dedicated Figma frame; built from the
@@ -158,7 +156,8 @@ export const WorkerSignupPage: FC<
         error={f.errors.address || f.locateError || undefined}
         testID="worker-address"
       />
-      <ChipGroup
+      <SelectSheetField
+        multiple
         label={t('workerSignup.workTypeLabel')}
         hint={
           f.catalogError ||
@@ -167,7 +166,6 @@ export const WorkerSignupPage: FC<
             : t('workerSignup.workTypeHint'))
         }
         error={f.errors.workTypes}
-        collapsedCount={SIGNUP_CHIPS_COLLAPSED}
         options={f.workTypeOptions.map(option => ({
           ...option,
           label: t(`workerSignup.workTypes.${option.id}`, {

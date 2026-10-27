@@ -1,6 +1,7 @@
 import RazorpayCheckout from 'react-native-razorpay';
 
 import { apiRequest } from '@/services/api/apiClient';
+import { tr } from '@/services/i18n/tr';
 
 export type PaymentMethodCode =
   | 'google_pay'
@@ -81,19 +82,31 @@ export type Payment = {
 export class PaymentNotCompletedError extends Error {}
 
 export const billingApi = {
-  invoice: (invoiceId: string) => apiRequest<Invoice>('GET', `/business/invoices/${invoiceId}`),
+  invoice: (invoiceId: string) =>
+    apiRequest<Invoice>('GET', `/business/invoices/${invoiceId}`),
   history: (status?: PaymentHistoryStatus) =>
     apiRequest<PaymentHistoryPage>('GET', '/business/payments', {
       query: status ? { status } : undefined,
     }),
   startPayment: (invoiceId: string, method: PaymentMethodCode) =>
-    apiRequest<Payment>('POST', `/business/invoices/${invoiceId}/payments`, { body: { method } }),
+    apiRequest<Payment>('POST', `/business/invoices/${invoiceId}/payments`, {
+      body: { method },
+    }),
   confirmPayment: (paymentId: string) =>
     apiRequest<Payment>('POST', `/business/payments/${paymentId}/confirm`),
   verifyRazorpay: (
     paymentId: string,
-    body: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string },
-  ) => apiRequest<Payment>('POST', `/business/payments/${paymentId}/razorpay-verify`, { body }),
+    body: {
+      razorpay_payment_id: string;
+      razorpay_order_id: string;
+      razorpay_signature: string;
+    },
+  ) =>
+    apiRequest<Payment>(
+      'POST',
+      `/business/payments/${paymentId}/razorpay-verify`,
+      { body },
+    ),
 };
 
 const CHECKOUT_NAME = 'KaaamNow';
@@ -112,19 +125,26 @@ const razorpayCheckout = async (payment: Payment) => {
   } catch (error) {
     if (error instanceof Error) throw error;
     const description = (error as { description?: string } | null)?.description;
-    throw new PaymentNotCompletedError(description || 'Payment was cancelled.');
+    throw new PaymentNotCompletedError(
+      description || tr('errors.paymentCancelled'),
+    );
   }
 };
 
 /** Starts one payment and settles it: Razorpay Checkout when live, a plain confirm for the fake provider. */
-export const payInvoice = async (invoiceId: string, method: PaymentMethodCode = 'upi_qr') => {
+export const payInvoice = async (
+  invoiceId: string,
+  method: PaymentMethodCode = 'upi_qr',
+) => {
   const payment = await billingApi.startPayment(invoiceId, method);
   const result =
     payment.provider === 'razorpay'
       ? await razorpayCheckout(payment)
       : await billingApi.confirmPayment(payment.id);
   if (result.status !== 'succeeded') {
-    throw new PaymentNotCompletedError(result.failure_reason || 'Payment did not go through.');
+    throw new PaymentNotCompletedError(
+      result.failure_reason || tr('errors.paymentFailed'),
+    );
   }
   return result;
 };

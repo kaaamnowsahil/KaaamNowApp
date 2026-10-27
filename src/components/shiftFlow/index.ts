@@ -11,6 +11,7 @@ export { ReasonSheet } from './ReasonSheet';
 export { ShiftRouteMap, type ShiftRoute } from './ShiftRouteMap';
 export { StatTiles, type StatTile } from './StatTiles';
 export { StatusHero } from './StatusHero';
+export { TermsCheckbox } from './TermsCheckbox';
 export { TermsSheet } from './TermsSheet';
 export { TextSection } from './TextSection';
 export { WorkerCancellationPolicyCard } from './WorkerCancellationPolicyCard';

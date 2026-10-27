@@ -1,3 +1,5 @@
+import { tr } from '@/services/i18n/tr';
+
 import { apiBaseUrl, AuthApiError } from './authApi';
 
 export type SignupOption = { id: string; label: string; sortOrder: number };
@@ -17,14 +19,14 @@ async function loadOptions(path: string): Promise<SignupOption[]> {
     });
   } catch {
     throw new AuthApiError(
-      'Could not load signup options. Check your connection and try again.',
+      tr('errors.signupOptionsUnreachable'),
       'network_error',
       0,
     );
   }
   if (!response.ok) {
     throw new AuthApiError(
-      'Could not load signup options. Please try again.',
+      tr('errors.signupOptionsFailed'),
       'lookup_failed',
       response.status,
     );
@@ -33,7 +35,11 @@ async function loadOptions(path: string): Promise<SignupOption[]> {
   return items
     .filter(item => item.is_active)
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map(item => ({ id: item.slug, label: item.name, sortOrder: item.sort_order }));
+    .map(item => ({
+      id: item.slug,
+      label: item.name,
+      sortOrder: item.sort_order,
+    }));
 }
 
 export const loadWorkerSignupOptions = () => loadOptions('/work-categories');

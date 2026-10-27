@@ -1,21 +1,45 @@
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`shiftTravel.${key}`, values);
+
 export const SHIFT_TRAVEL_STRINGS = {
-  OVERLINE: 'HEADING TO BUSINESS',
-  heading: (workplace: string) => `Head to ${workplace}`,
-  subtitle: (time: string) => `Your shift starts at ${time}.`,
-  eta: (min: number) => `${min} min`,
-  ETA: 'Estimated travel',
-  distance: (km: number) => `${km} km`,
-  DISTANCE: 'To the business',
-  DIRECTIONS: 'Open directions in Google Maps',
-  ARRIVAL_INSTRUCTIONS: 'Arrival instructions',
-  locationNote: (business: string) =>
-    `While this screen is open your location is shared with ${business} so they know you are on the way.`,
-  START_NAVIGATION: 'Start navigation',
-  travelOpensAt: (time: string) => `Travel opens at ${time}`,
-  ARRIVED: 'I have arrived – check in',
-  checkInOpensAt: (time: string) => `Check-in opens at ${time}`,
-  MESSAGE: 'Message business',
-  EMERGENCY: 'Emergency help',
+  get OVERLINE() {
+    return k('overline');
+  },
+  heading: (workplace: string) => k('heading', { workplace }),
+  subtitle: (time: string) => k('subtitle', { time }),
+  eta: (min: number) => k('eta', { min }),
+  get ETA() {
+    return k('etaLabel');
+  },
+  distance: (km: number) => k('distance', { km }),
+  get DISTANCE() {
+    return k('distanceLabel');
+  },
+  get DIRECTIONS() {
+    return k('directions');
+  },
+  get ARRIVAL_INSTRUCTIONS() {
+    return k('arrivalInstructions');
+  },
+  locationNote: (business: string) => k('locationNote', { business }),
+  get START_NAVIGATION() {
+    return k('startNavigation');
+  },
+  travelOpensAt: (time: string) => k('travelOpensAt', { time }),
+  get ARRIVED() {
+    return k('arrived');
+  },
+  checkInOpensAt: (time: string) => k('checkInOpensAt', { time }),
+  get MESSAGE() {
+    return k('message');
+  },
+  get EMERGENCY() {
+    return k('emergency');
+  },
   NO_ETA: '—',
-  START_FAILED: 'Couldn’t start travelling',
-} as const;
+  get START_FAILED() {
+    return k('startFailed');
+  },
+};

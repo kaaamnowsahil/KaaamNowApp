@@ -6,7 +6,7 @@ import MapPinIcon from '@/assets/figma/map-pin.svg';
 import UserIcon from '@/assets/figma/user.svg';
 import {
   BodyNote,
-  ChipGroup,
+  SelectSheetField,
   IconField,
   PrimaryButton,
   ScreenIntro,
@@ -17,8 +17,6 @@ import type { AppScreenProps } from '@/types';
 
 import { ADD_ROLE_STRINGS as S } from './constants/addRoleStrings';
 import { useAddRole } from './hooks/useAddRole';
-
-const CHIPS_COLLAPSED = 6;
 
 /** Signed-in user adds their other role (worker or Business / Work), then switches to it. */
 export const AddRolePage: FC<AppScreenProps<typeof ROUTES.addRole>> = ({
@@ -94,11 +92,11 @@ export const AddRolePage: FC<AppScreenProps<typeof ROUTES.addRole>> = ({
         }}
         error={f.errors.address || f.locateError || undefined}
       />
-      <ChipGroup
+      <SelectSheetField
+        multiple
         label={isWorker ? S.workTypesLabel : S.businessTypesLabel}
         hint={f.optionsError || (f.optionsLoading ? S.loadingOptions : undefined)}
         error={f.errors.types}
-        collapsedCount={CHIPS_COLLAPSED}
         options={f.options}
         selected={f.form.types}
         onToggle={f.toggleType}

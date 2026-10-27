@@ -18,25 +18,16 @@ import { splitTimeRange } from '@/utils/format';
 
 import { CheckInHelpSheet } from './components';
 
-const CHECK_IN_STRINGS = {
-  CODE_LENGTH: 4,
-  OVERLINE: 'AT THE WORKPLACE',
-  TITLE: 'Ready to check in?',
-  subtitle: (workplace: string) => `Enter the check-in code from the site contact at ${workplace}.`,
-  CODE_LABEL: 'Check-in code',
-  CODE_PLACEHOLDER: '••••',
-  CODE_WRONG: 'That code doesn’t match. Check with your shift lead and try again.',
-  SHIFT_STARTS: 'Shift starts',
-  SHIFT_ENDS: 'Shift ends',
-  LOCATION_NOTE: 'We confirm your location when you check in, so stay within 200 m of the workplace.',
-  LOCATION_TITLE: 'Location needed',
-  LOCATION_BODY: 'Turn on location so we can confirm you’re at the workplace, then try again.',
-  FAILED: 'Couldn’t check you in',
-} as const;
+const CODE_LENGTH = 4;
+const CODE_PLACEHOLDER = '••••••';
 
 const clockTime = (iso: string) =>
   new Date(iso)
-    .toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true })
+    .toLocaleTimeString('en-IN', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
     .toUpperCase();
 
 /**
@@ -67,7 +58,10 @@ export const ShiftCheckInPage: FC<
     try {
       const position = await getDevicePosition();
       if (!position) {
-        Alert.alert(CHECK_IN_STRINGS.LOCATION_TITLE, CHECK_IN_STRINGS.LOCATION_BODY);
+        Alert.alert(
+          t('workerFlow.checkIn.locationTitle'),
+          t('workerFlow.checkIn.locationBody'),
+        );
         return;
       }
       const assignment = await shiftsApi.checkIn(assignmentId, {
@@ -81,7 +75,7 @@ export const ShiftCheckInPage: FC<
       if (error instanceof ApiError && error.code === 'check_in_code_invalid') {
         setIsWrong(true);
       } else {
-        Alert.alert(CHECK_IN_STRINGS.FAILED, errorMessage(error));
+        Alert.alert(t('workerFlow.checkIn.failed'), errorMessage(error));
       }
     } finally {
       setIsVerifying(false);
@@ -90,11 +84,11 @@ export const ShiftCheckInPage: FC<
 
   const summary = [
     {
-      label: CHECK_IN_STRINGS.SHIFT_STARTS,
+      label: t('workerFlow.checkIn.shiftStarts'),
       value: shift.startsAt ? clockTime(shift.startsAt) : times.start,
     },
     {
-      label: CHECK_IN_STRINGS.SHIFT_ENDS,
+      label: t('workerFlow.checkIn.shiftEnds'),
       value: shift.endsAt ? clockTime(shift.endsAt) : times.end,
     },
   ];
@@ -113,7 +107,9 @@ export const ShiftCheckInPage: FC<
           <>
             <PrimaryButton
               label={t('workerFlow.checkIn.verify')}
-              disabled={code.length < CHECK_IN_STRINGS.CODE_LENGTH || isVerifying || !assignmentId}
+              disabled={
+                code.length < CODE_LENGTH || isVerifying || !assignmentId
+              }
               onPress={verify}
               testID="shift-check-in-verify"
             />
@@ -126,28 +122,35 @@ export const ShiftCheckInPage: FC<
         }
       >
         <FlowHeading
-          overline={CHECK_IN_STRINGS.OVERLINE}
-          title={CHECK_IN_STRINGS.TITLE}
-          subtitle={CHECK_IN_STRINGS.subtitle(shift.businessName)}
+          overline={t('workerFlow.checkIn.overline')}
+          title={t('workerFlow.checkIn.heading')}
+          subtitle={t('workerFlow.checkIn.enterCode', {
+            workplace: shift.businessName,
+          })}
         />
         <View style={styles.field}>
           <View style={styles.labelRow}>
             <KeyIcon width={16} height={16} color={colors.text} />
             <Text style={[styles.label, { color: colors.text }]}>
-              {CHECK_IN_STRINGS.CODE_LABEL}
+              {t('workerFlow.checkIn.checkInCodeLabel')}
             </Text>
           </View>
           <TextInput
-            accessibilityLabel={CHECK_IN_STRINGS.CODE_LABEL}
+            accessibilityLabel={t('workerFlow.checkIn.checkInCodeLabel')}
             value={code}
             onChangeText={v => {
-              setCode(v.replace(/[^0-9a-z]/gi, '').toUpperCase().slice(0, 8));
+              setCode(
+                v
+                  .replace(/[^0-9a-z]/gi, '')
+                  .toUpperCase()
+                  .slice(0, 8),
+              );
               setIsWrong(false);
             }}
             autoCapitalize="characters"
             autoCorrect={false}
             textContentType="oneTimeCode"
-            placeholder={CHECK_IN_STRINGS.CODE_PLACEHOLDER}
+            placeholder={CODE_PLACEHOLDER}
             placeholderTextColor={colors.textSubtle}
             style={[
               styles.input,
@@ -161,7 +164,7 @@ export const ShiftCheckInPage: FC<
           />
           {isWrong ? (
             <Text style={[styles.error, { color: colors.danger }]}>
-              {CHECK_IN_STRINGS.CODE_WRONG}
+              {t('workerFlow.checkIn.codeWrong')}
             </Text>
           ) : null}
         </View>
@@ -169,15 +172,22 @@ export const ShiftCheckInPage: FC<
           {summary.map(item => (
             <View
               key={item.label}
-              style={[styles.summaryItem, { borderColor: colors.border, backgroundColor: colors.surface }]}
+              style={[
+                styles.summaryItem,
+                { borderColor: colors.border, backgroundColor: colors.surface },
+              ]}
             >
-              <Text style={[styles.summaryLabel, { color: colors.textSubtle }]}>{item.label}</Text>
-              <Text style={[styles.summaryValue, { color: colors.text }]}>{item.value}</Text>
+              <Text style={[styles.summaryLabel, { color: colors.textSubtle }]}>
+                {item.label}
+              </Text>
+              <Text style={[styles.summaryValue, { color: colors.text }]}>
+                {item.value}
+              </Text>
             </View>
           ))}
         </View>
         <Text style={[styles.note, { color: colors.textSubtle }]}>
-          {CHECK_IN_STRINGS.LOCATION_NOTE}
+          {t('workerFlow.checkIn.locationNote')}
         </Text>
       </FormScreen>
       {isHelpOpen ? (

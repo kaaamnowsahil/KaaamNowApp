@@ -9,12 +9,23 @@ import { navigationRef } from '@/route/navigationRef';
 import { ApiError, errorMessage } from '@/services/api/apiClient';
 import { switchRole } from '@/services/auth/roleSwitch';
 import { useAuthStore } from '@/services/auth/useAuthStore';
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string) => tr(`roleSwitch.${key}`);
 
 const STRINGS = {
-  toBusiness: 'Switch to Business / Work',
-  toWorker: 'Switch to Worker',
-  switching: 'Switching…',
-  failedTitle: 'Could not switch',
+  get toBusiness() {
+    return k('toBusiness');
+  },
+  get toWorker() {
+    return k('toWorker');
+  },
+  get switching() {
+    return k('switching');
+  },
+  get failedTitle() {
+    return k('failedTitle');
+  },
 };
 
 /**

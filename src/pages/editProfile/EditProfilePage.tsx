@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import MapPinIcon from '@/assets/figma/map-pin.svg';
 import PhoneIcon from '@/assets/figma/phone.svg';
 import UserIcon from '@/assets/figma/user.svg';
-import { ChipGroup, IconField, PrimaryButton } from '@/components/ui';
+import { SelectSheetField, IconField, PrimaryButton } from '@/components/ui';
 import type { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import type { AppScreenProps } from '@/types';
@@ -75,7 +75,8 @@ export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
         }}
         testID="edit-address"
       />
-      <ChipGroup
+      <SelectSheetField
+        multiple
         label={t('editProfile.workTypeLabel')}
         hint={f.loadError || undefined}
         options={f.workTypeOptions}

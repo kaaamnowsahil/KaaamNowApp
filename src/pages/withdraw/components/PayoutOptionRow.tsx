@@ -1,14 +1,18 @@
 import type { FC } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import CreditCardIcon from '@/assets/icons/credit-card.svg';
 import QrCodeIcon from '@/assets/icons/qr-code.svg';
 import { RadioCheck } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
-import type { PayoutOption } from '../mock';
+export type PayoutOption = {
+  id: string;
+  title: string;
+  caption: string;
+  /** Letter shown in the tile; otherwise the add-UPI icon. */
+  initial?: string;
+};
 
 /** One "Withdraw to" choice: lettered or icon tile, title, caption, radio. */
 export const PayoutOptionRow: FC<{
@@ -17,27 +21,8 @@ export const PayoutOptionRow: FC<{
   isLast: boolean;
   onPress: () => void;
 }> = ({ option, selected, isLast, onPress }) => {
-  const { t } = useTranslation();
   const { colors } = useTheme();
-  const AddIcon = option.addKind === 'bank' ? CreditCardIcon : QrCodeIcon;
-  const titleKeys: Record<string, string> = {
-    upi: 'upiTitle',
-    paytm: 'paytmTitle',
-    bank: 'bankTitle',
-    'add-upi': 'addUpiTitle',
-    'add-bank': 'addBankTitle',
-  };
-  const captionKeys: Record<string, string> = {
-    paytm: 'phoneLinked',
-    'add-upi': 'addAnother',
-    'add-bank': 'accountIfsc',
-  };
-  const title = titleKeys[option.id]
-    ? t(`withdraw.options.${titleKeys[option.id]}`)
-    : option.title;
-  const caption = captionKeys[option.id]
-    ? t(`withdraw.options.${captionKeys[option.id]}`)
-    : option.caption;
+  const { title, caption } = option;
   return (
     <Pressable
       accessibilityRole="radio"
@@ -60,13 +45,11 @@ export const PayoutOptionRow: FC<{
             {option.initial}
           </Text>
         ) : (
-          <AddIcon width={16} height={16} color={colors.primary} />
+          <QrCodeIcon width={16} height={16} color={colors.primary} />
         )}
       </View>
       <View style={styles.text}>
-        <Text style={[styles.title, { color: colors.text }]}>
-          {title}
-        </Text>
+        <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
         <Text style={[styles.caption, { color: colors.textSubtle }]}>
           {caption}
         </Text>

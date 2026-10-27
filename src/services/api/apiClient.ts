@@ -1,14 +1,25 @@
 import { apiBaseUrl, refreshAuthTokens } from '@/services/auth/authApi';
 import { useAuthStore } from '@/services/auth/useAuthStore';
+import { tr } from '@/services/i18n/tr';
 
 export class ApiError extends Error {
   constructor(
     message: string,
     readonly code: string,
     readonly status: number,
+    readonly details: unknown = null,
+    readonly requestId: string | null = null,
   ) {
     super(message);
     this.name = 'ApiError';
+  }
+
+  /** Per-field messages from `details.fields`, when the server sent a field map. */
+  get fieldErrors(): Record<string, string> {
+    const fields = (this.details as { fields?: unknown } | null)?.fields;
+    return fields && typeof fields === 'object' && !Array.isArray(fields)
+      ? (fields as Record<string, string>)
+      : {};
   }
 }
 
@@ -41,8 +52,13 @@ const refreshAccessToken = () => {
 
 const buildUrl = (path: string, query?: Query) => {
   const params = Object.entries(query ?? {})
-    .filter(([, value]) => value !== undefined && value !== null && value !== '')
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+    .filter(
+      ([, value]) => value !== undefined && value !== null && value !== '',
+    )
+    .map(
+      ([key, value]) =>
+        `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`,
+    )
     .join('&');
   return `${apiBaseUrl}${path}${params ? `?${params}` : ''}`;
 };
@@ -62,17 +78,16 @@ const send = async (
       signal: controller.signal,
       headers: {
         Accept: 'application/json',
-        ...(body === undefined || isForm ? {} : { 'Content-Type': 'application/json' }),
+        ...(body === undefined || isForm
+          ? {}
+          : { 'Content-Type': 'application/json' }),
         ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       },
-      body: body === undefined ? undefined : isForm ? body : JSON.stringify(body),
+      body:
+        body === undefined ? undefined : isForm ? body : JSON.stringify(body),
     });
   } catch {
-    throw new ApiError(
-      'Could not reach KaaamNow. Check your connection and try again.',
-      'network_error',
-      0,
-    );
+    throw new ApiError(tr('errors.unreachable'), 'network_error', 0);
   } finally {
     clearTimeout(timer);
   }
@@ -92,7 +107,8 @@ export async function apiRequest<T>(
   );
   if (response.status === 401) {
     const accessToken = await refreshAccessToken();
-    if (accessToken) response = await send(method, url, options.body, accessToken);
+    if (accessToken)
+      response = await send(method, url, options.body, accessToken);
   }
 
   if (response.status === 204) return undefined as T;
@@ -100,18 +116,22 @@ export async function apiRequest<T>(
     code?: string;
     message?: string;
     detail?: unknown;
+    details?: unknown;
+    request_id?: string;
   };
   if (!response.ok) {
     throw new ApiError(
       payload.message ||
         (typeof payload.detail === 'string' ? payload.detail : '') ||
-        'Something went wrong. Please try again.',
+        tr('errors.generic'),
       payload.code || 'request_failed',
       response.status,
+      payload.details ?? null,
+      payload.request_id ?? response.headers.get('x-request-id'),
     );
   }
   return payload as T;
 }
 
 export const errorMessage = (error: unknown) =>
-  error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+  error instanceof Error ? error.message : tr('errors.generic');

@@ -8,7 +8,12 @@ export type BookingStatus =
   | 'cancelled';
 
 /** My shifts also lists applications that ended before a booking. */
-export type MyShiftStatus = BookingStatus | 'declined' | 'rejected' | 'withdrawn' | 'expired';
+export type MyShiftStatus =
+  | BookingStatus
+  | 'declined'
+  | 'rejected'
+  | 'withdrawn'
+  | 'expired';
 
 /** A worker's relationship to one shift. */
 export type Booking = {
@@ -28,16 +33,6 @@ export type Booking = {
   /** Earned or estimated pay in rupees. */
   estimatedPay?: number;
   businessRating?: { avg: number; count: number };
-};
-
-/** Result of a withdrawal request (12 · Withdrawal initiated). */
-export type WithdrawalReceipt = {
-  amount: number;
-  /** UPI id, wallet or masked bank account, e.g. "aarav@okbank". */
-  destination: string;
-  /** e.g. "UPI", "Paytm", "Bank" */
-  method: string;
-  reference: string;
 };
 
 export type PayoutStatus = 'pending' | 'processing' | 'completed' | 'failed';

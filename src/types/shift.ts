@@ -17,7 +17,10 @@ export type Shift = {
   area: string;
   requirement: string;
   distanceKm: number;
+  /** Worker's rate after commission. */
   hourlyRate: number;
+  /** Worker's pay for the shift after commission. */
+  estimatedPay?: number;
   spotsOpen: number;
   startsAt?: string;
   endsAt?: string;

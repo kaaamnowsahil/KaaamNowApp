@@ -6,8 +6,13 @@ export type {
   PayoutMethod,
   PayoutStatus,
   WorkerEarningDetails,
-  WithdrawalReceipt,
 } from './booking';
+export type {
+  DeletionDetailProps,
+  DeletionHold,
+  DeletionRequest,
+  DeletionRequestStatus,
+} from './accountDeletion';
 export type { Option, PickedAddress } from './common';
 export type {
   BusinessApplicant,
@@ -31,7 +36,4 @@ export type {
   TabAppNavigation,
   TabParamList,
   TabScreenProps,
-  BusinessPaymentMethod,
-  BusinessPaymentRecord,
-  BusinessPaymentDetails,
 } from './navigation';

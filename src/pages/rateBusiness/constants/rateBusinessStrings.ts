@@ -1,20 +1,41 @@
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`rateBusiness.${key}`, values);
+
+const RATING_LABEL_KEYS = [
+  'tapToRate',
+  'poor',
+  'couldBeBetter',
+  'good',
+  'great',
+  'excellent',
+];
+
 export const RATE_BUSINESS_STRINGS = {
-  heading: (business: string) => `Rate ${business}`,
-  SUBTITLE: 'Your feedback keeps KaaamNow safe and fair.',
+  heading: (business: string) => k('heading', { business }),
+  get SUBTITLE() {
+    return k('subtitle');
+  },
   businessMeta: (verified: boolean, role: string) =>
-    verified ? `Verified business · ${role}` : role,
-  starLabel: (n: number) => `${n} ${n === 1 ? 'star' : 'stars'}`,
-  RATING_LABEL: [
-    'Tap a star to rate',
-    'Poor',
-    'Could be better',
-    'Good',
-    'Great experience',
-    'Excellent',
-  ],
-  WENT_WELL: 'What went well?',
-  COMMENT_PLACEHOLDER: 'Share more about your shift (optional)',
-  SUBMIT: 'Submit rating',
-  SKIP: 'Skip for now',
-  SUBMIT_FAILED: 'Couldn’t send your rating',
-} as const;
+    verified ? k('businessMetaVerified', { role }) : role,
+  starLabel: (n: number) => k('starLabel', { count: n }),
+  get RATING_LABEL() {
+    return RATING_LABEL_KEYS.map(key => k(`ratingLabel.${key}`));
+  },
+  get WENT_WELL() {
+    return k('wentWell');
+  },
+  get COMMENT_PLACEHOLDER() {
+    return k('commentPlaceholder');
+  },
+  get SUBMIT() {
+    return k('submit');
+  },
+  get SKIP() {
+    return k('skip');
+  },
+  get SUBMIT_FAILED() {
+    return k('submitFailed');
+  },
+};

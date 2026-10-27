@@ -19,7 +19,7 @@ import { formatRupees } from '@/utils/format';
 import { EarningsOverview } from './components';
 import { WORKER_EARNINGS_STRINGS as S } from './constants';
 import { useWorkerEarnings } from './hooks/useWorkerEarnings';
-import type { EarningsRow } from './mock';
+import type { EarningsRow } from './types';
 
 const signedRupees = (amount: number) =>
   amount < 0 ? `−${formatRupees(-amount)}` : formatRupees(amount);

@@ -15,13 +15,6 @@ import type { AppScreenProps } from '@/types';
 import { ShiftFieldError } from './components';
 import { formatShiftTime, parseLocalDate } from './utils';
 
-const POSTED_STRINGS = {
-  PAY_DEPOSIT: 'Pay deposit',
-  PAY_FAILED: 'Payment didn’t go through',
-  UNPAID_NOTE: 'Not live yet: workers can book once the deposit is paid.',
-  DEPOSIT_PENDING: 'Deposit pending',
-} as const;
-
 export const BusinessShiftPostedPage: FC<
   AppScreenProps<typeof ROUTES.businessShiftPosted>
 > = ({ navigation, route }) => {
@@ -47,9 +40,11 @@ export const BusinessShiftPostedPage: FC<
         for (const invoiceId of unpaidInvoiceIds) await payInvoice(invoiceId);
       },
       () => navigation.setParams({ unpaidInvoiceIds: [] }),
-      POSTED_STRINGS.PAY_FAILED,
+      t('businessShiftCreate.payFailed'),
       error => {
-        setPayError(`${POSTED_STRINGS.PAY_FAILED}: ${errorMessage(error)}`);
+        setPayError(
+          `${t('businessShiftCreate.payFailed')}: ${errorMessage(error)}`,
+        );
         return true;
       },
     );
@@ -77,7 +72,7 @@ export const BusinessShiftPostedPage: FC<
         <>
           {unpaidInvoiceIds.length ? (
             <PrimaryButton
-              label={POSTED_STRINGS.PAY_DEPOSIT}
+              label={t('businessShiftCreate.payDeposit')}
               disabled={busy}
               onPress={payDeposits}
               testID="business-shift-pay-deposit"
@@ -106,14 +101,17 @@ export const BusinessShiftPostedPage: FC<
       </Text>
       <Text style={[styles.subtitle, { color: colors.textSubtle }]}>
         {unpaidInvoiceIds.length
-          ? POSTED_STRINGS.UNPAID_NOTE
+          ? t('businessShiftCreate.unpaidNote')
           : t('businessShiftCreate.postedSubtitle')}
       </Text>
       <ShiftFieldError message={payError} />
 
       {schedules.map((schedule, index) => (
         <View
-          key={draft.schedules[index]?.id ?? `${schedule.date}-${schedule.time}-${index}`}
+          key={
+            draft.schedules[index]?.id ??
+            `${schedule.date}-${schedule.time}-${index}`
+          }
           style={[
             styles.card,
             styles.shiftCard,
@@ -134,7 +132,7 @@ export const BusinessShiftPostedPage: FC<
           >
             <Text style={[styles.open, { color: colors.success }]}>
               {unpaidInvoiceIds.length
-                ? POSTED_STRINGS.DEPOSIT_PENDING
+                ? t('businessShiftCreate.depositPending')
                 : t('businessShiftCreate.openShift')}
             </Text>
           </View>

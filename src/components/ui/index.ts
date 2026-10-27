@@ -16,6 +16,7 @@ export { RadioCheck } from './RadioCheck';
 export { OutlineButton } from './OutlineButton';
 export { SectionHeading } from './SectionHeading';
 export { SegmentedControl } from './SegmentedControl';
+export { SelectSheetField } from './SelectSheetField';
 export { TextButton } from './TextButton';
 export {
   BackButton,

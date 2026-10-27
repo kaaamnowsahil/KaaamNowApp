@@ -1,14 +1,41 @@
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`businessShiftCreate.formErrors.${key}`, values);
+
 export const SHIFT_FORM_ERRORS = {
-  DATES: 'Select at least one date.',
-  LOCATION: 'Enter the work address and set the map pin.',
-  ROLE: 'Enter the role.',
-  CATEGORY: 'Choose a category.',
-  START: 'Choose a start time.',
-  END: 'Choose an end time.',
-  END_BEFORE_START: 'End time must be after the start time.',
-  tooSoon: (hours: number) => `Must start at least ${hours} hours from now.`,
-  WORKERS: 'Enter at least 1 worker.',
-  PAY: 'Enter the pay per hour.',
-  BREAK: 'Enter minutes (0 if none), shorter than the shift.',
-  RESPONSIBILITIES: 'Add the responsibilities.',
-} as const;
+  get DATES() {
+    return k('dates');
+  },
+  get LOCATION() {
+    return k('location');
+  },
+  get ROLE() {
+    return k('role');
+  },
+  get CATEGORY() {
+    return k('category');
+  },
+  get START() {
+    return k('start');
+  },
+  get END() {
+    return k('end');
+  },
+  get END_BEFORE_START() {
+    return k('endBeforeStart');
+  },
+  tooSoon: (hours: number) => k('tooSoon', { hours }),
+  get WORKERS() {
+    return k('workers');
+  },
+  get PAY() {
+    return k('pay');
+  },
+  get BREAK() {
+    return k('break');
+  },
+  get RESPONSIBILITIES() {
+    return k('responsibilities');
+  },
+};

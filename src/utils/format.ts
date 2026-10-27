@@ -4,9 +4,12 @@ export const maskIndianPhone = (e164: string): string => {
   return `+91 ***** ${local.slice(-5)}`;
 };
 
-/** 1050 -> "₹1,050" */
+/** 1050 -> "₹1,050", 1200.5 -> "₹1,200.50" */
 export const formatRupees = (amount: number): string =>
-  `₹${amount.toLocaleString('en-IN')}`;
+  `₹${amount.toLocaleString('en-IN', {
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })}`;
 
 /** 272 -> "04:32" */
 export const formatMmSs = (totalSeconds: number): string => {
@@ -36,6 +39,13 @@ export const formatMinSec = (totalSeconds: number) =>
 export const splitTimeRange = (timeLabel: string) => {
   const [start = timeLabel, end = ''] = timeLabel.split(/\s*[–-]\s*/);
   return { start, end };
+};
+
+/** ISO string → locale date-time; invalid input is returned unchanged. */
+export const formatDateTime = (value: string | null) => {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
 };
 
 /** "Aarav Sharma" → "AS" (first two words). */

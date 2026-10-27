@@ -8,7 +8,7 @@ import MapPinIcon from '@/assets/figma/map-pin.svg';
 import PhoneIcon from '@/assets/figma/phone.svg';
 import UserIcon from '@/assets/figma/user.svg';
 import {
-  ChipGroup,
+  SelectSheetField,
   BodyNote,
   IconField,
   PrimaryButton,
@@ -22,8 +22,6 @@ import type { AuthScreenProps } from '@/types';
 import { formatLocalPhone } from '@/utils/phone';
 
 import { useBusinessSignup } from './hooks/useBusinessSignup';
-
-const SIGNUP_CHIPS_COLLAPSED = 6;
 
 /**
  * Business sign-up orchestrator. No dedicated Figma frame; built from the
@@ -160,7 +158,8 @@ export const BusinessSignupPage: FC<
         error={f.errors.address || f.locateError || undefined}
         testID="business-address"
       />
-      <ChipGroup
+      <SelectSheetField
+        multiple
         label={t('businessSignup.businessTypeLabel')}
         hint={
           f.catalogError ||
@@ -169,7 +168,6 @@ export const BusinessSignupPage: FC<
             : t('businessSignup.businessTypeHint'))
         }
         error={f.errors.businessTypes}
-        collapsedCount={SIGNUP_CHIPS_COLLAPSED}
         options={f.businessTypeOptions.map(option => ({
           ...option,
           label: t(`businessSignup.businessTypes.${option.id}`, {

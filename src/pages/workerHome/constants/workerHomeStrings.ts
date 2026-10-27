@@ -1,68 +1,161 @@
+import { tr } from '@/services/i18n/tr';
 import type { ShiftStatus } from '@/types';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`workerHome.${key}`, values);
+const filter = (key: string) => tr(`shiftFilters.${key}`);
 
 export const WORKER_HOME_STRINGS = {
   greeting: (hour: number, name: string) => {
-    const part = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
-    return `Good ${part}, ${name}`;
+    const part = hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : 'Evening';
+    return k(`greeting${part}`, { name });
   },
-  GREETING_FALLBACK: 'Find your next shift',
-  LOAD_ERROR_TITLE: 'Couldn’t load shifts',
-  RETRY: 'Try again',
-  SEARCH_PLACEHOLDER: 'Role, business or location',
-  FILTERS: 'Filters',
-  filtersLabel: (n: number) => (n ? `Filters, ${n} active` : 'Filters'),
-  FILTER_TITLE: 'Filter shifts',
-  FILTER_SUBTITLE: 'Show only the shifts that work for you.',
-  FILTER_DISTANCE: 'Distance',
-  FILTER_PAY: 'Minimum pay',
-  FILTER_LENGTH: 'Shift length',
-  FILTER_BUSINESS_TYPE: 'Business type',
-  FILTER_BUSINESS_TYPE_HINT: 'Pick one or more.',
-  FILTER_VERIFIED: 'Verified businesses only',
-  FILTER_VERIFIED_HINT: 'Businesses checked by KaaamNow',
-  FILTER_RESET: 'Reset',
-  FILTER_APPLY: 'Show shifts',
-  CLOSE: 'Close filters',
-  CHANGE_LOCATION: 'Change location',
-  LOCATION_HINT: 'Show shifts near',
+  get GREETING_FALLBACK() {
+    return k('greetingFallback');
+  },
+  get LOAD_ERROR_TITLE() {
+    return k('loadErrorTitle');
+  },
+  get RETRY() {
+    return k('retry');
+  },
+  get SEARCH_PLACEHOLDER() {
+    return k('searchRolePlaceholder');
+  },
+  get FILTERS() {
+    return k('filters');
+  },
+  filtersLabel: (n: number) => (n ? k('filtersActive', { n }) : k('filters')),
+  get FILTER_TITLE() {
+    return filter('title');
+  },
+  get FILTER_SUBTITLE() {
+    return filter('subtitle');
+  },
+  get FILTER_DISTANCE() {
+    return filter('distance');
+  },
+  get FILTER_PAY() {
+    return filter('minimumPay');
+  },
+  get FILTER_LENGTH() {
+    return filter('length');
+  },
+  get FILTER_BUSINESS_TYPE() {
+    return filter('businessType');
+  },
+  get FILTER_BUSINESS_TYPE_HINT() {
+    return filter('businessTypeHint');
+  },
+  get FILTER_VERIFIED() {
+    return filter('verified');
+  },
+  get FILTER_VERIFIED_HINT() {
+    return filter('verifiedHint');
+  },
+  get FILTER_RESET() {
+    return filter('reset');
+  },
+  get FILTER_APPLY() {
+    return filter('apply');
+  },
+  get CLOSE() {
+    return filter('close');
+  },
+  get CHANGE_LOCATION() {
+    return k('changeLocation');
+  },
+  get LOCATION_HINT() {
+    return k('locationHint');
+  },
   SEGMENTS: [
-    { id: 'live', label: 'Live Now' },
-    { id: 'scheduled', label: 'Scheduled' },
+    {
+      id: 'live',
+      get label() {
+        return k('segments.live');
+      },
+    },
+    {
+      id: 'scheduled',
+      get label() {
+        return k('segments.scheduled');
+      },
+    },
   ] as { id: ShiftStatus; label: string }[],
   NEARBY_TITLE: {
-    live: 'Nearby, starting soon',
-    scheduled: 'Nearby, coming up',
+    get live() {
+      return k('nearbyTitle.live');
+    },
+    get scheduled() {
+      return k('nearbyTitle.scheduled');
+    },
   } as Record<ShiftStatus, string>,
-  RECOMMENDED_TITLE: 'Recommended for you',
-  EMPTY: 'No shifts match right now. Try another role or search.',
+  get RECOMMENDED_TITLE() {
+    return k('recommendedTitle');
+  },
+  get EMPTY() {
+    return k('empty');
+  },
   EMPTY_STATE: {
     live: {
-      title: 'No live shifts nearby',
-      body: 'There are no live shifts in your area right now.',
-      action: 'Browse scheduled shifts',
+      get title() {
+        return k('emptyState.live.title');
+      },
+      get body() {
+        return k('emptyState.live.body');
+      },
+      get action() {
+        return k('emptyState.live.action');
+      },
     },
     scheduled: {
-      title: 'No scheduled shifts found',
-      body: 'There are no scheduled shifts in your area right now.',
+      get title() {
+        return k('emptyState.scheduled.title');
+      },
+      get body() {
+        return k('emptyState.scheduled.body');
+      },
     },
   } as Record<ShiftStatus, { title: string; body: string; action?: string }>,
   AVAILABILITY: {
-    TITLE: 'Availability',
-    ON: 'LIVE',
-    OFF: 'You’re offline',
-    GO_ONLINE: 'Go live',
-    GO_OFFLINE: 'Go offline',
-    LOCATION_DENIED:
-      'We couldn’t get your location. Allow location access in your phone settings and check that location services are on, then try again.',
-    VERIFICATION_PENDING:
-      'Your worker profile is awaiting verification. You can go online once it’s approved.',
-    VERIFICATION_REJECTED:
-      'Your worker profile was not approved. Please update your details or contact support.',
-    PROMPT_TITLE: 'Share your location to go online',
-    PROMPT_BODY:
-      'We use your current location to show nearby shifts and help businesses find available workers. Your location is shared only after you allow it.',
-    PROMPT_CANCEL: 'Cancel',
-    PROMPT_SHARE: 'Share location',
-    PROMPT_LOADING: 'Loading…',
+    get TITLE() {
+      return k('availability.title');
+    },
+    get ON() {
+      return k('availability.on');
+    },
+    get OFF() {
+      return k('availability.off');
+    },
+    get GO_ONLINE() {
+      return k('availability.goOnline');
+    },
+    get GO_OFFLINE() {
+      return k('availability.goOffline');
+    },
+    get LOCATION_DENIED() {
+      return k('availability.locationDenied');
+    },
+    get VERIFICATION_PENDING() {
+      return k('availability.verificationPending');
+    },
+    get VERIFICATION_REJECTED() {
+      return k('availability.verificationRejected');
+    },
+    get PROMPT_TITLE() {
+      return k('availability.promptTitle');
+    },
+    get PROMPT_BODY() {
+      return k('availability.promptBody');
+    },
+    get PROMPT_CANCEL() {
+      return k('availability.promptCancel');
+    },
+    get PROMPT_SHARE() {
+      return k('availability.promptShare');
+    },
+    get PROMPT_LOADING() {
+      return k('availability.promptLoading');
+    },
   },
-} as const;
+};
