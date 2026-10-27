@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import BriefcaseIcon from '@/assets/icons/briefcase.svg';
 import MapPinIcon from '@/assets/figma/map-pin.svg';
 import PhoneIcon from '@/assets/figma/phone.svg';
-import { ChipGroup, IconField, PrimaryButton } from '@/components/ui';
+import { SelectSheetField, IconField, PrimaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import type { AppScreenProps } from '@/types';
@@ -75,7 +75,8 @@ export const BusinessEditProfilePage: FC<
                 error={form.errors.address || form.locateError || undefined}
                 testID="business-edit-address"
             />
-            <ChipGroup
+            <SelectSheetField
+                multiple
                 label={t('businessSignup.businessTypeLabel')}
                 hint={form.errors.businessTypes || form.loadError || undefined}
                 options={form.businessTypeOptions}

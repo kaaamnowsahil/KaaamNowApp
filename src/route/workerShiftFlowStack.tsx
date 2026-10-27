@@ -2,6 +2,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { FC } from 'react';
 
 import { ROUTES } from '@/constants/routes';
+import { WorkerLiveBookingPage } from '@/pages/liveWork/WorkerLiveBookingPage';
+import { WorkerLiveWorkPage } from '@/pages/liveWork/WorkerLiveWorkPage';
 import { ShiftDetailsPage } from '@/pages/shiftDetails/ShiftDetailsPage';
 import { ShiftSecuredPage } from '@/pages/shiftSecured/ShiftSecuredPage';
 import { ShiftSelectedPage } from '@/pages/shiftSelected/ShiftSelectedPage';
@@ -35,6 +37,14 @@ const workerShiftFlowStack = (
         <Stack.Screen name={ROUTES.shiftDetails} component={ShiftDetailsPage} />
         <Stack.Screen name={ROUTES.shiftSelected} component={ShiftSelectedPage} />
         <Stack.Screen name={ROUTES.shiftSecured} component={ShiftSecuredPage} />
+        <Stack.Screen
+          name={ROUTES.workerLiveWork}
+          component={WorkerLiveWorkPage}
+        />
+        <Stack.Screen
+          name={ROUTES.workerLiveBooking}
+          component={WorkerLiveBookingPage}
+        />
       </Stack.Navigator>
     );
   };
@@ -45,4 +55,7 @@ export const WorkerDiscoverStack = workerShiftFlowStack(
   ROUTES.workerDiscoverHome,
   WorkerHomePage,
 );
-export const WorkerShiftsStack = workerShiftFlowStack(ROUTES.workerShiftsHome, WorkerShiftsPage);
+export const WorkerShiftsStack = workerShiftFlowStack(
+  ROUTES.workerShiftsHome,
+  WorkerShiftsPage,
+);

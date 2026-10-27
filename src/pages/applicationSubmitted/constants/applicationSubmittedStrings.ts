@@ -1,10 +1,24 @@
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`applicationSubmitted.${key}`, values);
+
 export const APPLICATION_SUBMITTED_STRINGS = {
-  HEADER_TITLE: 'Worker mode',
-  HEADER_TAG: 'Worker',
-  overline: (ref: string) => `Applied · ${ref}`,
-  HEADING: 'Application submitted',
-  subtitle: (business: string) =>
-    `${business} received your application. No shift is booked yet.`,
-  TRACK: 'Track application',
-  BROWSE: 'Browse other shifts',
-} as const;
+  get HEADER_TITLE() {
+    return tr('workerFlow.shiftSecured.headerTitle');
+  },
+  get HEADER_TAG() {
+    return tr('workerFlow.checkIn.headerRight');
+  },
+  overline: (ref: string) => k('overline', { ref }),
+  get HEADING() {
+    return k('heading');
+  },
+  subtitle: (business: string) => k('subtitle', { business }),
+  get TRACK() {
+    return k('track');
+  },
+  get BROWSE() {
+    return k('browse');
+  },
+};

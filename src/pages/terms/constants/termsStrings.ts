@@ -1,6 +1,17 @@
+import { tr } from '@/services/i18n/tr';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`terms.${key}`, values);
+
 export const TERMS_STRINGS = {
-  TITLE: 'Terms & Conditions',
-  lastUpdated: (date: string) => `Last updated ${date}`,
-  EMPTY: 'Terms & Conditions have not been published yet.',
-  LOAD_ERROR: 'Could not load Terms & Conditions. Please try again later.',
-} as const;
+  get TITLE() {
+    return k('title');
+  },
+  lastUpdated: (date: string) => k('lastUpdated', { date }),
+  get EMPTY() {
+    return k('empty');
+  },
+  get LOAD_ERROR() {
+    return k('loadError');
+  },
+};

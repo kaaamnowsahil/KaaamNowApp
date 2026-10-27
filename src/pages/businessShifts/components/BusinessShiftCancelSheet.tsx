@@ -12,8 +12,14 @@ const money = (minor: number) => formatRupees(Math.round(minor / 100));
 
 const previewText = (preview: ShiftCancelPreview) =>
   preview.fee_minor > 0
-    ? `${preview.booked_workers} booked worker(s). Cancellation fee ${money(preview.fee_minor)}. Refund: ${money(preview.business_refund_minor)}.`
-    : `${preview.booked_workers} booked worker(s). No fee; full refund of ${money(preview.business_refund_minor)}.`;
+    ? `${preview.booked_workers} booked worker(s). Cancellation fee ${money(
+        preview.fee_minor,
+      )}. Refund: ${money(preview.business_refund_minor)}.`
+    : `${
+        preview.booked_workers
+      } booked worker(s). No fee; full refund of ${money(
+        preview.business_refund_minor,
+      )}.`;
 
 /** Confirms cancelling a shift; mirrors web `BusinessShiftCancelDialog`. Mount only while open. */
 export const BusinessShiftCancelSheet: FC<{
@@ -40,13 +46,18 @@ export const BusinessShiftCancelSheet: FC<{
     >
       <View style={styles.actions}>
         {error ? (
-          <Text accessibilityRole="alert" style={[styles.error, { color: colors.danger }]}>
+          <Text
+            accessibilityRole="alert"
+            style={[styles.error, { color: colors.danger }]}
+          >
             {error}
           </Text>
         ) : null}
         <PrimaryButton
           label={
-            isCancelling ? t('businessShifts.cancelling') : t('businessShifts.confirmCancel')
+            isCancelling
+              ? t('businessShifts.cancelling')
+              : t('businessShifts.confirmCancel')
           }
           tone="danger"
           disabled={isCancelling}

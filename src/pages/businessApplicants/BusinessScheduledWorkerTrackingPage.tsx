@@ -26,7 +26,11 @@ import {
   formatTimeRange,
   fromMinor,
 } from '@/services/shifts/shiftMappers';
-import { shiftsApi, type AssignmentDetail, type CancellationQuote } from '@/services/shifts/shiftsApi';
+import {
+  shiftsApi,
+  type AssignmentDetail,
+  type CancellationQuote,
+} from '@/services/shifts/shiftsApi';
 import { useAssignment, useShiftAction } from '@/services/shifts/useShiftFlow';
 import { useEmergency } from '@/services/support/useEmergency';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
@@ -37,6 +41,7 @@ import { formatRupees } from '@/utils/format';
 import {
   BOOKING_DETAIL_STRINGS as S,
   BUSINESS_CANCEL_REASONS,
+  cancelReasonForRecord,
   EXTEND_OPTIONS,
   STOP_REASONS,
 } from './constants/bookingDetailStrings';
@@ -62,19 +67,28 @@ export const BusinessScheduledWorkerTrackingPage: FC<
   const emergency = useEmergency(assignmentId);
   const [sheet, setSheet] = useState<Sheet>(null);
   const [extendBy, setExtendBy] = useState('60');
-  const [cancelQuote, setCancelQuote] = useState<CancellationQuote | null>(null);
+  const [cancelQuote, setCancelQuote] = useState<CancellationQuote | null>(
+    null,
+  );
   const upsert = useBusinessApplicantStore(state => state.upsert);
   const tracking = useApiQuery(
-    async () => (status === 'en_route' ? shiftsApi.tracking(assignmentId) : null),
+    async () =>
+      status === 'en_route' ? shiftsApi.tracking(assignmentId) : null,
     [assignmentId, status],
   );
 
-  const contact = useApiQuery(() => shiftsApi.contact(assignmentId), [assignmentId]);
+  const contact = useApiQuery(
+    () => shiftsApi.contact(assignmentId),
+    [assignmentId],
+  );
   const phone = contact.data?.phone;
 
   useEffect(() => {
     const id = setInterval(() => {
-      shiftsApi.assignment(assignmentId).then(setData).catch(() => undefined);
+      shiftsApi
+        .assignment(assignmentId)
+        .then(setData)
+        .catch(() => undefined);
     }, POLL_MS);
     return () => clearInterval(id);
   }, [assignmentId, setData]);
@@ -126,12 +140,17 @@ export const BusinessScheduledWorkerTrackingPage: FC<
     );
   const stop = (reason: string) =>
     run(
-      () => shiftsApi.stopWork(assignmentId, reason as 'business_stopped' | 'worker_left'),
+      () =>
+        shiftsApi.stopWork(
+          assignmentId,
+          reason as 'business_stopped' | 'worker_left',
+        ),
       update,
     );
-  const openCancel = () => run(() => shiftsApi.businessCancelPreview(assignmentId), setCancelQuote);
+  const openCancel = () =>
+    run(() => shiftsApi.businessCancelPreview(assignmentId), setCancelQuote);
   const cancel = (reasonId: string) => {
-    const reason = BUSINESS_CANCEL_REASONS.find(item => item.id === reasonId)?.label ?? reasonId;
+    const reason = cancelReasonForRecord(reasonId);
     setCancelQuote(null);
     run(
       () => shiftsApi.businessCancelAssignment(assignmentId, reason),
@@ -174,7 +193,11 @@ export const BusinessScheduledWorkerTrackingPage: FC<
             onPress={() => setSheet('extend')}
             testID="booking-extend"
           />
-          <SecondaryButton label={S.STOP} tone="danger" onPress={() => setSheet('stop')} />
+          <SecondaryButton
+            label={S.STOP}
+            tone="danger"
+            onPress={() => setSheet('stop')}
+          />
         </>
       );
     }
@@ -226,32 +249,46 @@ export const BusinessScheduledWorkerTrackingPage: FC<
           subtitle={
             shift
               ? S.when(
-                formatDateLabel(shift.starts_at),
-                formatTimeRange(shift.starts_at, shift.ends_at),
-              )
+                  formatDateLabel(shift.starts_at),
+                  formatTimeRange(shift.starts_at, shift.ends_at),
+                )
               : undefined
           }
         />
 
         {isBooked && detail?.check_in_code ? (
           <View style={[styles.codeCard, { backgroundColor: colors.fill }]}>
-            <Text style={[styles.codeLabel, { color: colors.textSubtle }]}>{S.CODE_LABEL}</Text>
-            <Text style={[styles.code, { color: colors.text }]} testID="booking-check-in-code">
+            <Text style={[styles.codeLabel, { color: colors.textSubtle }]}>
+              {S.CODE_LABEL}
+            </Text>
+            <Text
+              style={[styles.code, { color: colors.text }]}
+              testID="booking-check-in-code"
+            >
               {detail.check_in_code}
             </Text>
-            <Text style={[styles.codeLabel, { color: colors.textSubtle }]}>{S.CODE_HINT}</Text>
+            <Text style={[styles.codeLabel, { color: colors.textSubtle }]}>
+              {S.CODE_HINT}
+            </Text>
           </View>
         ) : null}
 
         {status === 'en_route' ? (
           <MapPreview
             variant="pin"
-            label={S.onTheWay(tracking.data?.distance_km, tracking.data?.eta_minutes)}
+            label={S.onTheWay(
+              tracking.data?.distance_km,
+              tracking.data?.eta_minutes,
+            )}
           />
         ) : null}
 
-        {pinForWorker ? <InfoCallout text={S.pinForWorker(pinForWorker)} /> : null}
-        {pending ? <InfoCallout text={S.extensionPending(pending.extra_minutes)} /> : null}
+        {pinForWorker ? (
+          <InfoCallout text={S.pinForWorker(pinForWorker)} />
+        ) : null}
+        {pending ? (
+          <InfoCallout text={S.extensionPending(pending.extra_minutes)} />
+        ) : null}
 
         {detail && (isWorking || isEnded) ? (
           <StatTiles
@@ -274,9 +311,13 @@ export const BusinessScheduledWorkerTrackingPage: FC<
 
         {shift ? (
           <View style={[styles.summary, { backgroundColor: colors.fill }]}>
-            <Text style={[styles.summaryTitle, { color: colors.text }]}>{shift.job_title}</Text>
+            <Text style={[styles.summaryTitle, { color: colors.text }]}>
+              {shift.job_title}
+            </Text>
             <Text style={[styles.meta, { color: colors.textSubtle }]}>
-              {`${formatRupees(fromMinor(detail.hourly_rate_minor))}/hr · ${shift.workplace_name || shift.address_text}`}
+              {`${formatRupees(fromMinor(detail.hourly_rate_minor))}/hr · ${
+                shift.workplace_name || shift.address_text
+              }`}
             </Text>
             {phone ? (
               <View style={styles.callButton}>
@@ -360,7 +401,12 @@ export const BusinessScheduledWorkerTrackingPage: FC<
 
 const styles = StyleSheet.create({
   codeCard: { borderRadius: 16, padding: 16, alignItems: 'center', gap: 6 },
-  codeLabel: { fontFamily: FONTS.regular, fontSize: 11, lineHeight: 15, textAlign: 'center' },
+  codeLabel: {
+    fontFamily: FONTS.regular,
+    fontSize: 11,
+    lineHeight: 15,
+    textAlign: 'center',
+  },
   code: {
     fontFamily: FONTS.bold,
     fontSize: 36,

@@ -63,7 +63,9 @@ export const MyShiftCard: FC<{
     shift.businessName,
     shift.isVerified ? t('workerShifts.verifiedTag') : null,
     booking.businessRating
-      ? `${booking.businessRating.avg.toFixed(1)} (${booking.businessRating.count})`
+      ? `${booking.businessRating.avg.toFixed(1)} (${
+          booking.businessRating.count
+        })`
       : null,
   ]
     .filter(Boolean)
@@ -85,13 +87,19 @@ export const MyShiftCard: FC<{
         <Text
           style={[
             styles.pill,
-            { color: pill[status].color, backgroundColor: pill[status].background },
+            {
+              color: pill[status].color,
+              backgroundColor: pill[status].background,
+            },
           ]}
         >
           {translatedStatus}
         </Text>
         <View style={styles.toplineEnd}>
-          <Text style={[styles.category, { color: colors.textMuted }]} numberOfLines={1}>
+          <Text
+            style={[styles.category, { color: colors.textMuted }]}
+            numberOfLines={1}
+          >
             {shift.requirement}
           </Text>
           <View style={[styles.info, { backgroundColor: colors.primarySoft }]}>
@@ -105,7 +113,9 @@ export const MyShiftCard: FC<{
         {shift.isVerified ? (
           <BadgeCheckIcon width={15} height={15} color={colors.success} />
         ) : null}
-        <Text style={[styles.meta, styles.flex, { color: colors.textMuted }]}>{business}</Text>
+        <Text style={[styles.meta, styles.flex, { color: colors.textMuted }]}>
+          {business}
+        </Text>
       </View>
 
       <Text style={[styles.meta, { color: colors.textMuted }]}>
@@ -116,11 +126,15 @@ export const MyShiftCard: FC<{
         })}
       </Text>
       <Text style={[styles.meta, { color: colors.textMuted }]}>
-        {`${shift.area} · ${t('workerShifts.distance', { km: shift.distanceKm })}`}
+        {`${shift.area} · ${t('workerShifts.distance', {
+          km: shift.distanceKm,
+        })}`}
       </Text>
       {booking.statusTime ? (
         <Text style={[styles.meta, { color: colors.textSubtle }]}>
-          {t(`workerShifts.times.${booking.statusTime.key}`, { time: booking.statusTime.at })}
+          {t(`workerShifts.times.${booking.statusTime.key}`, {
+            time: booking.statusTime.at,
+          })}
         </Text>
       ) : null}
       {status === 'selected' && booking.confirmBy ? (
@@ -133,7 +147,9 @@ export const MyShiftCard: FC<{
         <Text style={[styles.pay, { color: colors.text }]}>
           <Text style={styles.rate}>{formatRupees(shift.hourlyRate)}</Text>
           {` ${t('workerShifts.perHour')} · ${t('workerShifts.estimated', {
-            amount: formatRupees(booking.estimatedPay ?? shift.hourlyRate * shift.durationHours),
+            amount: formatRupees(
+              booking.estimatedPay ?? shift.hourlyRate * shift.durationHours,
+            ),
           })}`}
         </Text>
         {status === 'selected' && shift.applicationId ? (
@@ -178,8 +194,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
   },
-  toplineEnd: { flexShrink: 1, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  category: { flexShrink: 1, fontFamily: FONTS.regular, fontSize: 12, lineHeight: 16 },
+  toplineEnd: {
+    flexShrink: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  category: {
+    flexShrink: 1,
+    fontFamily: FONTS.regular,
+    fontSize: 12,
+    lineHeight: 16,
+  },
   info: {
     width: 30,
     height: 30,
@@ -195,9 +221,19 @@ const styles = StyleSheet.create({
   footer: { borderTopWidth: 1, marginTop: 8, paddingTop: 12, gap: 8 },
   pay: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 26 },
   rate: { fontFamily: FONTS.bold, fontSize: 20 },
-  action: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
+  action: {
+    alignSelf: 'flex-start',
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
   actionLabel: { fontFamily: FONTS.semiBold, fontSize: 15 },
-  selectionRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 10 },
+  selectionRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    gap: 10,
+  },
   selection: {
     minHeight: 44,
     borderWidth: 1,

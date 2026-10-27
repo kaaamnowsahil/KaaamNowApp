@@ -1,14 +1,26 @@
+import { tr } from '@/services/i18n/tr';
 import type { ShiftStatus } from '@/types';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`shiftCard.${key}`, values);
 
 export const SHIFT_STRINGS = {
   STATUS_LABEL: {
-    live: 'Live · starts soon',
-    scheduled: 'Scheduled',
+    get live() {
+      return k('statusLabel.live');
+    },
+    get scheduled() {
+      return k('statusLabel.scheduled');
+    },
   } as Record<ShiftStatus, string>,
-  VERIFIED: 'Verified',
-  PER_HOUR: ' / hour',
-  estimated: (amount: string) => `${amount} estimated / worker`,
-  spotsOpen: (n: number) => `${n} ${n === 1 ? 'spot' : 'spots'} open`,
-  hours: (n: number) => `${n} ${n === 1 ? 'hour' : 'hours'}`,
-  km: (n: number) => `${n} km`,
-} as const;
+  get VERIFIED() {
+    return k('verified');
+  },
+  get PER_HOUR() {
+    return k('perHour');
+  },
+  estimated: (amount: string) => k('estimated', { amount }),
+  spotsOpen: (n: number) => k('spotsOpen', { count: n }),
+  hours: (n: number) => k('hours', { count: n }),
+  km: (n: number) => k('km', { n }),
+};

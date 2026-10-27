@@ -16,7 +16,7 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { AuthScreenProps } from '@/types';
 import { formatMmSs, maskIndianPhone } from '@/utils/format';
 
-import { OTP_LENGTH, VERIFY_PHONE_STRINGS } from './constants';
+import { OTP_LENGTH } from './constants';
 import { useVerifyPhone } from './hooks/useVerifyPhone';
 
 /**
@@ -41,8 +41,7 @@ export const VerifyPhonePage: FC<
     otpSent,
     delivery,
     error,
-  } =
-    useVerifyPhone(route.params.phone, route.params);
+  } = useVerifyPhone(route.params.phone, route.params);
 
   return (
     <FormScreen
@@ -59,9 +58,7 @@ export const VerifyPhonePage: FC<
             testID="verify-submit"
           />
           <SecondaryButton
-            label={t('verifyPhone.changePhone', {
-              defaultValue: VERIFY_PHONE_STRINGS.CHANGE_PHONE,
-            })}
+            label={t('verifyPhone.changePhone')}
             onPress={navigation.goBack}
             testID="verify-change-phone"
           />
@@ -69,34 +66,22 @@ export const VerifyPhonePage: FC<
       }
     >
       <ScreenIntro
-        subtitle={
-          t('verifyPhone.subtitle', {
-            phone: maskIndianPhone(route.params.phone),
-            defaultValue: VERIFY_PHONE_STRINGS.subtitle(
-              maskIndianPhone(route.params.phone),
-            ),
-          })
-        }
+        subtitle={t('verifyPhone.subtitle', {
+          phone: maskIndianPhone(route.params.phone),
+        })}
       />
       <TextField
-        label={t('verifyPhone.codeLabel', {
-          defaultValue: VERIFY_PHONE_STRINGS.CODE_LABEL,
-        })}
+        label={t('verifyPhone.codeLabel')}
         helper={
           !otpSent && busy
             ? t('auth.sendingCode')
             : !otpSent
-              ? t('auth.retryCode')
-              : expiresIn > 0
-                ? t('verifyPhone.codeExpiresIn', {
-                    time: formatMmSs(expiresIn),
-                    defaultValue: VERIFY_PHONE_STRINGS.codeExpiresIn(
-                      formatMmSs(expiresIn),
-                    ),
-                  })
-                : t('verifyPhone.codeExpired', {
-                    defaultValue: VERIFY_PHONE_STRINGS.CODE_EXPIRED,
-                  })
+            ? t('auth.retryCode')
+            : expiresIn > 0
+            ? t('verifyPhone.codeExpiresIn', {
+                time: formatMmSs(expiresIn),
+              })
+            : t('verifyPhone.codeExpired')
         }
         value={code}
         onChangeText={setCode}
@@ -120,7 +105,6 @@ export const VerifyPhonePage: FC<
         {resendIn > 0 ? (
           t('verifyPhone.resendIn', {
             time: formatMmSs(resendIn),
-            defaultValue: VERIFY_PHONE_STRINGS.resendIn(formatMmSs(resendIn)),
           })
         ) : (
           <Text
@@ -129,14 +113,10 @@ export const VerifyPhonePage: FC<
             style={[styles.resend, { color: colors.primary }]}
             testID="verify-resend"
           >
-            {t(otpSent ? 'verifyPhone.resendNow' : 'auth.retryCode', {
-              defaultValue: VERIFY_PHONE_STRINGS.RESEND_NOW,
-            })}
+            {t(otpSent ? 'verifyPhone.resendNow' : 'auth.retryCode')}
           </Text>
         )}{' '}
-        {t('verifyPhone.neverShare', {
-          defaultValue: VERIFY_PHONE_STRINGS.NEVER_SHARE,
-        })}
+        {t('verifyPhone.neverShare')}
       </BodyNote>
     </FormScreen>
   );

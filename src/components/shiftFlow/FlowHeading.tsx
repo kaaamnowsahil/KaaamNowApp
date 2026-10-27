@@ -15,7 +15,9 @@ export const FlowHeading: FC<{
   isLarge?: boolean;
   /** Overline as a soft rounded badge (web `.worker-scheduled-shift-application-status`). */
   isPill?: boolean;
-}> = ({ overline, tone = 'primary', title, subtitle, isLarge, isPill }) => {
+  /** Uppercase overline (web `.section-label`). */
+  isCaps?: boolean;
+}> = ({ overline, tone = 'primary', title, subtitle, isLarge, isPill, isCaps }) => {
   const { colors } = useTheme();
   const pillBg = {
     default: colors.fill,
@@ -32,6 +34,7 @@ export const FlowHeading: FC<{
             styles.overline,
             isLarge && styles.overlineLarge,
             isPill && [styles.pill, { backgroundColor: pillBg }],
+            isCaps && styles.caps,
             { color: toneColor(colors, tone) },
           ]}
         >
@@ -65,6 +68,7 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     letterSpacing: 0.3,
   },
+  caps: { fontSize: 11, lineHeight: 15, letterSpacing: 0.66, textTransform: 'uppercase' },
   rootLarge: { marginTop: 6 },
   overlineLarge: { fontSize: 11, lineHeight: 15.4 },
   pill: {

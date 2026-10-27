@@ -41,15 +41,23 @@ const saveToken = async (pushToken: string) => {
 
 /**
  * Asks for permission, registers this device's FCM token with the API and keeps
- * it current. Returns an unsubscribe for the token-refresh listener.
+ * it current. Resolves to `null` when the user denied notifications; rejects when
+ * the token could not be saved (e.g. offline) so the caller can retry later.
+ * Otherwise returns an unsubscribe for the token-refresh listener.
  */
-export const registerForPush = async (): Promise<() => void> => {
-  if (!(await askPermission())) return () => undefined;
+export const registerForPush = async (): Promise<(() => void) | null> => {
+  if (!(await askPermission())) return null;
   const messaging = getMessaging();
-  await saveToken(await getToken(messaging));
-  return onTokenRefresh(messaging, token => {
+  const stopRefresh = onTokenRefresh(messaging, token => {
     saveToken(token).catch(() => undefined);
   });
+  try {
+    await saveToken(await getToken(messaging));
+  } catch (error) {
+    stopRefresh();
+    throw error;
+  }
+  return stopRefresh;
 };
 
 /** Call while the session is still valid, before clearing tokens on sign-out. */

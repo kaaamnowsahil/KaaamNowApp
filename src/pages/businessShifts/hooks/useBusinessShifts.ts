@@ -15,6 +15,7 @@ import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import type { TabAppNavigation } from '@/types';
 
 export type ShiftSection =
+  | 'live'
   | 'awaiting_payment'
   | 'draft'
   | 'completed'
@@ -24,6 +25,7 @@ export type ShiftSection =
   | 'cancelled';
 
 const SHIFT_SECTIONS: { key: ShiftSection; titleKey: string }[] = [
+  { key: 'live', titleKey: 'businessDashboard.liveNow' },
   { key: 'in_progress', titleKey: 'businessDashboard.shiftStatus.inProgress' },
   { key: 'upcoming', titleKey: 'businessDashboard.upcoming' },
   { key: 'awaiting_payment', titleKey: 'businessShifts.paymentPending' },
@@ -47,6 +49,19 @@ const SECTION_BY_STATUS: Record<ApiShiftStatus, ShiftSection> = {
   cancelled: 'cancelled',
 };
 
+const ACTIVE_STATUSES: ApiShiftStatus[] = [
+  'searching',
+  'open',
+  'filled',
+  'in_progress',
+];
+
+/** Active live requests get their own section, as on web. */
+const sectionOf = (shift: BusinessShiftItem): ShiftSection =>
+  shift.shift_type === 'live' && ACTIVE_STATUSES.includes(shift.status)
+    ? 'live'
+    : SECTION_BY_STATUS[shift.status];
+
 const byStart = (a: BusinessShiftItem, b: BusinessShiftItem) =>
   new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime();
 
@@ -63,18 +78,25 @@ export const useBusinessShifts = () => {
     [],
   );
   const [profile, live, scheduled] = query.data ?? [];
-  const shifts = [...(live?.items ?? []), ...(scheduled?.items ?? [])].sort(byStart);
+  const shifts = [...(live?.items ?? []), ...(scheduled?.items ?? [])].sort(
+    byStart,
+  );
   const business = profile?.business;
 
-  const [cancelTarget, setCancelTarget] = useState<BusinessShiftItem | null>(null);
-  const [cancelPreview, setCancelPreview] = useState<ShiftCancelPreview | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<BusinessShiftItem | null>(
+    null,
+  );
+  const [cancelPreview, setCancelPreview] = useState<ShiftCancelPreview | null>(
+    null,
+  );
   const [cancelError, setCancelError] = useState('');
   const [isCancelling, setIsCancelling] = useState(false);
   const [payingId, setPayingId] = useState<string | null>(null);
   const [publishingId, setPublishingId] = useState<string | null>(null);
-  const [cardError, setCardError] = useState<{ shiftId: string; message: string } | null>(
-    null,
-  );
+  const [cardError, setCardError] = useState<{
+    shiftId: string;
+    message: string;
+  } | null>(null);
 
   const openCancel = (shift: BusinessShiftItem) => {
     setCancelError('');
@@ -141,8 +163,10 @@ export const useBusinessShifts = () => {
     sections: SHIFT_SECTIONS.map(section => ({
       ...section,
       shifts: shifts
-        .filter(shift => SECTION_BY_STATUS[shift.status] === section.key)
-        .sort((a, b) => (PAST_SECTIONS.includes(section.key) ? byStart(b, a) : byStart(a, b))),
+        .filter(shift => sectionOf(shift) === section.key)
+        .sort((a, b) =>
+          PAST_SECTIONS.includes(section.key) ? byStart(b, a) : byStart(a, b),
+        ),
     })).filter(section => section.shifts.length > 0),
     cancelTarget,
     cancelPreview,
@@ -162,5 +186,11 @@ export const useBusinessShifts = () => {
       navigation.navigate(ROUTES.businessRoster, { shiftId: shift.id }),
     openSchedule: () => navigation.navigate(ROUTES.businessShiftSchedule),
     openApplicants: () => navigation.navigate(ROUTES.businessApplicants),
+    /** The tracking screen lives in the Dashboard tab, so the tabs stay visible. */
+    openLive: (shift: BusinessShiftItem) =>
+      navigation.navigate(ROUTES.businessLive, {
+        screen: ROUTES.businessLiveWork,
+        params: { bookingId: shift.id },
+      } as never),
   };
 };

@@ -11,9 +11,14 @@ import {
   SegmentedControl,
 } from '@/components/ui';
 import { TabScreen } from '@/layout/TabScreen';
+import { BusinessOwnedShiftCard } from '@/pages/businessShifts/components';
 import { useTheme } from '@/theme/ThemeProvider';
 
-import { BusinessMetrics, BusinessOverview, BusinessShiftCard } from './components';
+import {
+  BusinessLocation,
+  BusinessMetrics,
+  BusinessOverview,
+} from './components';
 import { useBusinessLive } from './hooks';
 
 export const BusinessLivePage: FC = () => {
@@ -28,6 +33,7 @@ export const BusinessLivePage: FC = () => {
       businessName={dashboard.businessName}
       isVerified={dashboard.isVerified}
     />,
+    <BusinessLocation key="location" />,
     <SegmentedControl
       key="view-toggle"
       segments={[
@@ -62,25 +68,26 @@ export const BusinessLivePage: FC = () => {
       ? [
           <SectionHeading
             key="section"
-            title={t(
-              isLive
-                ? 'businessDashboard.todayLive'
-                : 'businessDashboard.upcoming',
-            )}
-            statusColor={isLive ? undefined : colors.primary}
+            title={t('businessDashboard.upcoming')}
+            statusColor={colors.primary}
             action={t('businessDashboard.viewAll')}
             onAction={dashboard.openShifts}
           />,
-          ...dashboard.shifts.map(({ item, card }) => (
-            <BusinessShiftCard
-              key={card.id}
-              shift={card}
-              view={dashboard.view}
-              businessName={dashboard.businessName}
-              isVerified={dashboard.isVerified}
-              onPress={
-                isLive ? () => dashboard.openRoster(item) : dashboard.openShifts
-              }
+          ...dashboard.shifts.map(shift => (
+            <BusinessOwnedShiftCard
+              key={shift.id}
+              shift={shift}
+              titleColor={colors.primary}
+              isPaying={false}
+              isPublishing={false}
+              error=""
+              showActions={false}
+              onCancel={() => undefined}
+              onPay={() => undefined}
+              onPublish={() => undefined}
+              onOpenBooked={() => dashboard.openBooked(shift)}
+              onOpenWithdrawn={dashboard.openApplicants}
+              onOpenLive={() => dashboard.openLive(shift)}
             />
           )),
         ]
@@ -119,7 +126,6 @@ export const BusinessLivePage: FC = () => {
               : 'businessDashboard.createShift',
           )}
           onPress={dashboard.openSchedule}
-          disabled={isLive}
           testID="business-create-shift"
         />
       }

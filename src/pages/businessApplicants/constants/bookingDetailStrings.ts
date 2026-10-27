@@ -1,75 +1,146 @@
+import { localizedRecord, tr } from '@/services/i18n/tr';
 import type { Option } from '@/types';
 
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`bookingDetail.${key}`, values);
+
+const option = (group: string, id: string): Option => ({
+  id,
+  get label() {
+    return k(`${group}.${id}`);
+  },
+});
+
 export const BOOKING_DETAIL_STRINGS = {
-  TITLE: 'Booking',
-  CODE_LABEL: 'Check-in code',
-  CODE_HINT: 'Tell the worker this code when they arrive. It’s unique to this booking.',
-  status: {
-    confirmed: 'Booked',
-    en_route: 'On the way',
-    checked_in: 'Working',
-    checked_out: 'Shift ended',
-    approved: 'Completed',
-    no_show: 'No-show',
-    cancelled: 'Cancelled',
-  } as Record<string, string>,
+  get TITLE() {
+    return k('title');
+  },
+  get CODE_LABEL() {
+    return k('codeLabel');
+  },
+  get CODE_HINT() {
+    return k('codeHint');
+  },
+  status: localizedRecord('bookingDetail.status'),
   onTheWay: (km?: number | null, eta?: number | null) =>
-    [km != null ? `${Math.round(km * 10) / 10} km away` : null, eta != null ? `about ${eta} min` : null]
+    [
+      km != null ? k('kmAway', { km: Math.round(km * 10) / 10 }) : null,
+      eta != null ? k('etaMinutes', { eta }) : null,
+    ]
       .filter(Boolean)
-      .join(' · ') || 'On the way',
+      .join(' · ') || k('onTheWay'),
   when: (date: string, time: string) => `${date} · ${time}`,
-  extendedBy: (minutes: number) => `Extended by ${minutes} min`,
-  CHECKED_IN_AT: 'Checked in',
-  ENDS_AT: 'Ends',
-  END_SHIFT: 'End shift',
-  END_EARLY: 'End shift early',
-  EXTEND: 'Ask to stay longer',
-  STOP: 'Stop work now',
-  CANCEL: 'Cancel booking',
-  EMERGENCY: 'Emergency help',
-  call: (phone: string) => `Call ${phone}`,
-  RATE: 'Rate worker',
-  ACTION_FAILED: 'Couldn’t update the booking',
-  pinForWorker: (pin: string) =>
-    `The worker wants to end early. If you agree, tell them this PIN: ${pin}`,
-  PIN_TITLE: 'Enter the worker’s PIN',
-  PIN_BODY: 'We’ve asked the worker to end early. Their app now shows a 4-digit PIN; enter it here. You pay for the time actually worked.',
-  PIN_CONFIRM: 'End shift',
-  PIN_CLOSE: 'Not now',
-  extensionPending: (minutes: number) => `Waiting for the worker to accept ${minutes} more minutes`,
-  EXTEND_TITLE: 'Ask the worker to stay longer',
-  EXTEND_BODY: 'Extra time is paid at the overtime rate (130%). The worker has to accept.',
-  EXTEND_LABEL: 'Extra time',
-  EXTEND_CONFIRM: 'Send request',
-  EXTEND_CLOSE: 'Cancel',
-  STOP_TITLE: 'Stop work without the worker’s PIN?',
-  STOP_BODY: 'If you’re sending the worker home, you pay the full booking. If the worker walked off, you pay only the time worked.',
-  STOP_LABEL: 'What happened?',
-  STOP_CONFIRM: 'Stop work',
-  STOP_KEEP: 'Keep working',
-  CANCEL_TITLE: 'Cancel this booking?',
-  FREE_CANCEL: 'Cancelling now is free.',
-  feeCancel: (fee: string) => `Cancelling now costs ${fee}, kept from your deposit. The worker is compensated.`,
-  CANCEL_LABEL: 'Reason',
-  CANCEL_CONFIRM: 'Cancel booking',
-  CANCEL_KEEP: 'Keep booking',
-} as const;
+  extendedBy: (minutes: number) => k('extendedBy', { minutes }),
+  get CHECKED_IN_AT() {
+    return k('checkedInAt');
+  },
+  get ENDS_AT() {
+    return k('endsAt');
+  },
+  get END_SHIFT() {
+    return k('endShift');
+  },
+  get END_EARLY() {
+    return k('endEarly');
+  },
+  get EXTEND() {
+    return k('extend');
+  },
+  get STOP() {
+    return k('stop');
+  },
+  get CANCEL() {
+    return k('cancel');
+  },
+  get EMERGENCY() {
+    return k('emergency');
+  },
+  call: (phone: string) => k('call', { phone }),
+  get RATE() {
+    return k('rate');
+  },
+  get ACTION_FAILED() {
+    return k('actionFailed');
+  },
+  pinForWorker: (pin: string) => k('pinForWorker', { pin }),
+  get PIN_TITLE() {
+    return k('pinTitle');
+  },
+  get PIN_BODY() {
+    return k('pinBody');
+  },
+  get PIN_CONFIRM() {
+    return k('pinConfirm');
+  },
+  get PIN_CLOSE() {
+    return k('pinClose');
+  },
+  extensionPending: (minutes: number) => k('extensionPending', { minutes }),
+  get EXTEND_TITLE() {
+    return k('extendTitle');
+  },
+  get EXTEND_BODY() {
+    return k('extendBody');
+  },
+  get EXTEND_LABEL() {
+    return k('extendLabel');
+  },
+  get EXTEND_CONFIRM() {
+    return k('extendConfirm');
+  },
+  get EXTEND_CLOSE() {
+    return k('extendClose');
+  },
+  get STOP_TITLE() {
+    return k('stopTitle');
+  },
+  get STOP_BODY() {
+    return k('stopBody');
+  },
+  get STOP_LABEL() {
+    return k('stopLabel');
+  },
+  get STOP_CONFIRM() {
+    return k('stopConfirm');
+  },
+  get STOP_KEEP() {
+    return k('stopKeep');
+  },
+  get CANCEL_TITLE() {
+    return k('cancelTitle');
+  },
+  get FREE_CANCEL() {
+    return k('freeCancel');
+  },
+  feeCancel: (fee: string) => k('feeCancel', { fee }),
+  get CANCEL_LABEL() {
+    return k('cancelLabel');
+  },
+  get CANCEL_CONFIRM() {
+    return k('cancelConfirm');
+  },
+  get CANCEL_KEEP() {
+    return k('cancelKeep');
+  },
+};
 
-export const EXTEND_OPTIONS: Option[] = [
-  { id: '30', label: '30 min' },
-  { id: '60', label: '1 hour' },
-  { id: '90', label: '1.5 hours' },
-  { id: '120', label: '2 hours' },
-];
+export const EXTEND_OPTIONS: Option[] = ['30', '60', '90', '120'].map(id =>
+  option('extendOptions', id),
+);
 
-export const STOP_REASONS: Option[] = [
-  { id: 'business_stopped', label: 'We’re sending the worker home' },
-  { id: 'worker_left', label: 'The worker walked off' },
-];
+export const STOP_REASONS: Option[] = ['business_stopped', 'worker_left'].map(
+  id => option('stopReasons', id),
+);
 
 export const BUSINESS_CANCEL_REASONS: Option[] = [
-  { id: 'not_needed', label: 'No longer needed' },
-  { id: 'closed', label: 'Business closed that day' },
-  { id: 'over_staffed', label: 'Over-staffed' },
-  { id: 'other', label: 'Other' },
-];
+  'not_needed',
+  'closed',
+  'over_staffed',
+  'other',
+].map(id => option('cancelReasons', id));
+
+/** The cancel reason is stored as free text, so the record keeps the English label in every language. */
+export const cancelReasonForRecord = (id: string): string =>
+  BUSINESS_CANCEL_REASONS.some(item => item.id === id)
+    ? tr(`bookingDetail.cancelReasons.${id}`, { lng: 'en' })
+    : id;

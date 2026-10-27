@@ -38,6 +38,8 @@ export type WorkerShiftCard = {
   ends_at: string;
   break_minutes: number;
   hourly_rate_minor: number;
+  /** Hourly rate after worker commission. */
+  worker_hourly_rate_minor: number;
   currency: string;
   estimated_pay_minor: number;
   spots_left: number;

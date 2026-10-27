@@ -20,32 +20,24 @@ import type { AppScreenProps } from '@/types';
 import { WorkerAvatar } from './components';
 import { useBusinessApplicantStore } from './store/useBusinessApplicantStore';
 
-const ROSTER_STRINGS = {
-  TITLE: 'Booked workers',
-  booked: (booked: number, required: number) => `${booked}/${required} BOOKED`,
-  shiftsDone: (count: number) => `${count} ${count === 1 ? 'shift' : 'shifts'} done`,
-  code: (code: string) => `Code ${code}`,
-  status: {
-    confirmed: 'Booked',
-    en_route: 'On the way',
-    checked_in: 'Working',
-    checked_out: 'Shift ended',
-    approved: 'Completed',
-    no_show: 'No-show',
-    cancelled: 'Cancelled',
-  } as Record<string, string>,
-} as const;
-
 /** Statuses where the worker still needs the check-in code. */
 const CODE_STATUSES = new Set(['confirmed', 'en_route']);
 const DONE_STATUSES = new Set(['checked_in', 'checked_out', 'approved']);
 const BAD_STATUSES = new Set(['no_show', 'cancelled']);
 
 const dateLabel = (iso: string) =>
-  new Date(iso).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+  new Date(iso).toLocaleDateString('en-IN', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+  });
 const timeLabel = (iso: string) =>
   new Date(iso)
-    .toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true })
+    .toLocaleTimeString('en-IN', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    })
     .toUpperCase();
 
 /** Everyone booked on one shift, as on web; each row opens the worker's booking. */
@@ -68,14 +60,16 @@ export const BusinessRosterPage: FC<
     return result;
   }, [shift?.id]);
   const entries = roster.data?.items ?? [];
-  const isFull = roster.data ? roster.data.booked_count >= roster.data.workers_required : false;
+  const isFull = roster.data
+    ? roster.data.booked_count >= roster.data.workers_required
+    : false;
 
   const statusColors = (status: string) =>
     DONE_STATUSES.has(status)
       ? { color: colors.success, backgroundColor: colors.successSoft }
       : BAD_STATUSES.has(status)
-        ? { color: colors.danger, backgroundColor: colors.dangerSoft }
-        : { color: colors.primary, backgroundColor: colors.primarySoft };
+      ? { color: colors.danger, backgroundColor: colors.dangerSoft }
+      : { color: colors.primary, backgroundColor: colors.primarySoft };
 
   return (
     <FormScreen
@@ -89,15 +83,17 @@ export const BusinessRosterPage: FC<
       testID="business-roster-page"
     >
       <FlowHeading
-        overline={ROSTER_STRINGS.booked(
-          roster.data?.booked_count ?? 0,
-          roster.data?.workers_required ?? 0,
-        )}
+        overline={t('businessRoster.bookedOverline', {
+          booked: roster.data?.booked_count ?? 0,
+          required: roster.data?.workers_required ?? 0,
+        })}
         tone={isFull ? 'success' : 'primary'}
-        title={shift?.job_title ?? ROSTER_STRINGS.TITLE}
+        title={shift?.job_title ?? t('bookedWorkers.title')}
         subtitle={
           shift
-            ? `${dateLabel(shift.starts_at)} · ${timeLabel(shift.starts_at)} – ${timeLabel(shift.ends_at)}`
+            ? `${dateLabel(shift.starts_at)} · ${timeLabel(
+                shift.starts_at,
+              )} – ${timeLabel(shift.ends_at)}`
             : undefined
         }
       />
@@ -132,30 +128,51 @@ export const BusinessRosterPage: FC<
                 ]}
                 testID={`business-roster-row-${entry.assignment_id}`}
               >
-                <WorkerAvatar name={worker.full_name} photoUrl={worker.photo_url} size={44} />
+                <WorkerAvatar
+                  name={worker.full_name}
+                  photoUrl={worker.photo_url}
+                  size={44}
+                />
                 <View style={styles.body}>
-                  <Text numberOfLines={1} style={[styles.name, { color: colors.text }]}>
+                  <Text
+                    numberOfLines={1}
+                    style={[styles.name, { color: colors.text }]}
+                  >
                     {worker.full_name}
                   </Text>
                   <Text style={[styles.meta, { color: colors.textSubtle }]}>
                     {worker.rating_count > 0
-                      ? `★ ${worker.rating_avg.toFixed(1)} (${worker.rating_count}) · `
+                      ? `★ ${worker.rating_avg.toFixed(1)} (${
+                          worker.rating_count
+                        }) · `
                       : ''}
-                    {ROSTER_STRINGS.shiftsDone(worker.completed_shift_count)}
+                    {t('bookedWorkers.shiftsDone', {
+                      count: worker.completed_shift_count,
+                    })}
                   </Text>
                   {entry.check_in_code && CODE_STATUSES.has(entry.status) ? (
-                    <View style={[styles.code, { backgroundColor: colors.fill }]}>
+                    <View
+                      style={[styles.code, { backgroundColor: colors.fill }]}
+                    >
                       <KeyIcon width={12} height={12} color={colors.text} />
                       <Text style={[styles.codeText, { color: colors.text }]}>
-                        {ROSTER_STRINGS.code(entry.check_in_code)}
+                        {t('businessRoster.code', {
+                          code: entry.check_in_code,
+                        })}
                       </Text>
                     </View>
                   ) : null}
                 </View>
                 <Text style={[styles.status, tone]}>
-                  {ROSTER_STRINGS.status[entry.status] ?? entry.status}
+                  {t(`bookingDetail.status.${entry.status}`, {
+                    defaultValue: entry.status,
+                  })}
                 </Text>
-                <ChevronRightIcon width={18} height={18} color={colors.textSubtle} />
+                <ChevronRightIcon
+                  width={18}
+                  height={18}
+                  color={colors.textSubtle}
+                />
               </Pressable>
             );
           })}

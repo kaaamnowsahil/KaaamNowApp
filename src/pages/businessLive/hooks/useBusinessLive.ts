@@ -2,7 +2,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 
 import { ROUTES } from '@/constants/routes';
-import { toDashboardShift } from '@/services/shifts/shiftMappers';
 import type { BusinessShiftItem } from '@/services/shifts/shiftsApi';
 import { useBusinessShiftsData } from '@/services/shifts/useBusinessShiftsData';
 import type { TabAppNavigation } from '@/types';
@@ -10,6 +9,8 @@ import type { TabAppNavigation } from '@/types';
 export type BusinessView = 'live' | 'scheduled';
 
 const DASHBOARD_PREVIEW_COUNT = 2;
+/** Same "Upcoming shifts" group as the web dashboard. */
+const UPCOMING = new Set(['searching', 'open', 'filled']);
 const DASHBOARD_REFRESH_MS = 5 * 60 * 1000;
 
 export const useBusinessLive = () => {
@@ -20,7 +21,10 @@ export const useBusinessLive = () => {
     setViewState(next);
     data.reload();
   };
-  const items = view === 'live' ? data.liveShifts : data.scheduledShifts;
+  const items = (view === 'live' ? data.liveShifts : data.scheduledShifts)
+    .filter(item => UPCOMING.has(item.status))
+    .sort((a, b) => Date.parse(a.starts_at) - Date.parse(b.starts_at))
+    .slice(0, DASHBOARD_PREVIEW_COUNT);
   const sum = (
     list: BusinessShiftItem[],
     pick: (item: BusinessShiftItem) => number,
@@ -39,13 +43,19 @@ export const useBusinessLive = () => {
     newApplicants: sum(items, item => item.pending_applications),
     view,
     setView,
-    shifts: items
-      .slice(0, DASHBOARD_PREVIEW_COUNT)
-      .map(item => ({ item, card: toDashboardShift(item) })),
+    shifts: items,
     openNotifications: () => navigation.navigate(ROUTES.notifications),
     openShifts: () => navigation.navigate(ROUTES.businessShifts),
-    openRoster: (item: BusinessShiftItem) =>
+    openLive: (item: BusinessShiftItem) =>
+      navigation.navigate(ROUTES.businessLiveWork, { bookingId: item.id }),
+    openBooked: (item: BusinessShiftItem) =>
       navigation.navigate(ROUTES.businessRoster, { shiftId: item.id }),
-    openSchedule: () => navigation.navigate(ROUTES.businessShiftSchedule),
+    openApplicants: () => navigation.navigate(ROUTES.businessApplicants),
+    openSchedule: () =>
+      navigation.navigate(
+        view === 'live'
+          ? ROUTES.businessLiveWorkPost
+          : ROUTES.businessShiftSchedule,
+      ),
   };
 };

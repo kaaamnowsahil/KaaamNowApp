@@ -12,7 +12,7 @@ import { formatRupees } from '@/utils/format';
 import type { TabAppNavigation } from '@/types';
 
 import { WORKER_EARNINGS_STRINGS as S } from '../constants';
-import type { EarningsRow, EarningsSummary } from '../mock';
+import type { EarningsRow, EarningsSummary } from '../types';
 
 const toRow = (entry: LedgerEntry): EarningsRow => ({
   id: entry.id,

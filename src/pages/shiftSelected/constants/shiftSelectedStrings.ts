@@ -1,42 +1,84 @@
+import { tr } from '@/services/i18n/tr';
 import type { Option } from '@/types';
 
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`shiftSelected.${key}`, values);
+
 export const SHIFT_SELECTED_STRINGS = {
-  HEADER_TITLE: 'Worker mode',
-  HEADER_TAG: 'Worker',
-  OVERLINE: 'Selected · Confirmation needed',
-  HEADING: 'You’ve been selected',
+  get HEADER_TITLE() {
+    return tr('workerFlow.shiftSecured.headerTitle');
+  },
+  get HEADER_TAG() {
+    return tr('workerFlow.checkIn.headerRight');
+  },
+  get OVERLINE() {
+    return k('overline');
+  },
+  get HEADING() {
+    return k('heading');
+  },
   subtitle: (business: string, deadline: string) =>
-    `${business} would like you to join. Confirm by ${deadline} to secure your place.`,
+    k('subtitle', { business, deadline }),
   business: (name: string, verified: boolean) =>
-    verified ? `${name} · Verified business` : name,
+    verified ? k('businessVerified', { name }) : name,
   timeRange: (time: string, hours: number, note: string) =>
-    `${time} · ${hours} ${hours === 1 ? 'hour' : 'hours'}, ${note}`,
-  AGREED_RATE: 'Agreed rate',
-  rate: (rate: string, total: string) =>
-    `${rate}/hour · ${total} estimated earnings`,
-  WORKPLACE: 'Workplace',
-  workplace: (place: string, km: number) => `${place} · ${km} km`,
-  CONFIRM: 'Confirm my place',
-  DECLINE: 'Decline offer',
-  DECLINE_TITLE: 'Decline this offer?',
-  declineBody: (business: string) =>
-    `${business} will offer the place to the next worker. This won’t affect your reliability.`,
-  DECLINE_REASON: 'Why are you declining?',
-  KEEP: 'Keep the offer',
-  DECLINED_TITLE: 'Offer declined',
-  DECLINED_BODY: 'The business has been told. You can find new shifts on Discover.',
-  OK: 'OK',
-  THE_DEADLINE: 'the deadline',
+    k('timeRange', { time, count: hours, note }),
+  get AGREED_RATE() {
+    return k('agreedRate');
+  },
+  rate: (rate: string, total: string) => k('rate', { rate, total }),
+  get WORKPLACE() {
+    return k('workplace');
+  },
+  workplace: (place: string, km: number) =>
+    k('workplaceDistance', { place, km }),
+  get CONFIRM() {
+    return k('confirm');
+  },
+  get DECLINE() {
+    return k('decline');
+  },
+  get DECLINE_TITLE() {
+    return k('declineTitle');
+  },
+  declineBody: (business: string) => k('declineBody', { business }),
+  get DECLINE_REASON() {
+    return k('declineReason');
+  },
+  get KEEP() {
+    return k('keep');
+  },
+  get DECLINED_TITLE() {
+    return k('declinedTitle');
+  },
+  get DECLINED_BODY() {
+    return k('declinedBody');
+  },
+  get OK() {
+    return k('ok');
+  },
+  get THE_DEADLINE() {
+    return k('theDeadline');
+  },
   breakNote: (minutes: number) =>
-    minutes ? `${minutes} min break` : 'no break',
-  CONFIRM_FAILED: 'Couldn’t confirm your place',
-  DECLINE_FAILED: 'Couldn’t decline this offer',
-} as const;
+    minutes ? k('breakNote', { minutes }) : k('noBreak'),
+  get CONFIRM_FAILED() {
+    return k('confirmFailed');
+  },
+  get DECLINE_FAILED() {
+    return k('declineFailed');
+  },
+};
 
 export const DECLINE_REASONS: Option[] = [
-  { id: 'busy', label: 'Not available anymore' },
-  { id: 'another', label: 'Took another shift' },
-  { id: 'far', label: 'Too far to travel' },
-  { id: 'pay', label: 'Pay doesn’t suit me' },
-  { id: 'other', label: 'Other' },
-];
+  'busy',
+  'another',
+  'far',
+  'pay',
+  'other',
+].map(id => ({
+  id,
+  get label() {
+    return k(`declineReasons.${id}`);
+  },
+}));

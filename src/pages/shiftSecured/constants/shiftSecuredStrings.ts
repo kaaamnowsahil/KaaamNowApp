@@ -1,23 +1,43 @@
+import { tr } from '@/services/i18n/tr';
 import type { Option } from '@/types';
+
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`shiftSecured.${key}`, values);
 
 export const SHIFT_SECURED_STRINGS = {
   ARRIVE_MINUTES_EARLY: 10,
-  SHIFT_LEAD: 'the shift lead',
-  lateCancelWindow: (hours: number) => `${hours} ${hours === 1 ? 'hour' : 'hours'}`,
-  CANCEL_FAILED: 'Couldn’t cancel this shift',
-  PREVIEW_FAILED: 'Couldn’t check the cancellation fee',
-  FREE_CANCEL: 'Cancelling now is free. The seat goes back to other workers.',
+  get SHIFT_LEAD() {
+    return k('shiftLead');
+  },
+  lateCancelWindow: (hours: number) => k('lateCancelWindow', { count: hours }),
+  get CANCEL_FAILED() {
+    return k('cancelFailed');
+  },
+  get PREVIEW_FAILED() {
+    return k('previewFailed');
+  },
+  get FREE_CANCEL() {
+    return k('freeCancel');
+  },
   feeCancel: (fee: string, strikes: number) =>
-    `Cancelling now costs ${fee}, taken from your next payout${strikes > 0 ? `, and adds ${strikes === 1 ? 'a strike' : `${strikes} strikes`} to your account` : ''}.`,
-  EMERGENCY: 'Emergency help',
-} as const;
+    strikes > 0
+      ? k('feeCancelStrikes', { fee, count: strikes })
+      : k('feeCancel', { fee }),
+  get EMERGENCY() {
+    return k('emergency');
+  },
+};
 
-/** Labels are translated with shiftSecured.reasons.<id>. */
 export const CANCEL_REASONS: Option[] = [
-  { id: 'sick', label: 'I’m unwell' },
-  { id: 'emergency', label: 'Family emergency' },
-  { id: 'transport', label: 'Transport issue' },
-  { id: 'clash', label: 'Another commitment' },
-  { id: 'mistake', label: 'Accepted by mistake' },
-  { id: 'other', label: 'Other' },
-];
+  'sick',
+  'emergency',
+  'transport',
+  'clash',
+  'mistake',
+  'other',
+].map(id => ({
+  id,
+  get label() {
+    return k(`reasons.${id}`);
+  },
+}));

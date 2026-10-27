@@ -5,6 +5,7 @@ import { ROUTES } from '@/constants/routes';
 import { errorMessage } from '@/services/api/apiClient';
 import { meApi } from '@/services/api/meApi';
 import { getDevicePosition, type DevicePosition } from '@/services/maps/devicePosition';
+import { useLocationHeartbeat } from '@/services/maps/locationHeartbeat';
 import { reverseGeocode } from '@/services/maps/googleMaps';
 import { toShift } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
@@ -79,6 +80,7 @@ export const useWorkerHome = () => {
   const businessTypes = useApiQuery(() => meApi.businessTypes(), []);
   const worker = profile.data?.worker;
   const isAvailable = availability ?? worker?.is_available ?? false;
+  const heartbeat = useLocationHeartbeat(isAvailable, () => setAvailability(false));
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query.trim()), 400);
@@ -238,9 +240,7 @@ export const useWorkerHome = () => {
     });
 
   const openShift = (shift: Shift) =>
-    shift.status === 'live'
-      ? navigation.navigate(ROUTES.shiftRequest, { shift })
-      : navigation.navigate(ROUTES.shiftDetails, { shift });
+    navigation.navigate(ROUTES.shiftDetails, { shift });
 
   return {
     isLoading: !positionResolved || feed.isLoading,
@@ -249,7 +249,9 @@ export const useWorkerHome = () => {
     firstName: firstName(worker?.full_name),
     isAvailable,
     availabilityPending,
-    availabilityError,
+    availabilityError:
+      availabilityError ??
+      (heartbeat === 'no_location' ? WORKER_HOME_STRINGS.AVAILABILITY.LOCATION_DENIED : null),
     toggleAvailability: () => {
       toggleAvailability().catch(() => undefined);
     },

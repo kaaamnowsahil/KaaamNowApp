@@ -1,56 +1,125 @@
 import type { LedgerEntryType } from '@/services/earnings/earningsApi';
+import { tr } from '@/services/i18n/tr';
 import type { PayoutStatus } from '@/types';
 
+const k = (key: string, values?: Record<string, unknown>) =>
+  tr(`workerEarnings.${key}`, values);
+
 export const WORKER_EARNINGS_STRINGS = {
-  TITLE: 'Earnings',
-  HEADER_TAG: 'Worker',
-  OVERLINE: 'EARNINGS',
-  HEADING: 'Worker earnings',
-  PENDING: 'Pending',
-  PROCESSING: 'Processing',
+  get TITLE() {
+    return k('title');
+  },
+  get HEADER_TAG() {
+    return k('headerTag');
+  },
+  get OVERLINE() {
+    return k('overline');
+  },
+  get HEADING() {
+    return k('heading');
+  },
+  get PENDING() {
+    return k('pending');
+  },
+  get PROCESSING() {
+    return k('processing');
+  },
   STATUS: {
-    pending: 'Pending',
-    processing: 'Processing',
-    completed: 'Completed',
-    failed: 'Failed',
+    get pending() {
+      return k('status.pending');
+    },
+    get processing() {
+      return k('status.processing');
+    },
+    get completed() {
+      return k('status.completed');
+    },
+    get failed() {
+      return k('status.failed');
+    },
   } as Record<PayoutStatus, string>,
   /** "4 h × ₹150 = ₹600" */
   shiftMeta: (hours: number, rate: string, total: string) =>
-    `${hours} h × ${rate} = ${total}`,
+    k('shiftMeta', { hours, rate, total }),
   /** "6 × ₹600 = ₹3,600" */
   groupMeta: (shifts: number, each: string, total: string) =>
     `${shifts} × ${each} = ${total}`,
-  WITHDRAW: 'Withdraw',
-  VIEW_ALL: 'View all earnings',
-  SUPPORT: 'Payment support',
-  AVAILABLE: 'Available to withdraw',
+  get WITHDRAW() {
+    return k('withdraw');
+  },
+  get VIEW_ALL() {
+    return k('viewAll');
+  },
+  get SUPPORT() {
+    return k('support');
+  },
+  get AVAILABLE() {
+    return k('available');
+  },
   thisMonth: (amount: string, shifts: number) =>
-    `${amount} this month · ${shifts} shift${shifts === 1 ? '' : 's'} completed`,
-  EMPTY: 'No earnings yet. Complete a shift to get paid.',
+    k('thisMonth', { amount, count: shifts }),
+  get EMPTY() {
+    return k('empty');
+  },
   ENTRY_TYPE: {
-    shift_earning: 'Shift pay',
-    withdrawal: 'Withdrawal',
-    withdrawal_reversal: 'Withdrawal returned',
-    commission: 'Service fee',
-    cancellation_fee: 'Cancellation fee',
-    cancellation_compensation: 'Cancellation pay',
-    adjustment: 'Adjustment',
-    promo_credit: 'Promo credit',
-    fee_waiver: 'Fee waived',
+    get shift_earning() {
+      return k('entryType.shift_earning');
+    },
+    get withdrawal() {
+      return k('entryType.withdrawal');
+    },
+    get withdrawal_reversal() {
+      return k('entryType.withdrawal_reversal');
+    },
+    get commission() {
+      return k('entryType.commission');
+    },
+    get cancellation_fee() {
+      return k('entryType.cancellation_fee');
+    },
+    get cancellation_compensation() {
+      return k('entryType.cancellation_compensation');
+    },
+    get adjustment() {
+      return k('entryType.adjustment');
+    },
+    get promo_credit() {
+      return k('entryType.promo_credit');
+    },
+    get fee_waiver() {
+      return k('entryType.fee_waiver');
+    },
   } as Record<LedgerEntryType, string>,
-  duesTitle: (amount: string) => `You owe ${amount} in fees`,
-  DUES_BODY: 'It’s taken from your next earnings. You can keep booking shifts meanwhile.',
-  RELIABILITY: 'Reliability',
-  strikes: (count: number, ban: number) => `${count} of ${ban} strikes`,
+  duesTitle: (amount: string) => k('duesTitle', { amount }),
+  get DUES_BODY() {
+    return k('duesBody');
+  },
+  get RELIABILITY() {
+    return k('reliability');
+  },
+  strikes: (count: number, ban: number) =>
+    k('strikes', { strikes: count, ban }),
   strikesBody: (days: number, limit: number) =>
-    `Late cancellations and no-shows add strikes. They expire after ${days} days. At ${limit} you’ll see fewer shifts for a while.`,
-  limitedUntil: (date: string) => `Fewer shifts shown until ${date}.`,
-  ON_HOLD: 'Your account is on hold. Contact support to review it.',
-  PROMO_LABEL: 'Promo code',
-  PROMO_PLACEHOLDER: 'Enter code',
-  PROMO_REDEEM: 'Redeem',
+    k('strikesBody', { days, limit }),
+  limitedUntil: (date: string) => k('limitedUntil', { date }),
+  get ON_HOLD() {
+    return k('onHold');
+  },
+  get PROMO_LABEL() {
+    return k('promoLabel');
+  },
+  get PROMO_PLACEHOLDER() {
+    return k('promoPlaceholder');
+  },
+  get PROMO_REDEEM() {
+    return k('promoRedeem');
+  },
   promoPending: (code: string) =>
-    `${code.toUpperCase()} will reduce the service fee on your next payout.`,
-  PROMO_DONE: 'Code saved',
-  PROMO_FAILED: 'Code can’t be used',
-} as const;
+    k('promoPending', { code: code.toUpperCase() }),
+  get PROMO_DONE() {
+    return k('promoDone');
+  },
+  get PROMO_FAILED() {
+    return k('promoFailed');
+  },
+};

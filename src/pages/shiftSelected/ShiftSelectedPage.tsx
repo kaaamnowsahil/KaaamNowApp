@@ -128,7 +128,7 @@ export const ShiftSelectedPage: FC<
             title={SHIFT_SELECTED_STRINGS.AGREED_RATE}
             caption={SHIFT_SELECTED_STRINGS.rate(
               formatRupees(shift.hourlyRate),
-              formatRupees(shift.hourlyRate * shift.durationHours),
+              formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
             )}
             onPress={openDetails}
           />

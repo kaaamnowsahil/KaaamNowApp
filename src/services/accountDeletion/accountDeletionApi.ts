@@ -1,30 +1,11 @@
 import * as Keychain from 'react-native-keychain';
 
 import { apiBaseUrl } from '@/services/auth/authApi';
-
-export type DeletionRequestStatus = 'pending' | 'approved' | 'on_hold' | 'completed';
-
-export type DeletionRequest = {
-  id: string;
-  status: DeletionRequestStatus;
-  requested_at: string;
-  approved_at: string | null;
-  completed_at: string | null;
-  blockers: string[];
-  holds: {
-    id: string;
-    basis: string;
-    reason: string;
-    reference: string | null;
-    expires_at: string;
-  }[];
-};
+import { tr } from '@/services/i18n/tr';
+import type { DeletionRequest } from '@/types';
 
 export class AccountDeletionApiError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-  ) {
+  constructor(message: string, readonly status: number) {
     super(message);
     this.name = 'AccountDeletionApiError';
   }
@@ -48,10 +29,7 @@ async function request<T>(
       },
     });
   } catch {
-    throw new AccountDeletionApiError(
-      'Could not reach KaaamNow. Check your connection and try again.',
-      0,
-    );
+    throw new AccountDeletionApiError(tr('errors.unreachable'), 0);
   }
 
   if (!response.ok) {
@@ -59,7 +37,7 @@ async function request<T>(
       message?: string;
     };
     throw new AccountDeletionApiError(
-      payload.message || 'Could not update account deletion status. Please try again.',
+      payload.message || tr('errors.deletionUpdateFailed'),
       response.status,
     );
   }
@@ -69,7 +47,11 @@ async function request<T>(
 }
 
 export const getCurrentDeletionRequest = (accessToken: string) =>
-  request<DeletionRequest | null>(`${REQUEST_PATH}/current`, accessToken, 'GET');
+  request<DeletionRequest | null>(
+    `${REQUEST_PATH}/current`,
+    accessToken,
+    'GET',
+  );
 
 export const submitDeletionRequest = (accessToken: string) =>
   request<DeletionRequest | null>(REQUEST_PATH, accessToken, 'POST');

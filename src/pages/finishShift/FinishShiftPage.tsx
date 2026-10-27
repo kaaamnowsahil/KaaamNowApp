@@ -16,13 +16,16 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
 
-const FINISH_SHIFT_STRINGS = {
-  FAILED: 'Couldn’t check you out',
-  NOT_RECORDED: '—',
-} as const;
+const NOT_RECORDED = '—';
 
 const hoursSince = (iso?: string | null) =>
-  iso ? Math.max(0, Math.round(((Date.now() - new Date(iso).getTime()) / 3600000) * 10) / 10) : 0;
+  iso
+    ? Math.max(
+        0,
+        Math.round(((Date.now() - new Date(iso).getTime()) / 3600000) * 10) /
+          10,
+      )
+    : 0;
 
 /**
  * Live shift step 7. Figma: Live · Finish your shift? (light/dark), shown as a sheet.
@@ -55,7 +58,7 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
         shift: { ...shift, assignmentStatus: result.status },
       });
     } catch (error) {
-      Alert.alert(FINISH_SHIFT_STRINGS.FAILED, errorMessage(error));
+      Alert.alert(t('workerFlow.finishShift.failed'), errorMessage(error));
     } finally {
       setIsSubmitting(false);
     }
@@ -69,7 +72,7 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
   const rows = [
     {
       title: t('workerFlow.finishShift.checkedIn'),
-      caption: checkedInAt ? formatDateTime(checkedInAt) : FINISH_SHIFT_STRINGS.NOT_RECORDED,
+      caption: checkedInAt ? formatDateTime(checkedInAt) : NOT_RECORDED,
     },
     {
       title: t('workerFlow.finishShift.checkOut'),

@@ -5,14 +5,29 @@ import { Alert } from 'react-native';
 import { ROUTES } from '@/constants/routes';
 import { errorMessage } from '@/services/api/apiClient';
 import { getDevicePosition } from '@/services/maps/devicePosition';
-import { formatDateTime, fromMinor, isToday, toShift } from '@/services/shifts/shiftMappers';
-import { shiftsApi, type MyShiftItem, type MyShiftsTab } from '@/services/shifts/shiftsApi';
+import {
+  formatDateTime,
+  fromMinor,
+  isToday,
+  toShift,
+} from '@/services/shifts/shiftMappers';
+import {
+  shiftsApi,
+  type MyShiftItem,
+  type MyShiftsTab,
+} from '@/services/shifts/shiftsApi';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
-import type { Booking, BookingStatus, MyShiftStatus, TabAppNavigation } from '@/types';
+import type {
+  Booking,
+  BookingStatus,
+  MyShiftStatus,
+  TabAppNavigation,
+} from '@/types';
 
-import type { ShiftsSection } from '../constants';
+import { WORKER_SHIFTS_STRINGS, type ShiftsSection } from '../constants';
 
 const SECTION_ORDER: ShiftsSection[] = [
+  'live',
   'inProgress',
   'today',
   'confirm',
@@ -23,15 +38,22 @@ const SECTION_ORDER: ShiftsSection[] = [
   'declinedByYou',
 ];
 const TABS: MyShiftsTab[] = ['applications', 'upcoming', 'active', 'completed'];
-const CLOSED_APPLICATION: MyShiftStatus[] = ['declined', 'rejected', 'withdrawn', 'expired'];
+const CLOSED_APPLICATION: MyShiftStatus[] = [
+  'declined',
+  'rejected',
+  'withdrawn',
+  'expired',
+];
 
 type Entry = { booking: Booking; section: ShiftsSection };
 export type SelectionAction = 'confirm' | 'decline';
 
 const statusOf = (item: MyShiftItem): MyShiftStatus => {
   const application = item.application_status as MyShiftStatus | undefined;
-  if (application === 'selected' || application === 'applied') return application;
-  if (application && CLOSED_APPLICATION.includes(application)) return application;
+  if (application === 'selected' || application === 'applied')
+    return application;
+  if (application && CLOSED_APPLICATION.includes(application))
+    return application;
   if (item.assignment_status === 'cancelled') return 'cancelled';
   return item.tab === 'completed' ? 'completed' : 'confirmed';
 };
@@ -52,6 +74,11 @@ const sectionOf = (item: MyShiftItem): ShiftsSection | null => {
         return null;
     }
   }
+  if (
+    item.shift.shift_type === 'live' &&
+    (item.tab === 'upcoming' || item.tab === 'active')
+  )
+    return 'live';
   if (item.tab === 'active') return 'inProgress';
   if (item.tab === 'completed') return 'past';
   return isToday(item.shift.starts_at) ? 'today' : 'upcoming';
@@ -59,14 +86,16 @@ const sectionOf = (item: MyShiftItem): ShiftsSection | null => {
 
 const statusTimeOf = (item: MyShiftItem, status: MyShiftStatus) => {
   if (item.tab !== 'applications') {
-    return item.responded_at ? { key: 'confirmed', at: item.responded_at } : undefined;
+    return item.responded_at
+      ? { key: 'confirmed', at: item.responded_at }
+      : undefined;
   }
   const at =
     status === 'applied'
       ? item.applied_at
       : status === 'declined' || status === 'withdrawn'
-        ? item.responded_at
-        : item.decided_at;
+      ? item.responded_at
+      : item.decided_at;
   return at ? { key: status, at } : undefined;
 };
 
@@ -90,11 +119,22 @@ const toEntry = (item: MyShiftItem): Entry | null => {
       status,
       shift,
       confirmBy: shift.confirmBy,
-      isToday: section === 'today' || section === 'inProgress',
-      statusTime: statusTime && { key: statusTime.key, at: formatDateTime(statusTime.at) },
-      estimatedPay: fromMinor(item.earned_minor ?? item.shift.estimated_pay_minor),
+      isToday:
+        section === 'today' ||
+        section === 'inProgress' ||
+        (section === 'live' && isToday(item.shift.starts_at)),
+      statusTime: statusTime && {
+        key: statusTime.key,
+        at: formatDateTime(statusTime.at),
+      },
+      estimatedPay: fromMinor(
+        item.earned_minor ?? item.shift.estimated_pay_minor,
+      ),
       businessRating: item.shift.business.rating_count
-        ? { avg: item.shift.business.rating_avg, count: item.shift.business.rating_count }
+        ? {
+            avg: item.shift.business.rating_avg,
+            count: item.shift.business.rating_count,
+          }
         : undefined,
     },
   };
@@ -102,10 +142,15 @@ const toEntry = (item: MyShiftItem): Entry | null => {
 
 export const useWorkerShifts = () => {
   const navigation = useNavigation<TabAppNavigation>();
-  const [pending, setPending] = useState<{ id: string; action: SelectionAction } | null>(null);
+  const [pending, setPending] = useState<{
+    id: string;
+    action: SelectionAction;
+  } | null>(null);
   const query = useApiQuery(async () => {
     const position = await getDevicePosition(5000);
-    const pages = await Promise.all(TABS.map(tab => shiftsApi.myShifts(tab, position)));
+    const pages = await Promise.all(
+      TABS.map(tab => shiftsApi.myShifts(tab, position)),
+    );
     return pages
       .flatMap(page => page.items)
       .map(toEntry)
@@ -116,6 +161,10 @@ export const useWorkerShifts = () => {
   const openBooking = ({ status, shift }: Booking) => {
     if (status === 'selected') {
       navigation.navigate(ROUTES.shiftSelected, { shift });
+    } else if (shift.status === 'live' && shift.assignmentId) {
+      navigation.navigate(ROUTES.workerLiveBooking, {
+        assignmentId: shift.assignmentId,
+      });
     } else if (shift.assignmentStatus === 'checked_in') {
       navigation.navigate(ROUTES.activeShift, { shift });
     } else if (shift.assignmentStatus === 'en_route') {
@@ -123,11 +172,17 @@ export const useWorkerShifts = () => {
     } else if (CLOSED_APPLICATION.includes(status)) {
       navigation.navigate(ROUTES.shiftDetails, { shift });
     } else {
-      navigation.navigate(ROUTES.shiftDetails, { shift, bookingStatus: status as BookingStatus });
+      navigation.navigate(ROUTES.shiftDetails, {
+        shift,
+        bookingStatus: status as BookingStatus,
+      });
     }
   };
 
-  const respondToSelection = async (booking: Booking, action: SelectionAction) => {
+  const respondToSelection = async (
+    booking: Booking,
+    action: SelectionAction,
+  ) => {
     const applicationId = booking.shift.applicationId;
     if (!applicationId || pending) return;
     setPending({ id: booking.id, action });
@@ -136,7 +191,7 @@ export const useWorkerShifts = () => {
         ? shiftsApi.confirmSelection(applicationId)
         : shiftsApi.declineSelection(applicationId));
     } catch (error) {
-      Alert.alert('Couldn’t update this application', errorMessage(error));
+      Alert.alert(WORKER_SHIFTS_STRINGS.UPDATE_FAILED, errorMessage(error));
     } finally {
       setPending(null);
       query.reload();
@@ -149,7 +204,9 @@ export const useWorkerShifts = () => {
     retry: query.reload,
     sections: SECTION_ORDER.map(id => ({
       id,
-      bookings: entries.filter(entry => entry.section === id).map(entry => entry.booking),
+      bookings: entries
+        .filter(entry => entry.section === id)
+        .map(entry => entry.booking),
     })).filter(section => section.bookings.length),
     pending,
     openBooking,

@@ -18,7 +18,10 @@ import { useTheme } from '@/theme/ThemeProvider';
 import type { TabAppNavigation } from '@/types';
 
 import { BusinessOwnedShiftCard, BusinessShiftCancelSheet } from './components';
-import { useBusinessShifts, type ShiftSection } from './hooks/useBusinessShifts';
+import {
+  useBusinessShifts,
+  type ShiftSection,
+} from './hooks/useBusinessShifts';
 
 export const BusinessShiftsPage: FC = () => {
   const { t } = useTranslation();
@@ -27,6 +30,7 @@ export const BusinessShiftsPage: FC = () => {
   const shifts = useBusinessShifts();
 
   const sectionColor: Record<ShiftSection, string> = {
+    live: colors.danger,
     awaiting_payment: colors.text,
     draft: colors.textMuted,
     completed: colors.success,
@@ -40,7 +44,10 @@ export const BusinessShiftsPage: FC = () => {
     <View key="intro" style={styles.intro}>
       <ScreenIntro title={t('businessShifts.title')} />
       {shifts.businessName ? (
-        <BusinessIdentity businessName={shifts.businessName} isVerified={shifts.isVerified} />
+        <BusinessIdentity
+          businessName={shifts.businessName}
+          isVerified={shifts.isVerified}
+        />
       ) : null}
     </View>,
     shifts.error ? (
@@ -66,20 +73,30 @@ export const BusinessShiftsPage: FC = () => {
             <SectionHeading
               title={t(section.titleKey)}
               statusColor={sectionColor[section.key]}
+              isLive={section.key === 'live'}
             />
             {section.shifts.map(shift => (
               <BusinessOwnedShiftCard
                 key={shift.id}
                 shift={shift}
-                titleColor={sectionColor[section.key]}
+                titleColor={
+                  section.key === 'live'
+                    ? colors.primary
+                    : sectionColor[section.key]
+                }
                 isPaying={shifts.payingId === shift.id}
                 isPublishing={shifts.publishingId === shift.id}
-                error={shifts.cardError?.shiftId === shift.id ? shifts.cardError.message : ''}
+                error={
+                  shifts.cardError?.shiftId === shift.id
+                    ? shifts.cardError.message
+                    : ''
+                }
                 onCancel={() => shifts.openCancel(shift)}
                 onPay={() => shifts.payDeposit(shift)}
                 onPublish={() => shifts.publish(shift)}
                 onOpenBooked={() => shifts.openBooked(shift)}
                 onOpenWithdrawn={shifts.openApplicants}
+                onOpenLive={() => shifts.openLive(shift)}
               />
             ))}
           </View>
@@ -92,7 +109,9 @@ export const BusinessShiftsPage: FC = () => {
     <>
       <TabScreen
         header={
-          <BrandAppBar onBellPress={() => navigation.navigate(ROUTES.notifications)} />
+          <BrandAppBar
+            onBellPress={() => navigation.navigate(ROUTES.notifications)}
+          />
         }
         blocks={blocks}
         gap={12}
