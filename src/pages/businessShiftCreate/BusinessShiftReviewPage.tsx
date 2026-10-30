@@ -69,10 +69,12 @@ export const BusinessShiftReviewPage: FC<
     Promise.all(
       toBulkItems(draft).map(item =>
         shiftsApi.estimate({
+          pricing_mode: item.pricing_mode,
           hourly_rate_minor: item.hourly_rate_minor,
+          task_price_minor: item.task_price_minor,
           workers_required: item.workers_required,
           starts_at: item.starts_at,
-          ends_at: item.ends_at ?? item.starts_at,
+          ends_at: item.ends_at ?? undefined,
           break_minutes: item.break_minutes,
           promo_code: code || undefined,
         }),
@@ -181,28 +183,46 @@ export const BusinessShiftReviewPage: FC<
           <Text style={[styles.detail, { color: colors.textMuted }]}>
             {categoryLabel(slot.category)}
           </Text>
-          <Text style={[styles.detail, { color: colors.textMuted }]}>
-            {`${formatShiftTime(
-              slot.startTime,
-              i18n.language,
-            )} – ${formatShiftTime(slot.endTime, i18n.language)} · ${t(
-              'businessShiftCreate.hoursDuration',
-              {
-                hours: roundedHours(slot.startTime, slot.endTime),
-              },
-            )}`}
-          </Text>
-          <Text style={[styles.detail, { color: colors.textMuted }]}>
-            {t('businessShiftCreate.breakMinutesSummary', {
-              count: Number(slot.breakMinutes || 0),
-            })}
-          </Text>
-          <Text style={[styles.detail, { color: colors.textMuted }]}>
-            {t('businessShiftCreate.paySummary', {
-              workers: Number(slot.workers),
-              rate: formatRupees(Number(slot.hourlyRate)),
-            })}
-          </Text>
+          {slot.pricingMode === 'task' ? (
+            <>
+              <Text style={[styles.detail, { color: colors.textMuted }]}>
+                {`${t('taskPricing.startsAt', {
+                  time: formatShiftTime(slot.startTime, i18n.language),
+                })} · ${t('taskPricing.fixedPrice')}`}
+              </Text>
+              <Text style={[styles.detail, { color: colors.textMuted }]}>
+                {t('taskPricing.taskPaySummary', {
+                  workers: Number(slot.workers),
+                  price: formatRupees(Number(slot.taskPrice)),
+                })}
+              </Text>
+            </>
+          ) : (
+            <>
+              <Text style={[styles.detail, { color: colors.textMuted }]}>
+                {`${formatShiftTime(
+                  slot.startTime,
+                  i18n.language,
+                )} – ${formatShiftTime(slot.endTime, i18n.language)} · ${t(
+                  'businessShiftCreate.hoursDuration',
+                  {
+                    hours: roundedHours(slot.startTime, slot.endTime),
+                  },
+                )}`}
+              </Text>
+              <Text style={[styles.detail, { color: colors.textMuted }]}>
+                {t('businessShiftCreate.breakMinutesSummary', {
+                  count: Number(slot.breakMinutes || 0),
+                })}
+              </Text>
+              <Text style={[styles.detail, { color: colors.textMuted }]}>
+                {t('businessShiftCreate.paySummary', {
+                  workers: Number(slot.workers),
+                  rate: formatRupees(Number(slot.hourlyRate)),
+                })}
+              </Text>
+            </>
+          )}
           <Text style={[styles.detail, { color: colors.textMuted }]}>
             {slot.responsibilities}
           </Text>

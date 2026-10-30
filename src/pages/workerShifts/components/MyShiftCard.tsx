@@ -7,6 +7,7 @@ import InfoIcon from '@/assets/icons/info.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { Booking, MyShiftStatus } from '@/types';
+import { isTaskShift } from '@/services/shifts/shiftMappers';
 import { formatRupees } from '@/utils/format';
 
 import type { SelectionAction } from '../hooks/useWorkerShifts';
@@ -144,14 +145,23 @@ export const MyShiftCard: FC<{
       ) : null}
 
       <View style={[styles.footer, { borderTopColor: colors.border }]}>
-        <Text style={[styles.pay, { color: colors.text }]}>
-          <Text style={styles.rate}>{formatRupees(shift.hourlyRate)}</Text>
-          {` ${t('workerShifts.perHour')} · ${t('workerShifts.estimated', {
-            amount: formatRupees(
-              booking.estimatedPay ?? shift.hourlyRate * shift.durationHours,
-            ),
-          })}`}
-        </Text>
+        {isTaskShift(shift) ? (
+          <Text style={[styles.pay, { color: colors.text }]}>
+            <Text style={styles.rate}>
+              {formatRupees(booking.estimatedPay ?? shift.estimatedPay ?? 0)}
+            </Text>
+            {` ${t('taskPricing.fixedPrice')}`}
+          </Text>
+        ) : (
+          <Text style={[styles.pay, { color: colors.text }]}>
+            <Text style={styles.rate}>{formatRupees(shift.hourlyRate)}</Text>
+            {` ${t('workerShifts.perHour')} · ${t('workerShifts.estimated', {
+              amount: formatRupees(
+                booking.estimatedPay ?? shift.hourlyRate * shift.durationHours,
+              ),
+            })}`}
+          </Text>
+        )}
         {status === 'selected' && shift.applicationId ? (
           <View style={styles.selectionRow}>
             {selectionButton('confirm')}

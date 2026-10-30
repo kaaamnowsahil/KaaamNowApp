@@ -1,6 +1,8 @@
 import type { FC, ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { tr } from '@/services/i18n/tr';
+
 import { FONTS } from '@/constants/fonts';
 import {
   formatMinutes,
@@ -80,41 +82,58 @@ export const PriceRow: FC<{
 /** Base, commission and tax shown separately; the total is exactly what the server charges. */
 export const LivePriceBreakdownCard: FC<{ price: LivePriceBreakdown }> = ({
   price,
-}) => (
-  <LiveCard testID="live-price-breakdown">
-    <LiveText tone="title">{S.priceTitle}</LiveText>
-    <PriceRow
-      label={S.baseLine(
-        formatRupees(price.hourly_rate_minor),
-        formatMinutes(price.reserved_minutes),
-      )}
-      value={formatRupees(price.base_amount_minor)}
-    />
-    <PriceRow
-      label={S.commissionLine(formatPct(price.commission_pct))}
-      value={formatRupees(price.commission_minor)}
-    />
-    {price.promo_discount_minor > 0 ? (
+}) => {
+  const isTask = price.pricing_mode === 'task';
+  return (
+    <LiveCard testID="live-price-breakdown">
+      <LiveText tone="title">{S.priceTitle}</LiveText>
       <PriceRow
-        label={S.couponLine(price.promo_code ?? '')}
-        value={`−${formatRupees(price.promo_discount_minor)}`}
+        label={
+          isTask
+            ? tr('taskPricing.taskLine')
+            : S.baseLine(
+                formatRupees(price.hourly_rate_minor),
+                formatMinutes(price.reserved_minutes),
+              )
+        }
+        value={formatRupees(price.base_amount_minor)}
       />
-    ) : null}
-    <PriceRow
-      label={`${price.tax_label} (${formatPct(price.tax_pct)})`}
-      value={formatRupees(price.tax_minor)}
-    />
-    <LiveText tone="muted">{price.tax_base_description}</LiveText>
-    <PriceRow label={S.total} strong value={formatRupees(price.total_minor)} />
-    <LiveText tone="muted">{S.reservedNote}</LiveText>
-    <LiveText tone="muted">
-      {S.extensionNote(
-        formatRupees(price.extension_rate_minor),
-        formatPct(price.extension_surcharge_pct),
+      <PriceRow
+        label={S.commissionLine(formatPct(price.commission_pct))}
+        value={formatRupees(price.commission_minor)}
+      />
+      {price.promo_discount_minor > 0 ? (
+        <PriceRow
+          label={S.couponLine(price.promo_code ?? '')}
+          value={`−${formatRupees(price.promo_discount_minor)}`}
+        />
+      ) : null}
+      <PriceRow
+        label={`${price.tax_label} (${formatPct(price.tax_pct)})`}
+        value={formatRupees(price.tax_minor)}
+      />
+      <LiveText tone="muted">{price.tax_base_description}</LiveText>
+      <PriceRow
+        label={S.total}
+        strong
+        value={formatRupees(price.total_minor)}
+      />
+      {isTask ? (
+        <LiveText tone="muted">{tr('taskPricing.taskNote')}</LiveText>
+      ) : (
+        <>
+          <LiveText tone="muted">{S.reservedNote}</LiveText>
+          <LiveText tone="muted">
+            {S.extensionNote(
+              formatRupees(price.extension_rate_minor),
+              formatPct(price.extension_surcharge_pct),
+            )}
+          </LiveText>
+        </>
       )}
-    </LiveText>
-  </LiveCard>
-);
+    </LiveCard>
+  );
+};
 
 export const LiveExtensionBreakdown: FC<{ quote: LiveExtensionQuote }> = ({
   quote,

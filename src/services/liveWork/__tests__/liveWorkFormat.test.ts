@@ -1,6 +1,7 @@
 import { ApiError } from '@/services/api/apiClient';
 
 import {
+  cleanCompletionCode,
   formatClock,
   formatMinutes,
   isRequestTaken,
@@ -29,9 +30,48 @@ const validForm: LiveWorkForm = {
   longitude: 77.62,
   instructions: '',
   siteContact: '',
+  pricingMode: 'hourly',
   durationMinutes: 120,
   rate: '500',
+  taskPrice: '',
 };
+
+describe('task pricing form', () => {
+  const task: LiveWorkForm = {
+    ...validForm,
+    pricingMode: 'task',
+    durationMinutes: Number.NaN,
+    rate: '',
+    taskPrice: '800',
+  };
+
+  it('needs only a valid task price, not a duration or rate', () => {
+    expect(validateLiveWorkForm(task)).toEqual({});
+  });
+
+  it('flags a missing or too-high task price', () => {
+    expect(
+      validateLiveWorkForm({ ...task, taskPrice: '' }).taskPrice,
+    ).toBeTruthy();
+    expect(
+      validateLiveWorkForm({ ...task, taskPrice: '1000000.01' }).taskPrice,
+    ).toBeTruthy();
+  });
+
+  it('maps the server task price error onto the field', () => {
+    const error = new ApiError('Invalid', 'validation_error', 422, {
+      fields: { task_price_minor: 'Too low' },
+    });
+    expect(serverFieldErrors(error)).toEqual({ taskPrice: 'Too low' });
+  });
+});
+
+describe('cleanCompletionCode', () => {
+  it('keeps at most six digits', () => {
+    expect(cleanCompletionCode(' 48-29 13 77')).toBe('482913');
+    expect(cleanCompletionCode('ab1')).toBe('1');
+  });
+});
 
 describe('rupeesToMinor', () => {
   it('converts rupee text to paise', () => {

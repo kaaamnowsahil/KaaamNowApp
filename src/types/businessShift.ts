@@ -27,6 +27,9 @@ export type BusinessShiftSlot = {
   workers: string;
   hourlyRate: string;
   breakMinutes?: string;
+  /** Missing means hourly. Task: one fixed price per worker, no end time or break. */
+  pricingMode?: 'hourly' | 'task';
+  taskPrice?: string;
 };
 
 export type BusinessDashboardShift = {

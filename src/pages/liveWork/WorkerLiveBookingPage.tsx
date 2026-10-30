@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
+import { CompletionCodeField } from '@/components/taskPricing/CompletionCode';
 import {
   BottomSheet,
   PrimaryButton,
@@ -22,9 +23,11 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { tr } from '@/services/i18n/tr';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
 import {
   ARRIVAL_CODE_LENGTH,
+  COMPLETION_CODE_LENGTH,
   formatClock,
   formatMinutes,
   formatRupees,
@@ -174,6 +177,9 @@ export const WorkerLiveBookingPage: FC<
   );
   const [cancelReason, setCancelReason] = useState('');
   const [sheetError, setSheetError] = useState('');
+  const [finishing, setFinishing] = useState(false);
+  const [finishCode, setFinishCode] = useState('');
+  const [finishError, setFinishError] = useState('');
 
   const sharing =
     booking?.status === 'assigned' || booking?.status === 'en_route';
@@ -237,14 +243,20 @@ export const WorkerLiveBookingPage: FC<
       setReached(true);
     });
 
+  const openComplete = () => {
+    setFinishCode('');
+    setFinishError('');
+    setFinishing(true);
+  };
+
   const confirmComplete = () =>
-    Alert.alert(S.completeTitle, S.completeBody, [
-      { text: S.keepWorking, style: 'cancel' },
-      {
-        text: S.completeWork,
-        onPress: () => run(() => liveWorkApi.complete(assignmentId)),
-      },
-    ]);
+    run(
+      () => liveWorkApi.complete(assignmentId, finishCode),
+      setFinishError,
+    ).then(ok => {
+      if (ok) setFinishing(false);
+      else setFinishCode('');
+    });
 
   const openCancel = () =>
     run(async () => {
@@ -267,6 +279,7 @@ export const WorkerLiveBookingPage: FC<
   }
 
   const { actions, work, earnings, status } = booking;
+  const isTask = work.pricing_mode === 'task';
   const ask = booking.extensions.find(e => e.status === 'requested');
   const canReach = actions.can_start_work && status === 'en_route' && !reached;
   const askCode = actions.can_start_work && status === 'en_route' && reached;
@@ -302,9 +315,10 @@ export const WorkerLiveBookingPage: FC<
             ) : null}
             {actions.can_complete ? (
               <PrimaryButton
-                label={S.completeWork}
-                onPress={confirmComplete}
+                label={isTask ? tr('taskPricing.finishTask') : S.completeWork}
+                onPress={openComplete}
                 disabled={busy}
+                testID="worker-live-complete"
               />
             ) : null}
             {actions.can_cancel ? (
@@ -322,9 +336,11 @@ export const WorkerLiveBookingPage: FC<
       <View style={styles.stack}>
         <LiveText tone="title">{work.job_title}</LiveText>
         <LiveText tone="muted">
-          {`${work.business_name} · ${
-            work.category_name ?? ''
-          } · ${formatMinutes(work.reserved_minutes)}`}
+          {`${work.business_name} · ${work.category_name ?? ''} · ${
+            isTask
+              ? tr('taskPricing.fixedPrice')
+              : formatMinutes(work.reserved_minutes)
+          }`}
         </LiveText>
         <View style={styles.address}>
           <MapPinIcon width={16} height={16} color={colors.textMuted} />
@@ -393,7 +409,7 @@ export const WorkerLiveBookingPage: FC<
         </LiveCard>
       ) : null}
 
-      {status === 'in_progress' && booking.timer ? (
+      {status === 'in_progress' && booking.timer && !isTask ? (
         <LiveCard>
           <LiveText tone="label">{S.timeLeft}</LiveText>
           <Text style={[styles.clock, { color: colors.text }]}>
@@ -466,6 +482,39 @@ export const WorkerLiveBookingPage: FC<
           value={formatRupees(earnings.total_net_minor)}
         />
       </LiveCard>
+
+      {finishing ? (
+        <BottomSheet
+          title={S.completeTitle}
+          subtitle={
+            isTask ? tr('taskPricing.completeTaskBody') : S.completeBody
+          }
+          onClose={() => setFinishing(false)}
+          closeLabel={S.keepWorking}
+        >
+          <View style={styles.stack}>
+            <CompletionCodeField
+              value={finishCode}
+              onChange={value => {
+                setFinishCode(value);
+                setFinishError('');
+              }}
+              businessName={work.business_name}
+              completion={booking.completion}
+              error={finishError}
+              testID="worker-live-completion-code"
+            />
+            {booking.completion?.locked ? null : (
+              <PrimaryButton
+                label={isTask ? tr('taskPricing.finishTask') : S.completeWork}
+                onPress={confirmComplete}
+                disabled={busy || finishCode.length !== COMPLETION_CODE_LENGTH}
+                testID="worker-live-complete-confirm"
+              />
+            )}
+          </View>
+        </BottomSheet>
+      ) : null}
 
       {cancelPreview ? (
         <BottomSheet

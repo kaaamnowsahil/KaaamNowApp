@@ -11,11 +11,15 @@ const form: LiveWorkForm = {
   longitude: 77.6,
   instructions: ' Back door ',
   siteContact: ' Ravi ',
+  pricingMode: 'hourly',
   durationMinutes: 120,
   rate: '450.5',
+  taskPrice: '',
 };
 
 const quote = {
+  pricing_mode: 'hourly',
+  task_price_minor: null,
   hourly_rate_minor: 45050,
   total_minor: 93000,
   promo_code: null,
@@ -25,6 +29,7 @@ describe('quoteRequest', () => {
   it('prices the rate in paise without a coupon', () => {
     expect(quoteRequest(form, null)).toEqual({
       category_slug: 'helper',
+      pricing_mode: 'hourly',
       hourly_rate_minor: 45050,
       duration_minutes: 120,
     });
@@ -46,6 +51,7 @@ describe('createRequest', () => {
       longitude: 77.6,
       arrival_instructions: 'Back door',
       site_contact_name: 'Ravi',
+      pricing_mode: 'hourly',
       duration_minutes: 120,
       hourly_rate_minor: 45050,
       accept_terms: true,
@@ -58,5 +64,38 @@ describe('createRequest', () => {
     expect(
       createRequest(form, { ...quote, promo_code: 'SAVE10' }, 'k').promo_code,
     ).toBe('SAVE10');
+  });
+});
+
+describe('task pricing', () => {
+  const task: LiveWorkForm = {
+    ...form,
+    pricingMode: 'task',
+    taskPrice: '800',
+  };
+  const taskQuote = {
+    ...quote,
+    pricing_mode: 'task',
+    task_price_minor: 80000,
+    total_minor: 84864,
+  } as LivePriceBreakdown;
+
+  it('quotes only the fixed price', () => {
+    expect(quoteRequest(task, null)).toEqual({
+      category_slug: 'helper',
+      pricing_mode: 'task',
+      task_price_minor: 80000,
+    });
+  });
+
+  it('books the reviewed fixed price without a duration or rate', () => {
+    const body = createRequest(task, taskQuote, 'key-2');
+    expect(body).toMatchObject({
+      pricing_mode: 'task',
+      task_price_minor: 80000,
+      expected_total_minor: 84864,
+    });
+    expect(body).not.toHaveProperty('duration_minutes');
+    expect(body).not.toHaveProperty('hourly_rate_minor');
   });
 });

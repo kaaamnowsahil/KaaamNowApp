@@ -19,7 +19,10 @@ import { useShiftAction } from '@/services/shifts/useShiftFlow';
 import { useEmergency } from '@/services/support/useEmergency';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
-import { formatClock, splitTimeRange } from '@/utils/format';
+
+import KeyRoundIcon from '@/assets/icons/key-round.svg';
+import TriangleAlertIcon from '@/assets/icons/triangle-alert.svg';
+import { formatClock, formatRupees, splitTimeRange } from '@/utils/format';
 
 import { ACTIVE_SHIFT_STRINGS } from './constants/activeShiftStrings';
 import { useActiveShift } from './hooks/useActiveShift';
@@ -49,6 +52,11 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
   const pinForBusiness =
     detail?.early_end_requested_by === 'business' ? detail.early_end_pin : null;
   const status = detail?.status;
+  const isTask = (detail?.shift.pricing_mode ?? shift.pricingMode) === 'task';
+  const awaitingPin =
+    !isTask &&
+    detail?.can_end === false &&
+    detail.early_end_requested_by === 'worker';
 
   useEffect(() => {
     if (status !== 'checked_out') return;
@@ -63,16 +71,6 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
-
-  const startEarlyEnd = () =>
-    action.run(
-      () => shiftsApi.requestEarlyEnd('worker', assignmentId),
-      next => {
-        a.setDetail(next);
-        setIsPinOpen(true);
-      },
-      ACTIVE_SHIFT_STRINGS.END_FAILED,
-    );
 
   const endEarly = (pin: string) =>
     action.run(
@@ -110,23 +108,28 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
         testID="active-shift-page"
         actions={
           <>
-            {detail?.can_end === false ? (
-              <PrimaryButton
+            <PrimaryButton
+              label={
+                isTask
+                  ? t('taskPricing.finishTask')
+                  : t('workerFlow.activeShift.checkOut')
+              }
+              onPress={() => navigation.navigate(ROUTES.finishShift, { shift })}
+              testID="active-shift-check-out"
+            />
+            {awaitingPin ? (
+              <SecondaryButton
                 label={ACTIVE_SHIFT_STRINGS.END_EARLY}
+                icon={KeyRoundIcon}
                 disabled={action.busy || !assignmentId}
-                onPress={startEarlyEnd}
+                onPress={() => setIsPinOpen(true)}
                 testID="active-shift-end-early"
               />
-            ) : (
-              <PrimaryButton
-                label={t('workerFlow.activeShift.checkOut')}
-                onPress={() => navigation.navigate(ROUTES.finishShift, { shift })}
-                testID="active-shift-check-out"
-              />
-            )}
+            ) : null}
             <SecondaryButton
               label={ACTIVE_SHIFT_STRINGS.EMERGENCY}
               tone="danger"
+              icon={TriangleAlertIcon}
               disabled={emergency.busy || !emergency.isAvailable}
               onPress={emergency.trigger}
               testID="active-shift-emergency"
@@ -176,12 +179,17 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
         <StatTiles
           items={[
             { value: times.start, label: t('workerFlow.activeShift.shiftStart') },
-            {
-              value: a.endsAt
-                ? ACTIVE_SHIFT_STRINGS.endsAt(a.endsAt, detail?.extended_minutes ?? 0)
-                : times.end,
-              label: t('workerFlow.activeShift.expectedEnd'),
-            },
+            isTask
+              ? {
+                  value: formatRupees(shift.estimatedPay ?? 0),
+                  label: t('taskPricing.fixedPrice'),
+                }
+              : {
+                  value: a.endsAt
+                    ? ACTIVE_SHIFT_STRINGS.endsAt(a.endsAt, detail?.extended_minutes ?? 0)
+                    : times.end,
+                  label: t('workerFlow.activeShift.expectedEnd'),
+                },
           ]}
         />
         <View style={[styles.timer, { backgroundColor: colors.fill }]}>

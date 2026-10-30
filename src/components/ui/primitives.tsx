@@ -138,6 +138,8 @@ type ButtonProps = {
 type SecondaryButtonProps = ButtonProps & {
   /** Leading icon, tinted with the button's accent colour. */
   icon?: FC<SvgProps>;
+  /** Icon without the label; `FormScreen` sets this when 4 actions share the footer. */
+  iconOnly?: boolean;
 };
 
 /** Figma "Primary action" (1:72): 52px, radius 12, filled primary. */
@@ -178,6 +180,7 @@ export const SecondaryButton: FC<SecondaryButtonProps> = ({
   tone = 'default',
   testID,
   icon: Icon,
+  iconOnly = false,
 }) => {
   const { colors } = useTheme();
   const isDanger = tone === 'danger';
@@ -185,6 +188,7 @@ export const SecondaryButton: FC<SecondaryButtonProps> = ({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={label}
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
@@ -196,18 +200,22 @@ export const SecondaryButton: FC<SecondaryButtonProps> = ({
           borderColor: accentColor,
         },
         Icon && styles.buttonWithIcon,
+        iconOnly && styles.iconOnlyButton,
         (pressed || disabled) && styles.dimmed,
       ]}
     >
       {Icon ? <Icon width={18} height={18} color={accentColor} /> : null}
-      <Text
-        style={[
-          styles.buttonLabel,
-          { color: accentColor },
-        ]}
-      >
-        {label}
-      </Text>
+      {!iconOnly ? (
+        <Text
+          style={[
+            styles.buttonLabel,
+            styles.shrink,
+            { color: accentColor },
+          ]}
+        >
+          {label}
+        </Text>
+      ) : null}
     </Pressable>
   );
 };
@@ -342,6 +350,12 @@ const styles = StyleSheet.create({
   },
   buttonLabel: { fontFamily: FONTS.semiBold, fontSize: 15 },
   buttonWithIcon: { flexDirection: 'row', gap: 8 },
+  shrink: { flexShrink: 1, textAlign: 'center' },
+  iconOnlyButton: {
+    minWidth: 52,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
   dimmed: { opacity: 0.7 },
   field: { width: '100%', gap: 7 },
   fieldLabel: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18 },

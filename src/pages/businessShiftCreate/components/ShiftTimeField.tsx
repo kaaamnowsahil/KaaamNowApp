@@ -1,14 +1,17 @@
 import { useRef, useState, type ComponentRef, type FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  useWindowDimensions,
   View,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
 } from 'react-native';
-import Svg, { Circle, Polyline } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle, Path, Polyline } from 'react-native-svg';
 
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -28,12 +31,12 @@ type ShiftTimeFieldProps = {
 type Period = 'AM' | 'PM';
 type Parts = { hour: number; minute: number; period: Period };
 
-const ITEM_HEIGHT = 38;
-const VISIBLE_ITEMS = 7;
-const POPOVER_WIDTH = 190;
+const ITEM_HEIGHT = 52;
+const VISIBLE_ITEMS = 5;
 const HOURS = Array.from({ length: 12 }, (_, index) => index + 1);
 const MINUTES = Array.from({ length: 60 }, (_, index) => index);
 const PERIODS: Period[] = ['AM', 'PM'];
+const DEFAULT_PARTS: Parts = { hour: 9, minute: 0, period: 'AM' };
 const pad = (value: number) => String(value).padStart(2, '0');
 
 const toParts = (value: string): Parts | null => {
@@ -50,10 +53,16 @@ const toParts = (value: string): Parts | null => {
 const fromParts = ({ hour, minute, period }: Parts) =>
   `${pad((hour % 12) + (period === 'PM' ? 12 : 0))}:${pad(minute)}`;
 
-const ClockIcon: FC<{ color: string }> = ({ color }) => (
+const display = ({ hour, minute, period }: Parts) => `${pad(hour)}:${pad(minute)} ${period}`;
+
+const Icon: FC<{ color: string; size?: number; kind: 'clock' | 'close' | 'check' }> = ({
+  color,
+  size = 16,
+  kind,
+}) => (
   <Svg
-    width={16}
-    height={16}
+    width={size}
+    height={size}
     viewBox="0 0 24 24"
     fill="none"
     stroke={color}
@@ -61,12 +70,94 @@ const ClockIcon: FC<{ color: string }> = ({ color }) => (
     strokeLinecap="round"
     strokeLinejoin="round"
   >
-    <Circle cx={12} cy={12} r={10} />
-    <Polyline points="12 6 12 12 16 14" />
+    {kind === 'clock' ? (
+      <>
+        <Circle cx={12} cy={12} r={10} />
+        <Polyline points="12 6 12 12 16 14" />
+      </>
+    ) : kind === 'close' ? (
+      <Path d="M18 6 6 18M6 6l12 12" />
+    ) : (
+      <Path d="M20 6 9 17l-5-5" />
+    )}
   </Svg>
 );
 
-/** Time input with a clock icon; opens an hour / minute / AM-PM picker under the field (same as web). */
+type WheelProps<T extends number | string> = {
+  items: T[];
+  value: T;
+  format: (item: T) => string;
+  onChange: (item: T) => void;
+  testID?: string;
+};
+
+/** Snapping column; the row in the centre band is the selected value. */
+const Wheel = <T extends number | string>({
+  items,
+  value,
+  format,
+  onChange,
+  testID,
+}: WheelProps<T>) => {
+  const { colors } = useTheme();
+  const ref = useRef<ComponentRef<typeof ScrollView>>(null);
+  const [initialIndex] = useState(() => Math.max(0, items.indexOf(value)));
+  const index = Math.max(0, items.indexOf(value));
+
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const next = Math.min(
+      items.length - 1,
+      Math.max(0, Math.round(event.nativeEvent.contentOffset.y / ITEM_HEIGHT)),
+    );
+    const item = items[next];
+    if (item !== undefined && item !== value) onChange(item);
+  };
+
+  return (
+    <ScrollView
+      ref={ref}
+      style={styles.column}
+      contentContainerStyle={styles.columnContent}
+      contentOffset={{ x: 0, y: initialIndex * ITEM_HEIGHT }}
+      snapToInterval={ITEM_HEIGHT}
+      decelerationRate="fast"
+      onScroll={onScroll}
+      scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
+      nestedScrollEnabled
+      testID={testID}
+    >
+      {items.map((item, i) => {
+        const distance = Math.abs(i - index);
+        return (
+          <Pressable
+            key={String(item)}
+            accessibilityRole="button"
+            accessibilityState={{ selected: distance === 0 }}
+            onPress={() => ref.current?.scrollTo({ y: i * ITEM_HEIGHT, animated: true })}
+            style={styles.item}
+            testID={testID ? `${testID}-${String(item)}` : undefined}
+          >
+            <Text
+              style={[
+                styles.itemLabel,
+                distance === 0
+                  ? [styles.itemSelected, { color: colors.text }]
+                  : distance === 1
+                    ? [styles.itemNear, { color: colors.textMuted }]
+                    : { color: colors.textSubtle },
+              ]}
+            >
+              {format(item)}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
+  );
+};
+
+/** Time input with a clock icon; opens an AM-PM / hour / minute scroll wheel in a bottom sheet (same as web). */
 export const ShiftTimeField: FC<ShiftTimeFieldProps> = ({
   label,
   value,
@@ -76,79 +167,27 @@ export const ShiftTimeField: FC<ShiftTimeFieldProps> = ({
   testID,
 }) => {
   const { colors } = useTheme();
-  const window = useWindowDimensions();
-  const fieldRef = useRef<ComponentRef<typeof View>>(null);
-  const [anchor, setAnchor] = useState<{ top: number; left: number } | null>(null);
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   const parts = toParts(value);
-  const current: Parts = parts ?? { hour: 9, minute: 0, period: 'AM' };
+  const [draft, setDraft] = useState<Parts | null>(null);
 
-  const open = () =>
-    fieldRef.current?.measureInWindow((x, y, _width, height) => {
-      const popoverHeight = ITEM_HEIGHT * VISIBLE_ITEMS + 8;
-      const below = y + height + 4;
-      setAnchor({
-        top:
-          below + popoverHeight > window.height
-            ? Math.max(8, y - popoverHeight - 4)
-            : below,
-        left: Math.min(x, window.width - POPOVER_WIDTH - 8),
-      });
-    });
-
-  const set = (changes: Partial<Parts>) => onChange(fromParts({ ...current, ...changes }));
-
-  const renderColumn = <T extends number | Period>(
-    items: T[],
-    selected: T | undefined,
-    format: (item: T) => string,
-    onSelect: (item: T) => void,
-    name: string,
-  ) => {
-    const index = selected === undefined ? 0 : Math.max(0, items.indexOf(selected));
-    return (
-      <ScrollView
-        style={styles.column}
-        contentOffset={{ x: 0, y: Math.max(0, index - 1) * ITEM_HEIGHT }}
-        showsVerticalScrollIndicator={false}
-      >
-        {items.map(item => {
-          const isSelected = item === selected;
-          return (
-            <Pressable
-              key={String(item)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: isSelected }}
-              onPress={() => onSelect(item)}
-              style={[
-                styles.item,
-                isSelected && { backgroundColor: colors.primary },
-              ]}
-              testID={testID ? `${testID}-${name}-${String(item)}` : undefined}
-            >
-              <Text
-                style={[
-                  styles.itemLabel,
-                  { color: isSelected ? colors.onPrimary : colors.text },
-                ]}
-              >
-                {format(item)}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-    );
+  const close = () => setDraft(null);
+  const confirm = () => {
+    if (draft) onChange(fromParts(draft));
+    close();
   };
+  const set = (changes: Partial<Parts>) =>
+    setDraft(current => ({ ...(current ?? DEFAULT_PARTS), ...changes }));
 
   return (
     <View style={styles.field}>
       <Text style={[styles.label, { color: colors.textSubtle }]}>{label}</Text>
       <Pressable
-        ref={fieldRef}
         accessibilityRole="button"
         accessibilityLabel={label}
-        accessibilityValue={{ text: parts ? fromDisplay(parts) : placeholder }}
-        onPress={open}
+        accessibilityValue={{ text: parts ? display(parts) : placeholder }}
+        onPress={() => setDraft(parts ?? DEFAULT_PARTS)}
         style={[
           styles.inputBox,
           {
@@ -162,43 +201,102 @@ export const ShiftTimeField: FC<ShiftTimeFieldProps> = ({
           numberOfLines={1}
           style={[styles.value, { color: parts ? colors.text : colors.textSubtle }]}
         >
-          {parts ? fromDisplay(parts) : placeholder}
+          {parts ? display(parts) : placeholder}
         </Text>
-        <ClockIcon color={colors.text} />
+        <Icon kind="clock" color={colors.text} />
       </Pressable>
       <ShiftFieldError message={error} />
-      {anchor ? (
+      {draft ? (
         <Modal
           transparent
           visible
           statusBarTranslucent
-          animationType="none"
-          onRequestClose={() => setAnchor(null)}
+          animationType="slide"
+          onRequestClose={close}
         >
-          <Pressable style={StyleSheet.absoluteFill} onPress={() => setAnchor(null)} />
-          <View
-            style={[
-              styles.popover,
-              {
-                top: anchor.top,
-                left: anchor.left,
-                backgroundColor: colors.background,
-                borderColor: colors.border,
-              },
-            ]}
-            testID={testID ? `${testID}-picker` : undefined}
-          >
-            {renderColumn(HOURS, parts?.hour, pad, hour => set({ hour }), 'hour')}
-            {renderColumn(MINUTES, parts?.minute, pad, minute => set({ minute }), 'minute')}
-            {renderColumn(PERIODS, parts?.period, p => p, period => set({ period }), 'period')}
+          <View style={styles.root}>
+            <Pressable
+              accessibilityLabel={t('common.cancel')}
+              style={[StyleSheet.absoluteFill, { backgroundColor: colors.backdrop }]}
+              onPress={close}
+            />
+            <View
+              style={[
+                styles.sheet,
+                { backgroundColor: colors.background, paddingBottom: 24 + insets.bottom },
+              ]}
+              testID={testID ? `${testID}-picker` : undefined}
+            >
+              <View style={[styles.handle, { backgroundColor: colors.border }]} />
+              <View style={styles.header}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.cancel')}
+                  hitSlop={8}
+                  onPress={close}
+                  style={styles.iconButton}
+                  testID={testID ? `${testID}-cancel` : undefined}
+                >
+                  <Icon kind="close" size={24} color={colors.text} />
+                </Pressable>
+                <View style={styles.titleBlock}>
+                  <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>
+                    {label}
+                  </Text>
+                  <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+                    {display(draft)}
+                  </Text>
+                </View>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.done')}
+                  hitSlop={8}
+                  onPress={confirm}
+                  style={styles.iconButton}
+                  testID={testID ? `${testID}-confirm` : undefined}
+                >
+                  <Icon kind="check" size={24} color={colors.primary} />
+                </Pressable>
+              </View>
+              <View style={styles.columnLabels}>
+                <Text style={styles.columnLabel} />
+                <Text style={[styles.columnLabel, { color: colors.textMuted }]}>H</Text>
+                <Text style={[styles.columnLabel, { color: colors.textMuted }]}>M</Text>
+              </View>
+              <View style={styles.wheel}>
+                <View
+                  pointerEvents="none"
+                  style={[styles.band, { backgroundColor: colors.fill }]}
+                />
+                <Wheel
+                  items={PERIODS}
+                  value={draft.period}
+                  format={period => period}
+                  onChange={period => set({ period })}
+                  testID={testID ? `${testID}-period` : undefined}
+                />
+                <Wheel
+                  items={HOURS}
+                  value={draft.hour}
+                  format={pad}
+                  onChange={hour => set({ hour })}
+                  testID={testID ? `${testID}-hour` : undefined}
+                />
+                <Wheel
+                  items={MINUTES}
+                  value={draft.minute}
+                  format={pad}
+                  onChange={minute => set({ minute })}
+                  testID={testID ? `${testID}-minute` : undefined}
+                />
+              </View>
+            </View>
           </View>
         </Modal>
       ) : null}
     </View>
   );
 };
-
-const fromDisplay = ({ hour, minute, period }: Parts) => `${pad(hour)}:${pad(minute)} ${period}`;
 
 const styles = StyleSheet.create({
   field: { gap: 6 },
@@ -213,27 +311,44 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   value: { flex: 1, fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18 },
-  popover: {
-    position: 'absolute',
-    width: POPOVER_WIDTH,
-    height: ITEM_HEIGHT * VISIBLE_ITEMS + 8,
+  root: { flex: 1, justifyContent: 'flex-end' },
+  sheet: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    gap: 14,
+  },
+  handle: { alignSelf: 'center', width: 32, height: 4, borderRadius: 2 },
+  header: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
+  iconButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  titleBlock: { flex: 1, alignItems: 'center' },
+  title: { fontFamily: FONTS.semiBold, fontSize: 20, lineHeight: 26 },
+  subtitle: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18 },
+  columnLabels: { flexDirection: 'row' },
+  columnLabel: {
+    flex: 1,
+    textAlign: 'center',
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+  },
+  wheel: {
+    height: ITEM_HEIGHT * VISIBLE_ITEMS,
     flexDirection: 'row',
-    gap: 4,
-    padding: 4,
-    borderWidth: 1,
-    borderRadius: 10,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
+    marginBottom: 8,
+  },
+  band: {
+    position: 'absolute',
+    top: ITEM_HEIGHT * Math.floor(VISIBLE_ITEMS / 2),
+    left: 0,
+    right: 0,
+    height: ITEM_HEIGHT,
+    borderRadius: 12,
   },
   column: { flex: 1 },
-  item: {
-    height: ITEM_HEIGHT,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 6,
-  },
-  itemLabel: { fontFamily: FONTS.semiBold, fontSize: 15 },
+  columnContent: { paddingVertical: ITEM_HEIGHT * Math.floor(VISIBLE_ITEMS / 2) },
+  item: { height: ITEM_HEIGHT, alignItems: 'center', justifyContent: 'center' },
+  itemLabel: { fontFamily: FONTS.regular, fontSize: 22 },
+  itemNear: { fontSize: 26 },
+  itemSelected: { fontFamily: FONTS.semiBold, fontSize: 34 },
 });

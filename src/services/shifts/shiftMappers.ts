@@ -1,5 +1,6 @@
 import i18n from '@/services/i18n/i18n';
 import type { BusinessApplicant, BusinessDashboardShift, Shift } from '@/types';
+import { formatRupees } from '@/utils/format';
 
 import type {
   BusinessApplicantItem,
@@ -69,7 +70,29 @@ export const hoursBetween = (
 
 export const fromMinor = (minor: number) => Math.round(minor) / 100;
 
+export const isTaskShift = (shift: Pick<Shift, 'pricingMode'>) =>
+  shift.pricingMode === 'task';
+
+/** "₹580 fixed price": the Worker's pay after commission for a task shift. */
+export const taskPayLabel = (shift: Pick<Shift, 'estimatedPay'>) =>
+  i18n.t('taskPricing.fixedPriceAmount', {
+    amount: formatRupees(shift.estimatedPay ?? 0),
+  });
+
+/** Task shifts have no end time: show only the start and no length. */
 export const toShift = (card: WorkerShiftCard): Shift => ({
+  ...toShiftBase(card),
+  ...(card.pricing_mode === 'task'
+    ? {
+        timeLabel: i18n.t('taskPricing.startsAt', {
+          time: formatTime(card.starts_at),
+        }),
+        durationHours: 0,
+      }
+    : {}),
+});
+
+const toShiftBase = (card: WorkerShiftCard): Shift => ({
   id: card.id,
   status: card.shift_type,
   categoryId: card.category_slug,
@@ -95,6 +118,7 @@ export const toShift = (card: WorkerShiftCard): Shift => ({
   applicationStatus: card.my_application_status ?? null,
   assignmentId: card.my_assignment_id ?? null,
   assignmentStatus: card.my_assignment_status ?? null,
+  pricingMode: card.pricing_mode ?? 'hourly',
 });
 
 export const toDashboardShift = (

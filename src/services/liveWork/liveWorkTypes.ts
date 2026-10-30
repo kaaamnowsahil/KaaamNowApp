@@ -1,8 +1,21 @@
 export type TaxBase = 'subtotal' | 'base_amount' | 'commission';
 
+/** Hourly: rate × reserved time. Task: one fixed price, no timer, finished with a code. */
+export type PricingMode = 'hourly' | 'task';
+
+/** The code a Business shares when the work is done; `code` is only sent to the Business. */
+export type CompletionCode = {
+  code?: string | null;
+  attempts_left: number;
+  locked: boolean;
+  can_reissue: boolean;
+};
+
 export type LivePriceBreakdown = {
   currency: string;
   settings_version: number;
+  pricing_mode: PricingMode;
+  task_price_minor: number | null;
   hourly_rate_minor: number;
   reserved_minutes: number;
   base_amount_minor: number;
@@ -49,6 +62,8 @@ export type LiveWorkDetails = {
   business_name: string;
   reserved_minutes: number;
   hourly_rate_minor: number;
+  pricing_mode: PricingMode;
+  task_price_minor: number | null;
 };
 
 export type LiveAssignment = {
@@ -228,8 +243,10 @@ export type BusinessLiveBooking = {
     can_extend: boolean;
     can_end_work: boolean;
     can_reissue_code: boolean;
+    can_reissue_completion_code: boolean;
     can_repost: boolean;
   };
+  completion_code: CompletionCode | null;
 };
 
 export type WorkerLiveBooking = {
@@ -257,6 +274,7 @@ export type WorkerLiveBooking = {
   timer: LiveTimer | null;
   extensions: LiveExtension[];
   cancellation: LiveCancellation | null;
+  completion: CompletionCode | null;
   actions: {
     can_start_travel: boolean;
     can_start_work: boolean;
@@ -276,6 +294,8 @@ export type WorkerLiveRequest = {
   distance_km: number | null;
   reserved_minutes: number;
   hourly_rate_minor: number;
+  pricing_mode: PricingMode;
+  task_price_minor: number | null;
   worker_net_minor: number;
   currency: string;
   expires_at: string;
@@ -284,8 +304,10 @@ export type WorkerLiveRequest = {
 
 export type LiveQuoteRequest = {
   category_slug?: string;
-  hourly_rate_minor: number;
-  duration_minutes: number;
+  pricing_mode: PricingMode;
+  hourly_rate_minor?: number;
+  duration_minutes?: number;
+  task_price_minor?: number;
   promo_code?: string;
 };
 
@@ -298,8 +320,10 @@ export type LiveWorkCreate = {
   longitude: number;
   arrival_instructions: string;
   site_contact_name: string;
-  duration_minutes: number;
-  hourly_rate_minor: number;
+  pricing_mode: PricingMode;
+  duration_minutes?: number;
+  hourly_rate_minor?: number;
+  task_price_minor?: number;
   accept_terms: boolean;
   expected_total_minor: number;
   idempotency_key: string;

@@ -183,6 +183,7 @@ export const useBusinessShiftSchedule = (
         responsibilities: schedule.responsibilities.trim(),
         hourlyRate: schedule.hourlyRate.trim(),
         breakMinutes: (schedule.breakMinutes ?? '').trim(),
+        taskPrice: (schedule.taskPrice ?? '').trim(),
       })),
     }),
   };

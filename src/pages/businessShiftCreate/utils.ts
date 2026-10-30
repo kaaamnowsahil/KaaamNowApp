@@ -1,6 +1,9 @@
 import type { ShiftBulkItem } from '@/services/shifts/shiftsApi';
 import type { BusinessShiftDraft, BusinessShiftSlot } from '@/types';
 
+import { tr } from '@/services/i18n/tr';
+import { MAX_TASK_PRICE_RUPEES } from '@/services/liveWork/liveWorkFormat';
+
 import { SHIFT_FORM_ERRORS as E } from './constants/shiftFormErrors';
 
 export const toLocalDateString = (date: Date) =>
@@ -98,6 +101,7 @@ export type SlotErrors = Partial<
     | 'workers'
     | 'hourlyRate'
     | 'breakMinutes'
+    | 'taskPrice'
     | 'responsibilities',
     string
   >
@@ -120,11 +124,23 @@ export const slotErrors = (slot: BusinessShiftSlot): SlotErrors => {
   ) {
     errors.startTime = E.tooSoon(MIN_LEAD_HOURS);
   }
-  if (!slot.endTime) errors.endTime = E.END;
-  else if (slot.startTime && hours === 0) errors.endTime = E.END_BEFORE_START;
   if (!slot.workers.trim() || !Number.isInteger(workers) || workers < 1) {
     errors.workers = E.WORKERS;
   }
+  if (!slot.responsibilities.trim()) errors.responsibilities = E.RESPONSIBILITIES;
+  if (slot.pricingMode === 'task') {
+    const price = Number((slot.taskPrice ?? '').trim());
+    if (!(slot.taskPrice ?? '').trim() || !Number.isFinite(price) || price <= 0) {
+      errors.taskPrice = tr('taskPricing.taskPriceRequired');
+    } else if (price > MAX_TASK_PRICE_RUPEES) {
+      errors.taskPrice = tr('taskPricing.taskPriceMax', {
+        max: MAX_TASK_PRICE_RUPEES.toLocaleString('en-IN'),
+      });
+    }
+    return errors;
+  }
+  if (!slot.endTime) errors.endTime = E.END;
+  else if (slot.startTime && hours === 0) errors.endTime = E.END_BEFORE_START;
   if (!slot.hourlyRate.trim() || !Number.isFinite(rate) || rate <= 0) {
     errors.hourlyRate = E.PAY;
   }
@@ -136,7 +152,6 @@ export const slotErrors = (slot: BusinessShiftSlot): SlotErrors => {
   ) {
     errors.breakMinutes = E.BREAK;
   }
-  if (!slot.responsibilities.trim()) errors.responsibilities = E.RESPONSIBILITIES;
   return errors;
 };
 
@@ -145,20 +160,39 @@ export const uniqueDates = (draft: BusinessShiftDraft) => [
   ...new Set(draft.schedules.map(({ date }) => date)),
 ];
 
+/**
+ * Hourly: rate, start, end and break. Task: one fixed price and a start; the server
+ * sets the working window itself.
+ */
+export const slotPricing = (schedule: BusinessShiftSlot) => {
+  const at = (time: string) => scheduleAt(schedule.date, time).toISOString();
+  if (schedule.pricingMode === 'task') {
+    return {
+      pricing_mode: 'task' as const,
+      task_price_minor: Math.round(Number(schedule.taskPrice) * 100),
+      starts_at: at(schedule.startTime),
+      break_minutes: 0,
+    };
+  }
+  return {
+    pricing_mode: 'hourly' as const,
+    hourly_rate_minor: Math.round(Number(schedule.hourlyRate) * 100),
+    starts_at: at(schedule.startTime),
+    ends_at: at(schedule.endTime),
+    break_minutes: Number(schedule.breakMinutes || 0),
+  };
+};
+
 /** One API shift per slot; times are the business's local time. */
 export const toBulkItems = (draft: BusinessShiftDraft): ShiftBulkItem[] =>
   draft.schedules.map(schedule => {
-    const at = (time: string) => scheduleAt(schedule.date, time).toISOString();
     return {
       category_slug: schedule.category,
       job_title: schedule.role.trim(),
       responsibilities: schedule.responsibilities.trim(),
       requirements: schedule.requirement.trim() || undefined,
       workers_required: Number(schedule.workers),
-      hourly_rate_minor: Math.round(Number(schedule.hourlyRate) * 100),
-      starts_at: at(schedule.startTime),
-      ends_at: at(schedule.endTime),
-      break_minutes: Number(schedule.breakMinutes || 0),
+      ...slotPricing(schedule),
       address_text: draft.location.trim() || undefined,
       latitude: draft.latitude ?? undefined,
       longitude: draft.longitude ?? undefined,

@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import ArrowRightIcon from '@/assets/figma/arrow-right.svg';
 import BadgeCheckIcon from '@/assets/figma/badge-check.svg';
 import { FONTS } from '@/constants/fonts';
+import { isTaskShift } from '@/services/shifts/shiftMappers';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { Shift } from '@/types';
 import { formatRupees } from '@/utils/format';
@@ -65,15 +66,27 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
       </View>
 
       <Text style={[styles.body, { color: colors.textMuted }]}>
-        {`${shift.dateLabel} · ${shift.timeLabel} · ${SHIFT_STRINGS.hours(
-          shift.durationHours,
-        )}`}
+        {isTaskShift(shift)
+          ? `${shift.dateLabel} · ${shift.timeLabel}`
+          : `${shift.dateLabel} · ${shift.timeLabel} · ${SHIFT_STRINGS.hours(
+              shift.durationHours,
+            )}`}
       </Text>
       <Text style={[styles.meta, { color: colors.textSubtle }]}>
         {`${shift.area} · ${shift.requirement}`}
       </Text>
 
       <View style={[styles.row, styles.payRow]}>
+        {isTaskShift(shift) ? (
+          <View style={styles.pay}>
+            <Text style={[styles.rate, { color: colors.text }]}>
+              {formatRupees(shift.estimatedPay ?? 0)}
+              <Text style={[styles.perHour, { color: colors.textSubtle }]}>
+                {` ${t('taskPricing.fixedPrice')}`}
+              </Text>
+            </Text>
+          </View>
+        ) : (
         <View style={styles.pay}>
           <Text style={[styles.rate, { color: colors.text }]}>
             {formatRupees(shift.hourlyRate)}
@@ -87,6 +100,7 @@ export const ShiftCard: FC<{ shift: Shift; onPress?: () => void }> = ({
             )}
           </Text>
         </View>
+        )}
         {isLive ? (
           <Text style={[styles.cta, { color: colors.primary }]}>
             {SHIFT_STRINGS.spotsOpen(shift.spotsOpen)}

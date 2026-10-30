@@ -75,6 +75,11 @@ export const liveWorkApi = {
       'POST',
       `${BUSINESS}/${bookingId}/arrival-code/reissue`,
     ),
+  reissueCompletionCode: (bookingId: string) =>
+    apiRequest<BusinessLiveBooking>(
+      'POST',
+      `${BUSINESS}/${bookingId}/completion-code/reissue`,
+    ),
 
   reportWorkerLocation: (point: LivePoint) =>
     apiRequest<{ is_available: boolean }>('PUT', '/me/location', {
@@ -116,10 +121,11 @@ export const liveWorkApi = {
         body: { arrival_code: arrivalCode, ...point },
       },
     ),
-  complete: (assignmentId: string) =>
+  complete: (assignmentId: string, completionCode: string) =>
     apiRequest<WorkerLiveBooking>(
       'POST',
       `${WORKER}/bookings/${assignmentId}/complete`,
+      { body: { completion_code: completionCode } },
     ),
   workerCancelPreview: (assignmentId: string) =>
     apiRequest<LiveCancelPreview>(

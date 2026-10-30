@@ -3,11 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { DetailRow, FlowHeading, InfoCallout } from '@/components/shiftFlow';
+import { CompletionCodeField } from '@/components/taskPricing/CompletionCode';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { errorMessage } from '@/services/api/apiClient';
+import { COMPLETION_CODE_LENGTH } from '@/services/liveWork/liveWorkFormat';
 import { getDevicePosition } from '@/services/maps/devicePosition';
 import { formatDateTime } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
@@ -42,23 +44,35 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
   const assignment = useAssignment(shift.assignmentId);
   const checkedInAt = assignment.data?.attendance?.checked_in_at;
   const [note, setNote] = useState('');
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hours = hoursSince(checkedInAt);
+  const isTask =
+    (assignment.data?.shift.pricing_mode ?? shift.pricingMode) === 'task';
+  const completion = assignment.data?.completion_code;
+  const businessName =
+    assignment.data?.business.business_name ?? shift.businessName;
 
   const checkOut = async () => {
     if (!shift.assignmentId || isSubmitting) return;
+    if (code.length !== COMPLETION_CODE_LENGTH) return;
     setIsSubmitting(true);
+    setCodeError('');
     try {
       const position = await getDevicePosition(8000);
       const result = await shiftsApi.checkOut(shift.assignmentId, {
         ...(position ?? {}),
+        completion_code: code,
         note: note.trim() || undefined,
       });
       navigation.replace(ROUTES.shiftComplete, {
         shift: { ...shift, assignmentStatus: result.status },
       });
     } catch (error) {
-      Alert.alert(t('workerFlow.finishShift.failed'), errorMessage(error));
+      setCode('');
+      setCodeError(errorMessage(error));
+      assignment.reload();
     } finally {
       setIsSubmitting(false);
     }
@@ -86,11 +100,15 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
     },
     {
       title: t('workerFlow.finishShift.earnings'),
-      caption: t('workerFlow.finishShift.earningsFormula', {
-        hours,
-        rate: formatRupees(shift.hourlyRate),
-        total: formatRupees(shift.hourlyRate * hours),
-      }),
+      caption: isTask
+        ? t('taskPricing.fixedPriceAmount', {
+            amount: formatRupees(shift.estimatedPay ?? 0),
+          })
+        : t('workerFlow.finishShift.earningsFormula', {
+            hours,
+            rate: formatRupees(shift.hourlyRate),
+            total: formatRupees(shift.hourlyRate * hours),
+          }),
     },
   ];
 
@@ -107,8 +125,17 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
       actions={
         <>
           <PrimaryButton
-            label={t('workerFlow.finishShift.confirm')}
-            disabled={isSubmitting || !shift.assignmentId}
+            label={
+              isTask
+                ? t('taskPricing.finishTask')
+                : t('workerFlow.finishShift.confirm')
+            }
+            disabled={
+              isSubmitting ||
+              !shift.assignmentId ||
+              !!completion?.locked ||
+              code.length !== COMPLETION_CODE_LENGTH
+            }
             onPress={checkOut}
             testID="finish-shift-confirm"
           />
@@ -124,7 +151,24 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
         title={t('workerFlow.finishShift.heading')}
         subtitle={t('workerFlow.finishShift.subtitle')}
       />
-      <InfoCallout text={t('workerFlow.finishShift.reviewNote')} />
+      <InfoCallout
+        text={
+          isTask
+            ? t('taskPricing.checkOutStep')
+            : t('workerFlow.finishShift.reviewNote')
+        }
+      />
+      <CompletionCodeField
+        value={code}
+        onChange={value => {
+          setCode(value);
+          setCodeError('');
+        }}
+        businessName={businessName}
+        completion={completion}
+        error={codeError}
+        testID="finish-shift-code"
+      />
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.textMuted }]}>
           {t('workerFlow.finishShift.noteLabel')}

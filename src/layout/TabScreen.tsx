@@ -111,8 +111,14 @@ const styles = StyleSheet.create({
   },
   title: { fontFamily: FONTS.bold, fontSize: 22, lineHeight: 30.8 },
   content: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20 },
-  fillContent: { flexGrow: 1 },
-  fillBlock: { flexGrow: 1 },
+  fillContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  fillBlock: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
   bottomSpace: { height: 4 },
   actions: {
     borderTopWidth: 1,

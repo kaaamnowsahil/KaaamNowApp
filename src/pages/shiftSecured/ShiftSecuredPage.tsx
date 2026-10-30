@@ -2,11 +2,18 @@ import { useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Linking, View } from 'react-native';
 
+import NavigationIcon from '@/assets/figma/navigation.svg';
+import XIcon from '@/assets/figma/x.svg';
+import TriangleAlertIcon from '@/assets/icons/triangle-alert.svg';
 import { DetailRow, ReasonSheet, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
-import { fromMinor } from '@/services/shifts/shiftMappers';
+import {
+  fromMinor,
+  isTaskShift,
+  taskPayLabel,
+} from '@/services/shifts/shiftMappers';
 import { shiftsApi, type CancellationQuote } from '@/services/shifts/shiftsApi';
 import {
   bookingRef,
@@ -87,11 +94,13 @@ export const ShiftSecuredPage: FC<
             />
             <SecondaryButton
               label={t('shiftSecured.directions')}
+              icon={NavigationIcon}
               onPress={openMaps}
               testID="shift-secured-directions"
             />
             <SecondaryButton
               label={t('shiftSecured.cancelLink')}
+              icon={XIcon}
               disabled={action.busy || !shift.assignmentId}
               onPress={openCancel}
               testID="shift-secured-cancel"
@@ -99,6 +108,7 @@ export const ShiftSecuredPage: FC<
             <SecondaryButton
               label={SHIFT_SECURED_STRINGS.EMERGENCY}
               tone="danger"
+              icon={TriangleAlertIcon}
               disabled={emergency.busy || !emergency.isAvailable}
               onPress={emergency.trigger}
               testID="shift-secured-emergency"
@@ -136,10 +146,14 @@ export const ShiftSecuredPage: FC<
           <DetailRow
             size="compact"
             title={t('shiftSecured.agreedRate')}
-            caption={t('shiftSecured.rate', {
-              rate: formatRupees(shift.hourlyRate),
-              total: formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
-            })}
+            caption={
+              isTaskShift(shift)
+                ? taskPayLabel(shift)
+                : t('shiftSecured.rate', {
+                    rate: formatRupees(shift.hourlyRate),
+                    total: formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
+                  })
+            }
             onPress={openDetails}
           />
           <DetailRow

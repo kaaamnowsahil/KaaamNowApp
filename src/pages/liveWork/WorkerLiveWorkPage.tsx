@@ -5,6 +5,7 @@ import { Alert, StyleSheet, View } from 'react-native';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { tr } from '@/services/i18n/tr';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
 import {
   formatClock,
@@ -67,9 +68,13 @@ const RequestCard: FC<{
       <LiveText tone="label">{request.category_name ?? ''}</LiveText>
       <LiveText tone="strong">{request.job_title}</LiveText>
       <LiveText tone="muted">
-        {`${request.business_name} · ${formatMinutes(
-          request.reserved_minutes,
-        )} · ${formatRupees(request.hourly_rate_minor)}/h`}
+        {request.pricing_mode === 'task'
+          ? `${request.business_name} · ${tr('taskPricing.fixedPriceAmount', {
+              amount: formatRupees(request.task_price_minor ?? 0),
+            })}`
+          : `${request.business_name} · ${formatMinutes(
+              request.reserved_minutes,
+            )} · ${formatRupees(request.hourly_rate_minor)}/h`}
       </LiveText>
       <LiveText tone="muted">
         {`${request.address_text}${

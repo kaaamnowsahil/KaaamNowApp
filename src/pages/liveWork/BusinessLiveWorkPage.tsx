@@ -10,10 +10,15 @@ import {
   TextField,
 } from '@/components/ui';
 import MapPinIcon from '@/assets/figma/map-pin.svg';
+import XIcon from '@/assets/figma/x.svg';
+import CircleCheckIcon from '@/assets/icons/circle-check.svg';
+import ClockIcon from '@/assets/icons/clock.svg';
+import { CompletionCodeCard } from '@/components/taskPricing/CompletionCode';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { payInvoice } from '@/services/billing/billingApi';
+import { tr } from '@/services/i18n/tr';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
 import {
   EXTENSION_MINUTE_OPTIONS,
@@ -134,15 +139,20 @@ export const BusinessLiveWorkPage: FC<
     }
   };
 
+  const isTask = booking?.work.pricing_mode === 'task';
   const confirmEnd = () =>
-    Alert.alert(S.endTitle, S.endBody, [
-      { text: S.keep, style: 'cancel' },
-      {
-        text: S.endWork,
-        style: 'destructive',
-        onPress: () => run(() => liveWorkApi.endWork(bookingId)),
-      },
-    ]);
+    Alert.alert(
+      isTask ? tr('taskPricing.markDone') : S.endTitle,
+      isTask ? tr('taskPricing.markDoneBody') : S.endBody,
+      [
+        { text: S.keep, style: 'cancel' },
+        {
+          text: isTask ? tr('taskPricing.markDone') : S.endWork,
+          style: 'destructive',
+          onPress: () => run(() => liveWorkApi.endWork(bookingId)),
+        },
+      ],
+    );
 
   if (!booking) {
     return (
@@ -197,6 +207,7 @@ export const BusinessLiveWorkPage: FC<
           {actions.can_extend && !openExt ? (
             <SecondaryButton
               label={S.extend}
+              icon={ClockIcon}
               onPress={() => {
                 setSheet('extend');
                 loadExtQuote(extendBy);
@@ -206,7 +217,8 @@ export const BusinessLiveWorkPage: FC<
           ) : null}
           {actions.can_end_work ? (
             <SecondaryButton
-              label={S.endWork}
+              label={isTask ? tr('taskPricing.markDone') : S.endWork}
+              icon={CircleCheckIcon}
               onPress={confirmEnd}
               disabled={busy}
             />
@@ -221,6 +233,7 @@ export const BusinessLiveWorkPage: FC<
             <SecondaryButton
               label={S.cancel}
               tone="danger"
+              icon={XIcon}
               onPress={() => openCancel()}
               disabled={busy}
             />
@@ -231,9 +244,14 @@ export const BusinessLiveWorkPage: FC<
       <View style={styles.stack}>
         <LiveText tone="title">{work.job_title}</LiveText>
         <LiveText tone="muted">
-          {`${work.category_name ?? ''} · ${formatMinutes(
-            work.reserved_minutes,
-          )} · ${formatRupees(work.hourly_rate_minor)}/h`}
+          {isTask
+            ? `${work.category_name ?? ''} · ${tr(
+                'taskPricing.fixedPriceAmount',
+                { amount: formatRupees(work.task_price_minor ?? 0) },
+              )}`
+            : `${work.category_name ?? ''} · ${formatMinutes(
+                work.reserved_minutes,
+              )} · ${formatRupees(work.hourly_rate_minor)}/h`}
         </LiveText>
         <View style={styles.address}>
           <MapPinIcon width={16} height={16} color={colors.textMuted} />
@@ -339,7 +357,20 @@ export const BusinessLiveWorkPage: FC<
         </LiveCard>
       ) : null}
 
-      {status === 'in_progress' && booking.timer ? (
+      {status === 'in_progress' ? (
+        <CompletionCodeCard
+          completion={booking.completion_code}
+          busy={busy}
+          onReissue={
+            actions.can_reissue_completion_code
+              ? () => run(() => liveWorkApi.reissueCompletionCode(bookingId))
+              : undefined
+          }
+          testID="business-live-work-completion-code"
+        />
+      ) : null}
+
+      {status === 'in_progress' && booking.timer && !isTask ? (
         <LiveCard>
           <LiveText tone="label">{S.timeLeft}</LiveText>
           <Text style={[styles.code, { color: colors.text }]}>
