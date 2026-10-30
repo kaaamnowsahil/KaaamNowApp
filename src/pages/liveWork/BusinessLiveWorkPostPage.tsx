@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
 import { CouponRow } from '@/components/coupon/CouponRow';
+import { PricingModeRadio } from '@/components/taskPricing/PricingModeRadio';
 import { TermsCheckbox } from '@/components/shiftFlow';
 import {
   PrimaryButton,
@@ -71,8 +72,10 @@ const EMPTY_FORM: LiveWorkForm = {
   longitude: null,
   instructions: '',
   siteContact: '',
+  pricingMode: 'hourly',
   durationMinutes: 120,
   rate: '',
+  taskPrice: '',
 };
 /** Business: category, details, location, duration and rate → server price → post & pay. */
 export const BusinessLiveWorkPostPage: FC<
@@ -371,7 +374,9 @@ export const BusinessLiveWorkPostPage: FC<
           <LiveText tone="title">{form.jobTitle.trim()}</LiveText>
           <LiveText tone="muted">
             {categories.find(c => c.id === form.categorySlug)?.label} ·{' '}
-            {formatMinutes(form.durationMinutes)}
+            {quote.pricing_mode === 'task'
+              ? t('taskPricing.fixedPrice')
+              : formatMinutes(form.durationMinutes)}
           </LiveText>
           <LiveText tone="muted">{form.address}</LiveText>
         </LiveCard>
@@ -486,32 +491,58 @@ export const BusinessLiveWorkPostPage: FC<
         onChangeText={value => set('siteContact', value)}
         maxLength={120}
       />
-      <ShiftFormField
-        label={S.duration}
-        value={durationHours}
-        onChangeText={value => {
-          const text = value.replace(/[^\d.]/g, '');
-          setDurationHours(text);
-          set(
-            'durationMinutes',
-            text ? Math.round(Number(text) * 60) : Number.NaN,
-          );
-        }}
-        keyboardType="decimal-pad"
-        placeholder="2"
-        error={errors.durationMinutes}
-        testID="business-live-work-duration"
+      <PricingModeRadio
+        value={form.pricingMode}
+        onChange={mode => set('pricingMode', mode)}
+        disabled={busy}
+        testID="business-live-work-pricing"
       />
-      <ShiftFormField
-        label={S.rate}
-        value={form.rate}
-        onChangeText={value => set('rate', value.replace(/[^\d.]/g, ''))}
-        keyboardType="decimal-pad"
-        prefix="₹"
-        placeholder="450"
-        error={errors.rate}
-        testID="business-live-work-rate"
-      />
+      {form.pricingMode === 'task' ? (
+        <>
+          <ShiftFormField
+            label={t('taskPricing.taskPriceLabel')}
+            value={form.taskPrice}
+            onChangeText={value =>
+              set('taskPrice', value.replace(/[^\d.]/g, ''))
+            }
+            keyboardType="decimal-pad"
+            prefix="₹"
+            placeholder={t('taskPricing.taskPricePlaceholder')}
+            error={errors.taskPrice}
+            testID="business-live-work-task-price"
+          />
+          <LiveText tone="muted">{t('taskPricing.taskNote')}</LiveText>
+        </>
+      ) : (
+        <>
+          <ShiftFormField
+            label={S.duration}
+            value={durationHours}
+            onChangeText={value => {
+              const text = value.replace(/[^\d.]/g, '');
+              setDurationHours(text);
+              set(
+                'durationMinutes',
+                text ? Math.round(Number(text) * 60) : Number.NaN,
+              );
+            }}
+            keyboardType="decimal-pad"
+            placeholder="2"
+            error={errors.durationMinutes}
+            testID="business-live-work-duration"
+          />
+          <ShiftFormField
+            label={S.rate}
+            value={form.rate}
+            onChangeText={value => set('rate', value.replace(/[^\d.]/g, ''))}
+            keyboardType="decimal-pad"
+            prefix="₹"
+            placeholder="450"
+            error={errors.rate}
+            testID="business-live-work-rate"
+          />
+        </>
+      )}
     </FormScreen>
   );
 };

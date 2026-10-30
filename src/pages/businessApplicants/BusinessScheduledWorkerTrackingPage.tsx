@@ -1,7 +1,11 @@
 import { useEffect, useState, type FC } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
 
+import BadgeAlertIcon from '@/assets/figma/badge-alert.svg';
 import PhoneIcon from '@/assets/figma/phone.svg';
+import XIcon from '@/assets/figma/x.svg';
+import ClockIcon from '@/assets/icons/clock.svg';
+import TriangleAlertIcon from '@/assets/icons/triangle-alert.svg';
 import {
   FlowHeading,
   InfoCallout,
@@ -10,6 +14,7 @@ import {
   ReasonSheet,
   StatTiles,
 } from '@/components/shiftFlow';
+import { CompletionCodeCard } from '@/components/taskPricing/CompletionCode';
 import {
   BottomSheet,
   ChipGroup,
@@ -19,6 +24,7 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { tr } from '@/services/i18n/tr';
 import { useBusinessApplicantStore } from '@/pages/businessApplicants/store/useBusinessApplicantStore';
 import {
   formatDateLabel,
@@ -120,6 +126,13 @@ export const BusinessScheduledWorkerTrackingPage: FC<
     action.run(call, onDone, S.ACTION_FAILED);
 
   const endShift = () => run(() => shiftsApi.businessEnd(assignmentId), update);
+  const confirmTaskDone = () =>
+    Alert.alert(tr('taskPricing.markDone'), tr('taskPricing.markDoneBody'), [
+      { text: S.STOP_KEEP, style: 'cancel' },
+      { text: tr('taskPricing.markDone'), onPress: endShift },
+    ]);
+  const reissueCode = () =>
+    run(() => shiftsApi.reissueCompletionCode(assignmentId), setData);
   const startEarlyEnd = () =>
     run(
       () => shiftsApi.requestEarlyEnd('business', assignmentId),
@@ -165,6 +178,7 @@ export const BusinessScheduledWorkerTrackingPage: FC<
     detail?.early_end_requested_by === 'worker' ? detail.early_end_pin : null;
   const pending = detail?.pending_extension;
   const shift = detail?.shift;
+  const isTask = shift?.pricing_mode === 'task';
 
   const actions = (() => {
     if (isBooked) {
@@ -172,6 +186,7 @@ export const BusinessScheduledWorkerTrackingPage: FC<
         <SecondaryButton
           label={S.CANCEL}
           tone="danger"
+          icon={XIcon}
           disabled={action.busy}
           onPress={openCancel}
           testID="booking-cancel"
@@ -181,21 +196,34 @@ export const BusinessScheduledWorkerTrackingPage: FC<
     if (isWorking) {
       return (
         <>
-          <PrimaryButton
-            label={detail?.can_end ? S.END_SHIFT : S.END_EARLY}
-            disabled={action.busy}
-            onPress={detail?.can_end ? endShift : startEarlyEnd}
-            testID="booking-end"
-          />
-          <SecondaryButton
-            label={S.EXTEND}
-            disabled={action.busy || Boolean(pending)}
-            onPress={() => setSheet('extend')}
-            testID="booking-extend"
-          />
+          {isTask ? (
+            <PrimaryButton
+              label={tr('taskPricing.markDone')}
+              disabled={action.busy}
+              onPress={confirmTaskDone}
+              testID="booking-end"
+            />
+          ) : (
+            <PrimaryButton
+              label={detail?.can_end ? S.END_SHIFT : S.END_EARLY}
+              disabled={action.busy}
+              onPress={detail?.can_end ? endShift : startEarlyEnd}
+              testID="booking-end"
+            />
+          )}
+          {isTask ? null : (
+            <SecondaryButton
+              label={S.EXTEND}
+              icon={ClockIcon}
+              disabled={action.busy || Boolean(pending)}
+              onPress={() => setSheet('extend')}
+              testID="booking-extend"
+            />
+          )}
           <SecondaryButton
             label={S.STOP}
             tone="danger"
+            icon={BadgeAlertIcon}
             onPress={() => setSheet('stop')}
           />
         </>
@@ -236,6 +264,7 @@ export const BusinessScheduledWorkerTrackingPage: FC<
               <SecondaryButton
                 label={S.EMERGENCY}
                 tone="danger"
+                icon={TriangleAlertIcon}
                 disabled={emergency.busy}
                 onPress={emergency.trigger}
                 testID="booking-emergency"
@@ -250,7 +279,11 @@ export const BusinessScheduledWorkerTrackingPage: FC<
             shift
               ? S.when(
                   formatDateLabel(shift.starts_at),
-                  formatTimeRange(shift.starts_at, shift.ends_at),
+                  isTask
+                    ? tr('taskPricing.startsAt', {
+                        time: formatTime(shift.starts_at),
+                      })
+                    : formatTimeRange(shift.starts_at, shift.ends_at),
                 )
               : undefined
           }
@@ -283,6 +316,15 @@ export const BusinessScheduledWorkerTrackingPage: FC<
           />
         ) : null}
 
+        {isWorking ? (
+          <CompletionCodeCard
+            completion={detail?.completion_code}
+            busy={action.busy}
+            onReissue={reissueCode}
+            testID="booking-completion-code"
+          />
+        ) : null}
+
         {pinForWorker ? (
           <InfoCallout text={S.pinForWorker(pinForWorker)} />
         ) : null}
@@ -299,12 +341,19 @@ export const BusinessScheduledWorkerTrackingPage: FC<
                   : '—',
                 label: S.CHECKED_IN_AT,
               },
-              {
-                value: formatTime(detail.ends_at),
-                label: detail.extended_minutes
-                  ? S.extendedBy(detail.extended_minutes)
-                  : S.ENDS_AT,
-              },
+              isTask
+                ? {
+                    value: formatRupees(
+                      fromMinor(shift?.task_price_minor ?? 0),
+                    ),
+                    label: tr('taskPricing.fixedPrice'),
+                  }
+                : {
+                    value: formatTime(detail.ends_at),
+                    label: detail.extended_minutes
+                      ? S.extendedBy(detail.extended_minutes)
+                      : S.ENDS_AT,
+                  },
             ]}
           />
         ) : null}
@@ -315,9 +364,15 @@ export const BusinessScheduledWorkerTrackingPage: FC<
               {shift.job_title}
             </Text>
             <Text style={[styles.meta, { color: colors.textSubtle }]}>
-              {`${formatRupees(fromMinor(detail.hourly_rate_minor))}/hr · ${
-                shift.workplace_name || shift.address_text
-              }`}
+              {`${
+                isTask
+                  ? tr('taskPricing.fixedPriceAmount', {
+                      amount: formatRupees(
+                        fromMinor(shift.task_price_minor ?? 0),
+                      ),
+                    })
+                  : `${formatRupees(fromMinor(detail.hourly_rate_minor))}/hr`
+              } · ${shift.workplace_name || shift.address_text}`}
             </Text>
             {phone ? (
               <View style={styles.callButton}>

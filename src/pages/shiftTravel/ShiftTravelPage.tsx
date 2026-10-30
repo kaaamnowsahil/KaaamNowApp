@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Linking, Pressable, StyleSheet, Text } from 'react-native';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
+import MessageCircleIcon from '@/assets/icons/message-circle.svg';
+import TriangleAlertIcon from '@/assets/icons/triangle-alert.svg';
 import NavigationIcon from '@/assets/figma/navigation.svg';
 import {
   FlowHeading,
@@ -165,6 +167,7 @@ export const ShiftTravelPage: FC<AppScreenProps<typeof ROUTES.shiftTravel>> = ({
           />
           <SecondaryButton
             label={SHIFT_TRAVEL_STRINGS.MESSAGE}
+            icon={MessageCircleIcon}
             disabled={action.busy || !assignmentId}
             onPress={message}
             testID="shift-travel-message"
@@ -172,6 +175,7 @@ export const ShiftTravelPage: FC<AppScreenProps<typeof ROUTES.shiftTravel>> = ({
           <SecondaryButton
             label={SHIFT_TRAVEL_STRINGS.EMERGENCY}
             tone="danger"
+            icon={TriangleAlertIcon}
             disabled={emergency.busy || !emergency.isAvailable}
             onPress={emergency.trigger}
             testID="shift-travel-emergency"

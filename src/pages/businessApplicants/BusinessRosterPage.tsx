@@ -162,6 +162,21 @@ export const BusinessRosterPage: FC<
                       </Text>
                     </View>
                   ) : null}
+                  {entry.status === 'checked_in' &&
+                  entry.completion_code?.code &&
+                  !entry.completion_code.locked ? (
+                    <View
+                      style={[styles.code, { backgroundColor: colors.fill }]}
+                      testID={`roster-completion-code-${entry.assignment_id}`}
+                    >
+                      <KeyIcon width={12} height={12} color={colors.text} />
+                      <Text style={[styles.codeText, { color: colors.text }]}>
+                        {t('taskPricing.rosterCode', {
+                          code: entry.completion_code.code,
+                        })}
+                      </Text>
+                    </View>
+                  ) : null}
                 </View>
                 <Text style={[styles.status, tone]}>
                   {t(`bookingDetail.status.${entry.status}`, {

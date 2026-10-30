@@ -10,10 +10,20 @@ export function quoteRequest(
   form: LiveWorkForm,
   promoCode: string | null,
 ): LiveQuoteRequest {
+  const price =
+    form.pricingMode === 'task'
+      ? {
+          pricing_mode: 'task' as const,
+          task_price_minor: rupeesToMinor(form.taskPrice) as number,
+        }
+      : {
+          pricing_mode: 'hourly' as const,
+          hourly_rate_minor: rupeesToMinor(form.rate) as number,
+          duration_minutes: form.durationMinutes,
+        };
   return {
     category_slug: form.categorySlug,
-    hourly_rate_minor: rupeesToMinor(form.rate) as number,
-    duration_minutes: form.durationMinutes,
+    ...price,
     ...(promoCode ? { promo_code: promoCode } : {}),
   };
 }
@@ -24,6 +34,17 @@ export function createRequest(
   quote: LivePriceBreakdown,
   idempotencyKey: string,
 ): LiveWorkCreate {
+  const price =
+    quote.pricing_mode === 'task'
+      ? {
+          pricing_mode: 'task' as const,
+          task_price_minor: quote.task_price_minor as number,
+        }
+      : {
+          pricing_mode: 'hourly' as const,
+          duration_minutes: form.durationMinutes,
+          hourly_rate_minor: quote.hourly_rate_minor,
+        };
   return {
     category_slug: form.categorySlug,
     job_title: form.jobTitle.trim(),
@@ -33,8 +54,7 @@ export function createRequest(
     longitude: form.longitude as number,
     arrival_instructions: form.instructions.trim(),
     site_contact_name: form.siteContact.trim(),
-    duration_minutes: form.durationMinutes,
-    hourly_rate_minor: quote.hourly_rate_minor,
+    ...price,
     accept_terms: true,
     expected_total_minor: quote.total_minor,
     idempotency_key: idempotencyKey,

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { PricingModeRadio } from '@/components/taskPricing/PricingModeRadio';
 import { PrimaryButton, ScreenIntro, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
@@ -145,7 +146,10 @@ export const BusinessShiftSchedulePage: FC<
     const id = slot.id ?? '';
     const set = (changes: Partial<BusinessShiftSlot>) =>
       schedule.updateSchedule(id, changes);
-    const hours = Number(getDurationHours(slot.startTime, slot.endTime).toFixed(2));
+    const isTask = slot.pricingMode === 'task';
+    const hours = isTask
+      ? 0
+      : Number(getDurationHours(slot.startTime, slot.endTime).toFixed(2));
     const errors = errorsFor(slot, index);
     return (
       <View
@@ -195,6 +199,11 @@ export const BusinessShiftSchedulePage: FC<
           error={errors.category}
           testID={`business-shift-category-${id}`}
         />
+        <PricingModeRadio
+          value={slot.pricingMode ?? 'hourly'}
+          onChange={pricingMode => set({ pricingMode })}
+          testID={`business-shift-pricing-${id}`}
+        />
         <View style={styles.row}>
           <View style={styles.half}>
             <ShiftTimeField
@@ -206,16 +215,20 @@ export const BusinessShiftSchedulePage: FC<
               testID={`business-shift-start-${id}`}
             />
           </View>
-          <View style={styles.half}>
-            <ShiftTimeField
-              label={t('businessShiftCreate.end')}
-              value={slot.endTime}
-              placeholder={t('businessShiftCreate.timePlaceholder')}
-              onChange={endTime => set({ endTime })}
-              error={errors.endTime}
-              testID={`business-shift-end-${id}`}
-            />
-          </View>
+          {isTask ? (
+            <View style={styles.halfSpacer} />
+          ) : (
+            <View style={styles.half}>
+              <ShiftTimeField
+                label={t('businessShiftCreate.end')}
+                value={slot.endTime}
+                placeholder={t('businessShiftCreate.timePlaceholder')}
+                onChange={endTime => set({ endTime })}
+                error={errors.endTime}
+                testID={`business-shift-end-${id}`}
+              />
+            </View>
+          )}
         </View>
         {hours > 0 ? (
           <Text style={[styles.note, { color: colors.textSubtle }]}>
@@ -232,28 +245,46 @@ export const BusinessShiftSchedulePage: FC<
             error={errors.workers}
             testID={`business-shift-workers-${id}`}
           />
-          <ShiftFormField
-            label={t('businessShiftCreate.hourlyPay')}
-            value={slot.hourlyRate}
-            onChangeText={hourlyRate => set({ hourlyRate })}
-            keyboardType="number-pad"
-            placeholder={t('businessShiftCreate.hourlyPayPlaceholder')}
-            error={errors.hourlyRate}
-            testID={`business-shift-hourly-pay-${id}`}
-          />
+          {isTask ? (
+            <ShiftFormField
+              label={t('taskPricing.taskPriceLabel')}
+              value={slot.taskPrice ?? ''}
+              onChangeText={taskPrice => set({ taskPrice })}
+              keyboardType="number-pad"
+              placeholder={t('taskPricing.taskPricePlaceholder')}
+              error={errors.taskPrice}
+              testID={`business-shift-task-price-${id}`}
+            />
+          ) : (
+            <ShiftFormField
+              label={t('businessShiftCreate.hourlyPay')}
+              value={slot.hourlyRate}
+              onChangeText={hourlyRate => set({ hourlyRate })}
+              keyboardType="number-pad"
+              placeholder={t('businessShiftCreate.hourlyPayPlaceholder')}
+              error={errors.hourlyRate}
+              testID={`business-shift-hourly-pay-${id}`}
+            />
+          )}
         </View>
-        <View style={styles.row}>
-          <ShiftFormField
-            label={t('businessShiftCreate.breakMinutes')}
-            value={slot.breakMinutes ?? ''}
-            onChangeText={breakMinutes => set({ breakMinutes })}
-            keyboardType="number-pad"
-            placeholder={t('businessShiftCreate.breakMinutesPlaceholder')}
-            error={errors.breakMinutes}
-            testID={`business-shift-break-${id}`}
-          />
-          <View style={styles.halfSpacer} />
-        </View>
+        {isTask ? (
+          <Text style={[styles.note, { color: colors.textSubtle }]}>
+            {t('taskPricing.taskNote')}
+          </Text>
+        ) : (
+          <View style={styles.row}>
+            <ShiftFormField
+              label={t('businessShiftCreate.breakMinutes')}
+              value={slot.breakMinutes ?? ''}
+              onChangeText={breakMinutes => set({ breakMinutes })}
+              keyboardType="number-pad"
+              placeholder={t('businessShiftCreate.breakMinutesPlaceholder')}
+              error={errors.breakMinutes}
+              testID={`business-shift-break-${id}`}
+            />
+            <View style={styles.halfSpacer} />
+          </View>
+        )}
         <ShiftFormField
           label={t('businessShiftCreate.responsibilities')}
           value={slot.responsibilities}

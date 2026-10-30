@@ -8,6 +8,7 @@ import ClockIcon from '@/assets/icons/clock.svg';
 import KeyRoundIcon from '@/assets/icons/key-round.svg';
 import MessageCircleIcon from '@/assets/icons/message-circle.svg';
 import NavigationIcon from '@/assets/icons/navigation.svg';
+import TriangleAlertIcon from '@/assets/icons/triangle-alert.svg';
 import {
   businessIcon,
   BusinessRow,
@@ -32,7 +33,11 @@ import {
 } from '@/pages/shiftSecured/constants/shiftSecuredStrings';
 import { ApiError } from '@/services/api/apiClient';
 import { getDevicePosition } from '@/services/maps/devicePosition';
-import { formatDateTime, fromMinor } from '@/services/shifts/shiftMappers';
+import {
+  formatDateTime,
+  fromMinor,
+  isTaskShift,
+} from '@/services/shifts/shiftMappers';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
 import { isLiveWorkNotFound } from '@/services/liveWork/liveWorkFormat';
 import { shiftsApi, type CancellationQuote } from '@/services/shifts/shiftsApi';
@@ -322,6 +327,7 @@ export const ShiftDetailsPage: FC<
               <SecondaryButton
                 label={SHIFT_DETAILS_STRINGS.EMERGENCY}
                 tone="danger"
+                icon={TriangleAlertIcon}
                 disabled={emergency.busy || !emergency.isAvailable}
                 onPress={emergency.trigger}
                 testID="shift-details-emergency"
@@ -360,13 +366,22 @@ export const ShiftDetailsPage: FC<
         />
 
         <StatTiles
-          items={[
-            { value: SHIFT_DETAILS_STRINGS.rate(rate), label: SHIFT_DETAILS_STRINGS.AGREED_RATE },
-            {
-              value: formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
-              label: SHIFT_DETAILS_STRINGS.ESTIMATED,
-            },
-          ]}
+          items={
+            isTaskShift(shift)
+              ? [
+                  {
+                    value: formatRupees(shift.estimatedPay ?? 0),
+                    label: t('taskPricing.fixedPrice'),
+                  },
+                ]
+              : [
+                  { value: SHIFT_DETAILS_STRINGS.rate(rate), label: SHIFT_DETAILS_STRINGS.AGREED_RATE },
+                  {
+                    value: formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
+                    label: SHIFT_DETAILS_STRINGS.ESTIMATED,
+                  },
+                ]
+          }
         />
 
         {shift.status === 'scheduled' ? (
@@ -374,10 +389,14 @@ export const ShiftDetailsPage: FC<
             <InfoCard
               icon={CalendarIcon}
               title={SHIFT_DETAILS_STRINGS.when(shift.dateLabel, shift.timeLabel)}
-              caption={SHIFT_DETAILS_STRINGS.scheduledDuration(
-                shift.durationHours,
-                info?.break_minutes ?? 0,
-              )}
+              caption={
+                isTaskShift(shift)
+                  ? t('taskPricing.taskNote')
+                  : SHIFT_DETAILS_STRINGS.scheduledDuration(
+                      shift.durationHours,
+                      info?.break_minutes ?? 0,
+                    )
+              }
             />
             <InfoCard
               icon={MapPinIcon}

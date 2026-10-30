@@ -9,6 +9,7 @@ import { FormScreen } from '@/layout/FormScreen';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 import { useShiftAction, useWorkerShiftDetail } from '@/services/shifts/useShiftFlow';
 import type { AppScreenProps } from '@/types';
+import { isTaskShift, taskPayLabel } from '@/services/shifts/shiftMappers';
 import { formatRupees } from '@/utils/format';
 import { mapsUrl } from '@/utils/links';
 
@@ -126,10 +127,14 @@ export const ShiftSelectedPage: FC<
           <DetailRow
             size="large"
             title={SHIFT_SELECTED_STRINGS.AGREED_RATE}
-            caption={SHIFT_SELECTED_STRINGS.rate(
-              formatRupees(shift.hourlyRate),
-              formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
-            )}
+            caption={
+              isTaskShift(shift)
+                ? taskPayLabel(shift)
+                : SHIFT_SELECTED_STRINGS.rate(
+                    formatRupees(shift.hourlyRate),
+                    formatRupees(shift.estimatedPay ?? shift.hourlyRate * shift.durationHours),
+                  )
+            }
             onPress={openDetails}
           />
           <DetailRow

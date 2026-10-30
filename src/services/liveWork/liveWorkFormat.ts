@@ -1,6 +1,8 @@
 import { ApiError } from '@/services/api/apiClient';
 import { tr } from '@/services/i18n/tr';
 
+import type { PricingMode } from './liveWorkTypes';
+
 export const RESERVED_MINUTE_OPTIONS = Array.from(
   { length: 23 },
   (_, i) => 60 + i * 30,
@@ -9,7 +11,15 @@ export const EXTENSION_MINUTE_OPTIONS = [30, 60, 90, 120, 180, 240];
 export const LIVE_POLL_MS = 5000;
 export const LOCATION_SHARE_MS = 20000;
 export const ARRIVAL_CODE_LENGTH = 6;
+export const COMPLETION_CODE_LENGTH = 6;
+/** Server default; tries left are shown only after a wrong code. */
+export const COMPLETION_CODE_ATTEMPTS = 5;
 const MAX_RATE_RUPEES = 100000;
+export const MAX_TASK_PRICE_RUPEES = 1000000;
+
+/** Keeps only digits, at most the code length. */
+export const cleanCompletionCode = (value: string) =>
+  value.replace(/\D/g, '').slice(0, COMPLETION_CODE_LENGTH);
 
 export const formatRupees = (minor: number) =>
   `₹${(minor / 100).toLocaleString('en-IN', {
@@ -56,8 +66,10 @@ export type LiveWorkForm = {
   longitude: number | null;
   instructions: string;
   siteContact: string;
+  pricingMode: PricingMode;
   durationMinutes: number;
   rate: string;
+  taskPrice: string;
 };
 
 export type LiveWorkFormErrors = Partial<
@@ -75,6 +87,16 @@ export function validateLiveWorkForm(form: LiveWorkForm): LiveWorkFormErrors {
     errors.address = tr('liveWork.validation.address');
   else if (form.latitude === null || form.longitude === null)
     errors.address = tr('liveWork.validation.unplaced');
+  if (form.pricingMode === 'task') {
+    const price = rupeesToMinor(form.taskPrice);
+    if (price === null || price <= 0)
+      errors.taskPrice = tr('taskPricing.taskPriceRequired');
+    else if (price > MAX_TASK_PRICE_RUPEES * 100)
+      errors.taskPrice = tr('taskPricing.taskPriceMax', {
+        max: MAX_TASK_PRICE_RUPEES.toLocaleString('en-IN'),
+      });
+    return errors;
+  }
   if (!RESERVED_MINUTE_OPTIONS.includes(form.durationMinutes))
     errors.durationMinutes = tr('liveWork.validation.duration');
   const minor = rupeesToMinor(form.rate);
@@ -96,6 +118,7 @@ const SERVER_FIELDS: Record<string, keyof LiveWorkFormErrors> = {
   site_contact_name: 'siteContact',
   duration_minutes: 'durationMinutes',
   hourly_rate_minor: 'rate',
+  task_price_minor: 'taskPrice',
   accept_terms: 'terms',
 };
 

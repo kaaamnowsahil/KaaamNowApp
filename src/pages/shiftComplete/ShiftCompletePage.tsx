@@ -6,7 +6,7 @@ import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { meApi } from '@/services/api/meApi';
-import { formatTime } from '@/services/shifts/shiftMappers';
+import { formatTime, isTaskShift } from '@/services/shifts/shiftMappers';
 import { useAssignment } from '@/services/shifts/useShiftFlow';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import type { AppScreenProps } from '@/types';
@@ -75,7 +75,11 @@ export const ShiftCompletePage: FC<
             label: t('workerFlow.shiftComplete.recorded'),
           },
           {
-            value: formatRupees(Math.round(shift.hourlyRate * recordedHours)),
+            value: formatRupees(
+              isTaskShift(shift)
+                ? shift.estimatedPay ?? 0
+                : Math.round(shift.hourlyRate * recordedHours),
+            ),
             label: t('workerFlow.shiftComplete.earnings'),
           },
         ]}

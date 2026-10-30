@@ -33,4 +33,6 @@ export type Shift = {
   assignmentStatus?: string | null;
   /** Selected offers only, e.g. "20 Oct, 18:00". */
   confirmBy?: string;
+  /** Task shifts have one fixed price and no end time; missing means hourly. */
+  pricingMode?: 'hourly' | 'task';
 };

@@ -1,6 +1,15 @@
 import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
-import { Children, useContext, type FC, type ReactNode } from 'react';
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  useContext,
+  type FC,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -54,6 +63,38 @@ type FormScreenProps = {
   /** Signed-in screens show the logo + bell bar above the back bar (same as web); opt out here. */
   hideBrandBar?: boolean;
   testID?: string;
+};
+
+const flattenActions = (node: ReactNode): ReactElement[] =>
+  Children.toArray(node).flatMap(child =>
+    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
+      ? flattenActions(child.props.children)
+      : isValidElement(child)
+        ? [child]
+        : [],
+  );
+
+/**
+ * 3 actions: primary on its own row, then 2 side by side with labels.
+ * 4 actions: primary, then 3 icon-only. Secondary actions here need an `icon`.
+ */
+const ActionsLayout: FC<{ actions: ReactNode }> = ({ actions }) => {
+  const items = flattenActions(actions);
+  if (items.length !== 3 && items.length !== 4) return <>{items}</>;
+  const [first, ...rest] = items;
+  const iconOnly = items.length === 4;
+  return (
+    <>
+      {first}
+      <View style={styles.actionsRow}>
+        {rest.map((item, i) => (
+          <View key={item.key ?? i} style={styles.flex}>
+            {cloneElement(item as ReactElement<{ iconOnly?: boolean }>, { iconOnly })}
+          </View>
+        ))}
+      </View>
+    </>
+  );
 };
 
 /**
@@ -200,7 +241,7 @@ export const FormScreen: FC<FormScreenProps> = ({
               actionsChrome,
             ]}
           >
-            {actions}
+            <ActionsLayout actions={actions} />
           </Rise>
         ) : null}
       </KeyboardAvoidingView>
@@ -251,4 +292,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     gap: 10,
   },
+  actionsRow: { flexDirection: 'row', gap: 10 },
 });

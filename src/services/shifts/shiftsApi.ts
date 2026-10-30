@@ -1,4 +1,8 @@
 import { apiRequest } from '@/services/api/apiClient';
+import type {
+  CompletionCode,
+  PricingMode,
+} from '@/services/liveWork/liveWorkTypes';
 
 export type ApiShiftType = 'live' | 'scheduled';
 export type ApiShiftStatus =
@@ -37,6 +41,10 @@ export type WorkerShiftCard = {
   starts_at: string;
   ends_at: string;
   break_minutes: number;
+  /** Missing on older responses: treat as hourly. */
+  pricing_mode?: PricingMode;
+  /** Task pricing: fixed price per worker before commission. */
+  task_price_minor?: number | null;
   hourly_rate_minor: number;
   /** Hourly rate after worker commission. */
   worker_hourly_rate_minor: number;
@@ -118,7 +126,12 @@ export type ShiftExtension = {
   responded_at?: string | null;
 };
 
-export type EndedReason = 'scheduled_end' | 'mutual' | 'business_stopped' | 'worker_left';
+export type EndedReason =
+  | 'scheduled_end'
+  | 'mutual'
+  | 'business_stopped'
+  | 'worker_left'
+  | 'completed';
 
 export type AssignmentDetail = {
   id: string;
@@ -151,6 +164,8 @@ export type AssignmentDetail = {
   /** Shown only to the side that did NOT ask to end early. */
   early_end_pin?: string | null;
   pending_extension?: ShiftExtension | null;
+  /** The Business sees `code`; the Worker sees only tries left. */
+  completion_code?: CompletionCode | null;
 };
 
 export type CancellationQuote = {
@@ -223,6 +238,8 @@ export type ShiftCostEstimate = {
   worker_fee_percentage: number;
   worker_fee_per_worker_minor: number;
   worker_net_per_worker_minor: number;
+  pricing_mode?: PricingMode;
+  task_price_minor?: number | null;
   promo_code?: string | null;
   promo_discount_minor: number;
 };
@@ -248,6 +265,8 @@ export type BusinessShiftItem = {
   pending_applications: number;
   /** Workers who withdrew their application or booking, or declined. */
   withdrawn_count?: number;
+  pricing_mode?: PricingMode;
+  task_price_minor?: number | null;
   hourly_rate_minor: number;
   currency: string;
   starts_at: string;
@@ -273,7 +292,9 @@ export type ShiftBulkItem = {
   responsibilities?: string | null;
   requirements?: string | null;
   workers_required: number;
-  hourly_rate_minor: number;
+  pricing_mode: PricingMode;
+  hourly_rate_minor?: number;
+  task_price_minor?: number;
   starts_at: string;
   ends_at?: string | null;
   break_minutes?: number;
@@ -308,6 +329,8 @@ export type BusinessApplicantItem = {
     starts_at: string;
     ends_at: string;
     workers_required: number;
+    pricing_mode?: PricingMode;
+    task_price_minor?: number | null;
     hourly_rate_minor: number;
     currency: string;
   };
@@ -344,6 +367,7 @@ export type RosterEntry = {
   check_in_code?: string | null;
   extended_minutes: number;
   ended_reason?: EndedReason | null;
+  completion_code?: CompletionCode | null;
 };
 
 export type Roster = {
@@ -411,7 +435,12 @@ export const shiftsApi = {
     }),
   checkOut: (
     assignmentId: string,
-    body: { latitude?: number; longitude?: number; note?: string },
+    body: {
+      completion_code: string;
+      latitude?: number;
+      longitude?: number;
+      note?: string;
+    },
   ) =>
     apiRequest<AssignmentDetail>('POST', `/worker/assignments/${assignmentId}/check-out`, {
       body,
@@ -448,10 +477,12 @@ export const shiftsApi = {
   businessShifts: (query: { shift_type?: ApiShiftType; group?: BusinessShiftGroup }) =>
     apiRequest<ShiftPage>('GET', '/business/shifts', { query: { ...query, limit: 100 } }),
   estimate: (body: {
-    hourly_rate_minor: number;
+    pricing_mode: PricingMode;
+    hourly_rate_minor?: number;
+    task_price_minor?: number;
     workers_required: number;
     starts_at: string;
-    ends_at: string;
+    ends_at?: string;
     break_minutes?: number;
     promo_code?: string;
   }) => apiRequest<ShiftCostEstimate>('POST', '/business/shifts/estimate', { body }),
@@ -492,6 +523,11 @@ export const shiftsApi = {
     apiRequest<AssignmentDetail>(
       'POST',
       `/worker/assignments/${assignmentId}/extensions/${extensionId}/decline`,
+    ),
+  reissueCompletionCode: (assignmentId: string) =>
+    apiRequest<AssignmentDetail>(
+      'POST',
+      `/business/assignments/${assignmentId}/completion-code/reissue`,
     ),
   businessEnd: (assignmentId: string) =>
     apiRequest<AssignmentDetail>('POST', `/business/assignments/${assignmentId}/end`),

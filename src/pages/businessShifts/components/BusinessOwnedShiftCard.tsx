@@ -120,6 +120,7 @@ export const BusinessOwnedShiftCard: FC<BusinessOwnedShiftCardProps> = ({
     shift.status === 'awaiting_payment' && Boolean(shift.deposit_invoice_id);
   const isDraft = shift.status === 'draft';
   const isLive = shift.shift_type === 'live';
+  const isTask = shift.pricing_mode === 'task';
   const hasActions =
     showActions && !isLive && (canCancel || isDraft || needsDeposit);
 
@@ -147,11 +148,13 @@ export const BusinessOwnedShiftCard: FC<BusinessOwnedShiftCardProps> = ({
         {shift.job_title}
       </Text>
       <Text style={[styles.meta, { color: colors.textMuted }]}>
-        {t('businessDashboard.dateTimeHours', {
-          date,
-          time: `${time(start)}–${time(end)}`,
-          hours,
-        })}
+        {isTask
+          ? `${date} · ${t('taskPricing.startsAt', { time: time(start) })}`
+          : t('businessDashboard.dateTimeHours', {
+              date,
+              time: `${time(start)}–${time(end)}`,
+              hours,
+            })}
       </Text>
       {location ? (
         <Text style={[styles.meta, { color: colors.textMuted }]}>
@@ -159,12 +162,20 @@ export const BusinessOwnedShiftCard: FC<BusinessOwnedShiftCardProps> = ({
         </Text>
       ) : null}
       <View style={[styles.row, styles.footer]}>
-        <Text style={[styles.rate, { color: colors.text }]}>
-          {money(shift.hourly_rate_minor)}
-          <Text style={[styles.perHour, { color: colors.textMuted }]}>
-            {` ${t('businessDashboard.perHour')}`}
+        {isTask ? (
+          <Text style={[styles.rate, { color: colors.text }]}>
+            {t('taskPricing.fixedPriceAmount', {
+              amount: money(shift.task_price_minor ?? 0),
+            })}
           </Text>
-        </Text>
+        ) : (
+          <Text style={[styles.rate, { color: colors.text }]}>
+            {money(shift.hourly_rate_minor)}
+            <Text style={[styles.perHour, { color: colors.textMuted }]}>
+              {` ${t('businessDashboard.perHour')}`}
+            </Text>
+          </Text>
+        )}
         <View style={styles.counts}>
           <Pressable
             accessibilityRole="button"

@@ -7,7 +7,7 @@ import { meApi } from '@/services/api/meApi';
 import { getDevicePosition, type DevicePosition } from '@/services/maps/devicePosition';
 import { useLocationHeartbeat } from '@/services/maps/locationHeartbeat';
 import { reverseGeocode } from '@/services/maps/googleMaps';
-import { toShift } from '@/services/shifts/shiftMappers';
+import { isTaskShift, toShift } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import type { Shift, ShiftStatus, TabAppNavigation } from '@/types';
@@ -41,9 +41,11 @@ export const DEFAULT_FILTERS: ShiftFilters = {
 const matchesLocalFilters = (shift: Shift, f: ShiftFilters) => {
   const pay = PAY_OPTIONS.find(o => o.id === f.payId);
   const length = LENGTH_OPTIONS.find(o => o.id === f.lengthId);
+  const task = isTaskShift(shift);
   return (
-    (!pay || shift.hourlyRate >= pay.min) &&
+    (!pay || task || shift.hourlyRate >= pay.min) &&
     (!length ||
+      task ||
       (shift.durationHours >= length.min && shift.durationHours <= length.max)) &&
     (!f.verifiedOnly || shift.isVerified)
   );
