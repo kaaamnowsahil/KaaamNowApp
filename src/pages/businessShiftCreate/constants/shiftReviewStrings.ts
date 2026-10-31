@@ -7,9 +7,10 @@ export const SHIFT_REVIEW_STRINGS = {
   get WORKERS_PAY() {
     return k('workersPay');
   },
-  gatewayFee: (pct: number) => k('gatewayFee', { pct }),
+  get gatewayFee() {
+    return k('gatewayFee');
+  },
   platformCommission: (pct: number) => k('platformCommission', { pct }),
-  taxLine: (label: string, pct: number) => k('taxLine', { label, pct }),
   promoDiscount: (code: string) =>
     k('promoDiscount', { code: code.toUpperCase() }),
   get SHIFT_TOTAL() {

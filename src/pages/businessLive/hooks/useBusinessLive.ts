@@ -2,6 +2,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 
 import { ROUTES } from '@/constants/routes';
+import { useShiftCardActions } from '@/pages/businessShifts/hooks';
 import type { BusinessShiftItem } from '@/services/shifts/shiftsApi';
 import { useBusinessShiftsData } from '@/services/shifts/useBusinessShiftsData';
 import type { TabAppNavigation } from '@/types';
@@ -10,12 +11,13 @@ export type BusinessView = 'live' | 'scheduled';
 
 const DASHBOARD_PREVIEW_COUNT = 2;
 /** Same "Upcoming shifts" group as the web dashboard. */
-const UPCOMING = new Set(['searching', 'open', 'filled']);
+const UPCOMING = new Set(['awaiting_payment', 'searching', 'open', 'filled']);
 const DASHBOARD_REFRESH_MS = 5 * 60 * 1000;
 
 export const useBusinessLive = () => {
   const navigation = useNavigation<TabAppNavigation>();
   const data = useBusinessShiftsData({ pollIntervalMs: DASHBOARD_REFRESH_MS });
+  const actions = useShiftCardActions(data.reload);
   const [view, setViewState] = useState<BusinessView>('live');
   const setView = (next: BusinessView) => {
     setViewState(next);
@@ -44,6 +46,7 @@ export const useBusinessLive = () => {
     view,
     setView,
     shifts: items,
+    ...actions,
     openNotifications: () => navigation.navigate(ROUTES.notifications),
     openShifts: () => navigation.navigate(ROUTES.businessShifts),
     openLive: (item: BusinessShiftItem) =>

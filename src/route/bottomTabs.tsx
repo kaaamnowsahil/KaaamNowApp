@@ -17,13 +17,16 @@ import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { TabParamList } from '@/types';
 
-import { BusinessApplicantsStack } from './businessApplicantsStack';
-import { BusinessLiveStack } from './businessLiveStack';
-import { BusinessProfileStack } from './businessProfileStack';
-import { BusinessShiftsStack } from './businessShiftsStack';
-import { WorkerEarningsStack } from './workerEarningsStack';
-import { WorkerProfileStack } from './workerProfileStack';
-import { WorkerDiscoverStack, WorkerShiftsStack } from './workerShiftFlowStack';
+import {
+  BusinessApplicantsStack,
+  BusinessLiveStack,
+  BusinessProfileStack,
+  BusinessShiftsStack,
+  WorkerDiscoverStack,
+  WorkerEarningsStack,
+  WorkerProfileStack,
+  WorkerShiftsStack,
+} from './tabStacks';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 

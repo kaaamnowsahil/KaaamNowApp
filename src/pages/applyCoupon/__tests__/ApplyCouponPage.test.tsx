@@ -113,7 +113,7 @@ describe('Apply Coupon screen', () => {
     expect(available).toHaveBeenCalledWith('live', 90000);
     expect(text()).toContain('SAVE10');
     expect(text()).toContain('For you');
-    expect(text()).toContain('10% off platform commission');
+    expect(text()).toContain('10% off platform charge');
     expect(text()).toContain('Up to ₹200 off');
     expect(text()).toContain('On bookings of ₹500 or more');
   });

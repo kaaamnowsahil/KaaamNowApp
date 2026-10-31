@@ -102,10 +102,10 @@ export const BusinessPaymentDetailPage: FC<
               value={formatMinor(invoice.platform_fee_minor)}
             />
             <Detail
-              label={t('businessPayment.gatewayFee', {
-                pct: invoice.gateway_fee_percentage,
-              })}
-              value={formatMinor(invoice.gateway_fee_minor)}
+              label={t('businessPayment.gatewayFee')}
+              value={formatMinor(
+                invoice.gateway_fee_minor + (invoice.tax_minor ?? 0),
+              )}
             />
             {invoice.promo_discount_minor > 0 ? (
               <Detail

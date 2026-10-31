@@ -1,18 +1,16 @@
 import { useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
 
 import { ROUTES } from '@/constants/routes';
-import { errorMessage } from '@/services/api/apiClient';
 import { meApi } from '@/services/api/meApi';
-import { payInvoice } from '@/services/billing/billingApi';
 import {
   shiftsApi,
   type ApiShiftStatus,
   type BusinessShiftItem,
-  type ShiftCancelPreview,
 } from '@/services/shifts/shiftsApi';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import type { TabAppNavigation } from '@/types';
+
+import { useShiftCardActions } from './useShiftCardActions';
 
 export type ShiftSection =
   | 'live'
@@ -83,75 +81,7 @@ export const useBusinessShifts = () => {
   );
   const business = profile?.business;
 
-  const [cancelTarget, setCancelTarget] = useState<BusinessShiftItem | null>(
-    null,
-  );
-  const [cancelPreview, setCancelPreview] = useState<ShiftCancelPreview | null>(
-    null,
-  );
-  const [cancelError, setCancelError] = useState('');
-  const [isCancelling, setIsCancelling] = useState(false);
-  const [payingId, setPayingId] = useState<string | null>(null);
-  const [publishingId, setPublishingId] = useState<string | null>(null);
-  const [cardError, setCardError] = useState<{
-    shiftId: string;
-    message: string;
-  } | null>(null);
-
-  const openCancel = (shift: BusinessShiftItem) => {
-    setCancelError('');
-    setCancelPreview(null);
-    setCancelTarget(shift);
-    if (shift.shift_type === 'scheduled' && shift.booked_count > 0) {
-      shiftsApi
-        .shiftCancelPreview(shift.id)
-        .then(setCancelPreview)
-        .catch(() => undefined);
-    }
-  };
-
-  const confirmCancel = async () => {
-    if (!cancelTarget) return;
-    setIsCancelling(true);
-    setCancelError('');
-    try {
-      await shiftsApi.cancelShift(cancelTarget.id, '');
-      setCancelTarget(null);
-      query.reload();
-    } catch (error) {
-      setCancelError(errorMessage(error));
-    } finally {
-      setIsCancelling(false);
-    }
-  };
-
-  const payDeposit = async (shift: BusinessShiftItem) => {
-    if (!shift.deposit_invoice_id || payingId) return;
-    setPayingId(shift.id);
-    setCardError(null);
-    try {
-      await payInvoice(shift.deposit_invoice_id);
-      query.reload();
-    } catch (error) {
-      setCardError({ shiftId: shift.id, message: errorMessage(error) });
-    } finally {
-      setPayingId(null);
-    }
-  };
-
-  const publish = async (shift: BusinessShiftItem) => {
-    if (publishingId) return;
-    setPublishingId(shift.id);
-    setCardError(null);
-    try {
-      await shiftsApi.publishShift(shift.id);
-      query.reload();
-    } catch (error) {
-      setCardError({ shiftId: shift.id, message: errorMessage(error) });
-    } finally {
-      setPublishingId(null);
-    }
-  };
+  const actions = useShiftCardActions(query.reload);
 
   return {
     isLoading: query.isLoading,
@@ -168,20 +98,7 @@ export const useBusinessShifts = () => {
           PAST_SECTIONS.includes(section.key) ? byStart(b, a) : byStart(a, b),
         ),
     })).filter(section => section.shifts.length > 0),
-    cancelTarget,
-    cancelPreview,
-    cancelError,
-    isCancelling,
-    openCancel,
-    closeCancel: () => {
-      if (!isCancelling) setCancelTarget(null);
-    },
-    confirmCancel,
-    payingId,
-    publishingId,
-    cardError,
-    payDeposit,
-    publish,
+    ...actions,
     openBooked: (shift: BusinessShiftItem) =>
       navigation.navigate(ROUTES.businessRoster, { shiftId: shift.id }),
     openSchedule: () => navigation.navigate(ROUTES.businessShiftSchedule),

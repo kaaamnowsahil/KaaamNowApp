@@ -97,6 +97,9 @@ export const LIVE_TEXT = {
     k('baseLine', { rate, duration }),
   couponLine: (code: string) => k('couponLine', { code }),
   commissionLine: (pct: string) => k('commissionLine', { pct }),
+  get gatewayLine() {
+    return k('gatewayLine');
+  },
   get total() {
     return k('total');
   },
@@ -253,7 +256,36 @@ export const LIVE_TEXT = {
     return k('refunds');
   },
   refundStatus: localizedRecord('liveWork.refundStatus'),
+  refundReason: localizedRecord('liveWork.refundReason'),
   cancelledBy: localizedRecord('liveWork.cancelledBy'),
+  get workersLabel() {
+    return k('workersLabel');
+  },
+  get workersFewer() {
+    return k('workersFewer');
+  },
+  get workersMore() {
+    return k('workersMore');
+  },
+  get workersHint() {
+    return k('workersHint');
+  },
+  perWorkerTotal: (each: string, count: number, total: string) =>
+    k('perWorkerTotal', { each, count, total }),
+  workersFound: (filled: number, required: number) =>
+    k('workersFound', { filled, required }),
+  workerOfCount: (count: number) => k('workerOfCount', { count }),
+  unfilledRefunded: (amount: string) => k('unfilledRefunded', { amount }),
+  get cancelThisWorker() {
+    return k('cancelThisWorker');
+  },
+  get cancelWorkerTitle() {
+    return k('cancelWorkerTitle');
+  },
+  get postRest() {
+    return k('postRest');
+  },
+  workerNumber: (n: number) => k('workerNumber', { n }),
   get offline() {
     return k('offline');
   },
@@ -304,6 +336,15 @@ export const LIVE_TEXT = {
   get workerLocationOff() {
     return k('workerLocationOff');
   },
+  get shareLocationTitle() {
+    return k('shareLocationTitle');
+  },
+  get openSettings() {
+    return k('openSettings');
+  },
+  get notNow() {
+    return k('notNow');
+  },
   get directions() {
     return k('directions');
   },
@@ -345,11 +386,34 @@ export const LIVE_TEXT = {
   get earnings() {
     return k('earnings');
   },
-  earningsLine: (base: string, commission: string, net: string) =>
-    k('earningsLine', { base, commission, net }),
+  earningsLine: (net: string) => k('earningsLine', { net }),
   extensionEarnings: (amount: string) => k('extensionEarnings', { amount }),
   get totalEarnings() {
     return k('totalEarnings');
   },
   waiting: (count: number) => k('waiting', { count }),
+  get forceCancel() {
+    return k('forceCancel');
+  },
+  get forceCancelTitle() {
+    return k('forceCancelTitle');
+  },
+  cancelStage: localizedRecord('liveWork.cancelStage'),
+  workerCancelStage: localizedRecord('liveWork.workerCancelStage'),
+  get doneHintHourly() {
+    return k('doneHintHourly');
+  },
+  get doneHintTask() {
+    return k('doneHintTask');
+  },
+  get workerDoneHint() {
+    return k('workerDoneHint');
+  },
+  get businessStopped() {
+    return k('businessStopped');
+  },
+  finalEarned: (net: string) => k('finalEarned', { net }),
+  get finalNotPaid() {
+    return k('finalNotPaid');
+  },
 };

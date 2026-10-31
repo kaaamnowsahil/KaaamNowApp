@@ -1,4 +1,4 @@
-import { createRequest, quoteRequest } from '../livePrice';
+import { bookingTotal, createRequest, quoteRequest } from '../livePrice';
 import type { LiveWorkForm } from '../liveWorkFormat';
 import type { LivePriceBreakdown } from '../liveWorkTypes';
 
@@ -97,5 +97,33 @@ describe('task pricing', () => {
     });
     expect(body).not.toHaveProperty('duration_minutes');
     expect(body).not.toHaveProperty('hourly_rate_minor');
+  });
+});
+
+describe('several Workers', () => {
+  const crewQuote = {
+    ...quote,
+    workers_required: 3,
+    booking_total_minor: 279000,
+  } as LivePriceBreakdown;
+
+  it('asks for the Worker count only above one', () => {
+    expect(quoteRequest({ ...form, workers: 3 }, null).workers_required).toBe(
+      3,
+    );
+    expect(quoteRequest(form, null)).not.toHaveProperty('workers_required');
+  });
+
+  it('books the whole booking total for the quoted Workers', () => {
+    const body = createRequest({ ...form, workers: 3 }, crewQuote, 'key-3');
+    expect(body.workers_required).toBe(3);
+    expect(body.expected_total_minor).toBe(279000);
+  });
+
+  it('works out the booking total when the server omits it', () => {
+    expect(
+      bookingTotal({ ...quote, workers_required: 2 } as LivePriceBreakdown),
+    ).toBe(186000);
+    expect(bookingTotal(quote)).toBe(93000);
   });
 });

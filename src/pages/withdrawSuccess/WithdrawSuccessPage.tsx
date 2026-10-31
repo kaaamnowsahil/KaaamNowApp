@@ -13,6 +13,7 @@ import {
 } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
+import { tabHome } from '@/route/tabRoutes';
 import { FormScreen } from '@/layout/FormScreen';
 import { earningsApi } from '@/services/earnings/earningsApi';
 import { withdrawalTone } from '@/services/earnings/withdrawLogic';
@@ -46,7 +47,7 @@ export const WithdrawSuccessPage: FC<
     query.data ?? (passed?.id === withdrawalId ? passed : null);
 
   const backToEarnings = useCallback(
-    () => navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerEarnings }),
+    () => navigation.popTo(ROUTES.mainTabs, tabHome(ROUTES.workerEarnings)),
     [navigation],
   );
   useHardwareBack(backToEarnings);

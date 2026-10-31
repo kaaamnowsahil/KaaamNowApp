@@ -35,6 +35,10 @@ export type LivePriceBreakdown = {
   worker_net_minor: number;
   extension_surcharge_pct: number;
   extension_rate_minor: number;
+  /** Prices above are per Worker; the booking total is total_minor × workers_required. */
+  workers_required?: number;
+  max_workers?: number;
+  booking_total_minor?: number;
 };
 
 /** Approximate (~110 m) position of an available Worker; carries no identity. */
@@ -106,6 +110,7 @@ export type LiveTimer = {
 
 export type LiveExtension = {
   id: string;
+  assignment_id?: string;
   status:
     | 'requested'
     | 'awaiting_payment'
@@ -195,6 +200,31 @@ export type LiveCancelPreview = {
   currency: string;
 };
 
+export type LiveArrivalCode = {
+  code: string;
+  expires_at: string;
+  attempts_left: number;
+  locked: boolean;
+  expired: boolean;
+  verified: boolean;
+};
+
+/** One booked Worker of a several-Worker booking. */
+export type LiveSeat = {
+  assignment: LiveAssignment;
+  arrival_code: LiveArrivalCode | null;
+  completion_code: CompletionCode | null;
+  timer: LiveTimer | null;
+  actions: {
+    can_cancel: boolean;
+    can_extend: boolean;
+    can_end_work: boolean;
+    can_reissue_code: boolean;
+    can_reissue_completion_code: boolean;
+  };
+  final_invoice?: LiveInvoice | null;
+};
+
 export type BusinessLiveStatus =
   | 'awaiting_payment'
   | 'searching'
@@ -247,6 +277,11 @@ export type BusinessLiveBooking = {
     can_repost: boolean;
   };
   completion_code: CompletionCode | null;
+  workers_required?: number;
+  workers_filled?: number;
+  seat_total_minor?: number;
+  unfilled_refund_minor?: number;
+  workers?: LiveSeat[];
 };
 
 export type WorkerLiveBooking = {
@@ -264,6 +299,8 @@ export type WorkerLiveBooking = {
     worker_net_minor: number;
     extension_net_minor: number;
     total_net_minor: number;
+    /** Once the work ended: what was actually credited (null if nothing was). */
+    final_net_minor?: number | null;
   };
   arrival: {
     verified: boolean;
@@ -275,12 +312,14 @@ export type WorkerLiveBooking = {
   extensions: LiveExtension[];
   cancellation: LiveCancellation | null;
   completion: CompletionCode | null;
+  workers_required?: number;
   actions: {
     can_start_travel: boolean;
     can_start_work: boolean;
     can_complete: boolean;
     can_cancel: boolean;
     can_answer_extension: boolean;
+    can_accept_again?: boolean;
   };
 };
 
@@ -309,6 +348,7 @@ export type LiveQuoteRequest = {
   duration_minutes?: number;
   task_price_minor?: number;
   promo_code?: string;
+  workers_required?: number;
 };
 
 export type LiveWorkCreate = {
@@ -325,6 +365,7 @@ export type LiveWorkCreate = {
   hourly_rate_minor?: number;
   task_price_minor?: number;
   accept_terms: boolean;
+  workers_required?: number;
   expected_total_minor: number;
   idempotency_key: string;
   promo_code?: string;

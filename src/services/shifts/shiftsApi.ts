@@ -64,6 +64,8 @@ export type WorkerShiftDetail = WorkerShiftCard & {
   site_contact_name: string;
   cancellation_cutoff_hours: number;
   has_time_conflict: boolean;
+  can_reapply?: boolean;
+  reapply_block_reason?: string | null;
 };
 
 export type MyShiftsTab = 'upcoming' | 'active' | 'completed' | 'applications';
@@ -221,6 +223,8 @@ export type CancellationPolicy = {
   strikes_to_ban: number;
   voucher_valid_days: number;
   unfilled_cutoff_hours: number;
+  /** Business stops after the work started: the Worker keeps this % of the pay. */
+  business_stop_worker_share_pct?: number;
   tiers: CancellationTier[];
 };
 

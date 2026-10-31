@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useRef, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Linking, StyleSheet, Text, View } from 'react-native';
 
@@ -18,7 +18,7 @@ import {
   InfoCard,
   ReasonSheet,
   StatTiles,
-  TermsSheet,
+  TermsCheckbox,
   TextSection,
   WorkerCancellationPolicyCard,
 } from '@/components/shiftFlow';
@@ -31,7 +31,7 @@ import {
   CANCEL_REASONS,
   SHIFT_SECURED_STRINGS,
 } from '@/pages/shiftSecured/constants/shiftSecuredStrings';
-import { ApiError } from '@/services/api/apiClient';
+import { ApiError, errorMessage } from '@/services/api/apiClient';
 import { getDevicePosition } from '@/services/maps/devicePosition';
 import {
   formatDateTime,
@@ -47,11 +47,13 @@ import {
   useWorkerShiftDetail,
 } from '@/services/shifts/useShiftFlow';
 import { useEmergency } from '@/services/support/useEmergency';
+import { termsApi } from '@/services/terms/termsApi';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps, BookingStatus, Shift } from '@/types';
 import { formatRupees } from '@/utils/format';
 import { mapsUrl } from '@/utils/links';
 
+import { LiveRulesCard } from '../liveWork/components/LiveRulesCard';
 import {
   BOOKING_COPY,
   DETAILS_COPY,
@@ -93,14 +95,46 @@ export const ShiftDetailsPage: FC<
   const booking = bookingStatus ? BOOKING_COPY[bookingStatus] : undefined;
   const rate = formatRupees(shift.hourlyRate);
   const hasTimeConflict = !bookingStatus && Boolean(info?.has_time_conflict);
-  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const canReapply = Boolean(info?.can_reapply);
+  const hasLeft =
+    canReapply ||
+    Boolean(info?.reapply_block_reason && info.reapply_block_reason !== 'business_cancelled');
+  const againPrimary = hasLeft
+    ? canReapply
+      ? {
+        label: SHIFT_DETAILS_STRINGS.againAction(shift.status === 'live'),
+        onPress: agreeAndAccept,
+      }
+      : { label: SHIFT_DETAILS_STRINGS.CANT_APPLY_AGAIN, isDisabled: true }
+    : undefined;
+  const [agreed, setAgreed] = useState(false);
+  const [agreeError, setAgreeError] = useState('');
+  const termsRecorded = useRef(false);
+  function agreeAndAccept() {
+    if (!agreed) {
+      setAgreeError(t('shiftDetails.agreeRequired'));
+      return;
+    }
+    accept();
+  }
+  /** The box was ticked, so a missing terms acceptance is recorded once and the action retried. */
   const needsTerms = (error: unknown) => {
     const isTerms = error instanceof ApiError && error.code === 'terms_required';
-    if (isTerms) setIsTermsOpen(true);
-    return isTerms;
+    if (!isTerms || termsRecorded.current) return false;
+    termsRecorded.current = true;
+    termsApi.accept('worker').then(
+      () => accept(),
+      termsError =>
+        Alert.alert(
+          shift.status === 'live'
+            ? SHIFT_DETAILS_STRINGS.ACCEPT_FAILED
+            : SHIFT_DETAILS_STRINGS.APPLY_FAILED,
+          errorMessage(termsError),
+        ),
+    );
+    return true;
   };
 
-  const [isBookSheetOpen, setIsBookSheetOpen] = useState(false);
   const showBooked = (booked: Shift) => {
     navigation.setParams({ shift: booked, bookingStatus: 'confirmed' });
     detail.reload();
@@ -223,9 +257,26 @@ export const ShiftDetailsPage: FC<
     setCancelQuote(null);
     const reason = cancelReasons.find(item => item.id === reasonId)?.label ?? reasonId;
     action.run(
-      () => shiftsApi.cancelAssignment(shift.assignmentId as string, reason),
-      () =>
+      async () => {
+        await shiftsApi.cancelAssignment(shift.assignmentId as string, reason);
+        return shiftsApi.shiftDetail(shift.id).catch(() => null);
+      },
+      after =>
         Alert.alert(t('shiftSecured.cancelledTitle'), t('shiftSecured.cancelledBody'), [
+          ...(after?.can_reapply
+            ? [
+              {
+                text: SHIFT_DETAILS_STRINGS.againAction(shift.status === 'live'),
+                onPress: () => {
+                  navigation.setParams({
+                    shift: { ...shift, assignmentStatus: 'cancelled' },
+                    bookingStatus: 'cancelled',
+                  });
+                  detail.reload();
+                },
+              },
+            ]
+            : []),
           { text: t('shiftSecured.ok'), onPress: () => navigation.popToTop() },
         ]),
       SHIFT_DETAILS_STRINGS.CANCEL_FAILED,
@@ -257,9 +308,10 @@ export const ShiftDetailsPage: FC<
   const primary = (() => {
     switch (bookingStatus) {
       case undefined:
+        if (againPrimary) return againPrimary;
         return hasTimeConflict
           ? { label: SHIFT_DETAILS_STRINGS.TIME_CONFLICT_ACTION, isDisabled: true }
-          : { label: copy.accept(rate), onPress: () => setIsBookSheetOpen(true) };
+          : { label: copy.accept(rate), onPress: agreeAndAccept };
       case 'selected':
         return {
           label: booking?.action,
@@ -280,6 +332,8 @@ export const ShiftDetailsPage: FC<
           };
       case 'applied':
         return { label: booking?.action, isDisabled: true };
+      case 'cancelled':
+        return againPrimary;
       default:
         return undefined;
     }
@@ -338,9 +392,13 @@ export const ShiftDetailsPage: FC<
       >
         <FlowHeading
           overline={
-            (isCancelled && a?.cancelled_by === 'worker'
-              ? SHIFT_DETAILS_STRINGS.WITHDRAWN
-              : booking?.overline) ??
+            (hasLeft
+              ? canReapply
+                ? SHIFT_DETAILS_STRINGS.YOU_WITHDREW
+                : SHIFT_DETAILS_STRINGS.CANT_APPLY_AGAIN
+              : isCancelled && a?.cancelled_by === 'worker'
+                ? SHIFT_DETAILS_STRINGS.WITHDRAWN
+                : booking?.overline) ??
             (hasTimeConflict
               ? SHIFT_DETAILS_STRINGS.timeConflict(shift.status === 'live')
               : copy.overline(Math.max(shift.spotsOpen, 1)))
@@ -465,7 +523,33 @@ export const ShiftDetailsPage: FC<
             variant={shift.status === 'scheduled' ? 'accent' : 'box'}
           />
         )}
-        <WorkerCancellationPolicyCard onReadTerms={() => navigation.navigate(ROUTES.terms)} />
+        {shift.status === 'live' ? (
+          <LiveRulesCard
+            audience="worker"
+            isTask={isTaskShift(shift)}
+            onReadTerms={() => navigation.navigate(ROUTES.terms)}
+          />
+        ) : (
+          <WorkerCancellationPolicyCard onReadTerms={() => navigation.navigate(ROUTES.terms)} />
+        )}
+        {primary?.onPress === agreeAndAccept ? (
+          <TermsCheckbox
+            checked={agreed}
+            onToggle={() => {
+              setAgreed(value => !value);
+              setAgreeError('');
+            }}
+            label={
+              shift.status === 'live'
+                ? t('shiftDetails.agreeLive')
+                : t('shiftDetails.agreeScheduled')
+            }
+            linkLabel={WORKER_CANCELLATION_STRINGS.BOOK_SHEET_READ}
+            onReadTerms={() => navigation.navigate(ROUTES.terms)}
+            error={agreeError}
+            testID="shift-details-agree"
+          />
+        ) : null}
         {isBooked && shift.assignmentId ? (
           <TextButton
             label={SHIFT_DETAILS_STRINGS.WITHDRAW}
@@ -494,29 +578,6 @@ export const ShiftDetailsPage: FC<
           onConfirm={cancel}
           onClose={() => setCancelQuote(null)}
           testID="cancel-shift-sheet"
-        />
-      ) : null}
-      {isBookSheetOpen || isTermsOpen ? (
-        <TermsSheet
-          audience="worker"
-          title={
-            shift.status === 'live'
-              ? copy.accept(rate)
-              : WORKER_CANCELLATION_STRINGS.BOOK_SHEET_TITLE
-          }
-          body={WORKER_CANCELLATION_STRINGS.BOOK_SHEET_BODY}
-          acceptLabel={WORKER_CANCELLATION_STRINGS.BOOK_SHEET_ACCEPT}
-          readLabel={WORKER_CANCELLATION_STRINGS.BOOK_SHEET_READ}
-          onRead={() => navigation.navigate(ROUTES.terms)}
-          onClose={() => {
-            setIsBookSheetOpen(false);
-            setIsTermsOpen(false);
-          }}
-          onAccepted={() => {
-            setIsBookSheetOpen(false);
-            setIsTermsOpen(false);
-            accept();
-          }}
         />
       ) : null}
     </>

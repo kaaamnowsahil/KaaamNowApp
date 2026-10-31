@@ -9,6 +9,7 @@ import type {
 import type { ROUTES } from '@/constants/routes';
 import type { PaymentHistoryItem } from '@/services/billing/billingApi';
 import type { Withdrawal } from '@/services/earnings/earningsApi';
+import type { LiveRepost } from '@/services/liveWork/liveWorkFormat';
 
 import type { BookingStatus } from './booking';
 import type { Shift } from './shift';
@@ -61,7 +62,7 @@ export type AppStackParamList = CommonStackParamList & {
     draft: BusinessShiftDraft;
     unpaidInvoiceIds?: string[];
   };
-  [ROUTES.businessLiveWorkPost]: undefined;
+  [ROUTES.businessLiveWorkPost]: { repost?: LiveRepost } | undefined;
   [ROUTES.applyCoupon]: undefined;
   [ROUTES.businessLiveWork]: { bookingId: string };
   [ROUTES.workerLiveWork]: undefined;

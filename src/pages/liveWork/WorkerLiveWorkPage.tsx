@@ -7,6 +7,7 @@ import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { tr } from '@/services/i18n/tr';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
+import { askToShareLocation } from '@/services/liveWork/locationPrompt';
 import {
   formatClock,
   formatMinutes,
@@ -28,6 +29,7 @@ import {
   useLivePolling,
 } from '@/services/liveWork/useLivePolling';
 import { getDevicePosition } from '@/services/maps/devicePosition';
+import { useRealtime } from '@/services/realtime/useRealtime';
 import type { AppScreenProps } from '@/types';
 
 import { LiveCard, LiveText } from './components/LiveWorkUi';
@@ -109,6 +111,9 @@ export const WorkerLiveWorkPage: FC<
     useCallback(loadFeed, []),
     LIVE_POLL_MS,
   );
+  useRealtime('live_requests', () => {
+    refresh().catch(() => undefined);
+  });
   const [busy, setBusy] = useState(false);
 
   const accept = async (request: WorkerLiveRequest) => {
@@ -116,7 +121,7 @@ export const WorkerLiveWorkPage: FC<
     try {
       const point = await getDevicePosition(8000);
       if (!point) {
-        Alert.alert(S.accept, S.needLocation);
+        askToShareLocation(S.needLocation);
         return;
       }
       await liveWorkApi.reportWorkerLocation(point);

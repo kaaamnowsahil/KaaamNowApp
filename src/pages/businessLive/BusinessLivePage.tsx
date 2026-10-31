@@ -11,7 +11,10 @@ import {
   SegmentedControl,
 } from '@/components/ui';
 import { TabScreen } from '@/layout/TabScreen';
-import { BusinessOwnedShiftCard } from '@/pages/businessShifts/components';
+import {
+  BusinessOwnedShiftCard,
+  BusinessShiftCancelSheet,
+} from '@/pages/businessShifts/components';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import {
@@ -78,13 +81,16 @@ export const BusinessLivePage: FC = () => {
               key={shift.id}
               shift={shift}
               titleColor={colors.primary}
-              isPaying={false}
-              isPublishing={false}
-              error=""
-              showActions={false}
-              onCancel={() => undefined}
-              onPay={() => undefined}
-              onPublish={() => undefined}
+              isPaying={dashboard.payingId === shift.id}
+              isPublishing={dashboard.publishingId === shift.id}
+              error={
+                dashboard.cardError?.shiftId === shift.id
+                  ? dashboard.cardError.message
+                  : ''
+              }
+              onCancel={() => dashboard.openCancel(shift)}
+              onPay={() => dashboard.payDeposit(shift)}
+              onPublish={() => dashboard.publish(shift)}
               onOpenBooked={() => dashboard.openBooked(shift)}
               onOpenWithdrawn={dashboard.openApplicants}
               onOpenLive={() => dashboard.openLive(shift)}
@@ -110,25 +116,39 @@ export const BusinessLivePage: FC = () => {
   ];
 
   return (
-    <TabScreen
-      header={<BrandAppBar onBellPress={dashboard.openNotifications} />}
-      blocks={blocks}
-      gap={12}
-      fillLastBlock={Boolean(dashboard.error) || dashboard.shifts.length === 0}
-      isLoading={dashboard.isLoading}
-      busy={dashboard.isRefreshing}
-      testID="business-live-page"
-      actions={
-        <PrimaryButton
-          label={t(
-            isLive
-              ? 'businessDashboard.postLiveRequest'
-              : 'businessDashboard.createShift',
-          )}
-          onPress={dashboard.openSchedule}
-          testID="business-create-shift"
+    <>
+      <TabScreen
+        header={<BrandAppBar onBellPress={dashboard.openNotifications} />}
+        blocks={blocks}
+        gap={12}
+        fillLastBlock={
+          Boolean(dashboard.error) || dashboard.shifts.length === 0
+        }
+        isLoading={dashboard.isLoading}
+        busy={dashboard.isRefreshing}
+        testID="business-live-page"
+        actions={
+          <PrimaryButton
+            label={t(
+              isLive
+                ? 'businessDashboard.postLiveRequest'
+                : 'businessDashboard.createShift',
+            )}
+            onPress={dashboard.openSchedule}
+            testID="business-create-shift"
+          />
+        }
+      />
+      {dashboard.cancelTarget ? (
+        <BusinessShiftCancelSheet
+          cutoffHours={dashboard.cancelTarget.cancellation_cutoff_hours}
+          preview={dashboard.cancelPreview}
+          error={dashboard.cancelError}
+          isCancelling={dashboard.isCancelling}
+          onClose={dashboard.closeCancel}
+          onConfirm={dashboard.confirmCancel}
         />
-      }
-    />
+      ) : null}
+    </>
   );
 };

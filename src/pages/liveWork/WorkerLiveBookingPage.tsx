@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
+import { WORKER_CANCELLATION_STRINGS } from '@/components/shiftFlow/workerCancellationStrings';
 import { CompletionCodeField } from '@/components/taskPricing/CompletionCode';
 import {
   BottomSheet,
@@ -25,6 +26,12 @@ import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { tr } from '@/services/i18n/tr';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
+import {
+  askToShareLocation,
+  LocationOffError,
+} from '@/services/liveWork/locationPrompt';
+import { toShift } from '@/services/shifts/shiftMappers';
+import { shiftsApi } from '@/services/shifts/shiftsApi';
 import {
   ARRIVAL_CODE_LENGTH,
   COMPLETION_CODE_LENGTH,
@@ -51,6 +58,7 @@ import {
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
+import { LiveRulesCard } from './components/LiveRulesCard';
 import { LiveCard, LiveText, PriceRow } from './components/LiveWorkUi';
 
 type Position = {
@@ -98,7 +106,7 @@ function currentPoint(): Promise<LivePoint> {
   return new Promise((resolve, reject) => {
     Geolocation.getCurrentPosition(
       position => resolve(toPoint(position)),
-      () => reject(new Error(S.workerLocationOff)),
+      () => reject(new LocationOffError(S.workerLocationOff)),
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
     );
   });
@@ -154,7 +162,7 @@ function useLocationSharing(assignmentId: string, enabled: boolean) {
 /** Worker view of one accepted Live Work booking. */
 export const WorkerLiveBookingPage: FC<
   AppScreenProps<typeof ROUTES.workerLiveBooking>
-> = ({ route }) => {
+> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const { assignmentId } = route.params;
   const load = useCallback(
@@ -200,6 +208,11 @@ export const WorkerLiveBookingPage: FC<
       else await refresh();
       return true;
     } catch (error) {
+      if (error instanceof LocationOffError) {
+        askToShareLocation();
+        await refresh();
+        return false;
+      }
       const text = liveErrorText(error);
       if (onError) onError(text);
       else Alert.alert(S.actionFailed, text);
@@ -210,6 +223,12 @@ export const WorkerLiveBookingPage: FC<
     }
   };
 
+  const acceptAgain = (bookingId: string) =>
+    run(async () => {
+      const detail = await shiftsApi.shiftDetail(bookingId);
+      navigation.replace(ROUTES.shiftDetails, { shift: toShift(detail) });
+    });
+
   const startWork = () => {
     setCodeError('');
     if (code.length !== ARRIVAL_CODE_LENGTH) {
@@ -218,7 +237,7 @@ export const WorkerLiveBookingPage: FC<
     }
     run(async () => {
       if (!(await hasLocationPermission()))
-        throw new Error(S.workerLocationOff);
+        throw new LocationOffError(S.workerLocationOff);
       const next = await liveWorkApi.startWork(
         assignmentId,
         code,
@@ -232,7 +251,7 @@ export const WorkerLiveBookingPage: FC<
   const confirmReached = () =>
     run(async () => {
       if (!(await hasLocationPermission()))
-        throw new Error(S.workerLocationOff);
+        throw new LocationOffError(S.workerLocationOff);
       const here = await currentPoint();
       const { latitude, longitude } = booking?.work ?? {};
       if (latitude != null && longitude != null) {
@@ -323,7 +342,7 @@ export const WorkerLiveBookingPage: FC<
             ) : null}
             {actions.can_cancel ? (
               <SecondaryButton
-                label={S.cancel}
+                label={status === 'in_progress' ? S.forceCancel : S.cancel}
                 tone="danger"
                 onPress={openCancel}
                 disabled={busy}
@@ -342,6 +361,11 @@ export const WorkerLiveBookingPage: FC<
               : formatMinutes(work.reserved_minutes)
           }`}
         </LiveText>
+        {(booking.workers_required ?? 1) > 1 ? (
+          <LiveText tone="muted" testID="worker-live-work-of-count">
+            {S.workerOfCount(booking.workers_required ?? 1)}
+          </LiveText>
+        ) : null}
         <View style={styles.address}>
           <MapPinIcon width={16} height={16} color={colors.textMuted} />
           <View style={styles.addressText}>
@@ -373,6 +397,14 @@ export const WorkerLiveBookingPage: FC<
         <LiveText tone={locationDenied ? 'danger' : 'muted'}>
           {locationDenied ? S.workerLocationOff : S.sharingLocation}
         </LiveText>
+      ) : null}
+      {sharing && locationDenied ? (
+        <TextButton
+          label={S.openSettings}
+          tone="primary"
+          onPress={() => askToShareLocation()}
+          testID="worker-live-share-location"
+        />
       ) : null}
 
       {askCode && booking.arrival ? (
@@ -423,6 +455,10 @@ export const WorkerLiveBookingPage: FC<
         </LiveCard>
       ) : null}
 
+      {status === 'in_progress' ? (
+        <LiveText tone="muted">{S.workerDoneHint}</LiveText>
+      ) : null}
+
       {ask && actions.can_answer_extension ? (
         <LiveCard>
           <LiveText>
@@ -459,17 +495,20 @@ export const WorkerLiveBookingPage: FC<
           {booking.cancellation.reason ? (
             <LiveText>{booking.cancellation.reason}</LiveText>
           ) : null}
+          {booking.actions.can_accept_again ? (
+            <SecondaryButton
+              label={tr('shiftDetails.acceptAgain')}
+              onPress={() => acceptAgain(booking.booking_id)}
+              disabled={busy}
+            />
+          ) : null}
         </LiveCard>
       ) : null}
 
       <LiveCard>
         <LiveText tone="title">{S.earnings}</LiveText>
         <LiveText>
-          {S.earningsLine(
-            formatRupees(earnings.base_amount_minor),
-            formatRupees(earnings.worker_commission_minor),
-            formatRupees(earnings.worker_net_minor),
-          )}
+          {S.earningsLine(formatRupees(earnings.worker_net_minor))}
         </LiveText>
         {earnings.extension_net_minor > 0 ? (
           <LiveText>
@@ -481,7 +520,19 @@ export const WorkerLiveBookingPage: FC<
           strong
           value={formatRupees(earnings.total_net_minor)}
         />
+        {status === 'completed' ? (
+          <LiveText tone="strong">
+            {earnings.final_net_minor != null
+              ? S.finalEarned(formatRupees(earnings.final_net_minor))
+              : S.finalNotPaid}
+          </LiveText>
+        ) : null}
       </LiveCard>
+      <LiveRulesCard
+        audience="worker"
+        isTask={isTask}
+        onReadTerms={() => navigation.navigate(ROUTES.terms)}
+      />
 
       {finishing ? (
         <BottomSheet
@@ -518,13 +569,34 @@ export const WorkerLiveBookingPage: FC<
 
       {cancelPreview ? (
         <BottomSheet
-          title={S.workerCancelTitle}
-          subtitle={cancelPreview.effect}
+          title={
+            cancelPreview.stage === 'during_work'
+              ? S.forceCancelTitle
+              : S.workerCancelTitle
+          }
+          subtitle={
+            S.workerCancelStage[cancelPreview.stage] ?? cancelPreview.effect
+          }
           onClose={() => setCancelPreview(null)}
           closeLabel={S.keepWorking}
         >
           <View style={styles.stack}>
-            <LiveText tone="muted">{cancelPreview.rule}</LiveText>
+            {cancelPreview.fee_minor > 0 || cancelPreview.strike_weight > 0 ? (
+              <LiveText tone="muted">
+                {[
+                  cancelPreview.fee_minor > 0
+                    ? S.feeLine(formatRupees(cancelPreview.fee_minor))
+                    : '',
+                  cancelPreview.strike_weight > 0
+                    ? WORKER_CANCELLATION_STRINGS.strike(
+                        cancelPreview.strike_weight,
+                      )
+                    : '',
+                ]
+                  .filter(Boolean)
+                  .join(' + ')}
+              </LiveText>
+            ) : null}
             <TextField
               label={S.cancelReason}
               value={cancelReason}
@@ -535,7 +607,9 @@ export const WorkerLiveBookingPage: FC<
               <LiveText tone="danger">{sheetError}</LiveText>
             ) : null}
             <PrimaryButton
-              label={S.cancel}
+              label={
+                cancelPreview.stage === 'during_work' ? S.forceCancel : S.cancel
+              }
               tone="danger"
               disabled={busy}
               onPress={() =>

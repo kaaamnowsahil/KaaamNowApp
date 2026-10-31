@@ -72,6 +72,7 @@ export const WORKER_CANCELLATION_STRINGS = {
       ? `${fee} + ${strikeLabel(tier.strike_weight)}`
       : fee;
   },
+  strike: strikeLabel,
   strikes: (
     limit: number,
     windowDays: number,

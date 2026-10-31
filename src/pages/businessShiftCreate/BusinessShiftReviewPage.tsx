@@ -370,30 +370,19 @@ const EstimateRows: FC<{ estimate: PricedEstimate; promoCode: string }> = ({
 }) => {
   const { colors } = useTheme();
   const discount = estimate.promo_discount_minor ?? 0;
+  const gatewayCharge = estimate.gateway_fee_minor + (estimate.tax_minor ?? 0);
   return (
     <View style={[styles.estimate, { borderTopColor: colors.border }]}>
       <CostRow
         label={S.WORKERS_PAY}
         value={rupees(estimate.worker_subtotal_minor)}
       />
-      {estimate.gateway_fee_minor > 0 ? (
-        <CostRow
-          label={S.gatewayFee(estimate.gateway_fee_percentage)}
-          value={rupees(estimate.gateway_fee_minor)}
-        />
-      ) : null}
       <CostRow
         label={S.platformCommission(estimate.fee_percentage)}
         value={rupees(estimate.platform_fee_minor)}
       />
-      {estimate.tax_minor ? (
-        <CostRow
-          label={S.taxLine(
-            estimate.tax_label ?? '',
-            estimate.tax_percentage ?? 0,
-          )}
-          value={rupees(estimate.tax_minor)}
-        />
+      {gatewayCharge > 0 ? (
+        <CostRow label={S.gatewayFee} value={rupees(gatewayCharge)} />
       ) : null}
       {promoCode && discount > 0 ? (
         <CostRow

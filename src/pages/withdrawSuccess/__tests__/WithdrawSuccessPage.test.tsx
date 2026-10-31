@@ -147,6 +147,7 @@ describe('Withdrawal result screen', () => {
     await press('withdraw-success-back');
     expect(navigation.popTo).toHaveBeenCalledWith(ROUTES.mainTabs, {
       screen: ROUTES.workerEarnings,
+      params: { screen: ROUTES.workerEarningsHome, pop: true },
     });
   });
 

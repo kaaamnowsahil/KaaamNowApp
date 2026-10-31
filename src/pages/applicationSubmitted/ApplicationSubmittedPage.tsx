@@ -4,6 +4,7 @@ import CircleCheckIcon from '@/assets/icons/circle-check.svg';
 import { StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
+import { tabHome } from '@/route/tabRoutes';
 import { FormScreen } from '@/layout/FormScreen';
 import { bookingRef } from '@/services/shifts/useShiftFlow';
 import { useHardwareBack } from '@/shared/hooks/useHardwareBack';
@@ -22,7 +23,7 @@ export const ApplicationSubmittedPage: FC<
   const { shift } = route.params;
 
   const browse = useCallback(
-    () => navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerHome }),
+    () => navigation.popTo(ROUTES.mainTabs, tabHome(ROUTES.workerHome)),
     [navigation],
   );
   useHardwareBack(browse);
@@ -39,7 +40,7 @@ export const ApplicationSubmittedPage: FC<
           <PrimaryButton
             label={APPLICATION_SUBMITTED_STRINGS.TRACK}
             onPress={() =>
-              navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerShifts })
+              navigation.popTo(ROUTES.mainTabs, tabHome(ROUTES.workerShifts))
             }
             testID="application-submitted-track"
           />

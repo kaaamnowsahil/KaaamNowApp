@@ -6,6 +6,7 @@ import { errorMessage } from '@/services/api/apiClient';
 import { meApi } from '@/services/api/meApi';
 import { getDevicePosition, type DevicePosition } from '@/services/maps/devicePosition';
 import { useLocationHeartbeat } from '@/services/maps/locationHeartbeat';
+import { useRealtime } from '@/services/realtime/useRealtime';
 import { reverseGeocode } from '@/services/maps/googleMaps';
 import { isTaskShift, toShift } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
@@ -153,6 +154,10 @@ export const useWorkerHome = () => {
       filters.businessTypeIds.join(','),
     ],
   );
+
+  useRealtime('shifts', () => {
+    if (positionResolved) feed.refreshSilently().catch(() => undefined);
+  });
 
   const savedLabel = worker?.address_text || worker?.locality || '';
 
