@@ -22,13 +22,18 @@ import {
   payInvoice,
   PaymentNotCompletedError,
 } from '@/services/billing/billingApi';
-import { createRequest, quoteRequest } from '@/services/liveWork/livePrice';
+import {
+  bookingTotal,
+  createRequest,
+  quoteRequest,
+} from '@/services/liveWork/livePrice';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
 import {
   formatMinutes,
   formatRupees,
   liveErrorText,
   newIdempotencyKey,
+  repostForm,
   serverFieldErrors,
   validateLiveWorkForm,
   type LiveWorkForm,
@@ -55,10 +60,12 @@ import {
   ShiftSelectField,
 } from '../businessShiftCreate/components';
 import { AvailableWorkersMap } from './components/AvailableWorkersMap';
+import { LiveRulesCard } from './components/LiveRulesCard';
 import {
   LiveCard,
   LivePriceBreakdownCard,
   LiveText,
+  WorkerCountStepper,
 } from './components/LiveWorkUi';
 
 const AVAILABLE_REFRESH_MS = 30_000;
@@ -76,15 +83,21 @@ const EMPTY_FORM: LiveWorkForm = {
   durationMinutes: 120,
   rate: '',
   taskPrice: '',
+  workers: 1,
 };
 /** Business: category, details, location, duration and rate → server price → post & pay. */
 export const BusinessLiveWorkPostPage: FC<
   AppScreenProps<typeof ROUTES.businessLiveWorkPost>
-> = ({ navigation }) => {
+> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const startCouponSession = useCouponSession(state => state.start);
-  const [form, setForm] = useState<LiveWorkForm>(EMPTY_FORM);
-  const [durationHours, setDurationHours] = useState('2');
+  const repost = route.params?.repost;
+  const [form, setForm] = useState<LiveWorkForm>(() =>
+    repost ? repostForm(repost) : EMPTY_FORM,
+  );
+  const [durationHours, setDurationHours] = useState(() =>
+    String((repost ? repostForm(repost) : EMPTY_FORM).durationMinutes / 60),
+  );
   const [errors, setErrors] = useState<LiveWorkFormErrors>({});
   const [categories, setCategories] = useState<SignupOption[]>([]);
   const [categoriesError, setCategoriesError] = useState('');
@@ -97,6 +110,7 @@ export const BusinessLiveWorkPostPage: FC<
       : S.noAvailableWorkers(available.radius_km)
     : S.availabilityUnknown;
   const [quote, setQuote] = useState<LivePriceBreakdown | null>(null);
+  const [maxWorkers, setMaxWorkers] = useState<number | null>(null);
   const [promoCode, setPromoCode] = useState<string | null>(null);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -132,9 +146,12 @@ export const BusinessLiveWorkPostPage: FC<
     }));
     setLocating(false);
   }, []);
+  const hasRepostLocation =
+    repost?.work.latitude != null && repost.work.longitude != null;
   useEffect(() => {
+    if (hasRepostLocation) return;
     locateDevice().catch(() => setLocating(false));
-  }, [locateDevice]);
+  }, [hasRepostLocation, locateDevice]);
 
   const pickLocation = (picked: PickedAddress) => {
     addressEdited.current = false;
@@ -234,8 +251,11 @@ export const BusinessLiveWorkPostPage: FC<
     Alert.alert(S.actionFailed, liveErrorText(error));
   };
 
-  const fetchQuote = (code: string | null) =>
-    liveWorkApi.quote(quoteRequest(form, code));
+  const fetchQuote = async (code: string | null) => {
+    const next = await liveWorkApi.quote(quoteRequest(form, code));
+    if (next.max_workers) setMaxWorkers(next.max_workers);
+    return next;
+  };
 
   /** A coupon the server no longer accepts is dropped and the price shown without it. */
   const dropCoupon = async (error: unknown) => {
@@ -357,7 +377,7 @@ export const BusinessLiveWorkPostPage: FC<
         actions={
           <>
             <PrimaryButton
-              label={S.postAndPay(formatRupees(quote.total_minor))}
+              label={S.postAndPay(formatRupees(bookingTotal(quote)))}
               onPress={() => postAndPay()}
               disabled={busy}
               testID="business-live-work-post"
@@ -387,6 +407,11 @@ export const BusinessLiveWorkPostPage: FC<
           disabled={busy}
           onOpen={() => openCoupons(quote)}
           onRemove={removeCoupon}
+        />
+        <LiveRulesCard
+          audience="business"
+          isTask={quote.pricing_mode === 'task'}
+          onReadTerms={() => navigation.navigate(ROUTES.terms)}
         />
         <TermsCheckbox
           checked={acceptTerms}
@@ -490,6 +515,13 @@ export const BusinessLiveWorkPostPage: FC<
         value={form.siteContact}
         onChangeText={value => set('siteContact', value)}
         maxLength={120}
+      />
+      <WorkerCountStepper
+        value={form.workers ?? 1}
+        max={maxWorkers}
+        disabled={busy}
+        error={errors.workers}
+        onChange={value => set('workers', Math.max(1, value))}
       />
       <PricingModeRadio
         value={form.pricingMode}

@@ -6,7 +6,9 @@ import { PricingModeRadio } from '@/components/taskPricing/PricingModeRadio';
 import { PrimaryButton, ScreenIntro, SecondaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
+import { tabHome } from '@/route/tabRoutes';
 import { FormScreen } from '@/layout/FormScreen';
+import { WorkerCountStepper } from '@/pages/liveWork/components/LiveWorkUi';
 import { errorMessage } from '@/services/api/apiClient';
 import { meApi } from '@/services/api/meApi';
 import { geocodeAddress, reverseGeocode } from '@/services/maps/googleMaps';
@@ -32,6 +34,9 @@ import {
   toBulkItems,
   type SlotErrors,
 } from './utils';
+
+/** Matches the server's ``workers_required`` limit for scheduled shifts. */
+const MAX_SHIFT_WORKERS = 100;
 
 const GEOCODE_DELAY_MS = 800;
 
@@ -131,9 +136,7 @@ export const BusinessShiftSchedulePage: FC<
           shifts: toBulkItems(schedule.trimmed()),
         }),
       () =>
-        navigation.navigate(ROUTES.mainTabs, {
-          screen: ROUTES.businessShifts,
-        }),
+        navigation.navigate(ROUTES.mainTabs, tabHome(ROUTES.businessShifts)),
       undefined,
       error => {
         setSaveError(errorMessage(error));
@@ -235,16 +238,15 @@ export const BusinessShiftSchedulePage: FC<
             {t('businessShiftCreate.hoursDuration', { hours })}
           </Text>
         ) : null}
+        <WorkerCountStepper
+          value={Math.max(Number(slot.workers) || 1, 1)}
+          max={MAX_SHIFT_WORKERS}
+          error={errors.workers}
+          hint={null}
+          testID={`business-shift-workers-${id}`}
+          onChange={workers => set({ workers: String(workers) })}
+        />
         <View style={styles.row}>
-          <ShiftFormField
-            label={t('businessShiftCreate.workers')}
-            value={slot.workers}
-            onChangeText={workers => set({ workers })}
-            keyboardType="number-pad"
-            placeholder={t('businessShiftCreate.workersPlaceholder')}
-            error={errors.workers}
-            testID={`business-shift-workers-${id}`}
-          />
           {isTask ? (
             <ShiftFormField
               label={t('taskPricing.taskPriceLabel')}

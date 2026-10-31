@@ -11,7 +11,6 @@ import {
 } from '@/components/ui';
 import MapPinIcon from '@/assets/figma/map-pin.svg';
 import XIcon from '@/assets/figma/x.svg';
-import CircleCheckIcon from '@/assets/icons/circle-check.svg';
 import ClockIcon from '@/assets/icons/clock.svg';
 import { CompletionCodeCard } from '@/components/taskPricing/CompletionCode';
 import { FONTS } from '@/constants/fonts';
@@ -51,6 +50,8 @@ import {
   LiveText,
 } from './components/LiveWorkUi';
 import { LiveSearchMap } from './components/LiveSearchMap';
+import { LiveRulesCard } from './components/LiveRulesCard';
+import { LiveSeatCard } from './components/LiveSeatCard';
 
 const EXTENSION_OPTIONS = EXTENSION_MINUTE_OPTIONS.map(minutes => ({
   id: String(minutes),
@@ -77,7 +78,11 @@ export const BusinessLiveWorkPage: FC<
     refresh,
   } = useLivePolling<BusinessLiveBooking>(load, LIVE_POLL_MS);
   const [busy, setBusy] = useState(false);
-  const [sheet, setSheet] = useState<'cancel' | 'extend' | null>(null);
+  const [sheet, setSheet] = useState<
+    'cancel' | 'cancelWorker' | 'extend' | null
+  >(null);
+  /** The Worker a sheet acts on; undefined = the booking's first Worker. */
+  const [seatId, setSeatId] = useState<string | undefined>(undefined);
   const [sheetError, setSheetError] = useState('');
   const [cancelPreview, setCancelPreview] = useState<LiveCancelPreview | null>(
     null,
@@ -125,34 +130,40 @@ export const BusinessLiveWorkPage: FC<
     run(async () => {
       setCancelPreview(await liveWorkApi.cancelPreview(bookingId));
       setCancelReason('');
+      setSeatId(undefined);
       setSheet('cancel');
     });
 
-  const loadExtQuote = async (minutes: number) => {
+  const openCancelWorker = (assignmentId: string) =>
+    run(async () => {
+      setCancelPreview(
+        await liveWorkApi.cancelWorkerPreview(bookingId, assignmentId),
+      );
+      setCancelReason('');
+      setSeatId(assignmentId);
+      setSheet('cancelWorker');
+    });
+
+  const loadExtQuote = async (minutes: number, assignmentId = seatId) => {
     setExtendBy(minutes);
     setExtQuote(null);
     setSheetError('');
     try {
-      setExtQuote(await liveWorkApi.extensionQuote(bookingId, minutes));
+      setExtQuote(
+        await liveWorkApi.extensionQuote(bookingId, minutes, assignmentId),
+      );
     } catch (error) {
       setSheetError(liveErrorText(error));
     }
   };
 
+  const openExtend = (assignmentId?: string) => {
+    setSeatId(assignmentId);
+    setSheet('extend');
+    loadExtQuote(extendBy, assignmentId);
+  };
+
   const isTask = booking?.work.pricing_mode === 'task';
-  const confirmEnd = () =>
-    Alert.alert(
-      isTask ? tr('taskPricing.markDone') : S.endTitle,
-      isTask ? tr('taskPricing.markDoneBody') : S.endBody,
-      [
-        { text: S.keep, style: 'cancel' },
-        {
-          text: isTask ? tr('taskPricing.markDone') : S.endWork,
-          style: 'destructive',
-          onPress: () => run(() => liveWorkApi.endWork(bookingId)),
-        },
-      ],
-    );
 
   if (!booking) {
     return (
@@ -173,6 +184,16 @@ export const BusinessLiveWorkPage: FC<
   );
   const lastExt = booking.extensions[booking.extensions.length - 1];
   const beforeStart = status === 'assigned' || status === 'en_route';
+  const workersRequired = booking.workers_required ?? 1;
+  const multi = workersRequired > 1;
+  const unfilledRefund = booking.unfilled_refund_minor ?? 0;
+  const working =
+    status === 'in_progress' &&
+    (!multi ||
+      (booking.workers ?? []).some(
+        seat => seat.assignment.status === 'checked_in',
+      ));
+  const forceCancel = cancelPreview?.stage === 'during_work';
 
   return (
     <FormScreen
@@ -204,34 +225,35 @@ export const BusinessLiveWorkPage: FC<
               disabled={busy}
             />
           ) : null}
-          {actions.can_extend && !openExt ? (
+          {!multi && actions.can_extend && !openExt ? (
             <SecondaryButton
               label={S.extend}
               icon={ClockIcon}
-              onPress={() => {
-                setSheet('extend');
-                loadExtQuote(extendBy);
-              }}
+              onPress={() => openExtend()}
               disabled={busy}
             />
           ) : null}
-          {actions.can_end_work ? (
+          {unfilledRefund > 0 && status !== 'cancelled' ? (
             <SecondaryButton
-              label={isTask ? tr('taskPricing.markDone') : S.endWork}
-              icon={CircleCheckIcon}
-              onPress={confirmEnd}
+              label={S.postRest}
+              onPress={() => navigation.navigate(ROUTES.businessShiftSchedule)}
               disabled={busy}
+              testID="business-live-work-post-rest"
             />
           ) : null}
           {actions.can_repost ? (
             <PrimaryButton
               label={S.repost}
-              onPress={() => navigation.replace(ROUTES.businessLiveWorkPost)}
+              onPress={() =>
+                navigation.replace(ROUTES.businessLiveWorkPost, {
+                  repost: { work, workers: workersRequired },
+                })
+              }
             />
           ) : null}
           {actions.can_cancel ? (
             <SecondaryButton
-              label={S.cancel}
+              label={working ? S.forceCancel : S.cancel}
               tone="danger"
               icon={XIcon}
               onPress={() => openCancel()}
@@ -300,7 +322,51 @@ export const BusinessLiveWorkPage: FC<
         </LiveCard>
       ) : null}
 
-      {assignment && status !== 'cancelled' ? (
+      {multi && status !== 'awaiting_payment' ? (
+        <LiveCard testID="business-live-work-workers-found">
+          <LiveText tone="strong">
+            {S.workersFound(booking.workers_filled ?? 0, workersRequired)}
+          </LiveText>
+          {unfilledRefund > 0 ? (
+            <LiveText>
+              {S.unfilledRefunded(formatRupees(unfilledRefund))}
+            </LiveText>
+          ) : null}
+        </LiveCard>
+      ) : null}
+
+      {multi && status !== 'cancelled'
+        ? (booking.workers ?? []).map((seat, index) => (
+            <LiveSeatCard
+              key={seat.assignment.assignment_id}
+              seat={seat}
+              index={index}
+              isTask={isTask}
+              busy={busy}
+              serverTime={booking.server_time}
+              onReissueCode={() =>
+                run(() =>
+                  liveWorkApi.reissueCode(
+                    bookingId,
+                    seat.assignment.assignment_id,
+                  ),
+                )
+              }
+              onReissueCompletion={() =>
+                run(() =>
+                  liveWorkApi.reissueCompletionCode(
+                    bookingId,
+                    seat.assignment.assignment_id,
+                  ),
+                )
+              }
+              onExtend={() => openExtend(seat.assignment.assignment_id)}
+              onCancel={() => openCancelWorker(seat.assignment.assignment_id)}
+            />
+          ))
+        : null}
+
+      {!multi && assignment && status !== 'cancelled' ? (
         <LiveCard testID="business-live-work-worker">
           <LiveText tone="label">{S.workerProfile}</LiveText>
           <LiveText tone="strong">
@@ -328,10 +394,13 @@ export const BusinessLiveWorkPage: FC<
           {assignment.ended_reason === 'worker_left' ? (
             <LiveText>{S.workerLeft}</LiveText>
           ) : null}
+          {assignment.ended_reason === 'business_stopped' ? (
+            <LiveText>{S.businessStopped}</LiveText>
+          ) : null}
         </LiveCard>
       ) : null}
 
-      {booking.arrival_code && beforeStart ? (
+      {!multi && booking.arrival_code && beforeStart ? (
         <LiveCard testID="business-live-work-code">
           <LiveText tone="label">{S.arrivalCodeTitle}</LiveText>
           {booking.arrival_code.locked ? (
@@ -357,7 +426,7 @@ export const BusinessLiveWorkPage: FC<
         </LiveCard>
       ) : null}
 
-      {status === 'in_progress' ? (
+      {!multi && status === 'in_progress' ? (
         <CompletionCodeCard
           completion={booking.completion_code}
           busy={busy}
@@ -369,8 +438,13 @@ export const BusinessLiveWorkPage: FC<
           testID="business-live-work-completion-code"
         />
       ) : null}
+      {!multi && status === 'in_progress' ? (
+        <LiveText tone="muted">
+          {isTask ? S.doneHintTask : S.doneHintHourly}
+        </LiveText>
+      ) : null}
 
-      {status === 'in_progress' && booking.timer && !isTask ? (
+      {!multi && status === 'in_progress' && booking.timer && !isTask ? (
         <LiveCard>
           <LiveText tone="label">{S.timeLeft}</LiveText>
           <Text style={[styles.code, { color: colors.text }]}>
@@ -434,7 +508,7 @@ export const BusinessLiveWorkPage: FC<
         </LiveCard>
       ) : null}
 
-      {booking.final_invoice ? (
+      {!multi && booking.final_invoice ? (
         <LiveCard>
           <LiveText tone="label">{S.finalBill}</LiveText>
           <LiveText tone="strong">
@@ -454,6 +528,10 @@ export const BusinessLiveWorkPage: FC<
             <LiveText key={refund.id}>
               {`${formatRupees(refund.amount_minor)} · ${
                 S.refundStatus[refund.status] ?? refund.status
+              }${
+                S.refundReason[refund.reason]
+                  ? ` · ${S.refundReason[refund.reason]}`
+                  : ''
               }`}
             </LiveText>
           ))}
@@ -461,16 +539,26 @@ export const BusinessLiveWorkPage: FC<
       ) : null}
 
       <LivePriceBreakdownCard price={booking.pricing} />
+      <LiveRulesCard
+        audience="business"
+        isTask={isTask}
+        onReadTerms={() => navigation.navigate(ROUTES.terms)}
+      />
 
-      {sheet === 'cancel' && cancelPreview ? (
+      {(sheet === 'cancel' || sheet === 'cancelWorker') && cancelPreview ? (
         <BottomSheet
-          title={S.cancelTitle}
-          subtitle={cancelPreview.effect}
+          title={
+            forceCancel
+              ? S.forceCancelTitle
+              : sheet === 'cancelWorker'
+              ? S.cancelWorkerTitle
+              : S.cancelTitle
+          }
+          subtitle={S.cancelStage[cancelPreview.stage] ?? cancelPreview.effect}
           onClose={() => setSheet(null)}
           closeLabel={S.keep}
         >
           <View style={styles.stack}>
-            <LiveText tone="muted">{cancelPreview.rule}</LiveText>
             {cancelPreview.fee_minor > 0 ? (
               <LiveText>
                 {S.feeLine(formatRupees(cancelPreview.fee_minor))}
@@ -503,17 +591,24 @@ export const BusinessLiveWorkPage: FC<
               <LiveText tone="danger">{sheetError}</LiveText>
             ) : null}
             <PrimaryButton
-              label={S.cancel}
+              label={forceCancel ? S.forceCancel : S.cancel}
               tone="danger"
               disabled={busy}
               onPress={() =>
                 run(
                   () =>
-                    liveWorkApi.cancel(
-                      bookingId,
-                      cancelReason.trim(),
-                      cancelPreview.business_refund_minor,
-                    ),
+                    sheet === 'cancelWorker' && seatId
+                      ? liveWorkApi.cancelWorker(
+                          bookingId,
+                          seatId,
+                          cancelReason.trim(),
+                          cancelPreview.business_refund_minor,
+                        )
+                      : liveWorkApi.cancel(
+                          bookingId,
+                          cancelReason.trim(),
+                          cancelPreview.business_refund_minor,
+                        ),
                   true,
                 ).then(ok => ok && setSheet(null))
               }
@@ -551,6 +646,7 @@ export const BusinessLiveWorkPage: FC<
                       bookingId,
                       extendBy,
                       extQuote.additional_total_minor,
+                      seatId,
                     ),
                   true,
                 ).then(ok => ok && setSheet(null))

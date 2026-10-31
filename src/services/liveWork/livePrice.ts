@@ -10,6 +10,7 @@ export function quoteRequest(
   form: LiveWorkForm,
   promoCode: string | null,
 ): LiveQuoteRequest {
+  const workers = form.workers ?? 1;
   const price =
     form.pricingMode === 'task'
       ? {
@@ -25,8 +26,14 @@ export function quoteRequest(
     category_slug: form.categorySlug,
     ...price,
     ...(promoCode ? { promo_code: promoCode } : {}),
+    ...(workers > 1 ? { workers_required: workers } : {}),
   };
 }
+
+/** Booking total for the quote (per-Worker total × Workers). */
+export const bookingTotal = (quote: LivePriceBreakdown) =>
+  quote.booking_total_minor ??
+  quote.total_minor * (quote.workers_required ?? 1);
 
 /** The booking exactly as reviewed: the server rejects it if the total it computes differs. */
 export function createRequest(
@@ -56,7 +63,10 @@ export function createRequest(
     site_contact_name: form.siteContact.trim(),
     ...price,
     accept_terms: true,
-    expected_total_minor: quote.total_minor,
+    ...((quote.workers_required ?? 1) > 1
+      ? { workers_required: quote.workers_required }
+      : {}),
+    expected_total_minor: bookingTotal(quote),
     idempotency_key: idempotencyKey,
     ...(quote.promo_code ? { promo_code: quote.promo_code } : {}),
   };

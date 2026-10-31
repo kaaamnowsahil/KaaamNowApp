@@ -72,6 +72,8 @@ export const useApiQuery = <T>(
     isLoading,
     isRefreshing,
     reload: () => run('refresh'),
+    /** Reload in the background, keeping the current data on screen. */
+    refreshSilently: () => run('silent'),
     setData,
   };
 };

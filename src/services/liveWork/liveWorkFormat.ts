@@ -1,7 +1,7 @@
 import { ApiError } from '@/services/api/apiClient';
 import { tr } from '@/services/i18n/tr';
 
-import type { PricingMode } from './liveWorkTypes';
+import type { LiveWorkDetails, PricingMode } from './liveWorkTypes';
 
 export const RESERVED_MINUTE_OPTIONS = Array.from(
   { length: 23 },
@@ -70,11 +70,40 @@ export type LiveWorkForm = {
   durationMinutes: number;
   rate: string;
   taskPrice: string;
+  /** Workers to book; the price is per Worker. */
+  workers?: number;
 };
 
 export type LiveWorkFormErrors = Partial<
   Record<keyof LiveWorkForm | 'terms', string>
 >;
+
+/** What "Post again" carries from a past booking to the post form. */
+export type LiveRepost = { work: LiveWorkDetails; workers: number };
+
+const minorToRupees = (minor: number | null) =>
+  minor ? String(minor / 100) : '';
+
+/** The post form filled with a past booking's details. */
+export function repostForm({ work, workers }: LiveRepost): LiveWorkForm {
+  return {
+    categorySlug: work.category_slug ?? '',
+    jobTitle: work.job_title,
+    description: work.description,
+    address: work.address_text,
+    latitude: work.latitude ?? null,
+    longitude: work.longitude ?? null,
+    instructions: work.arrival_instructions,
+    siteContact: work.site_contact_name,
+    pricingMode: work.pricing_mode,
+    durationMinutes: RESERVED_MINUTE_OPTIONS.includes(work.reserved_minutes)
+      ? work.reserved_minutes
+      : 120,
+    rate: minorToRupees(work.hourly_rate_minor),
+    taskPrice: minorToRupees(work.task_price_minor),
+    workers: Math.max(1, workers),
+  };
+}
 
 /** Inline checks before asking the server for a quote; the server validates again. */
 export function validateLiveWorkForm(form: LiveWorkForm): LiveWorkFormErrors {
@@ -119,6 +148,7 @@ const SERVER_FIELDS: Record<string, keyof LiveWorkFormErrors> = {
   duration_minutes: 'durationMinutes',
   hourly_rate_minor: 'rate',
   task_price_minor: 'taskPrice',
+  workers_required: 'workers',
   accept_terms: 'terms',
 };
 

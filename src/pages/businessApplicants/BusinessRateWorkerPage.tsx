@@ -13,6 +13,7 @@ import {
 } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
+import { tabHome } from '@/route/tabRoutes';
 import { TabScreen } from '@/layout/TabScreen';
 import { useBusinessApplicantStore } from '@/pages/businessApplicants/store/useBusinessApplicantStore';
 import { useBusinessPaymentStore } from '@/services/business/useBusinessPaymentStore';
@@ -53,9 +54,7 @@ export const BusinessRateWorkerPage: FC<
       });
       return;
     }
-    navigation.navigate(ROUTES.mainTabs, {
-      screen: ROUTES.businessShifts,
-    });
+    navigation.navigate(ROUTES.mainTabs, tabHome(ROUTES.businessShifts));
   }, [navigation, route.params]);
 
   if (!worker) {

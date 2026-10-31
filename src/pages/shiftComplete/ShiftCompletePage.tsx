@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { StatTiles, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
+import { tabHome } from '@/route/tabRoutes';
 import { FormScreen } from '@/layout/FormScreen';
 import { meApi } from '@/services/api/meApi';
 import { formatTime, isTaskShift } from '@/services/shifts/shiftMappers';
@@ -44,9 +45,7 @@ export const ShiftCompletePage: FC<
           <PrimaryButton
             label={t('workerFlow.shiftComplete.viewEarnings')}
             onPress={() =>
-              navigation.popTo(ROUTES.mainTabs, {
-                screen: ROUTES.workerEarnings,
-              })
+              navigation.popTo(ROUTES.mainTabs, tabHome(ROUTES.workerEarnings))
             }
             testID="shift-complete-earnings"
           />

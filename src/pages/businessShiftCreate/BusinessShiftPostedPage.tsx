@@ -5,6 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { PrimaryButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
+import { tabHome } from '@/route/tabRoutes';
 import { FormScreen } from '@/layout/FormScreen';
 import { errorMessage } from '@/services/api/apiClient';
 import { payInvoice } from '@/services/billing/billingApi';
@@ -30,7 +31,7 @@ export const BusinessShiftPostedPage: FC<
       const { type } = event.data.action;
       if (type !== 'GO_BACK' && type !== 'POP') return;
       event.preventDefault();
-      navigation.navigate(ROUTES.mainTabs, { screen: ROUTES.businessShifts });
+      navigation.navigate(ROUTES.mainTabs, tabHome(ROUTES.businessShifts));
     });
   }, [navigation]);
   const payDeposits = () => {
@@ -81,9 +82,10 @@ export const BusinessShiftPostedPage: FC<
           <PrimaryButton
             label={t('businessShiftCreate.reviewApplicants')}
             onPress={() =>
-              navigation.navigate(ROUTES.mainTabs, {
-                screen: ROUTES.businessApplicants,
-              })
+              navigation.navigate(
+                ROUTES.mainTabs,
+                tabHome(ROUTES.businessApplicants),
+              )
             }
             testID="business-shift-review-applicants"
           />

@@ -16,6 +16,10 @@ import type {
 const BUSINESS = '/business/live-work';
 const WORKER = '/worker/live-work';
 
+/** Business action on one Worker; without it the server picks the first Worker. */
+const seatQuery = (assignmentId?: string) =>
+  assignmentId ? { assignment_id: assignmentId } : undefined;
+
 export const liveWorkApi = {
   quote: (body: LiveQuoteRequest) =>
     apiRequest<LivePriceBreakdown>('POST', `${BUSINESS}/quote`, { body }),
@@ -40,18 +44,38 @@ export const liveWorkApi = {
     apiRequest<BusinessLiveBooking>('POST', `${BUSINESS}/${bookingId}/cancel`, {
       body: { reason, expected_refund_minor: expectedRefundMinor },
     }),
-  extensionQuote: (bookingId: string, minutes: number) =>
+  cancelWorkerPreview: (bookingId: string, assignmentId: string) =>
+    apiRequest<LiveCancelPreview>(
+      'GET',
+      `${BUSINESS}/${bookingId}/workers/${assignmentId}/cancel-preview`,
+    ),
+  cancelWorker: (
+    bookingId: string,
+    assignmentId: string,
+    reason: string,
+    expectedRefundMinor: number,
+  ) =>
+    apiRequest<BusinessLiveBooking>(
+      'POST',
+      `${BUSINESS}/${bookingId}/workers/${assignmentId}/cancel`,
+      { body: { reason, expected_refund_minor: expectedRefundMinor } },
+    ),
+  extensionQuote: (bookingId: string, minutes: number, assignmentId?: string) =>
     apiRequest<LiveExtensionQuote>(
       'GET',
       `${BUSINESS}/${bookingId}/extension-quote`,
       {
-        query: { minutes },
+        query: {
+          minutes,
+          ...(assignmentId ? { assignment_id: assignmentId } : {}),
+        },
       },
     ),
   requestExtension: (
     bookingId: string,
     minutes: number,
     expectedTotalMinor: number,
+    assignmentId?: string,
   ) =>
     apiRequest<BusinessLiveBooking>(
       'POST',
@@ -60,6 +84,7 @@ export const liveWorkApi = {
         body: {
           extra_minutes: minutes,
           expected_total_minor: expectedTotalMinor,
+          ...(assignmentId ? { assignment_id: assignmentId } : {}),
         },
       },
     ),
@@ -68,17 +93,21 @@ export const liveWorkApi = {
       'POST',
       `${BUSINESS}/${bookingId}/extensions/${extensionId}/cancel`,
     ),
-  endWork: (bookingId: string) =>
-    apiRequest<BusinessLiveBooking>('POST', `${BUSINESS}/${bookingId}/end`),
-  reissueCode: (bookingId: string) =>
+  endWork: (bookingId: string, assignmentId?: string) =>
+    apiRequest<BusinessLiveBooking>('POST', `${BUSINESS}/${bookingId}/end`, {
+      query: seatQuery(assignmentId),
+    }),
+  reissueCode: (bookingId: string, assignmentId?: string) =>
     apiRequest<BusinessLiveBooking>(
       'POST',
       `${BUSINESS}/${bookingId}/arrival-code/reissue`,
+      { query: seatQuery(assignmentId) },
     ),
-  reissueCompletionCode: (bookingId: string) =>
+  reissueCompletionCode: (bookingId: string, assignmentId?: string) =>
     apiRequest<BusinessLiveBooking>(
       'POST',
       `${BUSINESS}/${bookingId}/completion-code/reissue`,
+      { query: seatQuery(assignmentId) },
     ),
 
   reportWorkerLocation: (point: LivePoint) =>

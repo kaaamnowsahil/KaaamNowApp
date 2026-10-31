@@ -10,6 +10,7 @@ import {
   WORKER_LIVE_STATUS,
 } from '@/services/liveWork/liveWorkStrings';
 import { useLivePolling } from '@/services/liveWork/useLivePolling';
+import { useRealtime } from '@/services/realtime/useRealtime';
 import type { TabAppNavigation } from '@/types';
 
 import { LiveCard, LiveText } from './LiveWorkUi';
@@ -31,7 +32,13 @@ async function loadSummary() {
 /** Worker home: the current Live Work booking or pending Live Work requests, when there are any. */
 export const WorkerLiveWorkEntry: FC = () => {
   const navigation = useNavigation<TabAppNavigation>();
-  const { data } = useLivePolling(useCallback(loadSummary, []), ENTRY_POLL_MS);
+  const { data, refresh } = useLivePolling(
+    useCallback(loadSummary, []),
+    ENTRY_POLL_MS,
+  );
+  useRealtime('live_requests', () => {
+    refresh().catch(() => undefined);
+  });
   if (!data || (!data.active && !data.requestCount)) return null;
   const active = data.active;
   return (

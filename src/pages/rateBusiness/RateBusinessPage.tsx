@@ -18,6 +18,7 @@ import {
 } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
+import { tabHome } from '@/route/tabRoutes';
 import { TabScreen } from '@/layout/TabScreen';
 import { useHardwareBack } from '@/shared/hooks/useHardwareBack';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
@@ -51,7 +52,7 @@ export const RateBusinessPage: FC<
   const [comment, setComment] = useState('');
 
   const done = useCallback(
-    () => navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerShifts }),
+    () => navigation.popTo(ROUTES.mainTabs, tabHome(ROUTES.workerShifts)),
     [navigation],
   );
   useHardwareBack(done);

@@ -10,10 +10,12 @@ import { Alert, AppState } from 'react-native';
 
 import { ROUTES } from '@/constants/routes';
 import { navigationRef } from '@/route/navigationRef';
+import { inTab } from '@/route/tabRoutes';
 import { tr } from '@/services/i18n/tr';
 import type { UserRole } from '@/services/onboarding/useOnboardingStore';
 import { toShift } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
+import type { AppStackParamList, TabParamList } from '@/types';
 
 import { registerForPush } from './pushService';
 
@@ -27,16 +29,28 @@ const waitForNavigation = async () => {
   return navigationRef.isReady();
 };
 
+/** Opens a screen inside a tab so the bottom tabs stay visible. */
+const openInTab = <S extends keyof AppStackParamList>(
+  tab: keyof TabParamList,
+  screen: S,
+  params?: AppStackParamList[S],
+) => navigationRef.navigate(ROUTES.mainTabs, inTab(tab, screen, params));
+
 /** Booking pushes open the booking; everything else opens the inbox. */
 export const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
   if (!(await waitForNavigation())) return;
+  const inbox = () =>
+    openInTab(
+      role === 'business' ? ROUTES.businessLive : ROUTES.workerHome,
+      ROUTES.notifications,
+    );
   const assignmentId = message.data?.assignment_id;
   if (typeof assignmentId !== 'string' || !assignmentId) {
-    navigationRef.navigate(ROUTES.notifications);
+    inbox();
     return;
   }
   if (role === 'business') {
-    navigationRef.navigate(ROUTES.businessScheduledWorkerTracking, {
+    openInTab(ROUTES.businessShifts, ROUTES.businessScheduledWorkerTracking, {
       assignmentId,
     });
     return;
@@ -49,15 +63,15 @@ export const openFromPush = async (message: RemoteMessage, role: UserRole | null
       assignmentStatus: assignment.status,
     };
     if (assignment.status === 'checked_in') {
-      navigationRef.navigate(ROUTES.activeShift, { shift });
+      openInTab(ROUTES.workerShifts, ROUTES.activeShift, { shift });
     } else {
-      navigationRef.navigate(ROUTES.shiftDetails, {
+      openInTab(ROUTES.workerShifts, ROUTES.shiftDetails, {
         shift,
         bookingStatus: 'confirmed',
       });
     }
   } catch {
-    navigationRef.navigate(ROUTES.notifications);
+    inbox();
   }
 };
 

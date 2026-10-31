@@ -20,6 +20,7 @@ export type Invoice = {
   worker_subtotal_minor: number;
   platform_fee_minor: number;
   gateway_fee_minor: number;
+  tax_minor?: number;
   total_minor: number;
   deposit_applied_minor: number;
   amount_due_minor: number;

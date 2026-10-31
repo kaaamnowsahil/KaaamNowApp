@@ -67,6 +67,13 @@ export const SHIFT_DETAILS_STRINGS = {
   get WITHDRAWN() {
     return k('withdrawn');
   },
+  get YOU_WITHDREW() {
+    return k('youWithdrew');
+  },
+  get CANT_APPLY_AGAIN() {
+    return k('cantApplyAgain');
+  },
+  againAction: (isLive: boolean) => k(isLive ? 'acceptAgain' : 'bookAgain'),
   activity: {
     get APPLIED() {
       return k('activity.applied');

@@ -5,6 +5,7 @@ import ClockIcon from '@/assets/icons/clock.svg';
 import { DetailRow, ReasonSheet, StatusHero } from '@/components/shiftFlow';
 import { PrimaryButton, SecondaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
+import { tabHome } from '@/route/tabRoutes';
 import { FormScreen } from '@/layout/FormScreen';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 import { useShiftAction, useWorkerShiftDetail } from '@/services/shifts/useShiftFlow';
@@ -61,7 +62,7 @@ export const ShiftSelectedPage: FC<
           {
             text: SHIFT_SELECTED_STRINGS.OK,
             onPress: () =>
-              navigation.popTo(ROUTES.mainTabs, { screen: ROUTES.workerShifts }),
+              navigation.popTo(ROUTES.mainTabs, tabHome(ROUTES.workerShifts)),
           },
         ]),
       SHIFT_SELECTED_STRINGS.DECLINE_FAILED,
