@@ -35,6 +35,10 @@ export const liveWorkApi = {
     }),
   get: (bookingId: string) =>
     apiRequest<BusinessLiveBooking>('GET', `${BUSINESS}/${bookingId}`),
+  retry: (bookingId: string, boostMinor: number) =>
+    apiRequest<BusinessLiveBooking>('POST', `${BUSINESS}/${bookingId}/retry`, {
+      body: { boost_minor: boostMinor },
+    }),
   cancelPreview: (bookingId: string) =>
     apiRequest<LiveCancelPreview>(
       'GET',

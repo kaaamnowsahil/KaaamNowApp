@@ -10,7 +10,7 @@ import { DetailRow } from '@/components/shiftFlow';
 import { BottomSheet, SecondaryButton } from '@/components/ui';
 import { BRAND } from '@/constants/brand';
 import type { Shift } from '@/types';
-import { mapsUrl } from '@/utils/links';
+import { mapsUrl, whatsappUrl } from '@/utils/links';
 
 export type ShiftContact = { name: string; phone: string };
 
@@ -26,13 +26,10 @@ export const CheckInHelpSheet: FC<{
 }> = ({ shift, contact, onClose }) => {
   const { t } = useTranslation();
   const leadName = contact?.name ?? '';
-  const sms = encodeURIComponent(
-    t('workerFlow.checkIn.arrivedSms', {
-      lead: leadName.split(' ')[0],
-      role: shift.title,
-    }),
-  );
-  const supportEmail = BRAND.SUPPORT_EMAILS[0];
+  const arrivedText = t('workerFlow.checkIn.arrivedSms', {
+    lead: leadName.split(' ')[0],
+    role: shift.title,
+  });
 
   return (
     <BottomSheet
@@ -55,7 +52,7 @@ export const CheckInHelpSheet: FC<{
               icon={MessageCircleIcon}
               title={t('workerFlow.checkIn.messageLead')}
               caption={t('workerFlow.checkIn.messageCaption')}
-              onPress={() => Linking.openURL(`sms:${contact.phone}?body=${sms}`)}
+              onPress={() => Linking.openURL(whatsappUrl(contact.phone, arrivedText))}
             />
           </>
         ) : null}
@@ -74,8 +71,8 @@ export const CheckInHelpSheet: FC<{
         <DetailRow
           icon={CircleHelpIcon}
           title={t('workerFlow.checkIn.support')}
-          caption={supportEmail}
-          onPress={() => Linking.openURL(`mailto:${supportEmail}`)}
+          caption={BRAND.SUPPORT_WHATSAPP_LABEL}
+          onPress={() => Linking.openURL(whatsappUrl(BRAND.SUPPORT_WHATSAPP))}
           isLast
         />
       </View>

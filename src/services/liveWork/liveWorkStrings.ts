@@ -9,6 +9,42 @@ const k = (key: string, values?: Record<string, unknown>) =>
   tr(`liveWork.${key}`, values);
 
 export const LIVE_TEXT = {
+  get retryTitle() {
+    return k('retryTitle');
+  },
+  get retryClosedTitle() {
+    return k('retryClosedTitle');
+  },
+  retrySearchCount: (round: number, max: number) =>
+    k('retrySearchCount', { round, max }),
+  searchStepHint: (max: number) => k('searchStepHint', { max }),
+  retryTimer: (clock: string) => k('retryTimer', { clock }),
+  get retryAutoRefund() {
+    return k('retryAutoRefund');
+  },
+  get retryPickBoost() {
+    return k('retryPickBoost');
+  },
+  get retryPerHour() {
+    return k('retryPerHour');
+  },
+  get retryOnTask() {
+    return k('retryOnTask');
+  },
+  get retryBilledHourly() {
+    return k('retryBilledHourly');
+  },
+  get retryBilledTask() {
+    return k('retryBilledTask');
+  },
+  get retryRefund() {
+    return k('retryRefund');
+  },
+  retryAllUsed: (max: number) => k('retryAllUsed', { max }),
+  get retryTimeUp() {
+    return k('retryTimeUp');
+  },
+  boostNote: (amount: string) => k('boostNote', { amount }),
   get postTitle() {
     return k('postTitle');
   },

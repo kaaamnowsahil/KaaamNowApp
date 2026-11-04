@@ -110,6 +110,9 @@ export const SHIFT_DETAILS_STRINGS = {
     return k('headToBusiness');
   },
   travelOpensAt: (time: string) => k('travelOpensAt', { time }),
+  get SHIFT_ENDED() {
+    return k('shiftEnded');
+  },
   get CHECK_IN() {
     return k('checkIn');
   },

@@ -23,6 +23,7 @@ import type { AppScreenProps } from '@/types';
 import KeyRoundIcon from '@/assets/icons/key-round.svg';
 import TriangleAlertIcon from '@/assets/icons/triangle-alert.svg';
 import { formatClock, formatRupees, splitTimeRange } from '@/utils/format';
+import { whatsappUrl } from '@/utils/links';
 
 import { ACTIVE_SHIFT_STRINGS } from './constants/activeShiftStrings';
 import { useActiveShift } from './hooks/useActiveShift';
@@ -218,7 +219,7 @@ export const ActiveShiftPage: FC<AppScreenProps<typeof ROUTES.activeShift>> = ({
               size="compact"
               title={t('workerFlow.activeShift.shiftLead')}
               caption={t('workerFlow.activeShift.lead', { name: a.leadName })}
-              onPress={() => Linking.openURL(`sms:${a.leadPhone}`)}
+              onPress={() => Linking.openURL(whatsappUrl(a.leadPhone))}
             />
           ) : null}
         </View>

@@ -60,7 +60,13 @@ export function useCountdown(
   serverTime?: string,
 ) {
   const skew = useRef(0);
-  if (serverTime) skew.current = new Date(serverTime).getTime() - Date.now();
+  const skewSource = useRef<string | undefined>(undefined);
+  // Polling keeps the previous payload (and its server_time) while nothing changed, so the
+  // offset must be taken only when a new server_time arrives, not on every render.
+  if (serverTime && serverTime !== skewSource.current) {
+    skewSource.current = serverTime;
+    skew.current = new Date(serverTime).getTime() - Date.now();
+  }
   const [left, setLeft] = useState(() => secondsUntil(deadline, skew.current));
   useEffect(() => {
     setLeft(secondsUntil(deadline, skew.current));

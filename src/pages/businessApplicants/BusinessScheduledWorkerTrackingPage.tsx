@@ -43,6 +43,7 @@ import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 import { formatRupees } from '@/utils/format';
+import { whatsappUrl } from '@/utils/links';
 
 import {
   BOOKING_DETAIL_STRINGS as S,
@@ -379,7 +380,7 @@ export const BusinessScheduledWorkerTrackingPage: FC<
                 <SecondaryButton
                   label={S.call(phone)}
                   icon={PhoneIcon}
-                  onPress={() => Linking.openURL(`tel:${phone}`)}
+                  onPress={() => Linking.openURL(whatsappUrl(phone))}
                   testID="booking-call-worker"
                 />
               </View>

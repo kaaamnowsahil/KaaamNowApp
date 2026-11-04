@@ -42,4 +42,15 @@ export const SHIFT_TRAVEL_STRINGS = {
   get START_FAILED() {
     return k('startFailed');
   },
+  get ENDED_OVERLINE() {
+    return k('endedOverline');
+  },
+  get ENDED_TITLE() {
+    return k('endedTitle');
+  },
+  endedSubtitle: (workplace: string, time: string) =>
+    k('endedSubtitle', { workplace, time }),
+  get BACK_TO_SHIFTS() {
+    return k('backToShifts');
+  },
 };

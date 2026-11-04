@@ -17,6 +17,7 @@ import { ShiftCard } from '@/components/shift';
 import { FONTS } from '@/constants/fonts';
 import { TabScreen } from '@/layout/TabScreen';
 import { WorkerLiveWorkEntry } from '@/pages/liveWork/components/WorkerLiveWorkEntry';
+import { WorkerAccountHoldBanner } from './components/WorkerAccountHoldBanner';
 import { useTheme } from '@/theme/ThemeProvider';
 
 import {
@@ -48,6 +49,7 @@ export const WorkerHomePage: FC = () => {
           : WORKER_HOME_STRINGS.GREETING_FALLBACK
       }
     />,
+    <WorkerAccountHoldBanner key="account-hold" />,
     <AvailabilityCard
       key="availability"
       isAvailable={home.isAvailable}

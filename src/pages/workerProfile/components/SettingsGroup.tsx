@@ -45,8 +45,17 @@ export const SettingsRow: FC<{
   value?: string;
   onPress?: () => void;
   tone?: 'default' | 'danger';
+  disabled?: boolean;
   testID?: string;
-}> = ({ icon: Icon, title, value, onPress, tone = 'default', testID }) => {
+}> = ({
+  icon: Icon,
+  title,
+  value,
+  onPress,
+  tone = 'default',
+  disabled,
+  testID,
+}) => {
   const { colors } = useTheme();
   const isDanger = tone === 'danger';
   const accent = isDanger ? colors.danger : colors.primary;
@@ -54,9 +63,15 @@ export const SettingsRow: FC<{
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
       testID={testID}
-      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.row,
+        pressed && styles.pressed,
+        disabled && styles.disabled,
+      ]}
     >
       <View
         style={[
@@ -108,6 +123,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   pressed: { opacity: 0.7 },
+  disabled: { opacity: 0.5 },
   iconTile: {
     width: 34,
     height: 34,
