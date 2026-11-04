@@ -9,6 +9,7 @@ export const SAME_IN_EVERY_LANGUAGE: ReadonlySet<string> = new Set([
   'UPI',
   'UPI ID',
   'GPS: {{latitude}}, {{longitude}}',
+  'WhatsApp {{phone}}',
   'you@example.com',
   'manager@business.com',
   'yourname@bank',
