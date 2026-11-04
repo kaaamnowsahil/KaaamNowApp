@@ -24,6 +24,10 @@ export type MyWorkerProfile = {
   verification_status: 'pending' | 'verified' | 'rejected';
   rating_avg: number;
   rating_count: number;
+  /** Account on hold: no new shifts until support lifts it. */
+  banned_at?: string | null;
+  /** Fewer shifts in the feed until then (strikes). */
+  feed_limited_until?: string | null;
 };
 
 export type MyBusinessProfile = {

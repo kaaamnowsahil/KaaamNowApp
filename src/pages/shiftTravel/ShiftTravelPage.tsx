@@ -19,6 +19,7 @@ import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { getDevicePosition } from '@/services/maps/devicePosition';
+import { formatDateTime } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 import {
   useAssignment,
@@ -29,6 +30,7 @@ import { useEmergency } from '@/services/support/useEmergency';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
+import { whatsappUrl } from '@/utils/links';
 
 import { SHIFT_TRAVEL_STRINGS } from './constants';
 
@@ -37,10 +39,7 @@ const TRAVEL_OPENS_HOURS_BEFORE = 3;
 const CLOCK_TICK_MS = 30 * 1000;
 const LOCATION_SHARE_INTERVAL_MS = 60 * 1000;
 
-const clockTime = (ms: number) =>
-  new Date(ms)
-    .toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true })
-    .toUpperCase();
+const clockTime = (ms: number) => formatDateTime(new Date(ms).toISOString());
 
 /**
  * Heading to business, as on web: route map, directions, and "I've arrived" once check-in opens.
@@ -76,9 +75,12 @@ export const ShiftTravelPage: FC<AppScreenProps<typeof ROUTES.shiftTravel>> = ({
   const address = shift.addressText || shift.area;
   const status = assignment.data?.status ?? shift.assignmentStatus;
   const isEnRoute = hasStarted || status === 'en_route';
+  const endsAt = new Date(assignment.data?.ends_at ?? shift.endsAt ?? 0).getTime();
+  const hasEnded =
+    endsAt > 0 && now >= endsAt && (status === 'confirmed' || status === 'en_route');
 
   useEffect(() => {
-    if (!isEnRoute) return undefined;
+    if (!isEnRoute || hasEnded) return undefined;
     const share = () =>
       getDevicePosition()
         .then(position => position && shiftsApi.updateLocation(position))
@@ -86,10 +88,9 @@ export const ShiftTravelPage: FC<AppScreenProps<typeof ROUTES.shiftTravel>> = ({
     share();
     const timer = setInterval(share, LOCATION_SHARE_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, [isEnRoute]);
+  }, [hasEnded, isEnRoute]);
 
   const startsAt = shift.startsAt ? new Date(shift.startsAt).getTime() : null;
-  const endsAt = new Date(assignment.data?.ends_at ?? shift.endsAt ?? 0).getTime();
   const travelOpensAt = startsAt == null ? null : startsAt - TRAVEL_OPENS_HOURS_BEFORE * HOUR_MS;
   const canStartTravel =
     shift.status !== 'scheduled' || travelOpensAt == null || now >= travelOpensAt;
@@ -114,6 +115,10 @@ export const ShiftTravelPage: FC<AppScreenProps<typeof ROUTES.shiftTravel>> = ({
     );
 
   const primary = () => {
+    if (hasEnded) {
+      navigation.goBack();
+      return;
+    }
     if (isEnRoute) {
       navigation.navigate(ROUTES.shiftCheckIn, {
         shift: { ...shift, assignmentStatus: 'en_route' },
@@ -131,20 +136,23 @@ export const ShiftTravelPage: FC<AppScreenProps<typeof ROUTES.shiftTravel>> = ({
     );
   };
 
-  const primaryLabel = isEnRoute
-    ? isCheckInOpen
-      ? SHIFT_TRAVEL_STRINGS.ARRIVED
-      : SHIFT_TRAVEL_STRINGS.checkInOpensAt(checkInOpensAt ? clockTime(checkInOpensAt) : '—')
-    : canStartTravel
-      ? SHIFT_TRAVEL_STRINGS.START_NAVIGATION
-      : SHIFT_TRAVEL_STRINGS.travelOpensAt(travelOpensAt ? clockTime(travelOpensAt) : '—');
+  const primaryLabel = hasEnded
+    ? SHIFT_TRAVEL_STRINGS.BACK_TO_SHIFTS
+    : isEnRoute
+      ? isCheckInOpen
+        ? SHIFT_TRAVEL_STRINGS.ARRIVED
+        : SHIFT_TRAVEL_STRINGS.checkInOpensAt(checkInOpensAt ? clockTime(checkInOpensAt) : '—')
+      : canStartTravel
+        ? SHIFT_TRAVEL_STRINGS.START_NAVIGATION
+        : SHIFT_TRAVEL_STRINGS.travelOpensAt(travelOpensAt ? clockTime(travelOpensAt) : '—');
   const primaryDisabled =
-    action.busy || !assignmentId || (isEnRoute ? !isCheckInOpen : !canStartTravel);
+    !hasEnded &&
+    (action.busy || !assignmentId || (isEnRoute ? !isCheckInOpen : !canStartTravel));
 
   const message = () =>
     action.run(
       () => shiftsApi.contact(assignmentId),
-      contact => Linking.openURL(`sms:${contact.phone}`),
+      contact => Linking.openURL(whatsappUrl(contact.phone)),
     );
 
   return (
@@ -172,68 +180,80 @@ export const ShiftTravelPage: FC<AppScreenProps<typeof ROUTES.shiftTravel>> = ({
             onPress={message}
             testID="shift-travel-message"
           />
-          <SecondaryButton
-            label={SHIFT_TRAVEL_STRINGS.EMERGENCY}
-            tone="danger"
-            icon={TriangleAlertIcon}
-            disabled={emergency.busy || !emergency.isAvailable}
-            onPress={emergency.trigger}
-            testID="shift-travel-emergency"
-          />
+          {hasEnded ? null : (
+            <SecondaryButton
+              label={SHIFT_TRAVEL_STRINGS.EMERGENCY}
+              tone="danger"
+              icon={TriangleAlertIcon}
+              disabled={emergency.busy || !emergency.isAvailable}
+              onPress={emergency.trigger}
+              testID="shift-travel-emergency"
+            />
+          )}
         </>
       }
     >
-      <FlowHeading
-        overline={SHIFT_TRAVEL_STRINGS.OVERLINE}
-        title={SHIFT_TRAVEL_STRINGS.heading(workplace)}
-        subtitle={startsAt ? SHIFT_TRAVEL_STRINGS.subtitle(clockTime(startsAt)) : undefined}
-      />
-      <ShiftRouteMap destination={destination} onRoute={setRouteInfo} />
-      <StatTiles
-        items={[
-          {
-            value: eta == null ? SHIFT_TRAVEL_STRINGS.NO_ETA : SHIFT_TRAVEL_STRINGS.eta(eta),
-            label: SHIFT_TRAVEL_STRINGS.ETA,
-          },
-          {
-            value: SHIFT_TRAVEL_STRINGS.distance(Math.round(distance * 10) / 10),
-            label: SHIFT_TRAVEL_STRINGS.DISTANCE,
-          },
-        ]}
-      />
-      <Pressable
-        accessibilityRole="link"
-        onPress={openDirections}
-        testID="shift-travel-directions"
-        style={({ pressed }) => [
-          styles.linkButton,
-          {
-            borderColor: colors.border,
-            backgroundColor: pressed ? colors.primarySoft : colors.surface,
-          },
-        ]}
-      >
-        <NavigationIcon width={16} height={16} color={colors.primary} />
-        <Text style={[styles.linkLabel, { color: colors.primary }]}>
-          {SHIFT_TRAVEL_STRINGS.DIRECTIONS}
-        </Text>
-      </Pressable>
-      <InfoCard
-        icon={MapPinIcon}
-        title={workplace}
-        caption={address}
-        onPress={openDirections}
-        testID="shift-travel-place"
-      />
-      {detail.data?.arrival_instructions ? (
-        <TextSection
-          title={SHIFT_TRAVEL_STRINGS.ARRIVAL_INSTRUCTIONS}
-          body={detail.data.arrival_instructions}
+      {hasEnded ? (
+        <FlowHeading
+          overline={SHIFT_TRAVEL_STRINGS.ENDED_OVERLINE}
+          title={SHIFT_TRAVEL_STRINGS.ENDED_TITLE}
+          subtitle={SHIFT_TRAVEL_STRINGS.endedSubtitle(workplace, clockTime(endsAt))}
         />
-      ) : null}
-      <Text style={[styles.note, { color: colors.textSubtle }]}>
-        {SHIFT_TRAVEL_STRINGS.locationNote(shift.businessName)}
-      </Text>
+      ) : (
+        <>
+          <FlowHeading
+            overline={SHIFT_TRAVEL_STRINGS.OVERLINE}
+            title={SHIFT_TRAVEL_STRINGS.heading(workplace)}
+            subtitle={startsAt ? SHIFT_TRAVEL_STRINGS.subtitle(clockTime(startsAt)) : undefined}
+          />
+          <ShiftRouteMap destination={destination} onRoute={setRouteInfo} />
+          <StatTiles
+            items={[
+              {
+                value: eta == null ? SHIFT_TRAVEL_STRINGS.NO_ETA : SHIFT_TRAVEL_STRINGS.eta(eta),
+                label: SHIFT_TRAVEL_STRINGS.ETA,
+              },
+              {
+                value: SHIFT_TRAVEL_STRINGS.distance(Math.round(distance * 10) / 10),
+                label: SHIFT_TRAVEL_STRINGS.DISTANCE,
+              },
+            ]}
+          />
+          <Pressable
+            accessibilityRole="link"
+            onPress={openDirections}
+            testID="shift-travel-directions"
+            style={({ pressed }) => [
+              styles.linkButton,
+              {
+                borderColor: colors.border,
+                backgroundColor: pressed ? colors.primarySoft : colors.surface,
+              },
+            ]}
+          >
+            <NavigationIcon width={16} height={16} color={colors.primary} />
+            <Text style={[styles.linkLabel, { color: colors.primary }]}>
+              {SHIFT_TRAVEL_STRINGS.DIRECTIONS}
+            </Text>
+          </Pressable>
+          <InfoCard
+            icon={MapPinIcon}
+            title={workplace}
+            caption={address}
+            onPress={openDirections}
+            testID="shift-travel-place"
+          />
+          {detail.data?.arrival_instructions ? (
+            <TextSection
+              title={SHIFT_TRAVEL_STRINGS.ARRIVAL_INSTRUCTIONS}
+              body={detail.data.arrival_instructions}
+            />
+          ) : null}
+          <Text style={[styles.note, { color: colors.textSubtle }]}>
+            {SHIFT_TRAVEL_STRINGS.locationNote(shift.businessName)}
+          </Text>
+        </>
+      )}
     </FormScreen>
   );
 };

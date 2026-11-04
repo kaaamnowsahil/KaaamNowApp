@@ -46,6 +46,13 @@ const focusedRoute = (
   return route.state ? focusedRoute(route.state as AnyState) : route;
 };
 
+const deadlineOf = (booking: BusinessLiveBooking | null | undefined) =>
+  booking?.status === 'searching'
+    ? booking.search?.expires_at
+    : booking?.status === 'in_progress'
+    ? booking.timer?.ends_at
+    : booking?.retry?.expires_at ?? null;
+
 /**
  * Floating, draggable shortcut back to the Business's active Live Work bookings. One booking
  * opens directly; several open a picker. The booking whose screen is open is left out.
@@ -129,13 +136,7 @@ export const ActiveLiveBubble: FC = () => {
     }),
   ).current;
 
-  const deadline =
-    booking?.status === 'searching'
-      ? booking.search?.expires_at
-      : booking?.status === 'in_progress'
-      ? booking.timer?.ends_at
-      : null;
-  const left = useCountdown(deadline, booking?.server_time);
+  const left = useCountdown(deadlineOf(booking), booking?.server_time);
 
   if (!others.length) return null;
 
@@ -224,13 +225,7 @@ const BookingRow: FC<{ booking: BusinessLiveBooking; onPress: () => void }> = ({
   onPress,
 }) => {
   const { colors } = useTheme();
-  const deadline =
-    booking.status === 'searching'
-      ? booking.search?.expires_at
-      : booking.status === 'in_progress'
-      ? booking.timer?.ends_at
-      : null;
-  const left = useCountdown(deadline, booking.server_time);
+  const left = useCountdown(deadlineOf(booking), booking.server_time);
   const status = BUSINESS_LIVE_STATUS[booking.status] ?? booking.status;
   return (
     <Pressable

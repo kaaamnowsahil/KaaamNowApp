@@ -235,6 +235,16 @@ export type BusinessLiveStatus =
   | 'completed'
   | 'cancelled';
 
+/** Nobody accepted: the Business can add to the pay and search again, or take a refund. */
+export type LiveRetry = {
+  search_round: number;
+  max_search_rounds: number;
+  expires_at: string;
+  seconds_left: number;
+  boost_options_minor: number[];
+  boost_minor: number;
+};
+
 export type BusinessLiveBooking = {
   booking_id: string;
   status: BusinessLiveStatus;
@@ -275,7 +285,14 @@ export type BusinessLiveBooking = {
     can_reissue_code: boolean;
     can_reissue_completion_code: boolean;
     can_repost: boolean;
+    can_retry?: boolean;
   };
+  retry?: LiveRetry | null;
+  /** Added to the pay after nobody accepted; billed with the final bill. */
+  boost_minor?: number;
+  search_round?: number;
+  max_search_rounds?: number;
+  boost_options_minor?: number[];
   completion_code: CompletionCode | null;
   workers_required?: number;
   workers_filled?: number;

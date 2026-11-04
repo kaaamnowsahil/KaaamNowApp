@@ -20,6 +20,7 @@ import {
   PAY_OPTIONS,
 } from '../constants/filterOptions';
 import { WORKER_HOME_STRINGS } from '../constants/workerHomeStrings';
+import { tr } from '@/services/i18n/tr';
 
 export type ShiftFilters = {
   distanceId: string;
@@ -217,7 +218,12 @@ export const useWorkerHome = () => {
         setAvailability(response.is_available);
         return;
       }
-      const verification = (await meApi.profile()).worker?.verification_status;
+      const me = (await meApi.profile()).worker;
+      if (me?.banned_at) {
+        setAvailabilityError(tr('workerHome.accountHoldTitle'));
+        return;
+      }
+      const verification = me?.verification_status;
       if (verification !== 'verified') {
         setAvailabilityError(
           verification === 'rejected'

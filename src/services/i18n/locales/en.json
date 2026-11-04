@@ -171,7 +171,12 @@
       "promptCancel": "Cancel",
       "promptShare": "Share location",
       "promptLoading": "Loading…"
-    }
+    },
+    "accountHoldTitle": "Your account is on hold",
+    "accountHoldBody": "Too many strikes (no-shows or late cancellations). You can't see or accept new shifts until support reviews your account.",
+    "feedLimitedTitle": "You'll see fewer shifts for now",
+    "feedLimitedBody": "Because of recent strikes, your feed is limited until {{date}}. Show up for booked shifts to avoid more strikes.",
+    "contactSupport": "Contact support"
   },
   "shiftDetails": {
     "apply": "Apply for shift",
@@ -270,7 +275,8 @@
     "cantApplyAgain": "You can't apply again to this shift",
     "agreeLive": "I agree to the Live Work rules above and the Worker terms & conditions.",
     "agreeScheduled": "I agree to the cancellation policy above and the Worker terms & conditions.",
-    "agreeRequired": "Tick the box to agree before you continue."
+    "agreeRequired": "Tick the box to agree before you continue.",
+    "shiftEnded": "Shift ended"
   },
   "notifications": {
     "title": "Notifications",
@@ -1487,7 +1493,7 @@
     "searchTimeLeft": "Search time left: {{clock}}",
     "notified_one": "{{count}} Worker notified",
     "notified_other": "{{count}} Workers notified",
-    "noWorkers": "No Worker accepted in time. Your payment is being refunded in full to your payment method.",
+    "noWorkers": "No Worker nearby accepted. Your payment is being refunded in full to your payment method.",
     "repost": "Post again",
     "arrivalCodeTitle": "Arrival code",
     "arrivalCodeHint": "Share this code with the Worker only when they reach the Work Location. They need it to start work.",
@@ -1646,7 +1652,22 @@
     "shareLocationTitle": "Share your location",
     "shareLocation": "Share location",
     "notNow": "Not now",
-    "openSettings": "Open settings"
+    "openSettings": "Open settings",
+    "retrySearchCount": "Search {{round}} of {{max}}",
+    "retryClosedTitle": "No Worker nearby",
+    "retryTimer": "{{clock}} left to choose",
+    "retryAutoRefund": "No choice means a full refund.",
+    "retryPickBoost": "Add to the pay and search again",
+    "retryPerHour": "per hour",
+    "retryOnTask": "on the task price",
+    "retryAllUsed": "All {{max}} searches used",
+    "retryTimeUp": "Time to choose ran out",
+    "retryTitle": "No Worker has accepted yet",
+    "retryBilledHourly": "The extra is added per hour and paid with the final bill. You don't pay anything now.",
+    "retryBilledTask": "The extra is added to the task price and paid with the final bill. You don't pay anything now.",
+    "retryRefund": "Get full refund",
+    "boostNote": "Pay raised by {{amount}} after nobody accepted. It is added to the final bill.",
+    "searchStepHint": "If nobody accepts, you can search again with higher pay, up to {{max}} searches."
   },
   "bookingDetail": {
     "title": "Booking",
@@ -1673,7 +1694,7 @@
     "stop": "Stop work now",
     "cancel": "Cancel booking",
     "emergency": "Emergency help",
-    "call": "Call {{phone}}",
+    "call": "WhatsApp {{phone}}",
     "rate": "Rate worker",
     "actionFailed": "Couldn’t update the booking",
     "pinForWorker": "The worker wants to end early. If you agree, tell them this PIN: {{pin}}",
@@ -1827,7 +1848,11 @@
     "checkInOpensAt": "Check-in opens at {{time}}",
     "message": "Message business",
     "emergency": "Emergency help",
-    "startFailed": "Couldn’t start travelling"
+    "startFailed": "Couldn’t start travelling",
+    "endedOverline": "Shift ended",
+    "endedTitle": "You didn't check in",
+    "endedSubtitle": "Your shift at {{workplace}} ended at {{time}}. It will be marked as a no-show.",
+    "backToShifts": "Back to My shifts"
   },
   "rateBusiness": {
     "heading": "Rate {{business}}",
@@ -2029,5 +2054,6 @@
     "wBusinessForce": "The Business force-cancels after you started",
     "noCodeToCancel": "Force cancel needs no code. The completion code is only for finishing the work.",
     "voucherDays": "The free platform charge voucher is valid for {{days}} days."
-  }
+  },
+  "workerBooking": {}
 }

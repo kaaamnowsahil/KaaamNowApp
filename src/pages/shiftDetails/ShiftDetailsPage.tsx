@@ -51,7 +51,7 @@ import { termsApi } from '@/services/terms/termsApi';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps, BookingStatus, Shift } from '@/types';
 import { formatRupees } from '@/utils/format';
-import { mapsUrl } from '@/utils/links';
+import { mapsUrl, whatsappUrl } from '@/utils/links';
 
 import { LiveRulesCard } from '../liveWork/components/LiveRulesCard';
 import {
@@ -183,7 +183,7 @@ export const ShiftDetailsPage: FC<
     shift.assignmentId &&
     action.run(
       () => shiftsApi.contact(shift.assignmentId as string),
-      contact => Linking.openURL(`sms:${contact.phone}`),
+      contact => Linking.openURL(whatsappUrl(contact.phone)),
       SHIFT_DETAILS_STRINGS.CONTACT_FAILED,
     );
 
@@ -197,10 +197,10 @@ export const ShiftDetailsPage: FC<
   const travelOpensAt = startsAt - TRAVEL_OPENS_HOURS_BEFORE * HOUR_MS;
   const canStartTravel = shift.status !== 'scheduled' || now >= travelOpensAt;
   const checkInOpensAt = assignment.data?.check_in_opens_at;
+  const endsAt = assignment.data?.ends_at ?? shift.endsAt;
+  const hasEnded = Boolean(endsAt) && now >= new Date(endsAt as string).getTime();
   const isCheckInOpen =
-    Boolean(checkInOpensAt) &&
-    now >= new Date(checkInOpensAt as string).getTime() &&
-    (!shift.endsAt || now < new Date(shift.endsAt).getTime());
+    Boolean(checkInOpensAt) && now >= new Date(checkInOpensAt as string).getTime() && !hasEnded;
   const workplace = [info?.workplace_name, shift.addressText || shift.area]
     .filter(Boolean)
     .join(', ');
@@ -318,6 +318,7 @@ export const ShiftDetailsPage: FC<
           onPress: () => navigation.popTo(ROUTES.shiftSelected, { shift }),
         };
       case 'confirmed':
+        if (hasEnded) return { label: SHIFT_DETAILS_STRINGS.SHIFT_ENDED, isDisabled: true };
         if (isCheckInOpen) {
           return {
             label: SHIFT_DETAILS_STRINGS.CHECK_IN,

@@ -50,6 +50,7 @@ import {
   LiveText,
 } from './components/LiveWorkUi';
 import { LiveSearchMap } from './components/LiveSearchMap';
+import { LiveRetryPanel, LiveSearchRound } from './components/LiveRetryPanel';
 import { LiveRulesCard } from './components/LiveRulesCard';
 import { LiveSeatCard } from './components/LiveSeatCard';
 
@@ -93,6 +94,10 @@ export const BusinessLiveWorkPage: FC<
 
   const searchLeft = useCountdown(
     booking?.status === 'searching' ? booking.search?.expires_at : null,
+    booking?.server_time,
+  );
+  const retryLeft = useCountdown(
+    booking?.actions.can_retry ? booking.retry?.expires_at : null,
     booking?.server_time,
   );
   const workLeft = useCountdown(
@@ -194,6 +199,10 @@ export const BusinessLiveWorkPage: FC<
         seat => seat.assignment.status === 'checked_in',
       ));
   const forceCancel = cancelPreview?.stage === 'during_work';
+  const retry = actions.can_retry ? booking.retry ?? null : null;
+  const boost = booking.boost_minor ?? 0;
+  const maxRounds = booking.max_search_rounds ?? 1;
+  const boostOptions = booking.boost_options_minor ?? [];
 
   return (
     <FormScreen
@@ -251,7 +260,7 @@ export const BusinessLiveWorkPage: FC<
               }
             />
           ) : null}
-          {actions.can_cancel ? (
+          {actions.can_cancel && !retry ? (
             <SecondaryButton
               label={working ? S.forceCancel : S.cancel}
               tone="danger"
@@ -293,6 +302,12 @@ export const BusinessLiveWorkPage: FC<
 
       {status === 'searching' && booking.search ? (
         <LiveCard testID="business-live-work-searching">
+          {maxRounds > 1 ? (
+            <LiveSearchRound
+              round={booking.search_round ?? 1}
+              maxRounds={maxRounds}
+            />
+          ) : null}
           {work.latitude != null && work.longitude != null ? (
             <LiveSearchMap
               latitude={work.latitude}
@@ -302,7 +317,7 @@ export const BusinessLiveWorkPage: FC<
               timerLabel={S.searchTimeLeft(formatClock(searchLeft))}
             />
           ) : null}
-          <LiveText>{S.searching}</LiveText>
+          {maxRounds <= 1 ? <LiveText>{S.searching}</LiveText> : null}
           <LiveText tone="strong">
             {S.searchTimeLeft(formatClock(searchLeft))}
           </LiveText>
@@ -316,10 +331,42 @@ export const BusinessLiveWorkPage: FC<
           </LiveText>
         </LiveCard>
       ) : null}
-      {status === 'no_workers' ? (
-        <LiveCard>
-          <LiveText>{S.noWorkers}</LiveText>
-        </LiveCard>
+      {retry ? (
+        <LiveRetryPanel
+          round={retry.search_round}
+          maxRounds={retry.max_search_rounds}
+          options={retry.boost_options_minor}
+          isTask={isTask}
+          busy={busy}
+          timeLeft={formatClock(retryLeft)}
+          onBoost={option => run(() => liveWorkApi.retry(bookingId, option))}
+          onRefund={() => openCancel()}
+        />
+      ) : status === 'no_workers' ? (
+        maxRounds > 1 && boostOptions.length > 0 ? (
+          <LiveRetryPanel
+            round={booking.search_round ?? maxRounds}
+            maxRounds={maxRounds}
+            options={boostOptions}
+            isTask={isTask}
+            busy={busy}
+            timeLeft={null}
+            onBoost={() => undefined}
+            onRefund={() => undefined}
+          />
+        ) : (
+          <LiveCard>
+            <LiveText>{S.noWorkers}</LiveText>
+          </LiveCard>
+        )
+      ) : null}
+      {boost > 0 &&
+      !retry &&
+      status !== 'no_workers' &&
+      status !== 'cancelled' ? (
+        <LiveText tone="muted">
+          {S.boostNote(`${formatRupees(boost)}${isTask ? '' : '/h'}`)}
+        </LiveText>
       ) : null}
 
       {multi && status !== 'awaiting_payment' ? (
