@@ -68,7 +68,12 @@ export type WorkerShiftDetail = WorkerShiftCard & {
   reapply_block_reason?: string | null;
 };
 
-export type MyShiftsTab = 'upcoming' | 'active' | 'completed' | 'applications';
+export type MyShiftsTab =
+  | 'upcoming'
+  | 'active'
+  | 'completed'
+  | 'missed'
+  | 'applications';
 
 export type MyShiftItem = {
   tab: string;

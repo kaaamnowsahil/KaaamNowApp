@@ -33,11 +33,18 @@ const SECTION_ORDER: ShiftsSection[] = [
   'confirm',
   'upcoming',
   'past',
+  'missed',
   'waiting',
   'declinedByBusiness',
   'declinedByYou',
 ];
-const TABS: MyShiftsTab[] = ['applications', 'upcoming', 'active', 'completed'];
+const TABS: MyShiftsTab[] = [
+  'applications',
+  'upcoming',
+  'active',
+  'completed',
+  'missed',
+];
 const CLOSED_APPLICATION: MyShiftStatus[] = [
   'declined',
   'rejected',
@@ -54,6 +61,7 @@ const statusOf = (item: MyShiftItem): MyShiftStatus => {
     return application;
   if (application && CLOSED_APPLICATION.includes(application))
     return application;
+  if (item.assignment_status === 'no_show') return 'no_show';
   if (item.assignment_status === 'cancelled') return 'cancelled';
   return item.tab === 'completed' ? 'completed' : 'confirmed';
 };
@@ -81,6 +89,7 @@ const sectionOf = (item: MyShiftItem): ShiftsSection | null => {
     return 'live';
   if (item.tab === 'active') return 'inProgress';
   if (item.tab === 'completed') return 'past';
+  if (item.tab === 'missed') return 'missed';
   return isToday(item.shift.starts_at) ? 'today' : 'upcoming';
 };
 
@@ -171,6 +180,11 @@ export const useWorkerShifts = () => {
       navigation.navigate(ROUTES.shiftTravel, { shift });
     } else if (CLOSED_APPLICATION.includes(status)) {
       navigation.navigate(ROUTES.shiftDetails, { shift });
+    } else if (status === 'no_show') {
+      navigation.navigate(ROUTES.shiftDetails, {
+        shift,
+        bookingStatus: 'cancelled',
+      });
     } else {
       navigation.navigate(ROUTES.shiftDetails, {
         shift,
