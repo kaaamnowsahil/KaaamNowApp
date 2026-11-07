@@ -67,7 +67,9 @@ const HOUR_MS = 3_600_000;
 const bookingFromShift = (shift: Shift): BookingStatus | undefined => {
   if (shift.applicationStatus === 'selected') return 'selected';
   if (shift.applicationStatus === 'applied') return 'applied';
-  if (shift.assignmentStatus === 'cancelled') return 'cancelled';
+  if (shift.assignmentStatus === 'cancelled' || shift.assignmentStatus === 'no_show') {
+    return 'cancelled';
+  }
   if (shift.assignmentStatus === 'checked_out' || shift.assignmentStatus === 'approved') {
     return 'completed';
   }

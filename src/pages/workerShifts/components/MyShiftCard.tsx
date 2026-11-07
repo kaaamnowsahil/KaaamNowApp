@@ -33,6 +33,7 @@ export const MyShiftCard: FC<{
     applied: { color: colors.primary, background: colors.primarySoft },
     completed: { color: colors.textMuted, background: colors.primarySoft },
     cancelled: { color: colors.textMuted, background: colors.primarySoft },
+    no_show: closed,
     declined: closed,
     rejected: closed,
     withdrawn: closed,

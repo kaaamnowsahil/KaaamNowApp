@@ -10,6 +10,7 @@ export type BookingStatus =
 /** My shifts also lists applications that ended before a booking. */
 export type MyShiftStatus =
   | BookingStatus
+  | 'no_show'
   | 'declined'
   | 'rejected'
   | 'withdrawn'

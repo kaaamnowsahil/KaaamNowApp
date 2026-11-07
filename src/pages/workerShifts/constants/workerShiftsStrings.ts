@@ -9,6 +9,7 @@ export type ShiftsSection =
   | 'confirm'
   | 'upcoming'
   | 'past'
+  | 'missed'
   | 'waiting'
   | 'declinedByBusiness'
   | 'declinedByYou';
@@ -41,6 +42,9 @@ export const WORKER_SHIFTS_STRINGS = {
     },
     get past() {
       return k('sections.past');
+    },
+    get missed() {
+      return k('sections.missed');
     },
     get waiting() {
       return k('sections.waiting');
