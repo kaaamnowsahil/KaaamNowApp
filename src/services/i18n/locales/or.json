@@ -1626,6 +1626,7 @@
       "business_cancelled": "ଆପଣ ବାତିଲ କଲେ",
       "no_workers_found": "କୌଣସି ୱର୍କର ମିଳିଲେ ନାହିଁ",
       "worker_left_unworked_time": "କର୍ମୀ ବାତିଲ କଲେ",
+      "worker_no_show": "କର୍ମୀ ପହଞ୍ଚିଲେ ନାହିଁ",
       "payment_after_booking_closed": "ବୁକିଂ ବନ୍ଦ ହେବା ପରେ ପେମେଣ୍ଟ ହେଲା",
       "extension_not_applied": "ଅତିରିକ୍ତ ସମୟ ଯୋଡ଼ାଗଲା ନାହିଁ",
       "finished_early_unworked_time": "କାମ ହୋଇନଥିବା ସମୟ"

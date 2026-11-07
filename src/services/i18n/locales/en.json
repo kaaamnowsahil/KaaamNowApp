@@ -1626,6 +1626,7 @@
       "business_cancelled": "You cancelled",
       "no_workers_found": "No Workers found",
       "worker_left_unworked_time": "The Worker cancelled",
+      "worker_no_show": "The Worker didn't arrive",
       "payment_after_booking_closed": "Paid after the booking closed",
       "extension_not_applied": "Extra time not added",
       "finished_early_unworked_time": "Time not worked"
