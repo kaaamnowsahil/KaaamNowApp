@@ -1626,6 +1626,7 @@
       "business_cancelled": "మీరు రద్దు చేశారు",
       "no_workers_found": "వర్కర్లు ఎవరూ దొరకలేదు",
       "worker_left_unworked_time": "కార్మికుడు రద్దు చేశారు",
+      "worker_no_show": "కార్మికుడు రాలేదు",
       "payment_after_booking_closed": "బుకింగ్ ముగిసిన తర్వాత చెల్లించారు",
       "extension_not_applied": "అదనపు సమయం జోడించలేదు",
       "finished_early_unworked_time": "పని చేయని సమయం"

@@ -1626,6 +1626,7 @@
       "business_cancelled": "നിങ്ങൾ റദ്ദാക്കി",
       "no_workers_found": "ഒരു വർക്കറെയും കിട്ടിയില്ല",
       "worker_left_unworked_time": "തൊഴിലാളി റദ്ദാക്കി",
+      "worker_no_show": "തൊഴിലാളി എത്തിയില്ല",
       "payment_after_booking_closed": "ബുക്കിംഗ് അടച്ചശേഷം പണമടച്ചു",
       "extension_not_applied": "അധിക സമയം ചേർത്തില്ല",
       "finished_early_unworked_time": "ജോലി ചെയ്യാത്ത സമയം"

@@ -1626,6 +1626,7 @@
       "business_cancelled": "آپ نے منسوخ کیا",
       "no_workers_found": "کوئی ورکر نہیں ملا",
       "worker_left_unworked_time": "کارکن نے منسوخ کیا",
+      "worker_no_show": "کارکن نہیں پہنچا",
       "payment_after_booking_closed": "بکنگ بند ہونے کے بعد ادائیگی ہوئی",
       "extension_not_applied": "اضافی وقت شامل نہیں ہوا",
       "finished_early_unworked_time": "کام نہ کیا گیا وقت"

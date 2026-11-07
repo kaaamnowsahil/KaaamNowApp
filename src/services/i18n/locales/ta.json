@@ -1626,6 +1626,7 @@
       "business_cancelled": "நீங்கள் ரத்து செய்தீர்கள்",
       "no_workers_found": "பணியாளர் யாரும் கிடைக்கவில்லை",
       "worker_left_unworked_time": "பணியாளர் ரத்து செய்தார்",
+      "worker_no_show": "பணியாளர் வரவில்லை",
       "payment_after_booking_closed": "முன்பதிவு முடிந்த பிறகு பணம் செலுத்தப்பட்டது",
       "extension_not_applied": "கூடுதல் நேரம் சேர்க்கப்படவில்லை",
       "finished_early_unworked_time": "வேலை செய்யாத நேரம்"

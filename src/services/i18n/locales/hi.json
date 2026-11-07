@@ -1626,6 +1626,7 @@
       "business_cancelled": "आपने कैंसल किया",
       "no_workers_found": "कोई वर्कर नहीं मिला",
       "worker_left_unworked_time": "कर्मचारी ने रद्द किया",
+      "worker_no_show": "वर्कर नहीं पहुँचा",
       "payment_after_booking_closed": "बुकिंग बंद होने के बाद पेमेंट हुआ",
       "extension_not_applied": "अतिरिक्त समय नहीं जुड़ा",
       "finished_early_unworked_time": "काम न किया गया समय"

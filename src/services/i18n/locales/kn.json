@@ -1626,6 +1626,7 @@
       "business_cancelled": "ನೀವು ರದ್ದುಮಾಡಿದ್ದೀರಿ",
       "no_workers_found": "ಯಾವ ಕೆಲಸಗಾರರೂ ಸಿಗಲಿಲ್ಲ",
       "worker_left_unworked_time": "ಕೆಲಸಗಾರರು ರದ್ದುಮಾಡಿದರು",
+      "worker_no_show": "ಕೆಲಸಗಾರರು ಬರಲಿಲ್ಲ",
       "payment_after_booking_closed": "ಬುಕಿಂಗ್ ಮುಗಿದ ನಂತರ ಪಾವತಿಸಲಾಗಿದೆ",
       "extension_not_applied": "ಹೆಚ್ಚುವರಿ ಸಮಯ ಸೇರಿಸಲಾಗಿಲ್ಲ",
       "finished_early_unworked_time": "ಕೆಲಸ ಮಾಡದ ಸಮಯ"
