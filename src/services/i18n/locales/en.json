@@ -173,7 +173,7 @@
       "promptLoading": "Loading…"
     },
     "accountHoldTitle": "Your account is on hold",
-    "accountHoldBody": "Too many strikes (no-shows or late cancellations). You can't see or accept new shifts until support reviews your account.",
+    "accountHoldBody": "Too many strikes (missed shifts or late cancellations). You can't see or accept new shifts until support reviews your account.",
     "feedLimitedTitle": "You'll see fewer shifts for now",
     "feedLimitedBody": "Because of recent strikes, your feed is limited until {{date}}. Show up for booked shifts to avoid more strikes.",
     "contactSupport": "Contact support"
@@ -446,7 +446,7 @@
       "applied": "Applied · Waiting for the business",
       "completed": "Completed",
       "cancelled": "Cancelled",
-      "no_show": "No-show",
+      "no_show": "Missed",
       "declined": "Declined by you",
       "rejected": "Declined by business",
       "withdrawn": "Application withdrawn",
@@ -533,7 +533,7 @@
     "duesBody": "It’s taken from your next earnings. You can keep booking shifts meanwhile.",
     "reliability": "Reliability",
     "strikes": "{{strikes}} of {{ban}} strikes",
-    "strikesBody": "Late cancellations and no-shows add strikes. They expire after {{days}} days. At {{limit}} you’ll see fewer shifts for a while.",
+    "strikesBody": "Late cancellations and missed shifts add strikes. They expire after {{days}} days. At {{limit}} you’ll see fewer shifts for a while.",
     "limitedUntil": "Fewer shifts shown until {{date}}.",
     "onHold": "Your account is on hold. Contact support to review it.",
     "promoLabel": "Promo code",
@@ -1682,7 +1682,7 @@
       "checked_in": "Working",
       "checked_out": "Shift ended",
       "approved": "Completed",
-      "no_show": "No-show",
+      "no_show": "Didn't arrive",
       "cancelled": "Cancelled"
     },
     "kmAway": "{{km}} km away",
@@ -1854,7 +1854,7 @@
     "startFailed": "Couldn’t start travelling",
     "endedOverline": "Shift ended",
     "endedTitle": "You didn't check in",
-    "endedSubtitle": "Your shift at {{workplace}} ended at {{time}}. It will be marked as a no-show.",
+    "endedSubtitle": "Your shift at {{workplace}} ended at {{time}}. It will be marked as missed.",
     "backToShifts": "Back to My shifts"
   },
   "rateBusiness": {
@@ -1881,7 +1881,7 @@
     "title": "Cancellation policy",
     "intro": "If you cancel after booking, a fee applies based on how long before the start you cancel.",
     "bookingNote": "Booking is instant. Your place is confirmed as soon as you book; no approval is needed.",
-    "noShow": "No-show (no cancel, no message)",
+    "noShow": "Not turning up (no cancel, no message)",
     "free": "Free",
     "loadFailed": "Couldn’t load the cancellation policy",
     "wallet": "Fees are taken from your wallet. If it goes negative, the amount is recovered from your next earnings, and you can keep booking.",
