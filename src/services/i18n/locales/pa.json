@@ -446,7 +446,7 @@
       "applied": "ਅਰਜ਼ੀ ਦਿੱਤੀ · ਕਾਰੋਬਾਰ ਦੇ ਜਵਾਬ ਦੀ ਉਡੀਕ",
       "completed": "ਮੁਕੰਮਲ",
       "cancelled": "ਰੱਦ",
-      "no_show": "ਗੈਰਹਾਜ਼ਰ",
+      "no_show": "ਖੁੰਝ ਗਈ",
       "declined": "ਤੁਸੀਂ ਰੱਦ ਕੀਤਾ",
       "rejected": "ਕਾਰੋਬਾਰ ਨੇ ਰੱਦ ਕੀਤਾ",
       "withdrawn": "ਅਰਜ਼ੀ ਵਾਪਸ ਲਈ ਗਈ",
@@ -575,9 +575,9 @@
     "available": "ਕਢਵਾਉਣ ਲਈ ਉਪਲਬਧ",
     "fromShifts": "{{count}} ਮੁਕੰਮਲ ਸ਼ਿਫਟਾਂ ਦੀ ਕਮਾਈ",
     "withdrawTo": "ਇੱਥੇ ਕਢਵਾਓ",
-    "payoutTime": "ਭੁਗਤਾਨ 24 ਘੰਟਿਆਂ ਵਿੱਚ ਮਿਲੇਗਾ",
+    "payoutTime": "ਅਸੀਂ ਤੁਹਾਡੀ ਬੇਨਤੀ ਦੀ ਜਾਂਚ ਕਰਕੇ 30 ਮਿੰਟਾਂ ਵਿੱਚ ਪੈਸੇ ਭੇਜ ਦੇਵਾਂਗੇ",
     "withdrawAmount": "{{amount}} ਕਢਵਾਓ",
-    "continue": "ਜਾਰੀ ਰੱਖੋ",
+    "continue": "ਪੈਸੇ ਕਢਵਾਉਣ ਦੀ ਬੇਨਤੀ ਕਰੋ",
     "options": {
       "upiTitle": "UPI ID",
       "paytmTitle": "Paytm",
@@ -595,7 +595,7 @@
     "aboveAvailable": "ਤੁਸੀਂ ਵੱਧ ਤੋਂ ਵੱਧ {{amount}} ਕਢਵਾ ਸਕਦੇ ਹੋ।",
     "noAccounts": "ਕਮਾਈ ਕਢਵਾਉਣ ਲਈ ਇੱਕ ਪੇਆਉਟ ਖਾਤਾ ਜੋੜੋ।",
     "addAccount": "ਪੇਆਉਟ ਖਾਤਾ ਜੋੜੋ",
-    "withdrawing": "ਕਢਵਾਇਆ ਜਾ ਰਿਹਾ ਹੈ...",
+    "withdrawing": "ਬੇਨਤੀ ਭੇਜੀ ਜਾ ਰਹੀ ਹੈ...",
     "retry": "ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
     "accountMissing": "ਇਹ ਪੇਆਉਟ ਖਾਤਾ ਹੁਣ ਉਪਲਬਧ ਨਹੀਂ ਹੈ। ਕੋਈ ਹੋਰ ਚੁਣੋ।",
     "staleRequest": "ਤੁਹਾਡੀ ਕਢਵਾਈ ਦੇ ਵੇਰਵੇ ਬਦਲ ਗਏ ਹਨ। ਕਿਰਪਾ ਕਰਕੇ ਜਾਂਚ ਕੇ ਮੁੜ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
@@ -1854,7 +1854,7 @@
     "startFailed": "ਸਫ਼ਰ ਸ਼ੁਰੂ ਨਹੀਂ ਹੋ ਸਕਿਆ",
     "endedOverline": "ਸ਼ਿਫਟ ਖਤਮ ਹੋ ਗਈ",
     "endedTitle": "ਤੁਸੀਂ ਚੈੱਕ-ਇਨ ਨਹੀਂ ਕੀਤਾ",
-    "endedSubtitle": "{{workplace}} 'ਤੇ ਤੁਹਾਡੀ ਸ਼ਿਫਟ {{time}} 'ਤੇ ਖਤਮ ਹੋ ਗਈ। ਇਸ ਨੂੰ ਨੋ-ਸ਼ੋ ਮੰਨਿਆ ਜਾਵੇਗਾ।",
+    "endedSubtitle": "{{workplace}} 'ਤੇ ਤੁਹਾਡੀ ਸ਼ਿਫਟ {{time}} 'ਤੇ ਖਤਮ ਹੋ ਗਈ। ਇਸ ਨੂੰ ਖੁੰਝੀ ਸ਼ਿਫਟ ਮੰਨਿਆ ਜਾਵੇਗਾ।",
     "backToShifts": "ਮੇਰੀਆਂ ਸ਼ਿਫਟਾਂ ਤੇ ਵਾਪਸ ਜਾਓ"
   },
   "rateBusiness": {
@@ -1947,7 +1947,7 @@
     "browse": "ਹੋਰ ਸ਼ਿਫਟਾਂ ਵੇਖੋ"
   },
   "withdrawSuccess": {
-    "heading": "ਪੈਸੇ ਕਢਵਾਉਣਾ ਸ਼ੁਰੂ ਹੋਇਆ",
+    "heading": "ਪੈਸੇ ਕਢਵਾਉਣ ਦੀ ਬੇਨਤੀ ਭੇਜੀ ਗਈ",
     "subtitle": "{{amount}} ਤੁਹਾਡੇ {{method}} ਵੱਲ ਭੇਜੇ ਜਾ ਰਹੇ ਹਨ",
     "amount": "ਰਕਮ",
     "to": "ਕਿਸ ਨੂੰ",
@@ -1960,7 +1960,7 @@
     "failedHeading": "ਕਢਵਾਈ ਅਸਫਲ ਰਹੀ",
     "failedBody": "ਰਕਮ ਤੁਹਾਡੇ ਉਪਲਬਧ ਬਕਾਏ ਵਿੱਚ ਵਾਪਸ ਜੋੜ ਦਿੱਤੀ ਗਈ ਹੈ।",
     "status": "ਸਥਿਤੀ",
-    "statusProcessing": "ਪ੍ਰਕਿਰਿਆ ਵਿੱਚ",
+    "statusProcessing": "ਜਾਂਚ ਚੱਲ ਰਹੀ ਹੈ",
     "statusPaid": "ਭੁਗਤਾਨ ਹੋ ਗਿਆ",
     "statusFailed": "ਅਸਫਲ",
     "notFound": "ਇਹ ਕਢਵਾਈ ਨਹੀਂ ਮਿਲੀ।"
