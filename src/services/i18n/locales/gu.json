@@ -575,9 +575,9 @@
     "available": "ઉપાડવા માટે ઉપલબ્ધ",
     "fromShifts": "{{count}} પૂર્ણ થયેલી શિફ્ટની કમાણી",
     "withdrawTo": "અહીં ઉપાડો",
-    "payoutTime": "ચુકવણી 24 કલાકમાં મળશે",
+    "payoutTime": "અમે તમારી વિનંતી તપાસીને 30 મિનિટમાં પૈસા મોકલીશું",
     "withdrawAmount": "{{amount}} ઉપાડો",
-    "continue": "ચાલુ રાખો",
+    "continue": "ઉપાડની વિનંતી કરો",
     "options": {
       "upiTitle": "UPI ID",
       "paytmTitle": "Paytm",
@@ -595,7 +595,7 @@
     "aboveAvailable": "તમે વધુમાં વધુ {{amount}} ઉપાડી શકો છો.",
     "noAccounts": "કમાણી ઉપાડવા માટે પેઆઉટ ખાતું ઉમેરો.",
     "addAccount": "પેઆઉટ ખાતું ઉમેરો",
-    "withdrawing": "ઉપાડ થઈ રહ્યો છે...",
+    "withdrawing": "વિનંતી મોકલી રહ્યા છીએ...",
     "retry": "ફરી પ્રયાસ કરો",
     "accountMissing": "આ પેઆઉટ ખાતું હવે ઉપલબ્ધ નથી. બીજું પસંદ કરો.",
     "staleRequest": "તમારી ઉપાડની વિગતો બદલાઈ ગઈ છે. કૃપા કરીને તપાસીને ફરી પ્રયાસ કરો.",
@@ -1947,7 +1947,7 @@
     "browse": "બીજી શિફ્ટ જુઓ"
   },
   "withdrawSuccess": {
-    "heading": "ઉપાડ શરૂ થયો",
+    "heading": "ઉપાડની વિનંતી મોકલાઈ",
     "subtitle": "{{amount}} તમારા {{method}} તરફ મોકલાઈ રહ્યા છે",
     "amount": "રકમ",
     "to": "કોને",
@@ -1960,7 +1960,7 @@
     "failedHeading": "ઉપાડ નિષ્ફળ ગયો",
     "failedBody": "રકમ તમારા ઉપલબ્ધ બેલેન્સમાં પરત જમા કરવામાં આવી છે.",
     "status": "સ્થિતિ",
-    "statusProcessing": "પ્રક્રિયામાં",
+    "statusProcessing": "તપાસ ચાલુ છે",
     "statusPaid": "ચૂકવાયું",
     "statusFailed": "નિષ્ફળ",
     "notFound": "આ ઉપાડ મળ્યો નથી."

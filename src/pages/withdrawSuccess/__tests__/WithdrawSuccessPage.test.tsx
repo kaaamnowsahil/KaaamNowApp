@@ -105,29 +105,29 @@ describe('Withdrawal result screen', () => {
     await renderPage({ withdrawalId: 'w-1' });
     expect(fetchWithdrawal).toHaveBeenCalledWith('w-1');
     const shown = text();
-    expect(shown).toContain('Withdrawal initiated');
+    expect(shown).toContain('Withdrawal requested');
     expect(shown).toContain('Amount: ₹1,200.50');
     expect(shown).toContain('To: UPI · aarav@okaxis');
     expect(shown).toContain('Reference: KN-WD-REAL1');
-    expect(shown).toContain('Status: Processing');
-    expect(shown).toContain('Payouts reach you within 24 hours');
+    expect(shown).toContain('Status: Under review');
+    expect(shown).toContain('We review your request and send the money within 30 minutes');
   });
 
   it('paints from the route, then trusts the fresh server status', async () => {
     let resolve: (value: Withdrawal) => void = () => undefined;
     fetchWithdrawal.mockReturnValueOnce(new Promise(r => (resolve = r)));
     await renderPage({ withdrawalId: 'w-1', withdrawal: withdrawal() });
-    expect(text()).toContain('Withdrawal initiated');
+    expect(text()).toContain('Withdrawal requested');
     await act(async () => resolve(withdrawal({ status: 'paid' })));
     expect(text()).toContain('Withdrawal paid');
     expect(text()).toContain('Status: Paid');
-    expect(text()).not.toContain('Payouts reach you within 24 hours');
+    expect(text()).not.toContain('We review your request and send the money within 30 minutes');
   });
 
   it('ignores route data for a different withdrawal', async () => {
     fetchWithdrawal.mockReturnValue(new Promise(() => undefined));
     await renderPage({ withdrawalId: 'w-2', withdrawal: withdrawal() });
-    expect(text()).not.toContain('Withdrawal initiated');
+    expect(text()).not.toContain('Withdrawal requested');
   });
 
   it('explains a failed payout', async () => {

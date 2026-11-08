@@ -40,6 +40,7 @@ export type EarningsSummaryResponse = {
   in_flight_withdrawals_minor: number;
   lifetime_minor: number;
   this_month_minor: number;
+  this_month_shifts?: number;
   completed_shifts: number;
   min_withdrawal_minor: number;
   recent: LedgerEntry[];

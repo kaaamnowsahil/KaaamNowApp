@@ -244,7 +244,7 @@ describe('Withdraw screen', () => {
       submit();
       submit();
     });
-    expect(text()).toContain('Withdrawing...');
+    expect(text()).toContain('Sending request...');
     expect(createWithdrawal).toHaveBeenCalledTimes(1);
 
     await act(async () => fail(new Error('Network down')));

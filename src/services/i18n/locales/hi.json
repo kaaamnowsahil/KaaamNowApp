@@ -575,9 +575,9 @@
     "available": "निकालने के लिए उपलब्ध",
     "fromShifts": "{{count}} पूरी हुई शिफ्ट की कमाई",
     "withdrawTo": "यहाँ निकालें",
-    "payoutTime": "भुगतान 24 घंटे में पहुँच जाएगा",
+    "payoutTime": "हम आपके अनुरोध की जाँच करके 30 मिनट के अंदर पैसे भेज देंगे",
     "withdrawAmount": "{{amount}} निकालें",
-    "continue": "जारी रखें",
+    "continue": "निकासी का अनुरोध करें",
     "options": {
       "upiTitle": "UPI ID",
       "paytmTitle": "Paytm",
@@ -595,7 +595,7 @@
     "aboveAvailable": "आप अधिकतम {{amount}} निकाल सकते हैं।",
     "noAccounts": "कमाई निकालने के लिए एक भुगतान खाता जोड़ें।",
     "addAccount": "भुगतान खाता जोड़ें",
-    "withdrawing": "निकासी हो रही है...",
+    "withdrawing": "अनुरोध भेजा जा रहा है...",
     "retry": "फिर से कोशिश करें",
     "accountMissing": "यह भुगतान खाता अब उपलब्ध नहीं है। कोई दूसरा चुनें।",
     "staleRequest": "आपकी निकासी की जानकारी बदल गई है। कृपया जाँचकर फिर से कोशिश करें।",
@@ -1947,7 +1947,7 @@
     "browse": "दूसरी शिफ्ट देखें"
   },
   "withdrawSuccess": {
-    "heading": "निकासी शुरू हुई",
+    "heading": "निकासी का अनुरोध भेजा गया",
     "subtitle": "{{amount}} आपके {{method}} की ओर भेजा जा रहा है",
     "amount": "राशि",
     "to": "किसको",
@@ -1960,7 +1960,7 @@
     "failedHeading": "निकासी विफल रही",
     "failedBody": "राशि आपके उपलब्ध बैलेंस में वापस जोड़ दी गई है।",
     "status": "स्थिति",
-    "statusProcessing": "प्रक्रिया में",
+    "statusProcessing": "जाँच चल रही है",
     "statusPaid": "भुगतान हो गया",
     "statusFailed": "विफल",
     "notFound": "यह निकासी नहीं मिली।"

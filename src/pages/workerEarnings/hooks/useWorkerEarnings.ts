@@ -41,7 +41,7 @@ export const useWorkerEarnings = () => {
     periodLabel: S.AVAILABLE,
     lastPaid: S.thisMonth(
       formatRupees(fromMinor(data?.this_month_minor ?? 0)),
-      data?.completed_shifts ?? 0,
+      data?.this_month_shifts ?? 0,
     ),
   };
   const rows = recent.map(toRow);
