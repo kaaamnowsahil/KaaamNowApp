@@ -33,6 +33,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>KaaamNow uses your camera so you can take a selfie for your profile photo.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>KaaamNow uses your location to fill in your address and show work nearby.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

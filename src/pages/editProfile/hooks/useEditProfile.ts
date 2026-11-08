@@ -35,6 +35,7 @@ export const useEditProfile = (onSaved: () => void) => {
   const photo = useProfilePhoto(
     worker?.photo_url ?? profile?.account.photo_url,
     next => next.worker?.photo_url ?? next.account.photo_url,
+    'camera',
   );
 
   useEffect(() => {
