@@ -1,2 +1,3 @@
+export { LegalFooter } from './LegalFooter';
 export { ProfileCard } from './ProfileCard';
 export { SettingsGroup, SettingsRow } from './SettingsGroup';
