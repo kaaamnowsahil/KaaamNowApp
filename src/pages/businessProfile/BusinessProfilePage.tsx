@@ -12,6 +12,7 @@ import { RoleSwitchRow } from '@/components/roleSwitch/RoleSwitchRow';
 import { BrandAppBar } from '@/components/ui';
 import { TabScreen } from '@/layout/TabScreen';
 import {
+  LegalFooter,
   ProfileCard,
   SettingsGroup,
   SettingsRow,
@@ -86,6 +87,7 @@ export const BusinessProfilePage: FC = () => {
         testID="business-profile-log-out"
       />
     </SettingsGroup>,
+    <LegalFooter key="legal" />,
   ];
 
   return (
