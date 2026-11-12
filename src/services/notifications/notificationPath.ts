@@ -11,6 +11,13 @@ export type NotificationTarget = {
 
 const INBOX = '/notifications';
 
+const LIVE_KINDS = new Set([
+  'live_request',
+  'live_worker_accepted',
+  'live_shift_filled',
+  'live_search_expired',
+]);
+
 const text = (data: Record<string, unknown>, key: string) => {
   const value = data[key];
   return value == null ? '' : String(value);
@@ -108,8 +115,6 @@ function businessPath(kind: string, data: Record<string, unknown>, shiftId: stri
   }
   if (kind === 'voucher_issued') return '/business/shifts';
   if (live && shiftId) return `/business/live-work/${shiftId}`;
-  if (assignmentId) return `/business/booking/${assignmentId}`;
-  if (shiftId) return '/business/shifts';
   if (
     kind === 'live_worker_accepted' ||
     kind === 'live_shift_filled' ||
@@ -118,6 +123,8 @@ function businessPath(kind: string, data: Record<string, unknown>, shiftId: stri
   ) {
     return '/business/live';
   }
+  if (assignmentId) return `/business/booking/${assignmentId}`;
+  if (shiftId) return '/business/shifts';
   return '/business/live';
 }
 
@@ -141,10 +148,18 @@ export function notificationPath(
   role?: 'worker' | 'business' | null,
 ): string {
   const data = item.data ?? {};
+  const kind = item.kind ?? text(data, 'kind');
   const stored = data.path;
-  if (typeof stored === 'string' && stored.startsWith('/') && !stored.startsWith('//')) return stored;
+  if (
+    typeof stored === 'string' &&
+    stored.startsWith('/') &&
+    !stored.startsWith('//') &&
+    !LIVE_KINDS.has(kind)
+  ) {
+    return stored;
+  }
   return computedPath(
-    item.kind ?? text(data, 'kind'),
+    kind,
     data,
     role === 'worker' || role === 'business' ? role : undefined,
   );

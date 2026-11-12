@@ -1,4 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { CommonActions, StackActions } from '@react-navigation/native';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
@@ -17,6 +18,7 @@ import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { TabParamList } from '@/types';
 
+import { TAB_HOMES } from './tabRoutes';
 import {
   BusinessApplicantsStack,
   BusinessLiveStack,
@@ -134,6 +136,30 @@ export const BottomTabRoutes: FC = () => {
             key={name}
             name={name}
             component={component}
+            listeners={({ navigation, route }) => ({
+              tabPress: event => {
+                const home = TAB_HOMES[route.name];
+                const tabState = navigation.getState();
+                const nested = tabState.routes.find(item => item.key === route.key)?.state;
+                if (!nested || !('key' in nested) || !nested.key || nested.routes.length === 0) {
+                  return;
+                }
+                const index = nested.index ?? 0;
+                const atHome = index === 0 && nested.routes[0]?.name === home;
+                if (atHome) return;
+                event.preventDefault();
+                if (nested.routes[0]?.name === home) {
+                  navigation.dispatch({ ...StackActions.popToTop(), target: nested.key });
+                } else {
+                  navigation.dispatch({
+                    ...CommonActions.reset({ index: 0, routes: [{ name: home }] }),
+                    target: nested.key,
+                  });
+                }
+                const focused = tabState.routes[tabState.index]?.key === route.key;
+                if (!focused) navigation.dispatch(CommonActions.navigate({ name: route.name }));
+              },
+            })}
             options={{
               title,
               tabBarIcon: Icon,

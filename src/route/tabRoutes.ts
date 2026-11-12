@@ -3,7 +3,7 @@ import type { NavigatorScreenParams } from '@react-navigation/native';
 import { ROUTES } from '@/constants/routes';
 import type { AppStackParamList, TabParamList } from '@/types';
 
-const TAB_HOMES = {
+export const TAB_HOMES = {
   [ROUTES.workerHome]: ROUTES.workerDiscoverHome,
   [ROUTES.workerShifts]: ROUTES.workerShiftsHome,
   [ROUTES.workerEarnings]: ROUTES.workerEarningsHome,
@@ -34,5 +34,7 @@ export const inTab = <S extends keyof AppStackParamList>(
 ): NavigatorScreenParams<TabParamList> =>
   ({
     screen: tab,
-    params: { screen, params },
+    // Keep the tab's home under this page, so Back returns there instead of
+    // leaving this page as the tab's only screen.
+    params: { screen, params, initial: false },
   } as NavigatorScreenParams<TabParamList>);

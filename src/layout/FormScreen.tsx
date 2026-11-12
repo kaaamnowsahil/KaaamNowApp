@@ -6,6 +6,7 @@ import {
   Fragment,
   isValidElement,
   useContext,
+  useRef,
   type FC,
   type ReactElement,
   type ReactNode,
@@ -29,8 +30,9 @@ import { BackButton, BrandAppBar, Loader, Rise } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { MOTION } from '@/constants/motion';
 import { ROUTES } from '@/constants/routes';
-import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
+import { useKeyboardInset } from '@/layout/useKeyboardInset';
 import { useAuthStore } from '@/services/auth/useAuthStore';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppStackParamList } from '@/types';
 
@@ -135,6 +137,8 @@ export const FormScreen: FC<FormScreenProps> = ({
   const showBrandBar = isAuth && !asSheet && !hideBrandBar;
   const blocks = Children.toArray(children);
   const outerBg = asSheet ? colors.fill : colors.background;
+  const scrollRef = useRef<ScrollView>(null);
+  const keyboardInset = useKeyboardInset(scrollRef);
 
   return (
     <SafeAreaView
@@ -143,7 +147,7 @@ export const FormScreen: FC<FormScreenProps> = ({
       testID={testID}
     >
       <KeyboardAvoidingView
-        style={styles.root}
+        style={[styles.root, keyboardInset > 0 && { paddingBottom: keyboardInset }]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {showBrandBar ? (
@@ -213,6 +217,7 @@ export const FormScreen: FC<FormScreenProps> = ({
           ) : null}
           {isLoading ? null : (
             <ScrollView
+              ref={scrollRef}
               contentContainerStyle={[
                 styles.content,
                 asSheet && styles.sheetContent,

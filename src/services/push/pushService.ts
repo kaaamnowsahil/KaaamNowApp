@@ -60,6 +60,12 @@ export const registerForPush = async (): Promise<(() => void) | null> => {
   return stopRefresh;
 };
 
+/** Posts the current FCM token again. A server-side deactivate only clears on the next save. */
+export const refreshPushToken = async (): Promise<void> => {
+  if (!(await askPermission())) return;
+  await saveToken(await getToken(getMessaging()));
+};
+
 /** Call while the session is still valid, before clearing tokens on sign-out. */
 export const unregisterPush = async () => {
   const id = deviceId;

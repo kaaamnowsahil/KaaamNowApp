@@ -3,8 +3,6 @@ package `in`.kaaamnow.app
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.media.AudioAttributes
-import android.net.Uri
 import android.os.Build
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
@@ -64,26 +62,16 @@ class MainApplication : Application(), ReactApplication {
       manager.createNotificationChannel(alerts)
     }
 
-    val audio =
-      AudioAttributes.Builder()
-        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-        .build()
+    // A channel's sound stream is fixed at creation. The older ring_* channels use the
+    // notification volume, so silent mode mutes them. These alarm channels are new ids
+    // that play the same raw files on the alarm stream.
     for (language in LANGUAGES) {
       for ((kind, label) in RINGS) {
-        val id = "ring_${language}_$kind"
-        if (manager.getNotificationChannel(id) != null) continue
-        val resId = resources.getIdentifier(id, "raw", packageName)
-        if (resId == 0) continue
-        val channel =
-          NotificationChannel(
-            id,
-            "$label · ${LANGUAGE_NAMES[language]}",
-            NotificationManager.IMPORTANCE_HIGH,
-          )
-        channel.setSound(Uri.parse("android.resource://$packageName/raw/$id"), audio)
-        channel.enableVibration(true)
-        manager.createNotificationChannel(channel)
+        RingMessageReceiver.ensureAlarmChannel(
+          this,
+          "ring_${language}_$kind",
+          "$label · ${LANGUAGE_NAMES[language]}",
+        )
       }
     }
   }

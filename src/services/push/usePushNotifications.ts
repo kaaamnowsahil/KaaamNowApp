@@ -14,7 +14,7 @@ import type { UserRole } from '@/services/onboarding/useOnboardingStore';
 
 import { useUnreadNotifications } from '@/services/notifications/useUnreadNotifications';
 
-import { registerForPush } from './pushService';
+import { refreshPushToken, registerForPush } from './pushService';
 
 export { openFromPush };
 
@@ -57,25 +57,32 @@ export const usePushNotifications = (role: UserRole | null) => {
     const messaging = getMessaging();
     let stopTokenRefresh: (() => void) | undefined;
     let isActive = true;
-    let isSettled = false;
+    let isListening = false;
     let isRegistering = false;
 
-    // Retried each time the app returns to the foreground until it succeeds or
-    // the user declines, so an offline sign-in still registers later.
+    // The first success keeps the token-refresh listener. Later foregrounds post the
+    // token again, because the server can deactivate a token the app still holds.
     const register = () => {
-      if (isSettled || isRegistering) return;
+      if (isRegistering) return;
       isRegistering = true;
+      const done = () => {
+        isRegistering = false;
+      };
+      if (isListening) {
+        refreshPushToken()
+          .catch(error => console.warn('Push registration failed; will retry.', error))
+          .finally(done);
+        return;
+      }
       registerForPush()
         .then(stop => {
-          isSettled = true;
           if (!stop) return;
+          isListening = true;
           if (isActive) stopTokenRefresh = stop;
           else stop();
         })
         .catch(error => console.warn('Push registration failed; will retry.', error))
-        .finally(() => {
-          isRegistering = false;
-        });
+        .finally(done);
     };
     register();
     const appState = AppState.addEventListener('change', state => {
@@ -93,10 +100,6 @@ export const usePushNotifications = (role: UserRole | null) => {
       const data = message.data ?? {};
       const sound = spokenRing(role, data.kind);
       if (Platform.OS === 'android' && sound) NativeModules.RingPlayer?.play?.(sound);
-      if (role === 'worker' && data.kind === 'live_request') {
-        void openFromPush(message, role);
-        return;
-      }
       const title = message.notification?.title ?? data.title;
       const body = message.notification?.body ?? data.body ?? '';
       if (typeof title !== 'string' || !title) return;

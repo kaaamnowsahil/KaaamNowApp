@@ -46,21 +46,8 @@ class RingMessageReceiver : BroadcastReceiver() {
     messageId: String?,
     sound: String,
   ) {
+    ensureAlarmChannel(context, sound, "KaaamNow")
     val manager = context.getSystemService(NotificationManager::class.java)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && manager.getNotificationChannel(sound) == null) {
-      val channel = NotificationChannel(sound, "KaaamNow", NotificationManager.IMPORTANCE_HIGH)
-      val resId = context.resources.getIdentifier(sound, "raw", context.packageName)
-      if (resId != 0) {
-        val audio =
-          AudioAttributes.Builder()
-            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-            .build()
-        channel.setSound(Uri.parse("android.resource://${context.packageName}/raw/$sound"), audio)
-      }
-      channel.enableVibration(true)
-      manager.createNotificationChannel(channel)
-    }
     val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
     val open =
       PendingIntent.getActivity(
@@ -70,11 +57,13 @@ class RingMessageReceiver : BroadcastReceiver() {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
       )
     val notification =
-      NotificationCompat.Builder(context, sound)
+      NotificationCompat.Builder(context, alarmChannelId(sound))
         .setSmallIcon(context.applicationInfo.icon)
         .setContentTitle(title)
         .setContentText(body)
-        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setCategory(NotificationCompat.CATEGORY_ALARM)
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        .setPriority(NotificationCompat.PRIORITY_MAX)
         .setAutoCancel(true)
         .setContentIntent(open)
         .build()
@@ -93,13 +82,38 @@ class RingMessageReceiver : BroadcastReceiver() {
   companion object {
     private const val RECEIVE = "com.google.android.c2dm.intent.RECEIVE"
     const val VOICE_CHANNEL = "kaaamnow_voice"
+    const val ALARM_CHANNEL_PREFIX = "kaaamnow_alarm_"
     private val soundName = Regex("ring_[a-z]{2}_(new_work|worker_accepted)")
     private val languages =
       setOf("bn", "en", "gu", "hi", "kn", "ml", "mr", "or", "pa", "ta", "te", "ur")
 
+    fun alarmChannelId(sound: String): String = "$ALARM_CHANNEL_PREFIX$sound"
+
+    /** Alarm-stream channel for one spoken file. The raw name stays ring_<lang>_<type>. */
+    fun ensureAlarmChannel(context: Context, sound: String, label: String) {
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+      if (!soundName.matches(sound)) return
+      val manager = context.getSystemService(NotificationManager::class.java) ?: return
+      val channelId = alarmChannelId(sound)
+      if (manager.getNotificationChannel(channelId) != null) return
+      val channel = NotificationChannel(channelId, label, NotificationManager.IMPORTANCE_HIGH)
+      val resId = context.resources.getIdentifier(sound, "raw", context.packageName)
+      if (resId != 0) {
+        val audio =
+          AudioAttributes.Builder()
+            .setUsage(AudioAttributes.USAGE_ALARM)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+            .build()
+        channel.setSound(Uri.parse("android.resource://${context.packageName}/raw/$sound"), audio)
+      }
+      channel.enableVibration(true)
+      channel.setBypassDnd(true)
+      manager.createNotificationChannel(channel)
+    }
+
     fun resolveSound(extras: android.os.Bundle): String? {
       listOf("sound", "gcm.notification.sound", "gcm.notification.android_channel_id").forEach { key ->
-        val value = extras.getString(key)
+        val value = extras.getString(key)?.removePrefix(ALARM_CHANNEL_PREFIX)
         if (value != null && soundName.matches(value)) return value
       }
       val liveWork = extras.getString("live_work")?.trim()?.lowercase()

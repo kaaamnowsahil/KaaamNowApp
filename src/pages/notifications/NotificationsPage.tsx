@@ -6,6 +6,7 @@ import { BodyNote } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import type { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { TAB_HOMES } from '@/route/tabRoutes';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { notificationsApi } from '@/services/notifications/notificationsApi';
 import { openNotificationTarget } from '@/services/notifications/openNotificationTarget';
@@ -52,9 +53,25 @@ export const NotificationsPage: FC<
       .finally(() => setMarking(false));
   };
 
+  const closeInbox = () => {
+    if ((navigation.getState()?.index ?? 0) > 0) {
+      navigation.goBack();
+      return;
+    }
+    const parent = navigation.getParent();
+    const parentState = parent?.getState();
+    const tab = parentState?.routes[parentState.index ?? 0]?.name;
+    const home = tab && tab in TAB_HOMES ? TAB_HOMES[tab as keyof typeof TAB_HOMES] : undefined;
+    if (home) {
+      navigation.reset({ index: 0, routes: [{ name: home }] });
+      return;
+    }
+    navigation.goBack();
+  };
+
   return (
     <FormScreen
-      onBack={navigation.goBack}
+      onBack={closeInbox}
       title={t('notifications.title')}
       gap={0}
       isLoading={query.isLoading}

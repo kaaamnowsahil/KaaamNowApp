@@ -8,7 +8,7 @@ import { PermissionsAndroid, Platform } from 'react-native';
 
 import { apiRequest } from '@/services/api/apiClient';
 
-import { registerForPush, unregisterPush } from '../pushService';
+import { refreshPushToken, registerForPush, unregisterPush } from '../pushService';
 
 jest.mock('@/services/api/apiClient', () => ({ apiRequest: jest.fn() }));
 
@@ -42,6 +42,15 @@ describe('pushService', () => {
       body: expect.objectContaining({ platform: 'ios', push_token: 'fcm-token-from-firebase' }),
     });
     expect(stop).toBe(stopRefresh);
+  });
+
+  it('posts the current token again without another listener', async () => {
+    await refreshPushToken();
+
+    expect(request).toHaveBeenCalledWith('POST', '/me/devices', {
+      body: expect.objectContaining({ push_token: 'fcm-token-from-firebase' }),
+    });
+    expect(refresh).not.toHaveBeenCalled();
   });
 
   it('re-registers when Firebase rotates the token', async () => {

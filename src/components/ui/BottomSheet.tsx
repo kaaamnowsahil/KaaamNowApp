@@ -3,6 +3,7 @@ import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FONTS } from '@/constants/fonts';
+import { useKeyboardInset } from '@/layout/useKeyboardInset';
 import { useTheme } from '@/theme/ThemeProvider';
 
 /**
@@ -19,6 +20,7 @@ export const BottomSheet: FC<{
 }> = ({ title, subtitle, onClose, closeLabel, children, testID }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const keyboardInset = useKeyboardInset();
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.root}>
@@ -32,7 +34,7 @@ export const BottomSheet: FC<{
             styles.sheet,
             {
               backgroundColor: colors.background,
-              paddingBottom: 24 + insets.bottom,
+              paddingBottom: 24 + insets.bottom + keyboardInset,
             },
           ]}
           testID={testID}

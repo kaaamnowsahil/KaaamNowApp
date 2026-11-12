@@ -57,6 +57,10 @@ const openWorkerAssignment = async (assignmentId: string, role: UserRole | null)
       assignmentStatus: assignment.status,
     };
     const live = assignment.shift.shift_type === 'live';
+    if (live && assignment.status !== 'cancelled' && assignment.status !== 'no_show') {
+      openInTab(ROUTES.workerHome, ROUTES.workerLiveBooking, { assignmentId: assignment.id });
+      return;
+    }
     switch (assignment.status) {
       case 'checked_in':
         openInTab(ROUTES.workerShifts, ROUTES.activeShift, { shift });
@@ -119,6 +123,17 @@ const openWorkerShift = async (shiftId: string, role: UserRole | null) => {
       openInTab(ROUTES.workerShifts, ROUTES.shiftComplete, { shift });
       return;
     }
+    if (
+      shift.status === 'live' &&
+      shift.assignmentId &&
+      status !== 'cancelled' &&
+      status !== 'no_show'
+    ) {
+      openInTab(ROUTES.workerHome, ROUTES.workerLiveBooking, {
+        assignmentId: shift.assignmentId,
+      });
+      return;
+    }
     if (status === 'cancelled' || status === 'no_show' || detail.can_reapply || detail.reapply_block_reason) {
       openInTab(ROUTES.workerShifts, ROUTES.shiftDetails, {
         shift,
@@ -154,6 +169,7 @@ export const openNotificationPath = async (path: string, role: UserRole | null) 
     return;
   }
   if (clean === '/worker/live-work') {
+    openInTab(ROUTES.workerHome, ROUTES.workerLiveWork);
     return;
   }
   const bookingId = idAfter(clean, '/worker/booking/');
@@ -240,6 +256,13 @@ export const openNotificationTarget = async (
   await openNotificationPath(path, role);
 };
 
+const LIVE_PUSH_KINDS = new Set([
+  'live_worker_accepted',
+  'live_shift_filled',
+  'live_search_expired',
+  'live_request',
+]);
+
 /** Booking pushes open the booking; a stored path opens that page; everything else opens the inbox. */
 export const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
   const data = message.data ?? {};
@@ -249,6 +272,10 @@ export const openFromPush = async (message: RemoteMessage, role: UserRole | null
       await openLiveOffer(shiftId, role);
       return;
     }
+  }
+  if (typeof data.kind === 'string' && LIVE_PUSH_KINDS.has(data.kind)) {
+    await openNotificationTarget({ ...data, kind: data.kind }, role);
+    return;
   }
   if (typeof data.path === 'string' && data.path.startsWith('/') && !data.path.startsWith('//')) {
     await openNotificationPath(data.path, role);

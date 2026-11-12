@@ -1,4 +1,4 @@
-import type { FC, ReactElement, ReactNode } from 'react';
+import { useRef, type FC, type ReactElement, type ReactNode } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -6,6 +6,8 @@ import { Loader, Rise } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { MOTION } from '@/constants/motion';
 import { useTheme } from '@/theme/ThemeProvider';
+
+import { useKeyboardInset } from './useKeyboardInset';
 
 type TabScreenProps = {
   /** Plain 22px bold app-bar title; ignored when `header` is given. */
@@ -43,6 +45,8 @@ export const TabScreen: FC<TabScreenProps> = ({
   testID,
 }) => {
   const { colors } = useTheme();
+  const scrollRef = useRef<ScrollView>(null);
+  const keyboardInset = useKeyboardInset(scrollRef);
   return (
     <SafeAreaView
       edges={['top']}
@@ -59,8 +63,10 @@ export const TabScreen: FC<TabScreenProps> = ({
           </Text>
         )}
       </Rise>
+      <View style={[styles.root, keyboardInset > 0 && { paddingBottom: keyboardInset }]}>
       {isLoading ? null : (
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={[
           styles.content,
           fillLastBlock && styles.fillContent,
@@ -95,6 +101,7 @@ export const TabScreen: FC<TabScreenProps> = ({
           {actions}
         </Rise>
       ) : null}
+      </View>
       {isLoading || busy ? <Loader /> : null}
     </SafeAreaView>
   );

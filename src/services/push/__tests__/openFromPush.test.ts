@@ -24,7 +24,7 @@ const message = (data?: Record<string, string>) => ({ data }) as unknown as Remo
 const expectTab = (tab: string, screen: string, params?: object) =>
   expect(navigate).toHaveBeenCalledWith(ROUTES.mainTabs, {
     screen: tab,
-    params: { screen, params },
+    params: { screen, params, initial: false },
   });
 
 describe('openFromPush', () => {
@@ -44,6 +44,16 @@ describe('openFromPush', () => {
     expectTab(ROUTES.businessShifts, ROUTES.businessScheduledWorkerTracking, {
       assignmentId: 'a1',
     });
+  });
+
+  it('opens a checked-in live booking on the live screen', async () => {
+    assignment.mockResolvedValue({
+      id: 'a1',
+      status: 'checked_in',
+      shift: { id: 's1', shift_type: 'live' },
+    });
+    await openFromPush(message({ assignment_id: 'a1', kind: 'worker_checked_in' }), 'worker');
+    expectTab(ROUTES.workerHome, ROUTES.workerLiveBooking, { assignmentId: 'a1' });
   });
 
   it('opens the live shift for a checked-in worker', async () => {
@@ -104,6 +114,21 @@ describe('openFromPush', () => {
       'worker',
     );
     expectTab(ROUTES.workerHome, ROUTES.shiftDetails, { shift: { id: 's1' } });
+  });
+
+  it('opens a live business alert on the live screen, not the shift list', async () => {
+    await openFromPush(
+      message({
+        kind: 'live_shift_filled',
+        path: '/business/shifts',
+        shift_id: 's1',
+      }),
+      'business',
+    );
+    expect(navigate).toHaveBeenCalledWith(ROUTES.mainTabs, {
+      screen: ROUTES.businessLive,
+      params: { screen: ROUTES.businessLiveHome, pop: true },
+    });
   });
 
   it('opens the page stored on the push', async () => {
