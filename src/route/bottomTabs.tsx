@@ -2,7 +2,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { CommonActions, StackActions } from '@react-navigation/native';
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { SvgProps } from 'react-native-svg';
 
 import BuildingIcon from '@/assets/figma/building-2.svg';
@@ -99,10 +100,14 @@ const BUSINESS_TABS: TabDef[] = [
   },
 ];
 
+/** Icon row plus label. The 12pt top padding is added on top of this, not taken out of it. */
+const TAB_BAR_CONTENT_HEIGHT = 49;
+
 /** Role-based bottom tabs: worker and business get different tab sets. */
 export const BottomTabRoutes: FC = () => {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const role = useAuthStore(s => s.role);
   const tabs =
     role === 'business'
@@ -127,6 +132,13 @@ export const BottomTabRoutes: FC = () => {
             backgroundColor: colors.background,
             borderTopColor: colors.border,
             paddingTop: 12,
+            // iOS already adds the home-indicator inset. Setting height here would replace it.
+            ...(Platform.OS === 'android'
+              ? {
+                  paddingBottom: insets.bottom,
+                  height: TAB_BAR_CONTENT_HEIGHT + 12 + insets.bottom,
+                }
+              : null),
           },
           tabBarLabelStyle: { fontFamily: FONTS.regular, fontSize: 10 },
         }}

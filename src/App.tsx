@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { FC } from 'react';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Bootstrap i18n before anything renders
 import '@/services/i18n/i18n';
@@ -21,7 +21,7 @@ const AppInner: FC = () => {
 
 export const App: FC = () => (
   <QueryClientProvider client={queryClient}>
-    <SafeAreaProvider>
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ThemeProvider>
         <AppInner />
       </ThemeProvider>
