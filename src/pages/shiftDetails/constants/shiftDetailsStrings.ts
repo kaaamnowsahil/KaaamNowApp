@@ -19,6 +19,9 @@ export const SHIFT_DETAILS_STRINGS = {
   get AGREED_RATE() {
     return k('agreedRate');
   },
+  get ACCEPT_TASK() {
+    return k('detailsCopy.live.acceptTask');
+  },
   get ESTIMATED() {
     return k('estimated');
   },

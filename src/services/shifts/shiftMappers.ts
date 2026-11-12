@@ -174,6 +174,7 @@ export const toApplicant = (
   ratingCount: item.worker.rating_count,
   completedShifts: item.worker.completed_shift_count,
   shiftId: item.shift.id,
+  shiftType: item.shift.shift_type,
   workplace: item.shift.workplace_name,
   startsAt: item.shift.starts_at,
   endsAt: item.shift.ends_at,

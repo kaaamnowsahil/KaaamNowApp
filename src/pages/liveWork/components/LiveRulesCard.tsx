@@ -1,8 +1,7 @@
 import type { FC } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { WORKER_CANCELLATION_STRINGS as W } from '@/components/shiftFlow/workerCancellationStrings';
-import { TextButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { tr } from '@/services/i18n/tr';
 import {
@@ -189,12 +188,18 @@ export const LiveRulesCard: FC<{
         </View>
       ))}
 
-      <TextButton
-        label={W.READ_TERMS}
-        onPress={onReadTerms}
-        testID="live-rules-terms"
-        tone="primary"
-      />
+      <View style={[styles.agree, { borderTopColor: colors.border }]}>
+        <Pressable
+          accessibilityRole="link"
+          onPress={onReadTerms}
+          testID="live-rules-terms"
+          style={({ pressed }) => [styles.readTerms, pressed && styles.pressed]}
+        >
+          <Text style={[styles.readTermsLabel, { color: colors.primary }]}>
+            {W.READ_TERMS}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -228,4 +233,18 @@ const styles = StyleSheet.create({
   },
   point: { flexDirection: 'row', gap: 6 },
   pointText: { flex: 1 },
+  agree: {
+    alignSelf: 'stretch',
+    borderTopWidth: 1,
+    paddingTop: 10,
+    alignItems: 'flex-start',
+  },
+  readTerms: { alignSelf: 'flex-start' },
+  readTermsLabel: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'left',
+  },
+  pressed: { opacity: 0.6 },
 });

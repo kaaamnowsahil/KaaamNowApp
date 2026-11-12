@@ -10,11 +10,13 @@ import {
 import { NotificationsPage } from '../NotificationsPage';
 
 jest.mock('@react-navigation/native', () => ({ useFocusEffect: jest.fn() }));
+jest.mock('@/services/notifications/openNotificationTarget', () => ({
+  openNotificationTarget: jest.fn(() => Promise.resolve()),
+}));
 jest.mock('@/services/notifications/notificationsApi', () => ({
   notificationsApi: {
     list: jest.fn(),
     markRead: jest.fn(),
-    markAllRead: jest.fn(),
   },
 }));
 
@@ -39,7 +41,6 @@ jest.mock('@/components/ui', () => {
 
 const list = jest.mocked(notificationsApi.list);
 const markRead = jest.mocked(notificationsApi.markRead);
-const markAllRead = jest.mocked(notificationsApi.markAllRead);
 
 const notification = (
   over: Partial<AppNotification> = {},
@@ -92,7 +93,6 @@ beforeEach(async () => {
       ]),
     );
   markRead.mockReset().mockResolvedValue({ unread_count: 0 });
-  markAllRead.mockReset().mockResolvedValue({ unread_count: 0 });
   await act(async () => {
     await i18n.changeLanguage('en');
   });
@@ -121,20 +121,12 @@ describe('Notifications screen', () => {
     expect(byId('notification-n1').props.accessibilityState).toEqual({
       selected: false,
     });
-    expect(has('notifications-mark-all')).toBe(false);
   });
 
   it('does not resend reads for read notifications', async () => {
     await renderPage();
     await press('notification-n2');
     expect(markRead).not.toHaveBeenCalled();
-  });
-
-  it('marks everything read', async () => {
-    await renderPage();
-    await press('notifications-mark-all');
-    expect(markAllRead).toHaveBeenCalled();
-    expect(has('notifications-mark-all')).toBe(false);
   });
 
   it('reloads the truth when marking read fails', async () => {
@@ -157,7 +149,6 @@ describe('Notifications screen', () => {
     list.mockRejectedValue(new Error('Server unavailable'));
     await renderPage();
     expect(text()).toContain('Server unavailable');
-    expect(has('notifications-mark-all')).toBe(false);
   });
 
   it('shows the loader until the list arrives', async () => {

@@ -125,6 +125,12 @@ export type RatingView = {
   created_at: string;
 };
 
+export type AssignmentRatings = {
+  items: RatingView[];
+  can_rate: boolean;
+  my_direction: string;
+};
+
 export type ShiftExtension = {
   id: string;
   extra_minutes: number;
@@ -456,6 +462,8 @@ export const shiftsApi = {
     }),
   rate: (assignmentId: string, body: { stars: number; tags?: string[]; review?: string }) =>
     apiRequest<RatingView>('POST', `/assignments/${assignmentId}/ratings`, { body }),
+  ratings: (assignmentId: string) =>
+    apiRequest<AssignmentRatings>('GET', `/assignments/${assignmentId}/ratings`),
   ratingTags: async (direction: 'worker_to_business' | 'business_to_worker') =>
     (
       await apiRequest<{ direction: string; tags: string[] }[]>('GET', '/catalog/rating-tags', {

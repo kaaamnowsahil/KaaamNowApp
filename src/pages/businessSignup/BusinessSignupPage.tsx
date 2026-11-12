@@ -47,7 +47,7 @@ export const BusinessSignupPage: FC<
 
   return (
     <FormScreen
-      busy={f.busy}
+      busy={f.busy || f.isLocating || f.catalogLoading}
       onBack={navigation.goBack}
       title={t('businessSignup.title')}
       testID="business-signup-page"

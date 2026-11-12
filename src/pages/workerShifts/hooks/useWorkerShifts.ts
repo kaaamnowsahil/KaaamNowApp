@@ -5,6 +5,7 @@ import { Alert } from 'react-native';
 import { ROUTES } from '@/constants/routes';
 import { errorMessage } from '@/services/api/apiClient';
 import { getDevicePosition } from '@/services/maps/devicePosition';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import {
   formatDateTime,
   fromMinor,
@@ -170,15 +171,47 @@ export const useWorkerShifts = () => {
   const openBooking = ({ status, shift }: Booking) => {
     if (status === 'selected') {
       navigation.navigate(ROUTES.shiftSelected, { shift });
-    } else if (shift.status === 'live' && shift.assignmentId) {
+      return;
+    }
+    if (shift.assignmentId && shift.status === 'live') {
       navigation.navigate(ROUTES.workerLiveBooking, {
         assignmentId: shift.assignmentId,
       });
-    } else if (shift.assignmentStatus === 'checked_in') {
-      navigation.navigate(ROUTES.activeShift, { shift });
-    } else if (shift.assignmentStatus === 'en_route') {
-      navigation.navigate(ROUTES.shiftTravel, { shift });
-    } else if (CLOSED_APPLICATION.includes(status)) {
+      return;
+    }
+    // One booking, same steps as web: overview, travel, active, then completed.
+    if (shift.assignmentId) {
+      switch (shift.assignmentStatus) {
+        case 'en_route':
+          navigation.navigate(ROUTES.shiftTravel, { shift });
+          return;
+        case 'checked_in':
+          navigation.navigate(ROUTES.activeShift, { shift });
+          return;
+        case 'checked_out':
+        case 'approved':
+          navigation.navigate(ROUTES.shiftComplete, { shift });
+          return;
+        case 'cancelled':
+        case 'no_show':
+          navigation.navigate(ROUTES.shiftDetails, {
+            shift,
+            bookingStatus: 'cancelled',
+          });
+          return;
+        default:
+          if (status === 'completed') {
+            navigation.navigate(ROUTES.shiftComplete, { shift });
+            return;
+          }
+          navigation.navigate(ROUTES.shiftDetails, {
+            shift,
+            bookingStatus: 'confirmed',
+          });
+          return;
+      }
+    }
+    if (CLOSED_APPLICATION.includes(status)) {
       navigation.navigate(ROUTES.shiftDetails, { shift });
     } else if (status === 'no_show') {
       navigation.navigate(ROUTES.shiftDetails, {
@@ -225,7 +258,7 @@ export const useWorkerShifts = () => {
     pending,
     openBooking,
     respondToSelection,
-    openNotifications: () => navigation.navigate(ROUTES.notifications),
+    openNotifications: navigateToNotifications,
     findShifts: () => navigation.navigate(ROUTES.workerHome),
   };
 };

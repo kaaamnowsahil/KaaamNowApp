@@ -124,6 +124,7 @@ export const WithdrawPage: FC<AppScreenProps<typeof ROUTES.withdraw>> = ({
       title={t('withdraw.title')}
       gap={14}
       isLoading={withdraw.isLoading}
+      busy={withdraw.isSubmitting}
       testID="withdraw-page"
       actions={action}
     >

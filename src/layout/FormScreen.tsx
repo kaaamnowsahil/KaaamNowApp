@@ -29,6 +29,7 @@ import { BackButton, BrandAppBar, Loader, Rise } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { MOTION } from '@/constants/motion';
 import { ROUTES } from '@/constants/routes';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppStackParamList } from '@/types';
@@ -148,7 +149,7 @@ export const FormScreen: FC<FormScreenProps> = ({
         {showBrandBar ? (
           <View style={styles.appBar}>
             <BrandAppBar
-              onBellPress={() => navigation.navigate(ROUTES.notifications)}
+              onBellPress={navigateToNotifications}
             />
           </View>
         ) : null}

@@ -11,6 +11,23 @@ type PreferencesState = {
   setTheme: (theme: ThemePreference) => void;
   language: Option;
   setLanguage: (language: Option) => void;
+  /** True after AsyncStorage has loaded. Until then `language` is only the default. */
+  hasHydrated: boolean;
+  /** True when this device already has a saved language, including English. */
+  languagePersisted: boolean;
+};
+
+const PREFERENCES_KEY = 'KaaamNow-preferences';
+let persistedLanguageId: string | null = null;
+
+const readPersistedLanguageId = (raw: string | null): string | null => {
+  if (!raw) return null;
+  try {
+    const id = JSON.parse(raw)?.state?.language?.id;
+    return typeof id === 'string' && id ? id : null;
+  } catch {
+    return null;
+  }
 };
 
 /**
@@ -22,11 +39,14 @@ const memoryFallback = new Map<string, string>();
 
 const safeStorage = {
   getItem: async (key: string): Promise<string | null> => {
+    let raw: string | null;
     try {
-      return await AsyncStorage.getItem(key);
+      raw = await AsyncStorage.getItem(key);
     } catch {
-      return memoryFallback.get(key) ?? null;
+      raw = memoryFallback.get(key) ?? null;
     }
+    if (key === PREFERENCES_KEY) persistedLanguageId = readPersistedLanguageId(raw);
+    return raw;
   },
   setItem: async (key: string, value: string): Promise<void> => {
     try {
@@ -50,15 +70,23 @@ export const usePreferencesStore = create<PreferencesState>()(
       theme: 'light',
       setTheme: theme => set({ theme }),
       language: { id: 'en', label: 'English' },
-      setLanguage: language => set({ language }),
+      hasHydrated: false,
+      languagePersisted: false,
+      setLanguage: language => set({ language, languagePersisted: true }),
     }),
     {
-      name: 'KaaamNow-preferences',
+      name: PREFERENCES_KEY,
       storage: createJSONStorage(() => safeStorage),
       partialize: state => ({
         theme: state.theme,
         language: state.language,
       }),
+      onRehydrateStorage: () => () => {
+        usePreferencesStore.setState({
+          hasHydrated: true,
+          languagePersisted: persistedLanguageId != null,
+        });
+      },
     },
   ),
 );

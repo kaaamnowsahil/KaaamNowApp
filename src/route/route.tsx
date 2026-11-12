@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { useEffect, useState, type FC } from 'react';
 import { StatusBar } from 'react-native';
 
+import { ForegroundPushDialog } from '@/components/push/ForegroundPushDialog';
 import { SPLASH_DURATION_MS, SplashPage } from '@/pages/splash/SplashPage';
 import { useAuthStore } from '@/services/auth/useAuthStore';
 import { usePushNotifications } from '@/services/push/usePushNotifications';
@@ -12,8 +13,15 @@ import { BeforeLoginRoutes } from './beforeLogin';
 import { navigationRef } from './navigationRef';
 
 const PushBridge: FC = () => {
-  usePushNotifications(useAuthStore(s => s.role));
-  return null;
+  const push = usePushNotifications(useAuthStore(s => s.role));
+  return push.notice ? (
+    <ForegroundPushDialog
+      title={push.notice.title}
+      body={push.notice.body}
+      onClose={push.dismissNotice}
+      onView={push.viewNotice}
+    />
+  ) : null;
 };
 
 /** Root: splash, then the login stack or the app stack depending on isAuth. */

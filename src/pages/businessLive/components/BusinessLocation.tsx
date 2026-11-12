@@ -9,7 +9,9 @@ import { useCurrentAddress } from '@/shared/hooks/useCurrentAddress';
 import { useTheme } from '@/theme/ThemeProvider';
 
 /** Current device address; tap to look it up again. */
-export const BusinessLocation: FC = () => {
+export const BusinessLocation: FC<{ onLocatingChange?: (locating: boolean) => void }> = ({
+  onLocatingChange,
+}) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const [address, setAddress] = useState('');
@@ -21,6 +23,10 @@ export const BusinessLocation: FC = () => {
     locate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    onLocatingChange?.(isLocating);
+  }, [isLocating, onLocatingChange]);
 
   const label = locateError || (isLocating ? t('common.loading') : address);
 

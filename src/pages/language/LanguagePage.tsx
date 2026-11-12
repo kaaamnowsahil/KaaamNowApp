@@ -23,18 +23,20 @@ export const LanguagePage: FC<AppScreenProps<typeof ROUTES.language>> = ({
   const language = usePreferencesStore(s => s.language);
   const setLanguage = usePreferencesStore(s => s.setLanguage);
   const [selectedId, setSelectedId] = useState(language.id);
+  const [saving, setSaving] = useState(false);
 
-  const apply = () => {
+  const apply = async () => {
     const picked = LANGUAGES.find(option => option.id === selectedId);
-    if (picked) {
+    if (!picked || saving) return;
+    setSaving(true);
+    try {
+      await meApi.updateProfile({ language_code: picked.id });
       setLanguage({ id: picked.id, label: picked.caption });
-      meApi
-        .updateProfile({ language_code: picked.id })
-        .catch(error =>
-          Alert.alert(t('editProfile.preferenceFailed'), errorMessage(error)),
-        );
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert(t('editProfile.preferenceFailed'), errorMessage(error));
+      setSaving(false);
     }
-    navigation.goBack();
   };
 
   return (
@@ -42,12 +44,15 @@ export const LanguagePage: FC<AppScreenProps<typeof ROUTES.language>> = ({
       onBack={navigation.goBack}
       title={t('language.title')}
       gap={14}
+      busy={saving}
       testID="language-page"
       actions={
         <PrimaryButton
           label={t('language.apply')}
-          disabled={selectedId === language.id}
-          onPress={apply}
+          disabled={saving || selectedId === language.id}
+          onPress={() => {
+            void apply();
+          }}
           testID="language-apply"
         />
       }

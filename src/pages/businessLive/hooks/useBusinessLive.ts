@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { ROUTES } from '@/constants/routes';
 import { useShiftCardActions } from '@/pages/businessShifts/hooks';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import type { BusinessShiftItem } from '@/services/shifts/shiftsApi';
 import { useBusinessShiftsData } from '@/services/shifts/useBusinessShiftsData';
 import type { TabAppNavigation } from '@/types';
@@ -47,7 +48,7 @@ export const useBusinessLive = () => {
     setView,
     shifts: items,
     ...actions,
-    openNotifications: () => navigation.navigate(ROUTES.notifications),
+    openNotifications: navigateToNotifications,
     openShifts: () => navigation.navigate(ROUTES.businessShifts),
     openLive: (item: BusinessShiftItem) =>
       navigation.navigate(ROUTES.businessLiveWork, { bookingId: item.id }),

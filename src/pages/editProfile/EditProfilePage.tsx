@@ -29,6 +29,7 @@ export const EditProfilePage: FC<AppScreenProps<typeof ROUTES.editProfile>> = ({
       title={t('editProfile.title')}
       gap={16}
       isLoading={f.isLoading}
+      busy={f.busy || f.isUploading || f.isLocating}
       testID="edit-profile-page"
       actions={
         <PrimaryButton

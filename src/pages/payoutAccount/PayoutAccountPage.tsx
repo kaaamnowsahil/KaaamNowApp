@@ -27,6 +27,7 @@ export const PayoutAccountPage: FC<
       onBack={navigation.goBack}
       title={t('payoutAccount.title')}
       isLoading={form.isLoading}
+      busy={form.isSaving}
       testID="payout-account-page"
       actions={
         form.loadError ? (

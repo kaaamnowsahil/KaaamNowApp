@@ -21,6 +21,7 @@ type UnreadCount = { unread_count: number };
 
 export const notificationsApi = {
   list: () => apiRequest<NotificationPage>('GET', '/notifications'),
+  unreadCount: () => apiRequest<UnreadCount>('GET', '/notifications/unread-count'),
   markRead: (notificationId: string) =>
     apiRequest<UnreadCount>('POST', `/notifications/${notificationId}/read`),
   markAllRead: () => apiRequest<UnreadCount>('POST', '/notifications/read-all'),

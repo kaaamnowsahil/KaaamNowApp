@@ -84,6 +84,7 @@ export const WorkerShiftsPage: FC = () => {
       gap={12}
       fillLastBlock={Boolean(shifts.error) || shifts.sections.length === 0}
       isLoading={shifts.isLoading}
+      busy={shifts.pending !== null}
       testID="worker-shifts-page"
     />
   );

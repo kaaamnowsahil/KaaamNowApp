@@ -19,6 +19,7 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { tabHome } from '@/route/tabRoutes';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import { TabScreen } from '@/layout/TabScreen';
 import { useHardwareBack } from '@/shared/hooks/useHardwareBack';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
@@ -164,7 +165,7 @@ export const RateBusinessPage: FC<
       busy={action.busy}
       header={
         <BrandAppBar
-          onBellPress={() => navigation.navigate(ROUTES.notifications)}
+          onBellPress={navigateToNotifications}
         />
       }
       blocks={blocks}

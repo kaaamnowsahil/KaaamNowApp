@@ -241,7 +241,8 @@
         "overline_one": "ਲਾਈਵ · {{count}} ਥਾਂ ਖਾਲੀ",
         "overline_other": "ਲਾਈਵ · {{count}} ਥਾਵਾਂ ਖਾਲੀ",
         "callout": "ਯੋਗ ਕਾਮਿਆਂ ਲਈ ਪਹਿਲਾਂ ਆਓ ਪਹਿਲਾਂ ਪਾਓ। ਥਾਂ ਉਪਲਬਧ ਹੋਣ 'ਤੇ ਹੀ ਤੁਹਾਡੀ ਥਾਂ ਪੱਕੀ ਹੁੰਦੀ ਹੈ।",
-        "accept": "ਸ਼ਿਫਟ ਸਵੀਕਾਰ ਕਰੋ · {{rate}}/ਘੰਟਾ"
+        "accept": "ਸ਼ਿਫਟ ਸਵੀਕਾਰ ਕਰੋ · {{rate}}/ਘੰਟਾ",
+        "acceptTask": "ਸ਼ਿਫਟ ਸਵੀਕਾਰ ਕਰੋ"
       },
       "scheduled": {
         "overline": "ਤੈਅ · ਬੁਕਿੰਗ ਲਈ ਖੁੱਲ੍ਹੀ",
@@ -919,7 +920,8 @@
     "cancelling": "ਰੱਦ ਹੋ ਰਹੀ ਹੈ…",
     "paymentPending": "ਭੁਗਤਾਨ ਬਾਕੀ",
     "paying": "ਭੁਗਤਾਨ ਹੋ ਰਿਹਾ ਹੈ…",
-    "payDepositAmount": "ਜਮ੍ਹਾਂ ਰਕਮ {{amount}} ਦਿਓ"
+    "payDepositAmount": "ਜਮ੍ਹਾਂ ਰਕਮ {{amount}} ਦਿਓ",
+    "viewDetails": "ਵੇਰਵੇ ਵੇਖੋ"
   },
   "businessShiftCreate": {
     "prompt": "ਸ਼ਿਫਟ ਕਦੋਂ ਹੈ?",
@@ -1670,7 +1672,15 @@
     "retryBilledTask": "ਵਾਧੂ ਰਕਮ ਕੰਮ ਦੀ ਕੀਮਤ ਵਿੱਚ ਜੁੜਦੀ ਹੈ ਅਤੇ ਅੰਤਿਮ ਬਿੱਲ ਨਾਲ ਭਰੀ ਜਾਂਦੀ ਹੈ। ਹੁਣ ਕੁਝ ਵੀ ਨਹੀਂ ਭਰਨਾ।",
     "retryRefund": "ਪੂਰਾ ਰਿਫੰਡ ਲਓ",
     "boostNote": "ਕਿਸੇ ਦੇ ਸਵੀਕਾਰ ਨਾ ਕਰਨ ਕਰਕੇ ਭੁਗਤਾਨ {{amount}} ਵਧਾਇਆ ਗਿਆ। ਇਹ ਅੰਤਿਮ ਬਿੱਲ ਵਿੱਚ ਜੁੜੇਗਾ।",
-    "searchStepHint": "ਜੇ ਕੋਈ ਸਵੀਕਾਰ ਨਹੀਂ ਕਰਦਾ, ਤਾਂ ਤੁਸੀਂ ਵੱਧ ਮਿਹਨਤਾਨੇ ਨਾਲ ਦੁਬਾਰਾ ਖੋਜ ਸਕਦੇ ਹੋ, ਵੱਧ ਤੋਂ ਵੱਧ {{max}} ਵਾਰ।"
+    "searchStepHint": "ਜੇ ਕੋਈ ਸਵੀਕਾਰ ਨਹੀਂ ਕਰਦਾ, ਤਾਂ ਤੁਸੀਂ ਵੱਧ ਮਿਹਨਤਾਨੇ ਨਾਲ ਦੁਬਾਰਾ ਖੋਜ ਸਕਦੇ ਹੋ, ਵੱਧ ਤੋਂ ਵੱਧ {{max}} ਵਾਰ।",
+    "rateTitle": "{{name}} ਨੂੰ ਰੇਟਿੰਗ ਦਿਓ",
+    "ratedTitle": "ਤੁਹਾਡੀ ਰੇਟਿੰਗ",
+    "starsLabel_one": "{{count}} ਸਟਾਰ",
+    "starsLabel_other": "{{count}} ਸਟਾਰ",
+    "reviewLabel": "ਟਿੱਪਣੀ ਜੋੜੋ (ਵਿਕਲਪਿਕ)",
+    "reviewPlaceholder": "ਕੰਮ ਕਿਵੇਂ ਰਿਹਾ?",
+    "submitRating": "ਰੇਟਿੰਗ ਭੇਜੋ",
+    "goHome": "ਹੋਮ ਤੇ ਜਾਓ"
   },
   "bookingDetail": {
     "title": "ਬੁਕਿੰਗ",

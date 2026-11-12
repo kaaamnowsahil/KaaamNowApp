@@ -92,15 +92,17 @@ export const ShiftDetailsPage: FC<
   const { shift } = detail;
   const info = detail.data;
   const action = useShiftAction();
-  const bookingStatus = route.params.bookingStatus ?? bookingFromShift(shift);
-  const copy = DETAILS_COPY[shift.status];
-  const booking = bookingStatus ? BOOKING_COPY[bookingStatus] : undefined;
-  const rate = formatRupees(shift.hourlyRate);
-  const hasTimeConflict = !bookingStatus && Boolean(info?.has_time_conflict);
   const canReapply = Boolean(info?.can_reapply);
   const hasLeft =
     canReapply ||
     Boolean(info?.reapply_block_reason && info.reapply_block_reason !== 'business_cancelled');
+  const bookingStatus = hasLeft
+    ? undefined
+    : (route.params.bookingStatus ?? bookingFromShift(shift));
+  const copy = DETAILS_COPY[shift.status];
+  const booking = bookingStatus ? BOOKING_COPY[bookingStatus] : undefined;
+  const rate = formatRupees(shift.hourlyRate);
+  const hasTimeConflict = !bookingStatus && Boolean(info?.has_time_conflict);
   const againPrimary = hasLeft
     ? canReapply
       ? {
@@ -244,7 +246,7 @@ export const ShiftDetailsPage: FC<
     action.run(
       () => shiftsApi.startTravel(shift.assignmentId as string),
       () =>
-        navigation.navigate(ROUTES.shiftTravel, {
+        navigation.replace(ROUTES.shiftTravel, {
           shift: { ...shift, assignmentStatus: 'en_route' },
         }),
       SHIFT_DETAILS_STRINGS.TRAVEL_FAILED,
@@ -313,7 +315,12 @@ export const ShiftDetailsPage: FC<
         if (againPrimary) return againPrimary;
         return hasTimeConflict
           ? { label: SHIFT_DETAILS_STRINGS.TIME_CONFLICT_ACTION, isDisabled: true }
-          : { label: copy.accept(rate), onPress: agreeAndAccept };
+          : {
+              label: isTaskShift(shift)
+                ? SHIFT_DETAILS_STRINGS.ACCEPT_TASK
+                : copy.accept(rate),
+              onPress: agreeAndAccept,
+            };
       case 'selected':
         return {
           label: booking?.action,

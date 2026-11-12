@@ -121,6 +121,7 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
       asSheet
       gap={14}
       isLoading={assignment.isLoading}
+      busy={isSubmitting}
       testID="finish-shift-page"
       actions={
         <>

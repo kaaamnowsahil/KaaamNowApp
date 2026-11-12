@@ -114,11 +114,17 @@ export const BusinessRosterPage: FC<
               <Pressable
                 key={entry.assignment_id}
                 accessibilityRole="button"
-                onPress={() =>
+                onPress={() => {
+                  if (shift?.shift_type === 'live') {
+                    navigation.navigate(ROUTES.businessLiveWork, {
+                      bookingId: shift.id,
+                    });
+                    return;
+                  }
                   navigation.navigate(ROUTES.businessScheduledWorkerTracking, {
                     assignmentId: entry.assignment_id,
-                  })
-                }
+                  });
+                }}
                 style={({ pressed }) => [
                   styles.card,
                   {

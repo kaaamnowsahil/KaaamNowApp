@@ -1,4 +1,4 @@
-import { useState, type FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
@@ -17,6 +17,7 @@ type ShiftLocationCardProps = {
   latitude?: number | null;
   longitude?: number | null;
   isGeocoding: boolean;
+  onLocatingChange?: (locating: boolean) => void;
   onAddressChange: (address: string) => void;
   onPicked: (picked: PickedAddress) => void;
   onMapPick: (latitude: number, longitude: number) => void;
@@ -46,6 +47,7 @@ export const ShiftLocationCard: FC<ShiftLocationCardProps> = ({
   latitude,
   longitude,
   isGeocoding,
+  onLocatingChange,
   onAddressChange,
   onPicked,
   onMapPick,
@@ -58,6 +60,10 @@ export const ShiftLocationCard: FC<ShiftLocationCardProps> = ({
   const pin =
     latitude != null && longitude != null ? { latitude, longitude } : null;
   const isBusy = isLocating || isGeocoding;
+
+  useEffect(() => {
+    onLocatingChange?.(isLocating);
+  }, [isLocating, onLocatingChange]);
 
   return (
     <View

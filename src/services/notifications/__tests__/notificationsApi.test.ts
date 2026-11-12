@@ -11,16 +11,18 @@ describe('notificationsApi', () => {
 
   it('lists and marks notifications read', async () => {
     await notificationsApi.list();
+    await notificationsApi.unreadCount();
     await notificationsApi.markRead('n1');
     await notificationsApi.markAllRead();
     expect(request).toHaveBeenNthCalledWith(1, 'GET', '/notifications');
+    expect(request).toHaveBeenNthCalledWith(2, 'GET', '/notifications/unread-count');
     expect(request).toHaveBeenNthCalledWith(
-      2,
+      3,
       'POST',
       '/notifications/n1/read',
     );
     expect(request).toHaveBeenNthCalledWith(
-      3,
+      4,
       'POST',
       '/notifications/read-all',
     );

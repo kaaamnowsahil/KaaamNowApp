@@ -51,38 +51,33 @@ const getDeviceLanguage = (): SupportedLanguage => {
 };
 
 /**
- * Syncs the persisted language preference from the store into i18next.
- * On first app open, we also hydrate from the user's saved API language so the app
- * matches the last selected language even before the user opens settings.
+ * Applies the saved language to i18next.
+ * The account language is read only on the first launch, before this device has a saved
+ * choice. English is a real choice: a later change must not be replaced by the previous one.
  */
 export const useLanguageSync = () => {
   const { i18n } = useTranslation();
   const language = usePreferencesStore(s => s.language);
   const setLanguage = usePreferencesStore(s => s.setLanguage);
+  const preferencesHydrated = usePreferencesStore(s => s.hasHydrated);
+  const languagePersisted = usePreferencesStore(s => s.languagePersisted);
   const hasHydrated = useAuthStore(s => s.hasHydrated);
   const isAuth = useAuthStore(s => s.isAuth);
 
   useEffect(() => {
-    const rootLang = normalizeLanguage(language.id) ?? 'en';
-    const target = rootLang;
-
+    const target = normalizeLanguage(language.id) ?? 'en';
     if (i18n.language !== target) {
       i18n.changeLanguage(target);
     }
   }, [language.id, i18n]);
 
   useEffect(() => {
-    if (!hasHydrated) return;
-
-    const localLanguage = normalizeLanguage(language.id) ?? 'en';
-    const isDefaultLanguage = localLanguage === 'en';
+    if (!hasHydrated || !preferencesHydrated || languagePersisted) return;
 
     if (!isAuth) {
-      if (isDefaultLanguage) {
-        const fallback = getDeviceLanguage();
-        if (fallback !== 'en') {
-          setLanguage({ id: fallback, label: LANGUAGE_LABELS[fallback] });
-        }
+      const fallback = getDeviceLanguage();
+      if (fallback !== language.id) {
+        setLanguage({ id: fallback, label: LANGUAGE_LABELS[fallback] });
       }
       return;
     }
@@ -93,30 +88,24 @@ export const useLanguageSync = () => {
       try {
         const profile = await meApi.profile();
         if (cancelled) return;
-
         const apiLanguage = normalizeLanguage(profile.account.language_code);
-        if (!apiLanguage) return;
-
-        const currentLanguage = normalizeLanguage(language.id) ?? 'en';
-        if (currentLanguage !== 'en') return;
-
+        if (!apiLanguage || apiLanguage === language.id) return;
         setLanguage({ id: apiLanguage, label: LANGUAGE_LABELS[apiLanguage] });
-        if (i18n.language !== apiLanguage) {
-          i18n.changeLanguage(apiLanguage);
-        }
-
-        await meApi.updateProfile({ language_code: apiLanguage }).catch(() => undefined);
       } catch {
-        // Ignore profile sync issues; local preference remains the source of truth.
+        // Keep the local language when the profile cannot be loaded.
       }
     };
 
-    if (isDefaultLanguage) {
-      void syncFromProfile();
-    }
-
+    void syncFromProfile();
     return () => {
       cancelled = true;
     };
-  }, [hasHydrated, isAuth, i18n, language.id, setLanguage]);
+  }, [
+    hasHydrated,
+    preferencesHydrated,
+    languagePersisted,
+    isAuth,
+    language.id,
+    setLanguage,
+  ]);
 };

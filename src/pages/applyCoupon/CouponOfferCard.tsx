@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, View } from 'react-native';
 
-import { OutlineButton, TextButton } from '@/components/ui';
+import { PrimaryButton, TextButton } from '@/components/ui';
 import { discountKey, reasonKey } from '@/services/promos/couponLogic';
 import type { CouponOffer } from '@/services/promos/promoApi';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -47,8 +47,8 @@ export const CouponOfferCard: FC<Props> = ({
       style={[
         styles.card,
         {
-          backgroundColor: colors.surface,
-          borderColor: applied ? colors.primary : colors.border,
+          backgroundColor: offer.eligible ? colors.primarySoft : colors.fill,
+          borderColor: offer.eligible ? colors.primary : colors.border,
         },
         !offer.eligible && styles.cardUnavailable,
       ]}
@@ -60,7 +60,7 @@ export const CouponOfferCard: FC<Props> = ({
           <Text
             style={[
               styles.badge,
-              { color: colors.primary, backgroundColor: colors.primarySoft },
+              { color: colors.primary, backgroundColor: colors.surface },
             ]}
           >
             {t('coupons.assigned')}
@@ -122,11 +122,14 @@ export const CouponOfferCard: FC<Props> = ({
             testID={`coupon-remove-${offer.code}`}
           />
         ) : (
-          <OutlineButton
+          <PrimaryButton
+            size="small"
+            dimmedOpacity={0.5}
+            loading={pending}
             label={
-              pending ? t('coupons.applying') : t('coupons.applyCode', { code })
+              pending ? t('coupons.applying') : t('coupons.apply')
             }
-            tone="primary"
+            accessibilityLabel={t('coupons.applyCode', { code })}
             disabled={disabled || !offer.eligible}
             onPress={onApply}
             testID={`coupon-apply-${offer.code}`}

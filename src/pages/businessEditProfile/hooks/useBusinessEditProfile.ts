@@ -68,6 +68,7 @@ export const useBusinessEditProfile = (onSaved: () => void) => {
         initials: initialsOf(form.businessName || business?.business_name || ''),
         phone: toLocalDigits(business?.phone ?? ''),
         businessTypeOptions: query.data?.[1] ?? [],
+        busy,
         canSave: parsed.success && isDirty && !busy,
         setBusinessName: (value: string) => update('businessName', value),
         setAddress: (value: string) => {

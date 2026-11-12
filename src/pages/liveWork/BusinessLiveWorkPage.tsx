@@ -10,12 +10,14 @@ import {
   TextField,
 } from '@/components/ui';
 import MapPinIcon from '@/assets/figma/map-pin.svg';
-import XIcon from '@/assets/figma/x.svg';
+import BadgeCheckIcon from '@/assets/figma/badge-check.svg';
+import XCircleIcon from '@/assets/figma/x-circle.svg';
 import ClockIcon from '@/assets/icons/clock.svg';
 import { CompletionCodeCard } from '@/components/taskPricing/CompletionCode';
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { tabHome } from '@/route/tabRoutes';
 import { payInvoice } from '@/services/billing/billingApi';
 import { tr } from '@/services/i18n/tr';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
@@ -49,6 +51,7 @@ import {
   LivePriceBreakdownCard,
   LiveText,
 } from './components/LiveWorkUi';
+import { LiveRatingCard } from './components/LiveRatingCard';
 import { LiveSearchMap } from './components/LiveSearchMap';
 import { LiveRetryPanel, LiveSearchRound } from './components/LiveRetryPanel';
 import { LiveRulesCard } from './components/LiveRulesCard';
@@ -203,6 +206,17 @@ export const BusinessLiveWorkPage: FC<
   const boost = booking.boost_minor ?? 0;
   const maxRounds = booking.max_search_rounds ?? 1;
   const boostOptions = booking.boost_options_minor ?? [];
+  const seats = booking.workers ?? [];
+  const doneSeats = (
+    multi ? seats.map(seat => seat.assignment) : assignment ? [assignment] : []
+  ).filter(
+    seat => seat.status === 'checked_out' || seat.status === 'approved',
+  );
+  const finished =
+    !retry &&
+    (status === 'completed' ||
+      status === 'cancelled' ||
+      status === 'no_workers');
 
   return (
     <FormScreen
@@ -260,11 +274,23 @@ export const BusinessLiveWorkPage: FC<
               }
             />
           ) : null}
+          {finished ? (
+            <SecondaryButton
+              label={S.goHome}
+              onPress={() =>
+                navigation.popTo(
+                  ROUTES.mainTabs,
+                  tabHome(ROUTES.businessLive),
+                )
+              }
+              testID="business-live-go-home"
+            />
+          ) : null}
           {actions.can_cancel && !retry ? (
             <SecondaryButton
               label={working ? S.forceCancel : S.cancel}
               tone="danger"
-              icon={XIcon}
+              icon={XCircleIcon}
               onPress={() => openCancel()}
               disabled={busy}
             />
@@ -416,11 +442,14 @@ export const BusinessLiveWorkPage: FC<
       {!multi && assignment && status !== 'cancelled' ? (
         <LiveCard testID="business-live-work-worker">
           <LiveText tone="label">{S.workerProfile}</LiveText>
-          <LiveText tone="strong">
-            {`${assignment.worker.full_name ?? 'Worker'}${
-              assignment.worker.verification_status === 'verified' ? ' ✓' : ''
-            }`}
-          </LiveText>
+          <View style={styles.workerName}>
+            <LiveText tone="strong">
+              {assignment.worker.full_name ?? 'Worker'}
+            </LiveText>
+            {assignment.worker.verification_status === 'verified' ? (
+              <BadgeCheckIcon width={16} height={16} color={colors.success} />
+            ) : null}
+          </View>
           <LiveText tone="muted">
             {`${S.rating(
               assignment.worker.rating_avg,
@@ -554,6 +583,14 @@ export const BusinessLiveWorkPage: FC<
           ) : null}
         </LiveCard>
       ) : null}
+
+      {doneSeats.map(seat => (
+        <LiveRatingCard
+          key={seat.assignment_id}
+          assignmentId={seat.assignment_id}
+          name={seat.worker.full_name ?? tr('businessRating.workerFallback')}
+        />
+      ))}
 
       {!multi && booking.final_invoice ? (
         <LiveCard>
@@ -710,5 +747,6 @@ const styles = StyleSheet.create({
   stack: { gap: 8 },
   address: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
   addressText: { flex: 1, paddingTop: 1 },
+  workerName: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   code: { fontFamily: FONTS.bold, fontSize: 30, letterSpacing: 6 },
 });

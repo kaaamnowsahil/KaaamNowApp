@@ -10,6 +10,7 @@ import {
   BrandAppBar,
   EmptyState,
   OutlineButton,
+  PrimaryButton,
   ScreenIntro,
   SegmentedControl,
 } from '@/components/ui';
@@ -170,8 +171,6 @@ export const WorkerHomePage: FC = () => {
             icon={home.status === 'live' ? ZapIcon : CalendarDaysIcon}
             title={emptyState.title}
             body={emptyState.body}
-            action={emptyState.action}
-            onAction={home.status === 'live' ? home.showScheduled : undefined}
             testID={`home-empty-${home.status}`}
           />,
         ]),
@@ -184,7 +183,20 @@ export const WorkerHomePage: FC = () => {
         header={<BrandAppBar onBellPress={home.openNotifications} />}
         blocks={blocks}
         fillLastBlock={home.nearby.length === 0}
+        actions={
+          home.status === 'live' &&
+          !home.error &&
+          home.nearby.length === 0 &&
+          emptyState.action ? (
+            <PrimaryButton
+              label={emptyState.action}
+              onPress={home.showScheduled}
+              testID="home-empty-live-action"
+            />
+          ) : undefined
+        }
         isLoading={home.isLoading}
+        busy={home.isLocating || home.availabilityPending}
       />
       {home.isFilterOpen ? (
         <FilterSheet

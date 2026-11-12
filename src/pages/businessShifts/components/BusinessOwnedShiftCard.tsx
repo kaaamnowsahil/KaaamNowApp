@@ -26,6 +26,7 @@ const CANCELLABLE: ApiShiftStatus[] = [
   'open',
   'filled',
 ];
+const FINISHED = new Set<ApiShiftStatus>(['completed', 'expired', 'cancelled']);
 
 const STATUS_KEYS: Record<ApiShiftStatus, string> = {
   awaiting_payment: '',
@@ -120,6 +121,9 @@ export const BusinessOwnedShiftCard: FC<BusinessOwnedShiftCardProps> = ({
     shift.status === 'awaiting_payment' && Boolean(shift.deposit_invoice_id);
   const isDraft = shift.status === 'draft';
   const isLive = shift.shift_type === 'live';
+  const isFinished = FINISHED.has(shift.status);
+  const hasDetails =
+    isLive || !['draft', 'awaiting_payment'].includes(shift.status);
   const isTask = shift.pricing_mode === 'task';
   const hasActions =
     showActions && !isLive && (canCancel || isDraft || needsDeposit);
@@ -200,18 +204,7 @@ export const BusinessOwnedShiftCard: FC<BusinessOwnedShiftCardProps> = ({
           ) : null}
         </View>
       </View>
-      {isLive ? (
-        <Pressable
-          accessibilityRole="button"
-          onPress={onOpenLive}
-          style={[styles.openLive, { borderColor: colors.primary }]}
-          testID={`business-shift-open-live-${shift.id}`}
-        >
-          <Text style={[styles.buttonText, { color: colors.primary }]}>
-            {LIVE_TEXT.openLiveWork}
-          </Text>
-        </Pressable>
-      ) : (
+      {isLive ? null : (
         <>
           <View style={[styles.row, styles.commission]}>
             <Text style={[styles.meta, { color: colors.textMuted }]}>
@@ -233,6 +226,24 @@ export const BusinessOwnedShiftCard: FC<BusinessOwnedShiftCardProps> = ({
           </View>
         </>
       )}
+      {hasDetails ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={isLive ? onOpenLive : onOpenBooked}
+          style={[styles.openLive, { borderColor: colors.primary }]}
+          testID={
+            isLive
+              ? `business-shift-open-live-${shift.id}`
+              : `business-shift-details-${shift.id}`
+          }
+        >
+          <Text style={[styles.buttonText, { color: colors.primary }]}>
+            {isLive && !isFinished
+              ? LIVE_TEXT.openLiveWork
+              : t('businessShifts.viewDetails')}
+          </Text>
+        </Pressable>
+      ) : null}
       {hasActions ? (
         <View style={[styles.actions, { borderTopColor: colors.border }]}>
           {needsDeposit ? (
