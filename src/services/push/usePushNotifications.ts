@@ -5,78 +5,54 @@ import {
   onNotificationOpenedApp,
   type RemoteMessage,
 } from '@react-native-firebase/messaging';
-import { useEffect } from 'react';
-import { Alert, AppState } from 'react-native';
+import { useEffect, useState } from 'react';
+import { AppState, NativeModules, Platform } from 'react-native';
 
-import { ROUTES } from '@/constants/routes';
-import { navigationRef } from '@/route/navigationRef';
-import { inTab } from '@/route/tabRoutes';
-import { tr } from '@/services/i18n/tr';
+import i18n from '@/services/i18n/i18n';
+import { openFromPush } from '@/services/notifications/openNotificationTarget';
 import type { UserRole } from '@/services/onboarding/useOnboardingStore';
-import { toShift } from '@/services/shifts/shiftMappers';
-import { shiftsApi } from '@/services/shifts/shiftsApi';
-import type { AppStackParamList, TabParamList } from '@/types';
+
+import { useUnreadNotifications } from '@/services/notifications/useUnreadNotifications';
 
 import { registerForPush } from './pushService';
 
-const READY_RETRIES = 20;
-const READY_DELAY_MS = 250;
+export { openFromPush };
 
-const waitForNavigation = async () => {
-  for (let i = 0; i < READY_RETRIES && !navigationRef.isReady(); i += 1) {
-    await new Promise<void>(resolve => setTimeout(resolve, READY_DELAY_MS));
-  }
-  return navigationRef.isReady();
-};
+const RING_LANGUAGES = new Set([
+  'bn',
+  'en',
+  'gu',
+  'hi',
+  'kn',
+  'ml',
+  'mr',
+  'or',
+  'pa',
+  'ta',
+  'te',
+  'ur',
+]);
 
-/** Opens a screen inside a tab so the bottom tabs stay visible. */
-const openInTab = <S extends keyof AppStackParamList>(
-  tab: keyof TabParamList,
-  screen: S,
-  params?: AppStackParamList[S],
-) => navigationRef.navigate(ROUTES.mainTabs, inTab(tab, screen, params));
-
-/** Booking pushes open the booking; everything else opens the inbox. */
-export const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
-  if (!(await waitForNavigation())) return;
-  const inbox = () =>
-    openInTab(
-      role === 'business' ? ROUTES.businessLive : ROUTES.workerHome,
-      ROUTES.notifications,
-    );
-  const assignmentId = message.data?.assignment_id;
-  if (typeof assignmentId !== 'string' || !assignmentId) {
-    inbox();
-    return;
+/** Same files as the web: ring, then the spoken line, in the app language. */
+const spokenRing = (role: UserRole | null, kind: unknown): string | null => {
+  const code = i18n.language.split('-')[0] ?? 'en';
+  const language = RING_LANGUAGES.has(code) ? code : 'en';
+  if (role === 'worker' && kind === 'live_request') return `ring_${language}_new_work`;
+  if (role === 'business' && kind === 'live_worker_accepted') {
+    return `ring_${language}_worker_accepted`;
   }
-  if (role === 'business') {
-    openInTab(ROUTES.businessShifts, ROUTES.businessScheduledWorkerTracking, {
-      assignmentId,
-    });
-    return;
-  }
-  try {
-    const assignment = await shiftsApi.assignment(assignmentId);
-    const shift = {
-      ...toShift(assignment.shift),
-      assignmentId: assignment.id,
-      assignmentStatus: assignment.status,
-    };
-    if (assignment.status === 'checked_in') {
-      openInTab(ROUTES.workerShifts, ROUTES.activeShift, { shift });
-    } else {
-      openInTab(ROUTES.workerShifts, ROUTES.shiftDetails, {
-        shift,
-        bookingStatus: 'confirmed',
-      });
-    }
-  } catch {
-    inbox();
-  }
+  return null;
 };
 
 /** Registers the device and handles pushes while signed in. Mount once inside the app stack. */
 export const usePushNotifications = (role: UserRole | null) => {
+  const [notice, setNotice] = useState<{
+    title: string;
+    body: string;
+    message: RemoteMessage;
+    role: UserRole | null;
+  } | null>(null);
+
   useEffect(() => {
     const messaging = getMessaging();
     let stopTokenRefresh: (() => void) | undefined;
@@ -113,12 +89,14 @@ export const usePushNotifications = (role: UserRole | null) => {
       openFromPush(message, role),
     );
     const stopForeground = onMessage(messaging, message => {
-      const { title, body } = message.notification ?? {};
-      if (!title) return;
-      Alert.alert(title, body ?? '', [
-        { text: tr('common.close'), style: 'cancel' },
-        { text: tr('common.view'), onPress: () => openFromPush(message, role) },
-      ]);
+      void useUnreadNotifications.getState().refresh();
+      const data = message.data ?? {};
+      const title = message.notification?.title ?? data.title;
+      const body = message.notification?.body ?? data.body ?? '';
+      if (typeof title !== 'string' || !title) return;
+      const sound = spokenRing(role, data.kind);
+      if (Platform.OS === 'android' && sound) NativeModules.RingPlayer?.play?.(sound);
+      setNotice({ title, body: typeof body === 'string' ? body : '', message, role });
     });
 
     return () => {
@@ -129,4 +107,15 @@ export const usePushNotifications = (role: UserRole | null) => {
       stopForeground();
     };
   }, [role]);
+
+  return {
+    notice,
+    dismissNotice: () => setNotice(null),
+    viewNotice: () => {
+      if (!notice) return;
+      const { message, role: noticeRole } = notice;
+      setNotice(null);
+      void openFromPush(message, noticeRole);
+    },
+  };
 };

@@ -96,6 +96,7 @@ export const BusinessProfilePage: FC = () => {
       blocks={blocks}
       gap={10}
       isLoading={profile.isLoading}
+      busy={profile.isSigningOut}
       testID="business-profile-page"
     />
   );

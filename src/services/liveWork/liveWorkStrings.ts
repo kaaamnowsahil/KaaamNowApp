@@ -452,4 +452,21 @@ export const LIVE_TEXT = {
   get finalNotPaid() {
     return k('finalNotPaid');
   },
+  rateTitle: (name: string) => k('rateTitle', { name }),
+  get ratedTitle() {
+    return k('ratedTitle');
+  },
+  starsLabel: (count: number) => k('starsLabel', { count }),
+  get reviewLabel() {
+    return k('reviewLabel');
+  },
+  get reviewPlaceholder() {
+    return k('reviewPlaceholder');
+  },
+  get submitRating() {
+    return k('submitRating');
+  },
+  get goHome() {
+    return k('goHome');
+  },
 };

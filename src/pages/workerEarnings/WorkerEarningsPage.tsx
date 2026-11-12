@@ -164,6 +164,7 @@ export const WorkerEarningsPage: FC = () => {
       blocks={blocks}
       gap={20}
       isLoading={earnings.isLoading}
+      busy={earnings.isRedeeming}
       testID="worker-earnings-page"
       actions={
         <>

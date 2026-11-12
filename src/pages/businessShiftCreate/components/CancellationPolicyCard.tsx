@@ -1,7 +1,6 @@
 import type { FC } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { TextButton } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
@@ -90,13 +89,19 @@ export const CancellationPolicyCard: FC<{ onReadTerms: () => void }> = ({ onRead
       ) : null}
 
       <View style={[styles.agree, { borderTopColor: colors.border }]}>
-        <Text style={[styles.note, { color: colors.textSubtle }]}>{S.TERMS_AGREE}</Text>
-        <TextButton
-          label={S.READ_TERMS}
+        <Pressable
+          accessibilityRole="link"
           onPress={onReadTerms}
           testID="business-shift-read-terms"
-          tone="primary"
-        />
+          style={({ pressed }) => [
+            styles.readTermsPressable,
+            pressed && styles.linkPressed,
+          ]}
+        >
+          <Text style={[styles.readTerms, { color: colors.primary }]}>
+            {S.READ_TERMS}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -121,5 +126,19 @@ const styles = StyleSheet.create({
   points: { gap: 4 },
   point: { flexDirection: 'row', gap: 6 },
   pointText: { flex: 1 },
-  agree: { borderTopWidth: 1, paddingTop: 10, gap: 4, alignItems: 'flex-start' },
+  agree: {
+    alignSelf: 'stretch',
+    borderTopWidth: 1,
+    paddingTop: 10,
+    alignItems: 'flex-start',
+  },
+  readTermsPressable: { alignSelf: 'flex-start' },
+  readTerms: {
+    alignSelf: 'flex-start',
+    textAlign: 'left',
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  linkPressed: { opacity: 0.6 },
 });

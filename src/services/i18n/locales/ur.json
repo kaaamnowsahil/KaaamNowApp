@@ -241,7 +241,8 @@
         "overline_one": "لائیو · {{count}} جگہ خالی",
         "overline_other": "لائیو · {{count}} جگہیں خالی",
         "callout": "اہل کارکنوں کے لیے پہلے آئیں پہلے پائیں۔ جگہ دستیاب ہونے پر ہی آپ کی جگہ پکی ہوتی ہے۔",
-        "accept": "شفٹ قبول کریں · {{rate}}/گھنٹہ"
+        "accept": "شفٹ قبول کریں · {{rate}}/گھنٹہ",
+        "acceptTask": "شفٹ قبول کریں"
       },
       "scheduled": {
         "overline": "طے شدہ · بکنگ کے لیے کھلی",
@@ -919,7 +920,8 @@
     "cancelling": "منسوخ ہو رہی ہے…",
     "paymentPending": "ادائیگی باقی",
     "paying": "ادائیگی ہو رہی ہے…",
-    "payDepositAmount": "ڈپازٹ {{amount}} ادا کریں"
+    "payDepositAmount": "ڈپازٹ {{amount}} ادا کریں",
+    "viewDetails": "تفصیلات دیکھیں"
   },
   "businessShiftCreate": {
     "prompt": "شفٹ کب ہے؟",
@@ -1670,7 +1672,15 @@
     "retryBilledTask": "اضافی رقم کام کی قیمت میں شامل ہوتی ہے اور آخری بل کے ساتھ ادا کی جاتی ہے۔ ابھی کچھ ادا نہیں کرنا۔",
     "retryRefund": "مکمل رقم واپس لیں",
     "boostNote": "کسی کے قبول نہ کرنے پر ادائیگی {{amount}} بڑھائی گئی۔ یہ آخری بل میں شامل ہوگی۔",
-    "searchStepHint": "اگر کوئی قبول نہ کرے تو آپ زیادہ معاوضے کے ساتھ دوبارہ تلاش کر سکتے ہیں، زیادہ سے زیادہ {{max}} بار۔"
+    "searchStepHint": "اگر کوئی قبول نہ کرے تو آپ زیادہ معاوضے کے ساتھ دوبارہ تلاش کر سکتے ہیں، زیادہ سے زیادہ {{max}} بار۔",
+    "rateTitle": "{{name}} کو ریٹنگ دیں",
+    "ratedTitle": "آپ کی ریٹنگ",
+    "starsLabel_one": "{{count}} اسٹار",
+    "starsLabel_other": "{{count}} اسٹار",
+    "reviewLabel": "تبصرہ شامل کریں (اختیاری)",
+    "reviewPlaceholder": "کام کیسا رہا؟",
+    "submitRating": "ریٹنگ بھیجیں",
+    "goHome": "ہوم پر جائیں"
   },
   "bookingDetail": {
     "title": "بکنگ",

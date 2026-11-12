@@ -116,11 +116,11 @@ export const ShiftTravelPage: FC<AppScreenProps<typeof ROUTES.shiftTravel>> = ({
 
   const primary = () => {
     if (hasEnded) {
-      navigation.goBack();
+      navigation.popToTop();
       return;
     }
     if (isEnRoute) {
-      navigation.navigate(ROUTES.shiftCheckIn, {
+      navigation.replace(ROUTES.shiftCheckIn, {
         shift: { ...shift, assignmentStatus: 'en_route' },
       });
       return;

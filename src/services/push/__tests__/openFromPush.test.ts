@@ -32,7 +32,7 @@ describe('openFromPush', () => {
 
   it('opens the inbox for pushes without a booking', async () => {
     await openFromPush(message({ kind: 'verification' }), 'worker');
-    expectTab(ROUTES.workerHome, ROUTES.notifications);
+    expectTab(ROUTES.workerProfile, ROUTES.notifications);
   });
 
   it('opens worker tracking for a business booking push', async () => {
@@ -50,6 +50,29 @@ describe('openFromPush', () => {
     });
   });
 
+  it('opens a finished live booking on the done screen', async () => {
+    assignment.mockResolvedValue({
+      id: 'a1',
+      status: 'approved',
+      shift: { id: 's1', shift_type: 'live' },
+    });
+    await openFromPush(message({ assignment_id: 'a1' }), 'worker');
+    expectTab(ROUTES.workerHome, ROUTES.workerLiveBooking, { assignmentId: 'a1' });
+  });
+
+  it('opens a withdrawn booking as cancelled, not as a check-in', async () => {
+    assignment.mockResolvedValue({
+      id: 'a1',
+      status: 'cancelled',
+      shift: { id: 's1', shift_type: 'live' },
+    });
+    await openFromPush(message({ assignment_id: 'a1' }), 'worker');
+    expectTab(ROUTES.workerShifts, ROUTES.shiftDetails, {
+      shift: { id: 's1', assignmentId: 'a1', assignmentStatus: 'cancelled' },
+      bookingStatus: 'cancelled',
+    });
+  });
+
   it('opens booking details for other worker bookings', async () => {
     assignment.mockResolvedValue({ id: 'a1', status: 'confirmed', shift: { id: 's1' } });
     await openFromPush(message({ assignment_id: 'a1' }), 'worker');
@@ -62,11 +85,29 @@ describe('openFromPush', () => {
   it('falls back to the inbox when the booking cannot be loaded', async () => {
     assignment.mockRejectedValue(new Error('offline'));
     await openFromPush(message({ assignment_id: 'a1' }), 'worker');
-    expectTab(ROUTES.workerHome, ROUTES.notifications);
+    expectTab(ROUTES.workerProfile, ROUTES.notifications);
   });
 
   it('opens the business inbox on the dashboard tab', async () => {
     await openFromPush(message({ kind: 'verification' }), 'business');
-    expectTab(ROUTES.businessLive, ROUTES.notifications);
+    expectTab(ROUTES.businessProfile, ROUTES.notifications);
+  });
+
+  it('opens the page stored on the push', async () => {
+    await openFromPush(message({ path: '/business/live-work/s1' }), 'business');
+    expectTab(ROUTES.businessLive, ROUTES.businessLiveWork, { bookingId: 's1' });
+  });
+
+  it('opens worker earnings from the stored path', async () => {
+    await openFromPush(message({ path: '/worker/earnings' }), 'worker');
+    expect(navigate).toHaveBeenCalledWith(ROUTES.mainTabs, {
+      screen: ROUTES.workerEarnings,
+      params: { screen: ROUTES.workerEarningsHome, pop: true },
+    });
+  });
+
+  it('stays in the inbox when the path is for the other role', async () => {
+    await openFromPush(message({ path: '/business/shifts' }), 'worker');
+    expectTab(ROUTES.workerProfile, ROUTES.notifications);
   });
 });

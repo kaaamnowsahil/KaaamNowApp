@@ -13,6 +13,7 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { TabScreen } from '@/layout/TabScreen';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import type { TabAppNavigation } from '@/types';
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
 import { useTheme } from '@/theme/ThemeProvider';
@@ -97,15 +98,24 @@ export const BusinessApplicantsPage: FC = () => {
         if (route.params?.status) navigation.setParams({ status: undefined });
     }, [navigation, route.params?.status]);
 
-    const openBooking = (applicant: BusinessApplicant) =>
-        applicant.assignmentId
-            ? navigation.navigate(ROUTES.businessScheduledWorkerTracking, {
-                  assignmentId: applicant.assignmentId,
-              })
-            : navigation.navigate(ROUTES.businessApplicantProfile, { applicantId: applicant.id });
+    const openBooking = (applicant: BusinessApplicant) => {
+        if (applicant.shiftType === 'live' && applicant.shiftId) {
+            navigation.navigate(ROUTES.businessLiveWork, {
+                bookingId: applicant.shiftId,
+            });
+            return;
+        }
+        if (applicant.assignmentId) {
+            navigation.navigate(ROUTES.businessScheduledWorkerTracking, {
+                assignmentId: applicant.assignmentId,
+            });
+            return;
+        }
+        navigation.navigate(ROUTES.businessApplicantProfile, { applicantId: applicant.id });
+    };
 
     const header = (
-        <BrandAppBar onBellPress={() => navigation.navigate(ROUTES.notifications)} />
+        <BrandAppBar onBellPress={navigateToNotifications} />
     );
 
     const blocks = [

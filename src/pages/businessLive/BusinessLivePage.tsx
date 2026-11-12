@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CalendarDaysIcon from '@/assets/figma/calendar-days.svg';
@@ -28,6 +28,7 @@ export const BusinessLivePage: FC = () => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const dashboard = useBusinessLive();
+  const [isLocating, setIsLocating] = useState(false);
   const isLive = dashboard.view === 'live';
 
   const blocks = [
@@ -36,7 +37,7 @@ export const BusinessLivePage: FC = () => {
       businessName={dashboard.businessName}
       isVerified={dashboard.isVerified}
     />,
-    <BusinessLocation key="location" />,
+    <BusinessLocation key="location" onLocatingChange={setIsLocating} />,
     <SegmentedControl
       key="view-toggle"
       segments={[
@@ -125,7 +126,7 @@ export const BusinessLivePage: FC = () => {
           Boolean(dashboard.error) || dashboard.shifts.length === 0
         }
         isLoading={dashboard.isLoading}
-        busy={dashboard.isRefreshing}
+        busy={dashboard.isRefreshing || isLocating}
         testID="business-live-page"
         actions={
           <PrimaryButton

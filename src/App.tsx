@@ -7,6 +7,7 @@ import '@/services/i18n/i18n';
 
 import { AppRoutes } from '@/route';
 import { useLanguageSync } from '@/services/i18n';
+import { useUnreadNotificationSync } from '@/services/notifications/useUnreadNotifications';
 import { ThemeProvider } from '@/theme/ThemeProvider';
 
 const queryClient = new QueryClient();
@@ -14,6 +15,7 @@ const queryClient = new QueryClient();
 /** Inner wrapper so hooks (useLanguageSync) can run inside providers. */
 const AppInner: FC = () => {
   useLanguageSync();
+  useUnreadNotificationSync();
   return <AppRoutes />;
 };
 

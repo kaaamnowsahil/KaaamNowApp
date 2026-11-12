@@ -102,6 +102,7 @@ export const BusinessLiveWorkPostPage: FC<
   const [categories, setCategories] = useState<SignupOption[]>([]);
   const [categoriesError, setCategoriesError] = useState('');
   const [locating, setLocating] = useState(false);
+  const [isPickingLocation, setIsPickingLocation] = useState(false);
   const [locationNote, setLocationNote] = useState('');
   const [available, setAvailable] = useState<LiveAvailableWorkers | null>(null);
   const availabilityText = available
@@ -435,7 +436,7 @@ export const BusinessLiveWorkPostPage: FC<
       title={S.postTitle}
       headerTag={S.modeTag}
       gap={14}
-      busy={busy}
+      busy={busy || locating || isPickingLocation}
       testID="business-live-work-post-page"
       actions={
         <PrimaryButton
@@ -487,6 +488,7 @@ export const BusinessLiveWorkPostPage: FC<
         latitude={form.latitude}
         longitude={form.longitude}
         isGeocoding={locating}
+        onLocatingChange={setIsPickingLocation}
         onAddressChange={value => set('address', value)}
         onPicked={pickLocation}
         onMapPick={pinOnMap}

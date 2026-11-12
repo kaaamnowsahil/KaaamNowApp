@@ -2,7 +2,7 @@ import { useCallback, useEffect, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Text, TextInput, View } from 'react-native';
 
-import { OutlineButton } from '@/components/ui';
+import { OutlineButton, PrimaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import {
@@ -53,6 +53,7 @@ export const ApplyCouponContent: FC<{
       title={t('coupons.title')}
       headerTag={t('businessApplicants.headerTag')}
       gap={18}
+      busy={busy}
       testID="apply-coupon-page"
     >
       <View style={styles.form}>
@@ -81,13 +82,17 @@ export const ApplyCouponContent: FC<{
             testID="coupon-code-input"
             value={coupon.input}
           />
-          <OutlineButton
+          <PrimaryButton
+            size="compact"
+            dimmedOpacity={0.5}
+            loading={
+              busy && coupon.pendingCode === coupon.input.trim().toUpperCase()
+            }
             label={
               busy && coupon.pendingCode === coupon.input.trim().toUpperCase()
                 ? t('coupons.applying')
                 : t('coupons.apply')
             }
-            tone="primary"
             disabled={busy || !coupon.input.trim()}
             onPress={() => coupon.apply(coupon.input)}
             testID="coupon-code-apply"

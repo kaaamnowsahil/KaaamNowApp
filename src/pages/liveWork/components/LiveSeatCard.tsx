@@ -1,7 +1,8 @@
 import type { FC } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import XIcon from '@/assets/figma/x.svg';
+import BadgeCheckIcon from '@/assets/figma/badge-check.svg';
+import XCircleIcon from '@/assets/figma/x-circle.svg';
 import ClockIcon from '@/assets/icons/clock.svg';
 import { SecondaryButton } from '@/components/ui';
 import { CompletionCodeCard } from '@/components/taskPricing/CompletionCode';
@@ -67,11 +68,14 @@ export const LiveSeatCard: FC<{
           BUSINESS_LIVE_STATUS[status] ?? status
         }`}
       </LiveText>
-      <LiveText tone="strong">
-        {`${assignment.worker.full_name ?? 'Worker'}${
-          assignment.worker.verification_status === 'verified' ? ' ✓' : ''
-        }`}
-      </LiveText>
+      <View style={styles.workerName}>
+        <LiveText tone="strong">
+          {assignment.worker.full_name ?? 'Worker'}
+        </LiveText>
+        {assignment.worker.verification_status === 'verified' ? (
+          <BadgeCheckIcon width={16} height={16} color={colors.success} />
+        ) : null}
+      </View>
       <LiveText tone="muted">
         {`${S.rating(
           assignment.worker.rating_avg,
@@ -172,7 +176,7 @@ export const LiveSeatCard: FC<{
         <SecondaryButton
           label={working ? S.forceCancel : S.cancelThisWorker}
           tone="danger"
-          icon={XIcon}
+          icon={XCircleIcon}
           onPress={onCancel}
           disabled={busy}
           testID={`${testID}-cancel`}
@@ -183,5 +187,6 @@ export const LiveSeatCard: FC<{
 };
 
 const styles = StyleSheet.create({
+  workerName: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   code: { fontFamily: FONTS.bold, fontSize: 26, letterSpacing: 6 },
 });

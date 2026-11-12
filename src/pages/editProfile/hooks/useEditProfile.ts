@@ -70,6 +70,7 @@ export const useEditProfile = (onSaved: () => void) => {
     initials: initialsOf(form.fullName || worker?.full_name || ''),
     phone: toLocalDigits(worker?.phone ?? profile?.account.phone ?? ''),
     workTypeOptions: query.data?.[1] ?? [],
+    busy,
     canSave: parsed.success && isDirty && !busy,
     setFullName: (v: string) => update('fullName', v),
     setAddress: (v: string) => {

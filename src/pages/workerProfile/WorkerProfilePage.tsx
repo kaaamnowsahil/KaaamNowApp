@@ -93,6 +93,7 @@ export const WorkerProfilePage: FC = () => {
       blocks={blocks}
       gap={10}
       isLoading={p.isLoading}
+      busy={p.isSigningOut}
       testID="worker-profile-page"
     />
   );

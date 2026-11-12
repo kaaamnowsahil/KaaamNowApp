@@ -13,6 +13,7 @@ import {
 } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { TabScreen } from '@/layout/TabScreen';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import { BusinessIdentity } from '@/pages/businessLive/components';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { TabAppNavigation } from '@/types';
@@ -110,13 +111,14 @@ export const BusinessShiftsPage: FC = () => {
       <TabScreen
         header={
           <BrandAppBar
-            onBellPress={() => navigation.navigate(ROUTES.notifications)}
+            onBellPress={navigateToNotifications}
           />
         }
         blocks={blocks}
         gap={12}
         fillLastBlock={Boolean(shifts.error) || !shifts.hasShifts}
         isLoading={shifts.isLoading}
+        busy={Boolean(shifts.payingId || shifts.publishingId || shifts.isCancelling)}
         testID="business-shifts-page"
         actions={
           <PrimaryButton

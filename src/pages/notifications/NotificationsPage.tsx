@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useEffect, useState, type FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -6,47 +6,50 @@ import { BodyNote } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import type { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { useAuthStore } from '@/services/auth/useAuthStore';
 import { notificationsApi } from '@/services/notifications/notificationsApi';
+import { openNotificationTarget } from '@/services/notifications/openNotificationTarget';
+import { useUnreadNotifications } from '@/services/notifications/useUnreadNotifications';
 import { formatDateTime } from '@/services/shifts/shiftMappers';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
-import { NOTIFICATIONS_STRINGS } from './constants';
 /**
- * App-bar bell. Tap a row to mark it read.
- * - data: GET /notifications; POST /notifications/{id}/read and /notifications/read-all
+ * App-bar bell. Tap a row to mark it read and open the related page.
+ * - data: GET /notifications; POST /notifications/{id}/read
  */
 export const NotificationsPage: FC<
   AppScreenProps<typeof ROUTES.notifications>
 > = ({ navigation }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const role = useAuthStore(state => state.role);
   const query = useApiQuery(() => notificationsApi.list(), []);
   const items = query.data?.items ?? [];
-  const hasUnread = items.some(n => !n.read_at);
+  const setUnreadCount = useUnreadNotifications(s => s.setCount);
+  const [marking, setMarking] = useState(false);
 
-  const markRead = (id?: string) => {
+  useEffect(() => {
+    if (query.data) setUnreadCount(query.data.unread_count);
+  }, [query.data, setUnreadCount]);
+
+  const markRead = (id: string) => {
     const page = query.data;
-    if (
-      !page ||
-      !items.some(n => !n.read_at && (id === undefined || n.id === id))
-    ) {
-      return;
-    }
+    if (!page || !items.some(n => !n.read_at && n.id === id)) return;
     const now = new Date().toISOString();
-    query.setData({
-      ...page,
-      items: page.items.map(n =>
-        id === undefined || n.id === id
-          ? { ...n, read_at: n.read_at ?? now }
-          : n,
-      ),
-    });
-    (id === undefined
-      ? notificationsApi.markAllRead()
-      : notificationsApi.markRead(id)
-    ).catch(query.reload);
+    const nextItems = page.items.map(n =>
+      n.id === id ? { ...n, read_at: n.read_at ?? now } : n,
+    );
+    const unreadCount = nextItems.filter(n => !n.read_at).length;
+    setUnreadCount(unreadCount);
+    query.setData({ ...page, items: nextItems, unread_count: unreadCount });
+    setMarking(true);
+    notificationsApi
+      .markRead(id)
+      .then(result => setUnreadCount(result.unread_count))
+      .catch(query.reload)
+      .finally(() => setMarking(false));
   };
 
   return (
@@ -54,21 +57,8 @@ export const NotificationsPage: FC<
       onBack={navigation.goBack}
       title={t('notifications.title')}
       gap={0}
-      headerRight={
-        hasUnread ? (
-          <Pressable
-            accessibilityRole="button"
-            hitSlop={8}
-            onPress={() => markRead()}
-            testID="notifications-mark-all"
-          >
-            <Text style={[styles.action, { color: colors.primary }]}>
-              {NOTIFICATIONS_STRINGS.MARK_ALL}
-            </Text>
-          </Pressable>
-        ) : null
-      }
       isLoading={query.isLoading}
+      busy={marking || query.isRefreshing}
       testID="notifications-page"
     >
       {query.error && !query.data ? (
@@ -79,7 +69,14 @@ export const NotificationsPage: FC<
             key={n.id}
             accessibilityRole="button"
             accessibilityState={{ selected: !n.read_at }}
-            onPress={() => markRead(n.id)}
+            onPress={() => {
+              markRead(n.id);
+              openNotificationTarget(
+                { kind: n.kind, ...(n.data ?? {}) },
+                role,
+                { fromInbox: true },
+              ).catch(() => undefined);
+            }}
             style={({ pressed }) => [
               styles.row,
               { borderBottomColor: colors.border },
@@ -122,7 +119,6 @@ export const NotificationsPage: FC<
 };
 
 const styles = StyleSheet.create({
-  action: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 18 },
   row: {
     flexDirection: 'row',
     gap: 10,

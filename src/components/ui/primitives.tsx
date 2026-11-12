@@ -1,12 +1,14 @@
 import { useState, type FC, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  ActivityIndicator,
   Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
   type TextInputProps,
+  type TextStyle,
 } from 'react-native';
 import type { SvgProps } from 'react-native-svg';
 
@@ -135,6 +137,13 @@ type ButtonProps = {
   testID?: string;
 };
 
+type PrimaryButtonProps = ButtonProps & {
+  accessibilityLabel?: string;
+  dimmedOpacity?: number;
+  loading?: boolean;
+  size?: 'default' | 'compact' | 'small';
+};
+
 type SecondaryButtonProps = ButtonProps & {
   /** Leading icon, tinted with the button's accent colour. */
   icon?: FC<SvgProps>;
@@ -143,31 +152,41 @@ type SecondaryButtonProps = ButtonProps & {
 };
 
 /** Figma "Primary action" (1:72): 52px, radius 12, filled primary. */
-export const PrimaryButton: FC<ButtonProps> = ({
+export const PrimaryButton: FC<PrimaryButtonProps> = ({
   label,
   onPress,
   disabled,
   tone = 'default',
   testID,
+  accessibilityLabel,
+  dimmedOpacity = 0.7,
+  loading = false,
+  size = 'default',
 }) => {
   const { colors } = useTheme();
   const fill = tone === 'danger' ? colors.danger : colors.primary;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled, busy: loading }}
       disabled={disabled}
       onPress={onPress}
       testID={testID}
       style={({ pressed }) => [
         styles.button,
+        size === 'compact' && styles.compactButton,
+        size === 'small' && styles.smallButton,
         { backgroundColor: fill, borderColor: fill },
-        (pressed || disabled) && styles.dimmed,
+        (pressed || disabled) && { opacity: dimmedOpacity },
       ]}
     >
-      <Text style={[styles.buttonLabel, { color: colors.onPrimary }]}>
-        {label}
-      </Text>
+      <View style={styles.buttonWithIcon}>
+        {loading ? <ActivityIndicator size="small" color={colors.onPrimary} /> : null}
+        <Text style={[styles.buttonLabel, { color: colors.onPrimary }]}>
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 };
@@ -222,6 +241,8 @@ export const SecondaryButton: FC<SecondaryButtonProps> = ({
 
 type TextFieldProps = TextInputProps & {
   label: string;
+  labelStyle?: TextStyle;
+  labelAdornment?: ReactNode;
   helper?: string;
   /** Red message under the input; shown below the helper. */
   error?: string;
@@ -234,6 +255,8 @@ export const TextField: FC<TextFieldProps> = ({
   label,
   helper,
   error,
+  labelStyle,
+  labelAdornment,
   prefix,
   style,
   secureTextEntry,
@@ -245,9 +268,12 @@ export const TextField: FC<TextFieldProps> = ({
   const EyeToggleIcon = isRevealed ? EyeOffIcon : EyeIcon;
   return (
     <View style={styles.field}>
-      <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>
-        {label}
-      </Text>
+      <View style={styles.fieldLabelRow}>
+        {labelAdornment}
+        <Text style={[styles.fieldLabel, { color: colors.textMuted }, labelStyle]}>
+          {label}
+        </Text>
+      </View>
       <View
         style={[
           styles.inputBox,
@@ -348,6 +374,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
+  compactButton: { minHeight: 44, paddingHorizontal: 18 },
+  smallButton: {
+    minHeight: 40,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
   buttonLabel: { fontFamily: FONTS.semiBold, fontSize: 15 },
   buttonWithIcon: { flexDirection: 'row', gap: 8 },
   shrink: { flexShrink: 1, textAlign: 'center' },
@@ -359,6 +392,7 @@ const styles = StyleSheet.create({
   dimmed: { opacity: 0.7 },
   field: { width: '100%', gap: 7 },
   fieldLabel: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18 },
+  fieldLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   inputBox: {
     minHeight: 52,
     borderRadius: 12,

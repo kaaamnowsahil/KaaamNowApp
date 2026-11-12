@@ -7,6 +7,7 @@ import { meApi } from '@/services/api/meApi';
 import { getDevicePosition, type DevicePosition } from '@/services/maps/devicePosition';
 import { useLocationHeartbeat } from '@/services/maps/locationHeartbeat';
 import { useRealtime } from '@/services/realtime/useRealtime';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import { reverseGeocode } from '@/services/maps/googleMaps';
 import { isTaskShift, toShift } from '@/services/shifts/shiftMappers';
 import { shiftsApi } from '@/services/shifts/shiftsApi';
@@ -195,7 +196,16 @@ export const useWorkerHome = () => {
   };
 
   const nearby = useMemo(
-    () => loaded.filter(shift => matchesLocalFilters(shift, filters)),
+    () => {
+      const seenIds = new Set<string>();
+      return loaded.filter(shift => {
+        if (seenIds.has(shift.id) || !matchesLocalFilters(shift, filters)) {
+          return false;
+        }
+        seenIds.add(shift.id);
+        return true;
+      });
+    },
     [loaded, filters],
   );
 
@@ -277,7 +287,7 @@ export const useWorkerHome = () => {
       setAvailabilityError(null);
     },
     openShift,
-    openNotifications: () => navigation.navigate(ROUTES.notifications),
+    openNotifications: navigateToNotifications,
     locationLabel: (position ? currentLabel : '') || savedLabel,
     isLocating,
     locationError,

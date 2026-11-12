@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { SecondaryButton } from '@/components/ui';
+import ClockIcon from '@/assets/icons/clock.svg';
 import { FONTS } from '@/constants/fonts';
 import { formatRupees } from '@/services/liveWork/liveWorkFormat';
 import { LIVE_TEXT as S } from '@/services/liveWork/liveWorkStrings';
@@ -109,7 +110,8 @@ export const LiveRetryPanel: FC<Props> = ({
 
       {open ? (
         <View style={[styles.timer, { backgroundColor: colors.fill }]}>
-          <Text style={[styles.timerStrong, { color: colors.warning }]}>
+          <ClockIcon width={16} height={16} color={colors.textMuted} />
+          <Text style={[styles.timerStrong, { color: colors.textMuted }]}>
             {S.retryTimer(timeLeft)}
           </Text>
           <Text style={[styles.timerNote, { color: colors.textMuted }]}>
@@ -206,10 +208,13 @@ const styles = StyleSheet.create({
   step: { flex: 1, height: 6, borderRadius: 999 },
   stepCurrent: { opacity: 0.55 },
   timer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    gap: 2,
+    gap: 8,
   },
   timerStrong: { fontFamily: FONTS.bold, fontSize: 14 },
   timerNote: { fontFamily: FONTS.regular, fontSize: 12 },

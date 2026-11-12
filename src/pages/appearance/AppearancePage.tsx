@@ -23,6 +23,20 @@ export const AppearancePage: FC<AppScreenProps<typeof ROUTES.appearance>> = ({
   const theme = usePreferencesStore(s => s.theme);
   const setTheme = usePreferencesStore(s => s.setTheme);
   const [selected, setSelected] = useState(theme);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    if (saving || selected === theme) return;
+    setSaving(true);
+    try {
+      await meApi.updateProfile({ theme_preference: selected });
+      setTheme(selected);
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert(t('editProfile.preferenceFailed'), errorMessage(error));
+      setSaving(false);
+    }
+  };
 
   const options = [
     { id: 'light' as const, title: t('appearance.light'), caption: t('appearance.lightCaption') },
@@ -34,20 +48,15 @@ export const AppearancePage: FC<AppScreenProps<typeof ROUTES.appearance>> = ({
       onBack={navigation.goBack}
       title={t('appearance.title')}
       gap={14}
+      busy={saving}
       testID="appearance-page"
       actions={
         <>
           <PrimaryButton
             label={t('appearance.save')}
-            disabled={selected === theme}
+            disabled={saving || selected === theme}
             onPress={() => {
-              setTheme(selected);
-              meApi
-                .updateProfile({ theme_preference: selected })
-                .catch(error =>
-                  Alert.alert(t('editProfile.preferenceFailed'), errorMessage(error)),
-                );
-              navigation.goBack();
+              void save();
             }}
             testID="appearance-save"
           />

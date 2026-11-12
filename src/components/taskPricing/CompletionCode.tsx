@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
+import KeyRoundIcon from '@/assets/figma/key-round.svg';
 import { SecondaryButton, TextField } from '@/components/ui';
 import { FONTS } from '@/constants/fonts';
 import {
@@ -100,6 +101,8 @@ export const CompletionCodeField: FC<{
   return (
     <TextField
       label={t('taskPricing.enterCodeLabel')}
+      labelAdornment={<KeyRoundIcon width={16} height={16} color={colors.text} />}
+      labelStyle={styles.inputLabel}
       value={value}
       onChangeText={text => onChange(cleanCompletionCode(text))}
       keyboardType="number-pad"
@@ -107,6 +110,8 @@ export const CompletionCodeField: FC<{
       textContentType="oneTimeCode"
       maxLength={COMPLETION_CODE_LENGTH}
       placeholder={'•'.repeat(COMPLETION_CODE_LENGTH)}
+      textAlign="center"
+      style={styles.codeInput}
       helper={`${t('taskPricing.enterCodeHint', {
         business: businessName,
       })}${tries}`}
@@ -127,4 +132,6 @@ const styles = StyleSheet.create({
   code: { fontFamily: FONTS.bold, fontSize: 32, letterSpacing: 6 },
   body: { fontFamily: FONTS.regular, fontSize: 13, lineHeight: 19 },
   hint: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 18 },
+  codeInput: { fontFamily: FONTS.bold, fontSize: 24, letterSpacing: 6, textAlign: 'center' },
+  inputLabel: { color: '#111827', fontFamily: FONTS.semiBold, fontSize: 14, lineHeight: 21 },
 });

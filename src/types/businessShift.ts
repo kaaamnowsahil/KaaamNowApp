@@ -75,6 +75,7 @@ export type BusinessApplicant = {
   ratingCount?: number;
   completedShifts?: number;
   shiftId?: string;
+  shiftType?: string;
   workplace?: string;
   startsAt?: string;
   endsAt?: string;

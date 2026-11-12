@@ -6,6 +6,7 @@ import { ROUTES } from '@/constants/routes';
 import { errorMessage } from '@/services/api/apiClient';
 import { earningsApi, type LedgerEntry } from '@/services/earnings/earningsApi';
 import { promoApi } from '@/services/promos/promoApi';
+import { navigateToNotifications } from '@/services/notifications/navigateToNotifications';
 import { formatDateLabel, fromMinor } from '@/services/shifts/shiftMappers';
 import { useApiQuery } from '@/shared/hooks/useApiQuery';
 import { formatRupees } from '@/utils/format';
@@ -76,7 +77,7 @@ export const useWorkerEarnings = () => {
     pendingPromo: promo.data?.pending ?? null,
     isRedeeming,
     redeem,
-    openNotifications: () => navigation.navigate(ROUTES.notifications),
+    openNotifications: navigateToNotifications,
     openAllEarnings: () => navigation.navigate(ROUTES.earningsHistory),
     openEarningDetail: (earning: EarningsRow) =>
       navigation.navigate(ROUTES.workerEarningDetail, {

@@ -25,6 +25,7 @@ export const BusinessEditProfilePage: FC<
             title={t('businessProfile.editBusinessProfile')}
             gap={16}
             isLoading={form.isLoading}
+            busy={form.busy || form.isUploading || form.isLocating}
             testID="business-edit-profile-page"
             actions={
                 <PrimaryButton

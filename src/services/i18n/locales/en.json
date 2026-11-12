@@ -241,7 +241,8 @@
         "overline_one": "Live · {{count}} spot available",
         "overline_other": "Live · {{count}} spots available",
         "callout": "First-come-first-served for eligible workers. Your place is confirmed only when availability is secured.",
-        "accept": "Accept shift · {{rate}}/hour"
+        "accept": "Accept shift · {{rate}}/hour",
+        "acceptTask": "Accept shift"
       },
       "scheduled": {
         "overline": "Scheduled · Open for booking",
@@ -919,7 +920,8 @@
     "cancelling": "Cancelling…",
     "paymentPending": "Payment pending",
     "paying": "Paying…",
-    "payDepositAmount": "Pay deposit {{amount}}"
+    "payDepositAmount": "Pay deposit {{amount}}",
+    "viewDetails": "View"
   },
   "businessShiftCreate": {
     "prompt": "When is the shift?",
@@ -1670,7 +1672,15 @@
     "retryBilledTask": "The extra is added to the task price and paid with the final bill. You don't pay anything now.",
     "retryRefund": "Get full refund",
     "boostNote": "Pay raised by {{amount}} after nobody accepted. It is added to the final bill.",
-    "searchStepHint": "If nobody accepts, you can search again with higher pay, up to {{max}} searches."
+    "searchStepHint": "If nobody accepts, you can search again with higher pay, up to {{max}} searches.",
+    "rateTitle": "Rate {{name}}",
+    "ratedTitle": "Your rating",
+    "starsLabel_one": "{{count}} star",
+    "starsLabel_other": "{{count}} stars",
+    "reviewLabel": "Add a comment (optional)",
+    "reviewPlaceholder": "How did it go?",
+    "submitRating": "Submit rating",
+    "goHome": "Go to home"
   },
   "bookingDetail": {
     "title": "Booking",

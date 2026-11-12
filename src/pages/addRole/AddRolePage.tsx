@@ -31,7 +31,7 @@ export const AddRolePage: FC<AppScreenProps<typeof ROUTES.addRole>> = ({
 
   return (
     <FormScreen
-      busy={f.busy}
+      busy={f.busy || f.isLocating || f.optionsLoading}
       onBack={navigation.goBack}
       testID="add-role-page"
       actions={

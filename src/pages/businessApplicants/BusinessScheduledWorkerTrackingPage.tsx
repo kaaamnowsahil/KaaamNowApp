@@ -172,6 +172,12 @@ export const BusinessScheduledWorkerTrackingPage: FC<
     );
   };
 
+  const isLive = detail?.shift.shift_type === 'live';
+  useEffect(() => {
+    if (!isLive || !detail) return;
+    navigation.replace(ROUTES.businessLiveWork, { bookingId: detail.shift.id });
+  }, [detail, isLive, navigation]);
+
   const isBooked = status === 'confirmed' || status === 'en_route';
   const isWorking = status === 'checked_in';
   const isEnded = status === 'checked_out' || status === 'approved';
@@ -247,6 +253,17 @@ export const BusinessScheduledWorkerTrackingPage: FC<
     }
     return null;
   })();
+
+  if (isLive) {
+    return (
+      <FormScreen
+        onBack={navigation.goBack}
+        title={S.TITLE}
+        isLoading
+        testID="business-scheduled-worker-tracking-page"
+      />
+    );
+  }
 
   return (
     <>

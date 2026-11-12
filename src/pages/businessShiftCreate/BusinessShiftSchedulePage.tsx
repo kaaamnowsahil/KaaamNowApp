@@ -60,6 +60,7 @@ export const BusinessShiftSchedulePage: FC<
   const { busy, run } = useShiftAction();
   const [addressEdited, setAddressEdited] = useState(false);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
   const [saveError, setSaveError] = useState('');
   const prefilled = useRef(Boolean(route.params?.draft?.location));
@@ -333,7 +334,7 @@ export const BusinessShiftSchedulePage: FC<
 
   return (
     <FormScreen
-      busy={busy}
+      busy={busy || isGeocoding || isLocating}
       onBack={navigation.goBack}
       title={t('businessApplicants.headerTitle')}
       subtitle={t('businessDashboard.scheduledStatus')}
@@ -375,6 +376,7 @@ export const BusinessShiftSchedulePage: FC<
         latitude={draft.latitude}
         longitude={draft.longitude}
         isGeocoding={isGeocoding}
+        onLocatingChange={setIsLocating}
         error={showErrors ? locationError : undefined}
         onAddressChange={location => {
           setAddressEdited(true);

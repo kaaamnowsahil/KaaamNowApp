@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import MapPinIcon from '@/assets/figma/map-pin.svg';
+import XCircleIcon from '@/assets/figma/x-circle.svg';
 import { WORKER_CANCELLATION_STRINGS } from '@/components/shiftFlow/workerCancellationStrings';
 import { CompletionCodeField } from '@/components/taskPricing/CompletionCode';
 import {
@@ -24,6 +25,7 @@ import {
 import { FONTS } from '@/constants/fonts';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
+import { tabHome } from '@/route/tabRoutes';
 import { tr } from '@/services/i18n/tr';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
 import {
@@ -58,6 +60,7 @@ import {
 import { useTheme } from '@/theme/ThemeProvider';
 import type { AppScreenProps } from '@/types';
 
+import { LiveRatingCard } from './components/LiveRatingCard';
 import { LiveRulesCard } from './components/LiveRulesCard';
 import { LiveCard, LiveText, PriceRow } from './components/LiveWorkUi';
 
@@ -302,6 +305,7 @@ export const WorkerLiveBookingPage: FC<
   const ask = booking.extensions.find(e => e.status === 'requested');
   const canReach = actions.can_start_work && status === 'en_route' && !reached;
   const askCode = actions.can_start_work && status === 'en_route' && reached;
+  const finished = status === 'completed' || status === 'cancelled';
 
   return (
     <FormScreen
@@ -315,7 +319,8 @@ export const WorkerLiveBookingPage: FC<
         actions.can_start_travel ||
         canReach ||
         actions.can_complete ||
-        actions.can_cancel ? (
+        actions.can_cancel ||
+        finished ? (
           <>
             {actions.can_start_travel ? (
               <PrimaryButton
@@ -344,8 +349,18 @@ export const WorkerLiveBookingPage: FC<
               <SecondaryButton
                 label={status === 'in_progress' ? S.forceCancel : S.cancel}
                 tone="danger"
+                icon={XCircleIcon}
                 onPress={openCancel}
                 disabled={busy}
+              />
+            ) : null}
+            {finished ? (
+              <SecondaryButton
+                label={S.goHome}
+                onPress={() =>
+                  navigation.popTo(ROUTES.mainTabs, tabHome(ROUTES.workerHome))
+                }
+                testID="worker-live-go-home"
               />
             ) : null}
           </>
@@ -415,6 +430,7 @@ export const WorkerLiveBookingPage: FC<
             <>
               <TextField
                 label={S.enterCode}
+                labelStyle={styles.arrivalCodeLabel}
                 value={code}
                 onChangeText={value => {
                   setCode(value.toUpperCase().replace(/[^A-Z0-9]/g, ''));
@@ -424,6 +440,7 @@ export const WorkerLiveBookingPage: FC<
                 autoCorrect={false}
                 maxLength={ARRIVAL_CODE_LENGTH}
                 placeholder={'•'.repeat(ARRIVAL_CODE_LENGTH)}
+                style={styles.arrivalCodeInput}
                 error={codeError}
                 testID="worker-live-code"
               />
@@ -505,6 +522,13 @@ export const WorkerLiveBookingPage: FC<
         </LiveCard>
       ) : null}
 
+      {status === 'completed' ? (
+        <LiveRatingCard
+          assignmentId={assignmentId}
+          name={work.business_name}
+        />
+      ) : null}
+
       <LiveCard>
         <LiveText tone="title">{S.earnings}</LiveText>
         <LiveText>
@@ -555,14 +579,27 @@ export const WorkerLiveBookingPage: FC<
               error={finishError}
               testID="worker-live-completion-code"
             />
-            {booking.completion?.locked ? null : (
-              <PrimaryButton
-                label={isTask ? tr('taskPricing.finishTask') : S.completeWork}
-                onPress={confirmComplete}
-                disabled={busy || finishCode.length !== COMPLETION_CODE_LENGTH}
-                testID="worker-live-complete-confirm"
-              />
-            )}
+            <View style={styles.completionActions}>
+              <View style={styles.completionAction}>
+                <PrimaryButton
+                  label={isTask ? tr('taskPricing.finishTask') : S.completeWork}
+                  onPress={confirmComplete}
+                  disabled={
+                    busy ||
+                    booking.completion?.locked ||
+                    finishCode.length !== COMPLETION_CODE_LENGTH
+                  }
+                  testID="worker-live-complete-confirm"
+                />
+              </View>
+              <View style={styles.completionAction}>
+                <SecondaryButton
+                  label={tr('common.cancel')}
+                  onPress={() => setFinishing(false)}
+                  disabled={busy}
+                />
+              </View>
+            </View>
           </View>
         </BottomSheet>
       ) : null}
@@ -629,7 +666,21 @@ export const WorkerLiveBookingPage: FC<
 
 const styles = StyleSheet.create({
   stack: { gap: 8 },
+  completionActions: { flexDirection: 'row', gap: 10 },
+  completionAction: { flex: 1 },
   address: { flexDirection: 'row', alignItems: 'flex-start', gap: 6 },
   addressText: { flex: 1, paddingTop: 1 },
   clock: { fontFamily: FONTS.bold, fontSize: 30 },
+  arrivalCodeLabel: {
+    fontFamily: FONTS.semiBold,
+    fontSize: 14,
+    lineHeight: 21,
+  },
+  arrivalCodeInput: {
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: '700',
+    letterSpacing: 9.6,
+    paddingVertical: 6,
+  },
 });
