@@ -9,13 +9,16 @@ import { openFromPush } from '../usePushNotifications';
 jest.mock('@/route/navigationRef', () => ({
   navigationRef: { isReady: jest.fn(() => true), navigate: jest.fn() },
 }));
-jest.mock('@/services/shifts/shiftsApi', () => ({ shiftsApi: { assignment: jest.fn() } }));
+jest.mock('@/services/shifts/shiftsApi', () => ({
+  shiftsApi: { assignment: jest.fn(), shiftDetail: jest.fn() },
+}));
 jest.mock('@/services/shifts/shiftMappers', () => ({
   toShift: (shift: { id: string }) => ({ id: shift.id }),
 }));
 
 const navigate = navigationRef.navigate as unknown as jest.Mock;
 const assignment = shiftsApi.assignment as jest.Mock;
+const shiftDetail = shiftsApi.shiftDetail as jest.Mock;
 const message = (data?: Record<string, string>) => ({ data }) as unknown as RemoteMessage;
 /** Every push opens inside a tab so the bottom tabs stay visible. */
 const expectTab = (tab: string, screen: string, params?: object) =>
@@ -28,6 +31,7 @@ describe('openFromPush', () => {
   beforeEach(() => {
     navigate.mockReset();
     assignment.mockReset();
+    shiftDetail.mockReset();
   });
 
   it('opens the inbox for pushes without a booking', async () => {
@@ -91,6 +95,15 @@ describe('openFromPush', () => {
   it('opens the business inbox on the dashboard tab', async () => {
     await openFromPush(message({ kind: 'verification' }), 'business');
     expectTab(ROUTES.businessProfile, ROUTES.notifications);
+  });
+
+  it('lands a worker live offer on the shift screen, with no extra page', async () => {
+    shiftDetail.mockResolvedValue({ id: 's1' });
+    await openFromPush(
+      message({ kind: 'live_request', path: '/worker/live-work', shift_id: 's1' }),
+      'worker',
+    );
+    expectTab(ROUTES.workerHome, ROUTES.shiftDetails, { shift: { id: 's1' } });
   });
 
   it('opens the page stored on the push', async () => {

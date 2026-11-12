@@ -94,6 +94,15 @@ const openWorkerAssignment = async (assignmentId: string, role: UserRole | null)
   }
 };
 
+const openLiveOffer = async (shiftId: string, role: UserRole | null) => {
+  try {
+    const detail = await shiftsApi.shiftDetail(shiftId);
+    openInTab(ROUTES.workerHome, ROUTES.shiftDetails, { shift: toShift(detail) });
+  } catch {
+    openInbox(role);
+  }
+};
+
 const openWorkerShift = async (shiftId: string, role: UserRole | null) => {
   try {
     const detail = await shiftsApi.shiftDetail(shiftId);
@@ -145,7 +154,6 @@ export const openNotificationPath = async (path: string, role: UserRole | null) 
     return;
   }
   if (clean === '/worker/live-work') {
-    openInTab(ROUTES.workerHome, ROUTES.workerLiveWork);
     return;
   }
   const bookingId = idAfter(clean, '/worker/booking/');
@@ -235,6 +243,13 @@ export const openNotificationTarget = async (
 /** Booking pushes open the booking; a stored path opens that page; everything else opens the inbox. */
 export const openFromPush = async (message: RemoteMessage, role: UserRole | null) => {
   const data = message.data ?? {};
+  if (role === 'worker' && data.kind === 'live_request') {
+    const shiftId = typeof data.shift_id === 'string' ? data.shift_id : '';
+    if (shiftId) {
+      await openLiveOffer(shiftId, role);
+      return;
+    }
+  }
   if (typeof data.path === 'string' && data.path.startsWith('/') && !data.path.startsWith('//')) {
     await openNotificationPath(data.path, role);
     return;

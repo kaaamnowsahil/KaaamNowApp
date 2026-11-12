@@ -2,18 +2,16 @@ import type { FC } from 'react';
 import { useCallback, useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
 
-import { PrimaryButton, SecondaryButton } from '@/components/ui';
+import { PrimaryButton } from '@/components/ui';
 import { ROUTES } from '@/constants/routes';
 import { FormScreen } from '@/layout/FormScreen';
 import { tr } from '@/services/i18n/tr';
+import { acceptLiveOffer, liveOfferError } from '@/services/liveWork/acceptLiveOffer';
 import { liveWorkApi } from '@/services/liveWork/liveWorkApi';
-import { askToShareLocation } from '@/services/liveWork/locationPrompt';
 import {
   formatClock,
   formatMinutes,
   formatRupees,
-  isRequestTaken,
-  liveErrorText,
   LIVE_POLL_MS,
 } from '@/services/liveWork/liveWorkFormat';
 import {
@@ -28,7 +26,6 @@ import {
   useCountdown,
   useLivePolling,
 } from '@/services/liveWork/useLivePolling';
-import { getDevicePosition } from '@/services/maps/devicePosition';
 import { useRealtime } from '@/services/realtime/useRealtime';
 import type { AppScreenProps } from '@/types';
 
@@ -58,9 +55,8 @@ async function loadFeed(): Promise<Feed> {
 const RequestCard: FC<{
   request: WorkerLiveRequest;
   disabled: boolean;
-  onAccept: () => void;
-  onDecline: () => void;
-}> = ({ request, disabled, onAccept, onDecline }) => {
+  onOkay: () => void;
+}> = ({ request, disabled, onOkay }) => {
   const [deadline] = useState(() =>
     new Date(Date.now() + request.seconds_left * 1000).toISOString(),
   );
@@ -89,14 +85,9 @@ const RequestCard: FC<{
       <LiveText tone="muted">{S.respondWithin(formatClock(left))}</LiveText>
       <View style={styles.actions}>
         <PrimaryButton
-          label={S.accept}
-          onPress={onAccept}
+          label={tr('common.okay')}
+          onPress={onOkay}
           disabled={disabled || left === 0}
-        />
-        <SecondaryButton
-          label={S.decline}
-          onPress={onDecline}
-          disabled={disabled}
         />
       </View>
     </LiveCard>
@@ -116,38 +107,18 @@ export const WorkerLiveWorkPage: FC<
   });
   const [busy, setBusy] = useState(false);
 
-  const accept = async (request: WorkerLiveRequest) => {
+  const okay = async (request: WorkerLiveRequest) => {
     setBusy(true);
     try {
-      const point = await getDevicePosition(8000);
-      if (!point) {
-        askToShareLocation(S.needLocation);
-        return;
-      }
-      await liveWorkApi.reportWorkerLocation(point);
-      const booking = await liveWorkApi.accept(request.booking_id);
+      const booking = await acceptLiveOffer(request.booking_id);
+      if (!booking) return;
       navigation.replace(ROUTES.workerLiveBooking, {
-        assignmentId: booking.assignment_id,
+        assignmentId: booking.assignmentId,
       });
     } catch (cause) {
-      Alert.alert(
-        S.actionFailed,
-        isRequestTaken(cause) ? S.taken : liveErrorText(cause),
-      );
+      Alert.alert(S.actionFailed, liveOfferError(cause));
       await refresh();
     } finally {
-      setBusy(false);
-    }
-  };
-
-  const decline = async (request: WorkerLiveRequest) => {
-    setBusy(true);
-    try {
-      await liveWorkApi.decline(request.booking_id);
-    } catch (cause) {
-      Alert.alert(S.actionFailed, liveErrorText(cause));
-    } finally {
-      await refresh();
       setBusy(false);
     }
   };
@@ -189,8 +160,7 @@ export const WorkerLiveWorkPage: FC<
           key={request.dispatch_id}
           request={request}
           disabled={busy || Boolean(data.active)}
-          onAccept={() => accept(request)}
-          onDecline={() => decline(request)}
+          onOkay={() => okay(request)}
         />
       ))}
     </FormScreen>

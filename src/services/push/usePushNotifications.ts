@@ -91,11 +91,15 @@ export const usePushNotifications = (role: UserRole | null) => {
     const stopForeground = onMessage(messaging, message => {
       void useUnreadNotifications.getState().refresh();
       const data = message.data ?? {};
+      const sound = spokenRing(role, data.kind);
+      if (Platform.OS === 'android' && sound) NativeModules.RingPlayer?.play?.(sound);
+      if (role === 'worker' && data.kind === 'live_request') {
+        void openFromPush(message, role);
+        return;
+      }
       const title = message.notification?.title ?? data.title;
       const body = message.notification?.body ?? data.body ?? '';
       if (typeof title !== 'string' || !title) return;
-      const sound = spokenRing(role, data.kind);
-      if (Platform.OS === 'android' && sound) NativeModules.RingPlayer?.play?.(sound);
       setNotice({ title, body: typeof body === 'string' ? body : '', message, role });
     });
 

@@ -73,9 +73,7 @@ function paymentPath(data: Record<string, unknown>): string {
 
 function workerPath(kind: string, data: Record<string, unknown>, shiftId: string, assignmentId: string) {
   const live = flag(data, 'live_work');
-  if (kind === 'live_request') {
-    return data.live_offer === 'live_work' || !shiftId ? '/worker/live-work' : `/worker/shift/${shiftId}`;
-  }
+  if (kind === 'live_request') return shiftId ? `/worker/shift/${shiftId}` : '/worker/live-work';
   if (kind === 'earning_credited') return '/worker/earnings';
   if (kind === 'withdrawal_paid' || kind === 'withdrawal_failed') return '/worker/earnings-history';
   if (kind === 'verification_updated') return '/worker/profile';

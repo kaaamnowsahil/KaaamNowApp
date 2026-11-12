@@ -13,7 +13,8 @@
     "comingSoon": "Coming soon",
     "viewMore": "View more ({{count}})",
     "viewLess": "View less",
-    "view": "View"
+    "view": "View",
+    "okay": "Okay"
   },
   "appearance": {
     "title": "Choose your appearance",
