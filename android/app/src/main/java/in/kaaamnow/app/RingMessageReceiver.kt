@@ -13,9 +13,9 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 
 /**
- * Killed-state sound comes from the notification channel named after the raw file.
- * When FCM already includes that channel, Android plays it. This only draws a banner
- * for a data-only message, on that same channel, so the spoken file still plays.
+ * Background and killed rings are played here, from the raw file, on the alarm stream.
+ * The FCM banner uses the silent channel, so Android does not add the phone's default tone.
+ * A data-only message has no banner yet, so this draws one on that same silent channel.
  */
 class RingMessageReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
@@ -24,19 +24,16 @@ class RingMessageReceiver : BroadcastReceiver() {
     if (extras.getString("google.message_id") == null) return
     val sound = resolveSound(extras) ?: return
     if (isAppForeground(context)) return
+    val pending = goAsync()
+    val app = context.applicationContext
     val systemShowing =
       extras.containsKey("gcm.notification.title") || extras.containsKey("gcm.notification.body")
-    if (systemShowing) return
-
-    val title = extras.getString("title") ?: "KaaamNow"
-    val body = extras.getString("body") ?: ""
-    showNotification(
-      context.applicationContext,
-      title,
-      body,
-      extras.getString("google.message_id"),
-      sound,
-    )
+    if (!systemShowing) {
+      val title = extras.getString("title") ?: "KaaamNow"
+      val body = extras.getString("body") ?: ""
+      showNotification(app, title, body, extras.getString("google.message_id"))
+    }
+    RingPlayback.play(app, sound) { pending.finish() }
   }
 
   private fun showNotification(
@@ -44,9 +41,7 @@ class RingMessageReceiver : BroadcastReceiver() {
     title: String,
     body: String,
     messageId: String?,
-    sound: String,
   ) {
-    ensureAlarmChannel(context, sound, "KaaamNow")
     val manager = context.getSystemService(NotificationManager::class.java)
     val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
     val open =
@@ -57,7 +52,7 @@ class RingMessageReceiver : BroadcastReceiver() {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
       )
     val notification =
-      NotificationCompat.Builder(context, alarmChannelId(sound))
+      NotificationCompat.Builder(context, VOICE_CHANNEL)
         .setSmallIcon(context.applicationInfo.icon)
         .setContentTitle(title)
         .setContentText(body)
