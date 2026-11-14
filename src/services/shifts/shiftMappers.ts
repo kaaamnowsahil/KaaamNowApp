@@ -167,6 +167,8 @@ export const toApplicant = (
   about: item.cover_note,
   skills: [],
   assignmentId: item.assignment_id ?? undefined,
+  assignmentStatus: item.assignment_status ?? undefined,
+  shiftStatus: item.shift.status,
   distanceKm: item.distance_km ?? undefined,
   workerId: item.worker.id,
   photoUrl: item.worker.photo_url ?? undefined,

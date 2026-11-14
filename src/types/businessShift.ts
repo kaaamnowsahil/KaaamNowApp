@@ -66,6 +66,10 @@ export type BusinessApplicant = {
   confirmedAt?: string;
   /** Booked seat; opens the booking detail. */
   assignmentId?: string;
+  /** Seat status once booked, e.g. confirmed, checked_in, checked_out, no_show. */
+  assignmentStatus?: string;
+  /** Shift status, used when the seat status is not on the response yet. */
+  shiftStatus?: string;
   distanceKm?: number;
   arrivalMinutes?: number;
   /** Worker profile id for GET /me/workers/{id}. */

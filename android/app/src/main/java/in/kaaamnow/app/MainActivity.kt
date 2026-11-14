@@ -13,7 +13,9 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class MainActivity : ReactActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    // Razorpay and other external screens can kill and restore this activity.
+    // Restoring screen fragments crashes; start the React tree fresh instead.
+    super.onCreate(null)
     val isLight =
       getSharedPreferences(SystemNavigationBar.PREFERENCES, MODE_PRIVATE)
         .getBoolean(SystemNavigationBar.LIGHT_APPEARANCE, true)

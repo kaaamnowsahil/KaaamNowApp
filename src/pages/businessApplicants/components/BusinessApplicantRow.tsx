@@ -23,6 +23,29 @@ const leftLabel = (applicant: BusinessApplicant) =>
       ? S.DECLINED_OFFER
       : S.WITHDREW;
 
+/** Short word for the seat: Accepted, Came, Done, and the same kind of label. */
+const BOOKING_WORD: Record<string, string> = {
+  confirmed: 'accepted',
+  en_route: 'coming',
+  checked_in: 'came',
+  checked_out: 'done',
+  approved: 'done',
+  no_show: 'missed',
+  cancelled: 'cancelled',
+};
+
+const bookingWord = (applicant: BusinessApplicant) => {
+  const fromSeat = applicant.assignmentStatus
+    ? BOOKING_WORD[applicant.assignmentStatus]
+    : undefined;
+  if (fromSeat) return fromSeat;
+  if (applicant.shiftStatus === 'completed') return 'done';
+  if (applicant.shiftStatus === 'in_progress') return 'came';
+  if (applicant.shiftStatus === 'expired') return 'missed';
+  return 'accepted';
+};
+const isAlertWord = (word: string) => word === 'missed' || word === 'cancelled';
+
 /** One booked worker (or one who withdrew): identity, rating, distance, and links. */
 export const BusinessApplicantRow: FC<{
   applicant: BusinessApplicant;
@@ -32,6 +55,7 @@ export const BusinessApplicantRow: FC<{
   onOpenBooking?: () => void;
 }> = ({ applicant, left, onOpenProfile, onOpenBooking }) => {
   const { colors } = useTheme();
+  const word = bookingWord(applicant);
   const meta = [
     left && applicant.respondedAt
       ? `${formatDateLabel(applicant.respondedAt)}, ${formatClock(applicant.respondedAt)}`
@@ -66,12 +90,12 @@ export const BusinessApplicantRow: FC<{
         <Text
           style={[
             styles.pill,
-            left
+            left || isAlertWord(word)
               ? { color: colors.danger, backgroundColor: colors.dangerSoft }
               : { color: colors.success, backgroundColor: colors.successSoft },
           ]}
         >
-          {left ? leftLabel(applicant) : S.BOOKED}
+          {left ? leftLabel(applicant) : S.status(word)}
         </Text>
       </View>
       <View style={[styles.actions, { borderTopColor: colors.border }]}>

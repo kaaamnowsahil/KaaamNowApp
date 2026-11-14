@@ -11,7 +11,8 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "typecheck": "tsc --noEmit",
-    "figma:export": "node scripts/figma-export.mjs"
+    "figma:export": "node scripts/figma-export.mjs",
+    "postinstall": "node scripts/apply-razorpay-patch.mjs"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^3.1.1",

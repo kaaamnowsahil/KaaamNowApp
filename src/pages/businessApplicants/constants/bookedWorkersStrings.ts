@@ -20,6 +20,8 @@ export const BOOKED_WORKERS_STRINGS = {
   get BOOKED() {
     return k('booked');
   },
+  /** One word for where a booking stands: Accepted, Came, Done, and the same kind of label. */
+  status: (code: string) => k(`status.${code}`),
   get VIEW_PROFILE() {
     return k('viewProfile');
   },

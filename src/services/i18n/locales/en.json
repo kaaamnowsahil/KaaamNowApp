@@ -1763,6 +1763,14 @@
     "emptyTitle": "No bookings yet",
     "emptyBody": "When workers book your shifts, they’ll appear here.",
     "booked": "Booked",
+    "status": {
+      "accepted": "Accepted",
+      "coming": "Coming",
+      "came": "Came",
+      "done": "Done",
+      "missed": "Missed",
+      "cancelled": "Cancelled"
+    },
     "viewProfile": "View profile",
     "viewBooking": "View booking",
     "newWorker": "New worker",

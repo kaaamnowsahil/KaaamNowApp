@@ -335,6 +335,8 @@ export type BusinessApplicantItem = {
   worker: WorkerSummary;
   /** Set once the seat is booked. */
   assignment_id?: string | null;
+  /** Seat status once booked, e.g. confirmed, checked_in, checked_out, no_show. */
+  assignment_status?: string | null;
   shift: {
     id: string;
     shift_type: string;
