@@ -1,0 +1,89 @@
+name: Android App Distribution
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: android-app-distribution-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  distribute:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore signing and Firebase config
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          ENV_PROD: ${{ secrets.ENV_PROD }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for name in GOOGLE_SERVICES_JSON ENV_PROD ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "Missing GitHub secret: $name"
+              exit 1
+            fi
+          done
+          printf '%s\n' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          printf '%s\n' "$ENV_PROD" > .env.prod
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/app/upload-keystore.jks
+          cat > android/keystore.properties <<EOF
+          storeFile=upload-keystore.jks
+          storePassword=${ANDROID_KEYSTORE_PASSWORD}
+          keyAlias=${ANDROID_KEY_ALIAS}
+          keyPassword=${ANDROID_KEY_PASSWORD}
+          EOF
+
+      - name: Build release APK
+        env:
+          APP_ENV: prod
+        run: |
+          set -euo pipefail
+          COUNT="$(git rev-list --count HEAD)"
+          NAME="1.0.${COUNT}"
+          echo "APP_VERSION_NAME=${NAME}" >> "$GITHUB_ENV"
+          echo "APP_VERSION_CODE=${COUNT}" >> "$GITHUB_ENV"
+          echo "Building ${NAME} (${COUNT})"
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon \
+            -PreactNativeArchitectures=arm64-v8a,armeabi-v7a \
+            -PVERSION_CODE="${COUNT}" \
+            -PVERSION_NAME="${NAME}"
+
+      - name: Upload to Firebase App Distribution
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          set -euo pipefail
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "Missing GitHub secret: FIREBASE_SERVICE_ACCOUNT"
+            exit 1
+          fi
+          printf '%s\n' "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
+          npx -y firebase-tools@latest appdistribution:distribute \
+            android/app/build/outputs/apk/release/app-release.apk \
+            --app "1:1067311615363:android:ca5d942e3286a5befb7ab6" \
+            --project kaaamnow-2c1e0 \
+            --groups kaaamnow \
+            --release-notes "${APP_VERSION_NAME} (${APP_VERSION_CODE}) ${GITHUB_SHA}"

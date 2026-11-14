@@ -73,6 +73,10 @@ def enableProguardInReleaseBuilds = false
  */
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+// CI passes a new VERSION_CODE and VERSION_NAME on every main push.
+def resolvedVersionCode = (project.findProperty("VERSION_CODE") ?: "2").toInteger()
+def resolvedVersionName = (project.findProperty("VERSION_NAME") ?: "1.0.1").toString()
+
 android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -83,8 +87,8 @@ android {
         applicationId "in.kaaamnow.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.0.1"
+        versionCode resolvedVersionCode
+        versionName resolvedVersionName
     }
     signingConfigs {
         debug {
