@@ -31,7 +31,7 @@ type TabScreenProps = {
 
 /**
  * Bottom-tab screen frame from Figma Discover (1:1456): 56px app bar and a
- * scrollable "Screen content" (12 top, 20 bottom, 20 horizontal, 8 gap).
+ * scrollable "Screen content" (12 top, 32 bottom without a footer, 20 horizontal, 8 gap).
  */
 export const TabScreen: FC<TabScreenProps> = ({
   title,
@@ -46,7 +46,7 @@ export const TabScreen: FC<TabScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const scrollRef = useRef<ScrollView>(null);
-  const keyboardInset = useKeyboardInset(scrollRef);
+  useKeyboardInset(scrollRef);
   return (
     <SafeAreaView
       edges={['top']}
@@ -63,12 +63,13 @@ export const TabScreen: FC<TabScreenProps> = ({
           </Text>
         )}
       </Rise>
-      <View style={[styles.root, keyboardInset > 0 && { paddingBottom: keyboardInset }]}>
+      <View style={styles.root}>
       {isLoading ? null : (
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={[
           styles.content,
+          { paddingBottom: actions ? 20 : 32 },
           fillLastBlock && styles.fillContent,
           { gap },
         ]}
@@ -77,19 +78,17 @@ export const TabScreen: FC<TabScreenProps> = ({
       >
         {blocks.map((block, i) => (
           <Rise
-            key={block.key ?? i}
+            key={`${block.key ?? 'block'}-${i}`}
             delay={(i + 1) * MOTION.stagger}
             style={fillLastBlock && i === blocks.length - 1 ? styles.fillBlock : undefined}
           >
             {block}
           </Rise>
         ))}
-        <View style={styles.bottomSpace} />
       </ScrollView>
       )}
       {actions && !isLoading ? (
-        <Rise
-          delay={(blocks.length + 1) * MOTION.stagger}
+        <View
           style={[
             styles.actions,
             {
@@ -99,7 +98,7 @@ export const TabScreen: FC<TabScreenProps> = ({
           ]}
         >
           {actions}
-        </Rise>
+        </View>
       ) : null}
       </View>
       {isLoading || busy ? <Loader /> : null}
@@ -117,7 +116,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   title: { fontFamily: FONTS.bold, fontSize: 22, lineHeight: 30.8 },
-  content: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 20 },
+  content: { paddingHorizontal: 20, paddingTop: 12 },
   fillContent: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -126,11 +125,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
   },
-  bottomSpace: { height: 4 },
   actions: {
     borderTopWidth: 1,
-    paddingTop: 12,
-    paddingBottom: 16,
+    paddingVertical: 16,
     paddingHorizontal: 20,
     gap: 10,
   },

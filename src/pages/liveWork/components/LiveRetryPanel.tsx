@@ -128,11 +128,11 @@ export const LiveRetryPanel: FC<Props> = ({
           : S.retryTimeUp}
       </LiveText>
       <View style={styles.options}>
-        {options.map(option => {
+        {options.map((option, index) => {
           const disabled = !open || busy;
           return (
             <Pressable
-              key={option}
+              key={`${option}-${index}`}
               accessibilityRole="button"
               accessibilityState={{ disabled }}
               disabled={disabled}

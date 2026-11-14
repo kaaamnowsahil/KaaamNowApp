@@ -66,7 +66,7 @@ export const LanguagePage: FC<AppScreenProps<typeof ROUTES.language>> = ({
       >
         {LANGUAGES.map((option, index) => (
           <LanguageRow
-            key={option.id}
+            key={`${option.id}-${index}`}
             label={option.label}
             caption={option.caption}
             selected={option.id === selectedId}

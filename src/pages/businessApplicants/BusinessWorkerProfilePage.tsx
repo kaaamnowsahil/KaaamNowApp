@@ -45,6 +45,7 @@ export const BusinessWorkerProfilePage: FC<
       compactTitle
       headerTag={HEADER_TAG}
       gap={16}
+      contentContainerStyle={{ paddingBottom: 32 }}
       isLoading={profile.isLoading}
       testID="business-worker-profile-page"
     >
@@ -57,7 +58,7 @@ export const BusinessWorkerProfilePage: FC<
           onAction={profile.reload}
         />
       ) : (
-        <>
+        <View style={styles.profileContent}>
           <View style={styles.identity}>
             <WorkerAvatar name={worker.full_name} photoUrl={worker.photo_url} size={72} />
             <View style={styles.identityCopy}>
@@ -84,6 +85,8 @@ export const BusinessWorkerProfilePage: FC<
           </View>
 
           <StatTiles
+            tilePadding={16}
+            tileGap={12}
             items={[
               {
                 value: worker.rating_count ? `★ ${worker.rating_avg.toFixed(1)}` : S.NO_RATING,
@@ -97,9 +100,9 @@ export const BusinessWorkerProfilePage: FC<
             <View style={styles.section}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{S.WORK_TYPES}</Text>
               <View style={styles.chips}>
-                {categoryNames.map(name => (
+                {categoryNames.map((name, index) => (
                   <Text
-                    key={name}
+                    key={`${name}-${index}`}
                     style={[
                       styles.chip,
                       { color: colors.primary, backgroundColor: colors.primarySoft },
@@ -115,9 +118,9 @@ export const BusinessWorkerProfilePage: FC<
           <View style={[styles.section, styles.reviewsSection]}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{S.REVIEWS}</Text>
             {worker.recent_reviews.length ? (
-              worker.recent_reviews.map(review => (
+              worker.recent_reviews.map((review, index) => (
                 <View
-                  key={`${review.rater_name}-${review.created_at}`}
+                  key={`${review.rater_name}-${review.created_at}-${index}`}
                   style={[styles.review, { borderColor: colors.border }]}
                 >
                   <View style={styles.reviewTop}>
@@ -146,21 +149,22 @@ export const BusinessWorkerProfilePage: FC<
               <Text style={[styles.body, { color: colors.textSubtle }]}>{S.NO_REVIEWS}</Text>
             )}
           </View>
-        </>
+        </View>
       )}
     </FormScreen>
   );
 };
 
 const styles = StyleSheet.create({
+  profileContent: { gap: 20 },
   identity: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   identityCopy: { flex: 1, gap: 3 },
   name: { fontFamily: FONTS.bold, fontSize: 20, lineHeight: 27 },
   verifiedRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   verified: { fontFamily: FONTS.semiBold, fontSize: 12, lineHeight: 17 },
   meta: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 17 },
-  section: { gap: 8 },
-  reviewsSection: { paddingTop: 12 },
+  section: { gap: 10 },
+  reviewsSection: { gap: 12 },
   sectionTitle: { fontFamily: FONTS.semiBold, fontSize: 16, lineHeight: 22 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {

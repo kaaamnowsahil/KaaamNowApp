@@ -42,7 +42,7 @@ export const WorkerCancellationPolicyCard: FC<{ onReadTerms: () => void }> = ({
         <View style={[styles.tiers, { borderColor: colors.border }]}>
           {rows.map(({ label, tier }, index) => (
             <View
-              key={`${tier.event}-${tier.hours_from}`}
+              key={`${tier.event}-${tier.hours_from}-${index}`}
               style={[
                 styles.tier,
                 index > 0 && [styles.tierDivider, { borderTopColor: colors.border }],
@@ -65,8 +65,8 @@ export const WorkerCancellationPolicyCard: FC<{ onReadTerms: () => void }> = ({
               policy.data.strikes_to_ban,
             ),
             S.WALLET,
-          ].map(point => (
-            <View key={point} style={styles.point}>
+          ].map((point, index) => (
+            <View key={`${point}-${index}`} style={styles.point}>
               <Text style={[styles.note, { color: colors.textMuted }]}>•</Text>
               <Text style={[styles.note, styles.pointText, { color: colors.textMuted }]}>
                 {point}

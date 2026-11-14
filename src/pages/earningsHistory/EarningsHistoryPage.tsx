@@ -72,8 +72,8 @@ export const EarningsHistoryPage: FC<
       {months.length === 0 ? (
         <EmptyState icon={WalletIcon} title={t('earningsHistory.title')} body={S.EMPTY} />
       ) : null}
-      {months.map(month => (
-        <View key={month.key} style={styles.month}>
+      {months.map((month, monthIndex) => (
+        <View key={`${month.key}-${monthIndex}`} style={styles.month}>
           <SectionHeading title={month.label} />
           <Text style={[styles.total, { color: colors.textSubtle }]}>
             {t('earningsHistory.monthTotal', {
@@ -87,7 +87,7 @@ export const EarningsHistoryPage: FC<
               const status = entry.amount_minor < 0 ? 'failed' : 'completed';
               return (
                 <EarningsRowItem
-                  key={entry.id}
+                  key={`${entry.id}-${i}`}
                   title={title}
                   meta={`${dateLabel} · ${signedRupees(entry.amount_minor)}`}
                   status={status}

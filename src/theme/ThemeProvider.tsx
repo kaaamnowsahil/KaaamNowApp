@@ -1,6 +1,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useMemo,
   type FC,
   type ReactNode,
@@ -12,6 +13,7 @@ import {
   type ThemeColors,
 } from '@/constants/colors';
 import { usePreferencesStore } from '@/services/config/usePreferencesStore';
+import { setLightNavigationBar } from '@/services/system/navigationBar';
 
 type Theme = { colors: ThemeColors; isDark: boolean };
 
@@ -22,7 +24,11 @@ const ThemeContext = createContext<Theme>({
 
 export const ThemeProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const preference = usePreferencesStore(s => s.theme);
+  const hasHydrated = usePreferencesStore(s => s.hasHydrated);
   const isDark = preference === 'dark';
+  useEffect(() => {
+    if (hasHydrated) setLightNavigationBar(!isDark);
+  }, [hasHydrated, isDark]);
   const value = useMemo(
     () => ({ colors: isDark ? DARK_COLORS : LIGHT_COLORS, isDark }),
     [isDark],

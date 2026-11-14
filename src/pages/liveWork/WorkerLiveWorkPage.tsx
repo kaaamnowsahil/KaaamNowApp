@@ -155,9 +155,9 @@ export const WorkerLiveWorkPage: FC<
       {data && !data.active && !data.requests.length ? (
         <LiveText tone="muted">{S.noRequests}</LiveText>
       ) : null}
-      {data?.requests.map(request => (
+      {data?.requests.map((request, index) => (
         <RequestCard
-          key={request.dispatch_id}
+          key={`${request.dispatch_id}-${index}`}
           request={request}
           disabled={busy || Boolean(data.active)}
           onOkay={() => okay(request)}

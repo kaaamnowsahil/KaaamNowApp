@@ -146,7 +146,7 @@ export const WorkerEarningsPage: FC = () => {
       ) : null}
       {earnings.rows.map((row, index) => (
         <EarningsRowItem
-          key={row.id}
+          key={`${row.id}-${index}`}
           title={row.title}
           meta={rowMeta(row)}
           status={row.status}

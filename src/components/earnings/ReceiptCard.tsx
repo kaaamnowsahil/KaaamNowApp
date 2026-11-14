@@ -18,7 +18,7 @@ export const ReceiptCard: FC<{ lines: ReceiptLine[] }> = ({ lines }) => {
     >
       {lines.map((line, i) => (
         <View
-          key={line.label}
+          key={`${line.label}-${i}`}
           style={[
             styles.row,
             i < lines.length - 1 && {

@@ -107,12 +107,12 @@ export const BusinessRosterPage: FC<
         />
       ) : (
         <View style={styles.list}>
-          {entries.map(entry => {
+          {entries.map((entry, index) => {
             const { worker } = entry;
             const tone = statusColors(entry.status);
             return (
               <Pressable
-                key={entry.assignment_id}
+                key={`${entry.assignment_id}-${index}`}
                 accessibilityRole="button"
                 onPress={() => {
                   if (shift?.shift_type === 'live') {

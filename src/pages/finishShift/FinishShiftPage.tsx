@@ -192,7 +192,7 @@ export const FinishShiftPage: FC<AppScreenProps<typeof ROUTES.finishShift>> = ({
       <View>
         {rows.map((row, i) => (
           <DetailRow
-            key={row.title}
+            key={`${row.title}-${i}`}
             size="compact"
             title={row.title}
             caption={row.caption}

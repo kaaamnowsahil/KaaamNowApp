@@ -169,9 +169,9 @@ export const ShiftCheckInPage: FC<
           ) : null}
         </View>
         <View style={styles.summary}>
-          {summary.map(item => (
+          {summary.map((item, index) => (
             <View
-              key={item.label}
+              key={`${item.label}-${index}`}
               style={[
                 styles.summaryItem,
                 { borderColor: colors.border, backgroundColor: colors.surface },

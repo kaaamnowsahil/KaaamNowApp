@@ -34,8 +34,8 @@ export const TermsPage: FC = () => {
           {terms.emptyMessage}
         </Text>
       ) : null}
-      {terms.sections.map(section => (
-        <View key={section.id} style={styles.section}>
+      {terms.sections.map((section, index) => (
+        <View key={`${section.id}-${index}`} style={styles.section}>
           <Text style={[styles.heading, { color: colors.text }]}>
             {section.title}
           </Text>

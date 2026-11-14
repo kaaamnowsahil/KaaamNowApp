@@ -77,9 +77,9 @@ export const BusinessLivePage: FC = () => {
             action={t('businessDashboard.viewAll')}
             onAction={dashboard.openShifts}
           />,
-          ...dashboard.shifts.map(shift => (
+          ...dashboard.shifts.map((shift, index) => (
             <BusinessOwnedShiftCard
-              key={shift.id}
+              key={`${shift.id}-${index}`}
               shift={shift}
               titleColor={colors.primary}
               isPaying={dashboard.payingId === shift.id}

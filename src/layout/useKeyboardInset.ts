@@ -2,11 +2,14 @@ import { useEffect, useState, type RefObject } from 'react';
 import { Keyboard, Platform, TextInput, type ScrollView } from 'react-native';
 
 /**
- * Android draws edge to edge, so the window does not shrink when the keyboard opens.
- * iOS already lifts the screen through KeyboardAvoidingView.
- * `scrollRef` moves the focused field above the keyboard.
+ * Android uses adjustResize to fit the window around the keyboard. This hook tracks
+ * keyboard visibility and scrolls the focused field; callers should not apply the
+ * returned keyboard height as additional bottom padding.
  */
-export const useKeyboardInset = (scrollRef?: RefObject<ScrollView | null>) => {
+export const useKeyboardInset = (
+  scrollRef?: RefObject<ScrollView | null>,
+  scrollOffset = 120,
+) => {
   const [height, setHeight] = useState(0);
   useEffect(() => {
     if (Platform.OS !== 'android') return;
@@ -16,7 +19,12 @@ export const useKeyboardInset = (scrollRef?: RefObject<ScrollView | null>) => {
       const scroll = scrollRef?.current;
       if (!input || !scroll) return;
       requestAnimationFrame(() => {
-        scroll.scrollResponderScrollNativeHandleToKeyboard(input, 120, true);
+        // Keep focused inputs above pinned actions as well as the keyboard.
+        scroll.scrollResponderScrollNativeHandleToKeyboard(
+          input,
+          scrollOffset,
+          true,
+        );
       });
     });
     const hide = Keyboard.addListener('keyboardDidHide', () => setHeight(0));
@@ -24,6 +32,6 @@ export const useKeyboardInset = (scrollRef?: RefObject<ScrollView | null>) => {
       show.remove();
       hide.remove();
     };
-  }, [scrollRef]);
+  }, [scrollRef, scrollOffset]);
   return height;
 };

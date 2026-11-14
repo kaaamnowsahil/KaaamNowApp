@@ -36,9 +36,9 @@ export const ShiftListPage: FC<AppScreenProps<typeof ROUTES.shiftList>> = ({
     >
       <BodyNote>{SHIFT_LIST_STRINGS.SUBTITLE}</BodyNote>
       {shifts.length ? (
-        shifts.map(shift => (
+        shifts.map((shift, index) => (
           <ShiftCard
-            key={shift.id}
+            key={`${shift.id}-${index}`}
             shift={shift}
             onPress={() => navigation.navigate(ROUTES.shiftDetails, { shift })}
           />

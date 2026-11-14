@@ -81,9 +81,9 @@ export const NotificationsPage: FC<
       {query.error && !query.data ? (
         <BodyNote>{query.error}</BodyNote>
       ) : items.length ? (
-        items.map(n => (
+        items.map((n, index) => (
           <Pressable
-            key={n.id}
+            key={`${n.id}-${index}`}
             accessibilityRole="button"
             accessibilityState={{ selected: !n.read_at }}
             onPress={() => {

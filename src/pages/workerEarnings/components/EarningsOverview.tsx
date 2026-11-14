@@ -26,9 +26,9 @@ export const EarningsOverview: FC<{
   return (
     <View style={styles.root}>
       <View style={styles.tiles}>
-        {tiles.map(tile => (
+        {tiles.map((tile, index) => (
           <View
-            key={tile.label}
+            key={`${tile.label}-${index}`}
             style={[styles.tile, { backgroundColor: colors.fill }]}
           >
             <Text style={[styles.tileAmount, { color: colors.text }]}>

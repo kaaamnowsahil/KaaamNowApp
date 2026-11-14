@@ -294,7 +294,7 @@ export const ShiftDetailsPage: FC<
       </Text>
       {activity.map(([at, label], index) => (
         <View
-          key={`${label}-${at}`}
+          key={`${label}-${at}-${index}`}
           style={[
             styles.activityRow,
             index > 0 && [styles.activityDivider, { borderTopColor: colors.border }],

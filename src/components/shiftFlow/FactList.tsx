@@ -15,8 +15,8 @@ export const FactList: FC<{ items: Fact[]; accentIcons?: boolean }> = ({
   const { colors } = useTheme();
   return (
     <View style={styles.list}>
-      {items.map(({ icon: Icon, text }) => (
-        <View key={text} style={styles.row}>
+      {items.map(({ icon: Icon, text }, index) => (
+        <View key={`${text}-${index}`} style={styles.row}>
           <Icon
             width={15}
             height={15}

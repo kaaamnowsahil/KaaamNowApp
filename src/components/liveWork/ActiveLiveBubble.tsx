@@ -205,9 +205,9 @@ export const ActiveLiveBubble: FC = () => {
           testID="active-live-picker"
         >
           <View style={styles.list}>
-            {others.map(item => (
+            {others.map((item, index) => (
               <BookingRow
-                key={item.booking_id}
+                key={`${item.booking_id}-${index}`}
                 booking={item}
                 onPress={() => openBooking(item.booking_id)}
               />

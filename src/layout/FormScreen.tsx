@@ -53,6 +53,8 @@ type FormScreenProps = {
   headerTag?: string;
   /** Space between content blocks; forms use 20. */
   gap?: number;
+  /** Extra room above the keyboard when scrolling a focused input into view. */
+  keyboardScrollOffset?: number;
   /** Additional layout for the scrollable content container. */
   contentContainerStyle?: StyleProp<ViewStyle>;
   /** Shows the brand loader instead of the content and actions. */
@@ -91,7 +93,7 @@ const ActionsLayout: FC<{ actions: ReactNode }> = ({ actions }) => {
       {first}
       <View style={styles.actionsRow}>
         {rest.map((item, i) => (
-          <View key={item.key ?? i} style={styles.flex}>
+          <View key={`${item.key ?? 'action'}-${i}`} style={styles.flex}>
             {cloneElement(item as ReactElement<{ iconOnly?: boolean }>, { iconOnly })}
           </View>
         ))}
@@ -103,8 +105,9 @@ const ActionsLayout: FC<{ actions: ReactNode }> = ({ actions }) => {
 /**
  * Figma form-screen frame: 56px app bar (optional back button), scrollable
  * "Screen content" (16/24 vertical, 20 horizontal, 20 gap) and a top-bordered
- * "Screen actions" bar (12 top, 24 bottom + home-indicator inset).
- * Each direct child rises in on mount, staggered; the actions bar comes last.
+ * "Screen actions" bar (12 top, measured bottom system inset).
+ * Each content child rises in on mount, staggered; pinned actions stay stationary
+ * so they remain clear of the keyboard on shorter Android viewports.
  */
 export const FormScreen: FC<FormScreenProps> = ({
   children,
@@ -116,6 +119,7 @@ export const FormScreen: FC<FormScreenProps> = ({
   headerRight,
   headerTag,
   gap = 20,
+  keyboardScrollOffset = 120,
   contentContainerStyle,
   isLoading,
   busy,
@@ -127,18 +131,20 @@ export const FormScreen: FC<FormScreenProps> = ({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const isInTabs = useContext(BottomTabBarHeightContext) !== undefined;
-  const actionsChrome = {
-    backgroundColor: colors.background,
-    borderTopColor: colors.border,
-    paddingBottom: isInTabs ? 16 : 24 + insets.bottom,
-  };
   const navigation = useNavigation<NavigationProp<AppStackParamList>>();
   const isAuth = useAuthStore(s => s.isAuth);
   const showBrandBar = isAuth && !asSheet && !hideBrandBar;
   const blocks = Children.toArray(children);
   const outerBg = asSheet ? colors.fill : colors.background;
   const scrollRef = useRef<ScrollView>(null);
-  const keyboardInset = useKeyboardInset(scrollRef);
+  const keyboardInset = useKeyboardInset(scrollRef, keyboardScrollOffset);
+  const actionsChrome = {
+    backgroundColor: colors.background,
+    borderTopColor: colors.border,
+    // The tab bar already owns the system inset. Keep tab screen footers balanced;
+    // standalone forms use the measured inset to clear system navigation.
+    paddingBottom: keyboardInset > 0 ? 12 : isInTabs ? 16 : insets.bottom,
+  };
 
   return (
     <SafeAreaView
@@ -147,7 +153,7 @@ export const FormScreen: FC<FormScreenProps> = ({
       testID={testID}
     >
       <KeyboardAvoidingView
-        style={[styles.root, keyboardInset > 0 && { paddingBottom: keyboardInset }]}
+        style={styles.root}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {showBrandBar ? (
@@ -218,6 +224,7 @@ export const FormScreen: FC<FormScreenProps> = ({
           {isLoading ? null : (
             <ScrollView
               ref={scrollRef}
+              style={styles.scroll}
               contentContainerStyle={[
                 styles.content,
                 asSheet && styles.sheetContent,
@@ -240,15 +247,15 @@ export const FormScreen: FC<FormScreenProps> = ({
           )}
         </View>
         {actions && !isLoading ? (
-          <Rise
-            delay={(blocks.length + 1) * MOTION.stagger}
+          <View
             style={[
               styles.actions,
+              keyboardInset > 0 && styles.actionsWithKeyboard,
               actionsChrome,
             ]}
           >
             <ActionsLayout actions={actions} />
-          </Rise>
+          </View>
         ) : null}
       </KeyboardAvoidingView>
       {isLoading || busy ? <Loader /> : null}
@@ -258,6 +265,7 @@ export const FormScreen: FC<FormScreenProps> = ({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
+  scroll: { flex: 1 },
   fill: { flexGrow: 1 },
   sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   handle: {
@@ -294,9 +302,10 @@ const styles = StyleSheet.create({
   },
   actions: {
     borderTopWidth: 1,
-    paddingTop: 12,
+    paddingTop: 16,
     paddingHorizontal: 20,
     gap: 10,
   },
+  actionsWithKeyboard: { paddingTop: 12, gap: 8 },
   actionsRow: { flexDirection: 'row', gap: 10 },
 });

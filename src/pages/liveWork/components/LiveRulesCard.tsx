@@ -157,7 +157,7 @@ export const LiveRulesCard: FC<{
         <View style={[styles.rows, { borderColor: colors.border }]}>
           {rows.map((row, index) => (
             <View
-              key={row.id}
+              key={`${row.id}-${index}`}
               style={[
                 styles.row,
                 index > 0 && [
@@ -177,8 +177,8 @@ export const LiveRulesCard: FC<{
         </View>
       ) : null}
 
-      {points.map(point => (
-        <View key={point} style={styles.point}>
+      {points.map((point, index) => (
+        <View key={`${point}-${index}`} style={styles.point}>
           <Text style={[styles.note, { color: colors.textMuted }]}>•</Text>
           <Text
             style={[styles.note, styles.pointText, { color: colors.textMuted }]}

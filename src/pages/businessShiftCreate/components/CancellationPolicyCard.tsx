@@ -35,7 +35,7 @@ export const CancellationPolicyCard: FC<{ onReadTerms: () => void }> = ({ onRead
         <View style={[styles.tiers, { borderColor: colors.border }]}>
           {tiers.map((tier, index) => (
             <View
-              key={tier.hours_from}
+              key={`${tier.hours_from}-${index}`}
               style={[
                 styles.tier,
                 index > 0 && [styles.tierDivider, { borderTopColor: colors.border }],
@@ -77,8 +77,8 @@ export const CancellationPolicyCard: FC<{ onReadTerms: () => void }> = ({ onRead
             ...(voucherHours != null
               ? [S.workerCancelVoucher(voucherHours, policy.data.voucher_valid_days)]
               : []),
-          ].map(point => (
-            <View key={point} style={styles.point}>
+          ].map((point, index) => (
+            <View key={`${point}-${index}`} style={styles.point}>
               <Text style={[styles.note, { color: colors.textMuted }]}>•</Text>
               <Text style={[styles.note, styles.pointText, { color: colors.textMuted }]}>
                 {point}

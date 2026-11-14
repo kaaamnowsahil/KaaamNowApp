@@ -157,7 +157,7 @@ export const BusinessShiftSchedulePage: FC<
     const errors = errorsFor(slot, index);
     return (
       <View
-        key={id}
+        key={`${id}-${index}`}
         style={[styles.slot, { borderColor: colors.border }]}
         testID={`business-shift-slot-${id}`}
       >
@@ -303,10 +303,10 @@ export const BusinessShiftSchedulePage: FC<
     );
   };
 
-  const renderDateGroup = (date: string) => {
+  const renderDateGroup = (date: string, index: number) => {
     const slots = draft.schedules.filter(slot => slot.date === date);
     return (
-      <View key={date} style={styles.dateGroup}>
+      <View key={`${date}-${index}`} style={styles.dateGroup}>
         <Text style={[styles.groupTitle, { color: colors.text }]}>
           {draft.sameForEveryDate
             ? t('businessShiftCreate.sameShiftsForSelectedDates', {

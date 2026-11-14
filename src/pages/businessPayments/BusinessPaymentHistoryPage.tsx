@@ -92,9 +92,9 @@ export const BusinessPaymentHistoryPage: FC<
         />
       ) : items.length ? (
         <View style={[styles.list, { borderColor: colors.border }]}>
-          {items.map(item => (
+          {items.map((item, index) => (
             <Pressable
-              key={item.invoice_id}
+              key={`${item.invoice_id}-${index}`}
               accessibilityRole="button"
               accessibilityLabel={t('businessPayment.openPaymentDetails', {
                 role: item.job_title,

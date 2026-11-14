@@ -34,7 +34,9 @@ export const BottomSheet: FC<{
             styles.sheet,
             {
               backgroundColor: colors.background,
-              paddingBottom: 24 + insets.bottom + keyboardInset,
+              // The IME already resizes the window. Don't add its height or the
+              // navigation inset again while it is open.
+              paddingBottom: keyboardInset > 0 ? 12 : 24 + insets.bottom,
             },
           ]}
           testID={testID}

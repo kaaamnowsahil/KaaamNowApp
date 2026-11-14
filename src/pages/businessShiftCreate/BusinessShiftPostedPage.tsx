@@ -110,10 +110,7 @@ export const BusinessShiftPostedPage: FC<
 
       {schedules.map((schedule, index) => (
         <View
-          key={
-            draft.schedules[index]?.id ??
-            `${schedule.date}-${schedule.time}-${index}`
-          }
+          key={`${draft.schedules[index]?.id ?? 'schedule'}-${schedule.date}-${schedule.time}-${index}`}
           style={[
             styles.card,
             styles.shiftCard,

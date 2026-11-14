@@ -24,11 +24,11 @@ export const SegmentedControl = <T extends string>({
         { backgroundColor: colors.fill, borderColor: colors.border },
       ]}
     >
-      {segments.map(segment => {
+      {segments.map((segment, index) => {
         const active = segment.id === value;
         return (
           <Pressable
-            key={segment.id}
+            key={`${segment.id}-${index}`}
             accessibilityRole="tab"
             accessibilityState={{ selected: active }}
             onPress={() => onChange(segment.id)}

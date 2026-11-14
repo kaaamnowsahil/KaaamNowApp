@@ -133,9 +133,9 @@ export const WorkerHomePage: FC = () => {
         ]
       : home.nearby.length
       ? [
-          ...home.nearby.map(shift => (
+          ...home.nearby.map((shift, index) => (
             <ShiftCard
-              key={shift.id}
+              key={`${shift.id}-${index}`}
               shift={shift}
               onPress={() => home.openShift(shift)}
             />

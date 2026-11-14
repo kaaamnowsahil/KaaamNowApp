@@ -47,11 +47,11 @@ export const ChipGroup: FC<ChipGroupProps> = ({
         <Text style={[styles.hint, { color: colors.textSubtle }]}>{hint}</Text>
       ) : null}
       <View style={styles.wrap}>
-        {visibleOptions.map(option => {
+        {visibleOptions.map((option, index) => {
           const isOn = selected.includes(option.id);
           return (
             <Pressable
-              key={option.id}
+              key={`${option.id}-${index}`}
               accessibilityRole="checkbox"
               accessibilityState={{ checked: isOn }}
               onPress={() => onToggle(option.id)}

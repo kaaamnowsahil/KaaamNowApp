@@ -70,9 +70,9 @@ export const AppearancePage: FC<AppScreenProps<typeof ROUTES.appearance>> = ({
     >
       <BodyNote>{t('appearance.subtitle')}</BodyNote>
       <View>
-        {options.map(option => (
+        {options.map((option, index) => (
           <InfoRow
-            key={option.id}
+            key={`${option.id}-${index}`}
             title={option.title}
             caption={option.caption}
             selected={option.id === selected}

@@ -69,16 +69,16 @@ export const BusinessShiftsPage: FC = () => {
       />
     ) : (
       <View key="sections" style={styles.sections}>
-        {shifts.sections.map(section => (
-          <View key={section.key} style={styles.section}>
+        {shifts.sections.map((section, sectionIndex) => (
+          <View key={`${section.key}-${sectionIndex}`} style={styles.section}>
             <SectionHeading
               title={t(section.titleKey)}
               statusColor={sectionColor[section.key]}
               isLive={section.key === 'live'}
             />
-            {section.shifts.map(shift => (
+            {section.shifts.map((shift, index) => (
               <BusinessOwnedShiftCard
-                key={shift.id}
+                key={`${shift.id}-${index}`}
                 shift={shift}
                 titleColor={
                   section.key === 'live'

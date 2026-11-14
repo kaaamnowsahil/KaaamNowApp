@@ -139,11 +139,11 @@ export const SelectSheetField: FC<SelectSheetFieldProps> = ({
             />
           </View>
           <ScrollView style={styles.list} keyboardShouldPersistTaps="handled">
-            {visible.map(option => {
+            {visible.map((option, index) => {
               const isSelected = selected.includes(option.id);
               return (
                 <Pressable
-                  key={option.id}
+                  key={`${option.id}-${index}`}
                   accessibilityRole={multiple ? 'checkbox' : 'radio'}
                   accessibilityState={
                     multiple ? { checked: isSelected } : { selected: isSelected }

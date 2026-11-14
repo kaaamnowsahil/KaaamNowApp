@@ -1,4 +1,5 @@
 import { apiRequest } from '@/services/api/apiClient';
+import type { PickedImage } from '@/services/api/meApi';
 
 export type LedgerEntryType =
   | 'shift_earning'
@@ -66,6 +67,7 @@ export type PayoutAccount = {
   account_holder_name: string;
   is_default: boolean;
   is_verified: boolean;
+  upi_qr_url?: string | null;
 };
 
 export type UpiAccountInput = { upi_id: string; account_holder_name: string };
@@ -105,6 +107,21 @@ export const earningsApi = {
     apiRequest<PayoutAccount>('PATCH', `/worker/payout-accounts/${accountId}`, {
       body: { ...body, make_default: true },
     }),
+  uploadUpiQr: (accountId: string, image: PickedImage) => {
+    const form = new FormData();
+    form.append('file', {
+      uri: image.uri,
+      type: image.type,
+      name: image.fileName,
+    } as never);
+    return apiRequest<PayoutAccount>(
+      'PUT',
+      `/worker/payout-accounts/${accountId}/qr`,
+      { body: form },
+    );
+  },
+  removeUpiQr: (accountId: string) =>
+    apiRequest<PayoutAccount>('DELETE', `/worker/payout-accounts/${accountId}/qr`),
   /** Retrying with the same `idempotency_key` returns the original withdrawal. */
   createWithdrawal: (body: WithdrawalCreate) =>
     apiRequest<Withdrawal>('POST', '/worker/withdrawals', { body }),

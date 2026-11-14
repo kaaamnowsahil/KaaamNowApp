@@ -411,7 +411,7 @@ export const BusinessLiveWorkPage: FC<
       {multi && status !== 'cancelled'
         ? (booking.workers ?? []).map((seat, index) => (
             <LiveSeatCard
-              key={seat.assignment.assignment_id}
+              key={`${seat.assignment.assignment_id}-${index}`}
               seat={seat}
               index={index}
               isTask={isTask}
@@ -584,9 +584,9 @@ export const BusinessLiveWorkPage: FC<
         </LiveCard>
       ) : null}
 
-      {doneSeats.map(seat => (
+      {doneSeats.map((seat, index) => (
         <LiveRatingCard
-          key={seat.assignment_id}
+          key={`${seat.assignment_id}-${index}`}
           assignmentId={seat.assignment_id}
           name={seat.worker.full_name ?? tr('businessRating.workerFallback')}
         />
@@ -608,8 +608,8 @@ export const BusinessLiveWorkPage: FC<
       {booking.refunds.length ? (
         <LiveCard>
           <LiveText tone="label">{S.refunds}</LiveText>
-          {booking.refunds.map(refund => (
-            <LiveText key={refund.id}>
+          {booking.refunds.map((refund, index) => (
+            <LiveText key={`${refund.id}-${index}`}>
               {`${formatRupees(refund.amount_minor)} · ${
                 S.refundStatus[refund.status] ?? refund.status
               }${

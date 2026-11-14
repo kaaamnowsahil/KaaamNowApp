@@ -151,9 +151,9 @@ export const ApplyCouponContent: FC<{
           </Text>
         ) : null}
         {coupon.listState === 'ready'
-          ? coupon.offers.map(offer => (
+          ? coupon.offers.map((offer, index) => (
               <CouponOfferCard
-                key={offer.id}
+                key={`${offer.id}-${index}`}
                 offer={offer}
                 applied={
                   session.appliedCode?.toUpperCase() ===

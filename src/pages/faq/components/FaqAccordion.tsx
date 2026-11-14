@@ -31,7 +31,7 @@ export const FaqAccordion: FC<FaqAccordionProps> = ({
         const isOpen = item.id === openId;
         return (
           <Pressable
-            key={item.id}
+            key={`${item.id}-${index}`}
             accessibilityRole="button"
             accessibilityState={{ expanded: isOpen }}
             onPress={() => onToggle(item.id)}

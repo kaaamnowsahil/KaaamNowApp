@@ -172,7 +172,7 @@ export const BusinessShiftReviewPage: FC<
     const estimate = estimates.data?.[index];
     return (
       <View
-        key={slot.id ?? index}
+        key={`${slot.id ?? 'slot'}-${index}`}
         style={[
           styles.card,
           { backgroundColor: colors.surface, borderColor: colors.border },
@@ -298,8 +298,8 @@ export const BusinessShiftReviewPage: FC<
           </Text>
         ) : null}
 
-        {groups.map(group => (
-          <View key={group.date} style={styles.day}>
+        {groups.map((group, index) => (
+          <View key={`${group.date}-${index}`} style={styles.day}>
             <Text style={[styles.dayTitle, { color: colors.text }]}>
               {formatDate(group.date)}
             </Text>

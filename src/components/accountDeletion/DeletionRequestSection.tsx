@@ -79,9 +79,9 @@ export const DeletionRequestSection: FC = () => {
                 ))}
               </View>
             ) : null}
-            {request.holds.map(hold => (
+            {request.holds.map((hold, index) => (
               <View
-                key={hold.id}
+                key={`${hold.id}-${index}`}
                 style={[styles.hold, { borderTopColor: colors.border }]}
               >
                 <DeletionDetail

@@ -190,7 +190,7 @@ export const WithdrawPage: FC<AppScreenProps<typeof ROUTES.withdraw>> = ({
                 >
                   {options.map((option, i) => (
                     <PayoutOptionRow
-                      key={option.id}
+                      key={`${option.id}-${i}`}
                       option={option}
                       selected={option.id === withdraw.accountId}
                       isLast={i === options.length - 1}

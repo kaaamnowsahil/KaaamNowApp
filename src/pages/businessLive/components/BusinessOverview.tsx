@@ -71,9 +71,9 @@ export const BusinessMetrics: FC<BusinessMetricsProps> = ({
 
     return (
         <View style={styles.metrics}>
-            {metrics.map(metric => (
+            {metrics.map((metric, index) => (
                 <View
-                    key={metric.label}
+                    key={`${metric.label}-${index}`}
                     style={[styles.metric, { backgroundColor: colors.fill }]}
                 >
                     <Text style={[styles.metricValue, { color: colors.text }]}>

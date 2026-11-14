@@ -32,16 +32,16 @@ export const WorkerShiftsPage: FC = () => {
       subtitle={t('workerShifts.subtitle')}
     />,
     ...(shifts.sections.length
-      ? shifts.sections.flatMap(section => [
+      ? shifts.sections.flatMap((section, sectionIndex) => [
           <SectionHeading
-            key={`heading-${section.id}`}
+            key={`heading-${section.id}-${sectionIndex}`}
             title={t(`workerShifts.sections.${section.id}`)}
             statusColor={section.id === 'live' ? colors.danger : undefined}
             isLive={section.id === 'live'}
           />,
-          ...section.bookings.map(booking => (
+          ...section.bookings.map((booking, bookingIndex) => (
             <MyShiftCard
-              key={booking.id}
+              key={`${booking.id}-${sectionIndex}-${bookingIndex}`}
               booking={booking}
               onPress={() => shifts.openBooking(booking)}
               busy={shifts.pending !== null}

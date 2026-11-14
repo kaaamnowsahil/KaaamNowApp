@@ -131,7 +131,7 @@ const Wheel = <T extends number | string>({
         const distance = Math.abs(i - index);
         return (
           <Pressable
-            key={String(item)}
+            key={`${String(item)}-${i}`}
             accessibilityRole="button"
             accessibilityState={{ selected: distance === 0 }}
             onPress={() => ref.current?.scrollTo({ y: i * ITEM_HEIGHT, animated: true })}

@@ -126,8 +126,8 @@ export const BusinessApplicantsPage: FC = () => {
             {BOOKED_STRINGS.SUBTITLE}
         </Text>,
         ...(hasWorkers
-            ? groups.map(group => (
-                  <View key={group.key} style={styles.group}>
+            ? groups.map((group, groupIndex) => (
+                  <View key={`${group.key}-${groupIndex}`} style={styles.group}>
                       <View style={styles.groupHeader}>
                           <View style={styles.groupCopy}>
                               <Text style={[styles.groupTitle, { color: colors.text }]}>
@@ -146,9 +146,9 @@ export const BusinessApplicantsPage: FC = () => {
                               {BOOKED_STRINGS.bookedCount(group.items.length)}
                           </Text>
                       </View>
-                      {group.items.map(applicant => (
+                      {group.items.map((applicant, index) => (
                           <BusinessApplicantRow
-                              key={applicant.id}
+                              key={`booked-${applicant.id}-${index}`}
                               applicant={applicant}
                               onOpenProfile={
                                   applicant.workerId
@@ -168,9 +168,9 @@ export const BusinessApplicantsPage: FC = () => {
                               {BOOKED_STRINGS.withdrewHeading(group.left.length)}
                           </Text>
                       ) : null}
-                      {group.left.map(applicant => (
+                      {group.left.map((applicant, index) => (
                           <BusinessApplicantRow
-                              key={applicant.id}
+                              key={`left-${applicant.id}-${index}`}
                               applicant={applicant}
                               left
                               onOpenProfile={
