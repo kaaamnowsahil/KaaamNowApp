@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { apiRequest, errorMessage } from '@/services/api/apiClient';
 import { loadBusinessSignupOptions, loadWorkerSignupOptions } from '@/services/auth';
@@ -61,6 +62,7 @@ const buildBody = (role: UserRole, form: Form, location?: GeoPoint) => {
 
 /** Adds the user's other role, then signs in again with tokens that carry both roles. */
 export const useAddRole = (role: UserRole, onDone: () => void) => {
+  const { i18n } = useTranslation();
   const [form, setForm] = useState<Form>(EMPTY);
   const [location, setLocation] = useState<GeoPoint | undefined>();
   const [submitted, setSubmitted] = useState(false);
@@ -80,7 +82,7 @@ export const useAddRole = (role: UserRole, onDone: () => void) => {
     return () => {
       active = false;
     };
-  }, [role]);
+  }, [i18n.language, role]);
 
   const update = <K extends keyof Form>(key: K, value: Form[K]) => {
     setForm(prev => ({ ...prev, [key]: value }));

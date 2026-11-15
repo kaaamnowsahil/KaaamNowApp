@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 
 import BadgeCheckIcon from '@/assets/figma/badge-check.svg';
@@ -28,10 +29,11 @@ const monthYear = (iso: string) =>
 export const BusinessWorkerProfilePage: FC<
   AppScreenProps<typeof ROUTES.businessWorkerProfile>
 > = ({ navigation, route }) => {
+  const { i18n } = useTranslation();
   const { colors } = useTheme();
   const { workerId } = route.params;
   const profile = useApiQuery(() => shiftsApi.workerProfile(workerId), [workerId]);
-  const categories = useApiQuery(() => meApi.workCategories(), []);
+  const categories = useApiQuery(() => meApi.workCategories(), [i18n.language]);
   const worker = profile.data;
   const categoryNames = (worker?.category_slugs ?? []).map(
     slug => categories.data?.find(option => option.id === slug)?.label ?? slug,

@@ -89,7 +89,7 @@ const EMPTY_FORM: LiveWorkForm = {
 export const BusinessLiveWorkPostPage: FC<
   AppScreenProps<typeof ROUTES.businessLiveWorkPost>
 > = ({ navigation, route }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const startCouponSession = useCouponSession(state => state.start);
   const repost = route.params?.repost;
   const [form, setForm] = useState<LiveWorkForm>(() =>
@@ -123,7 +123,7 @@ export const BusinessLiveWorkPostPage: FC<
     loadWorkerSignupOptions()
       .then(setCategories)
       .catch(error => setCategoriesError(liveErrorText(error)));
-  }, []);
+  }, [i18n.language]);
   useEffect(loadCategories, [loadCategories]);
 
   const locateDevice = useCallback(async () => {

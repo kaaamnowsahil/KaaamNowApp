@@ -1,15 +1,27 @@
 import { tr } from '@/services/i18n/tr';
+import i18n from '@/services/i18n/i18n';
 
 import { apiBaseUrl, AuthApiError } from './authApi';
 
-export type SignupOption = { id: string; label: string; sortOrder: number };
+export type SignupOption = {
+  id: string;
+  label: string;
+  sortOrder: number;
+  names?: Record<string, string>;
+};
 
 type LookupItem = {
   slug: string;
   name: string;
   sort_order: number;
   is_active: boolean;
+  names?: Record<string, string>;
 };
+
+function localizedName(item: LookupItem) {
+  const code = (i18n.resolvedLanguage || i18n.language || 'en').split('-')[0] ?? 'en';
+  return item.names?.[code] || item.name;
+}
 
 async function loadOptions(path: string): Promise<SignupOption[]> {
   let response: Response;
@@ -37,7 +49,8 @@ async function loadOptions(path: string): Promise<SignupOption[]> {
     .sort((a, b) => a.sort_order - b.sort_order)
     .map(item => ({
       id: item.slug,
-      label: item.name,
+      label: localizedName(item),
+      names: item.names,
       sortOrder: item.sort_order,
     }));
 }

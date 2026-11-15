@@ -47,7 +47,7 @@ export const BusinessShiftSchedulePage: FC<
   const { colors } = useTheme();
   const lookups = useApiQuery(
     () => Promise.all([meApi.workCategories(), meApi.profile()]),
-    [],
+    [i18n.language],
   );
   const categories = lookups.data?.[0] ?? [];
   const business = lookups.data?.[1].business;

@@ -1,4 +1,5 @@
 import { apiBaseUrl } from '@/services/auth/authApi';
+import i18n from '@/services/i18n/i18n';
 import type { Option } from '@/types';
 
 import { apiRequest } from './apiClient';
@@ -79,13 +80,17 @@ type LookupItem = {
   name: string;
   sort_order: number;
   is_active: boolean;
+  names?: Record<string, string>;
 };
 
 const toOptions = (items: LookupItem[]): Option[] =>
   items
     .filter(item => item.is_active)
     .sort((a, b) => a.sort_order - b.sort_order)
-    .map(item => ({ id: item.slug, label: item.name }));
+    .map(item => {
+      const code = (i18n.resolvedLanguage || i18n.language || 'en').split('-')[0] ?? 'en';
+      return { id: item.slug, label: item.names?.[code] || item.name, names: item.names };
+    });
 
 export const meApi = {
   profile: () => apiRequest<MyProfileResponse>('GET', '/me/profile'),

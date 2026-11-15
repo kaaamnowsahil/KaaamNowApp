@@ -18,11 +18,11 @@ const EMPTY_FORM: EditProfileForm = {
 };
 
 export const useEditProfile = (onSaved: () => void) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const editProfileSchema = createEditProfileSchema(t);
   const query = useApiQuery(
     () => Promise.all([meApi.profile(), meApi.workCategories()]),
-    [],
+    [i18n.language],
   );
   const profile = query.data?.[0];
   const worker = profile?.worker;

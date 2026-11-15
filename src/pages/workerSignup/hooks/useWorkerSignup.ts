@@ -13,6 +13,7 @@ import {
   type OtpSendResponse,
   loadWorkerSignupOptions,
 } from '@/services/auth';
+import type { SignupOption } from '@/services/auth/signupCatalogApi';
 import { toE164India, toLocalDigits } from '@/utils/phone';
 import { fieldErrors } from '@/utils/validation';
 
@@ -41,9 +42,7 @@ export const useWorkerSignup = (
   const [touched, setTouched] = useState<Partial<Record<keyof WorkerSignupForm, boolean>>>({});
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [workTypeOptions, setWorkTypeOptions] = useState<
-    { id: string; label: string; sortOrder: number }[]
-  >([]);
+  const [workTypeOptions, setWorkTypeOptions] = useState<SignupOption[]>([]);
   const [catalogError, setCatalogError] = useState('');
   const [catalogReady, setCatalogReady] = useState(false);
 

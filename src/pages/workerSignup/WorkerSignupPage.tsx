@@ -32,7 +32,7 @@ import { useWorkerSignup } from './hooks/useWorkerSignup';
 export const WorkerSignupPage: FC<
   AuthScreenProps<typeof ROUTES.workerSignup>
 > = ({ navigation }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const f = useWorkerSignup((phone, sent) =>
     navigation.navigate(ROUTES.verifyPhone, {
@@ -166,12 +166,17 @@ export const WorkerSignupPage: FC<
             : t('workerSignup.workTypeHint'))
         }
         error={f.errors.workTypes}
-        options={f.workTypeOptions.map(option => ({
-          ...option,
-          label: t(`workerSignup.workTypes.${option.id}`, {
-            defaultValue: option.label,
-          }),
-        }))}
+        options={f.workTypeOptions.map(option => {
+          const code = (i18n.language || 'en').split('-')[0] ?? 'en';
+          return {
+            ...option,
+            label:
+              option.names?.[code] ||
+              t(`workerSignup.workTypes.${option.id}`, {
+                defaultValue: option.label,
+              }),
+          };
+        })}
         selected={f.form.workTypes}
         onToggle={f.toggleWorkType}
       />

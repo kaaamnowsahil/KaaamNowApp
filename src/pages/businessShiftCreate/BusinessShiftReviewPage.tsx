@@ -61,7 +61,7 @@ export const BusinessShiftReviewPage: FC<
   const [termsError, setTermsError] = useState('');
   const startCouponSession = useCouponSession(state => state.start);
   const [postError, setPostError] = useState('');
-  const categories = useApiQuery(() => meApi.workCategories(), []);
+  const categories = useApiQuery(() => meApi.workCategories(), [i18n.language]);
   const categoryLabel = (slug: string) =>
     categories.data?.find(category => category.id === slug)?.label ?? slug;
 
