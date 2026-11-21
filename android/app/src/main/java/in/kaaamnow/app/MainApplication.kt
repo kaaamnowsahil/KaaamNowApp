@@ -19,6 +19,7 @@ class MainApplication : Application(), ReactApplication {
         PackageList(this).packages.apply {
           add(RingPackage())
           add(SystemNavigationBarPackage())
+          add(AppVersionPackage())
         },
     )
   }

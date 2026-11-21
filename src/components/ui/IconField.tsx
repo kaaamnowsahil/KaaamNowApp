@@ -10,6 +10,7 @@ import {
 import type { SvgProps } from 'react-native-svg';
 
 import { FONTS } from '@/constants/fonts';
+import { nudgeFocusedField } from '@/layout/useKeyboardInset';
 import { useTheme } from '@/theme/ThemeProvider';
 
 type IconFieldProps = TextInputProps & {
@@ -68,6 +69,10 @@ export const IconField: FC<IconFieldProps> = ({
             style,
           ]}
           {...inputProps}
+          onFocus={event => {
+            inputProps.onFocus?.(event);
+            setTimeout(nudgeFocusedField, 60);
+          }}
         />
         {action ? (
           <Pressable
@@ -102,7 +107,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   inputText: { fontFamily: FONTS.regular, fontSize: 15 },
-  input: { flex: 1, paddingVertical: 14, paddingHorizontal: 0 },
-  action: { fontFamily: FONTS.semiBold, fontSize: 12 },
+  input: {
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: 0,
+    paddingVertical: 14,
+    paddingHorizontal: 0,
+  },
+  action: { flexShrink: 0, fontFamily: FONTS.semiBold, fontSize: 12 },
   error: { fontFamily: FONTS.regular, fontSize: 12, lineHeight: 17 },
 });

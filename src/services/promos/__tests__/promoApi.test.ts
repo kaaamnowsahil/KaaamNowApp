@@ -42,6 +42,11 @@ describe('promoApi', () => {
     );
   });
 
+  it('lists coupons with no booking selected', async () => {
+    await promoApi.listed();
+    expect(request).toHaveBeenCalledWith('GET', '/business/promo-codes/available');
+  });
+
   it('keeps the voucher and worker endpoints', async () => {
     await promoApi.businessVouchers();
     await promoApi.workerStatus();

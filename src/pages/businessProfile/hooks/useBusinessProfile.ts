@@ -42,6 +42,7 @@ export const useBusinessProfile = () => {
       navigation.navigate(ROUTES.businessEditProfile),
     openPaymentHistory: () =>
       navigation.navigate(ROUTES.businessPaymentHistory),
+    openCoupons: () => navigation.navigate(ROUTES.myCoupons),
     signOut: async () => {
       if (isSigningOut) return;
       setIsSigningOut(true);

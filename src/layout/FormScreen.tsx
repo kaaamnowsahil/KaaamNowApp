@@ -53,7 +53,7 @@ type FormScreenProps = {
   headerTag?: string;
   /** Space between content blocks; forms use 20. */
   gap?: number;
-  /** Extra room above the keyboard when scrolling a focused input into view. */
+  /** Gap between the top of the scroll area and a focused input. */
   keyboardScrollOffset?: number;
   /** Additional layout for the scrollable content container. */
   contentContainerStyle?: StyleProp<ViewStyle>;
@@ -119,7 +119,7 @@ export const FormScreen: FC<FormScreenProps> = ({
   headerRight,
   headerTag,
   gap = 20,
-  keyboardScrollOffset = 120,
+  keyboardScrollOffset = 8,
   contentContainerStyle,
   isLoading,
   busy,
@@ -137,7 +137,9 @@ export const FormScreen: FC<FormScreenProps> = ({
   const blocks = Children.toArray(children);
   const outerBg = asSheet ? colors.fill : colors.background;
   const scrollRef = useRef<ScrollView>(null);
-  const keyboardInset = useKeyboardInset(scrollRef, keyboardScrollOffset);
+  const frameRef = useRef<View>(null);
+  const keyboard = useKeyboardInset(scrollRef, keyboardScrollOffset, frameRef);
+  const keyboardInset = keyboard.height;
   const actionsChrome = {
     backgroundColor: colors.background,
     borderTopColor: colors.border,
@@ -152,8 +154,9 @@ export const FormScreen: FC<FormScreenProps> = ({
       style={[styles.root, { backgroundColor: outerBg }]}
       testID={testID}
     >
+      <View ref={frameRef} style={styles.root}>
       <KeyboardAvoidingView
-        style={styles.root}
+        style={[styles.root, keyboardInset > 0 && { paddingBottom: keyboardInset }]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         {showBrandBar ? (
@@ -225,6 +228,8 @@ export const FormScreen: FC<FormScreenProps> = ({
             <ScrollView
               ref={scrollRef}
               style={styles.scroll}
+              onScroll={keyboard.onScroll}
+              scrollEventThrottle={16}
               contentContainerStyle={[
                 styles.content,
                 asSheet && styles.sheetContent,
@@ -258,14 +263,15 @@ export const FormScreen: FC<FormScreenProps> = ({
           </View>
         ) : null}
       </KeyboardAvoidingView>
+      </View>
       {isLoading || busy ? <Loader /> : null}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
-  scroll: { flex: 1 },
+  root: { flex: 1, minHeight: 0 },
+  scroll: { flex: 1, minHeight: 0 },
   fill: { flexGrow: 1 },
   sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   handle: {

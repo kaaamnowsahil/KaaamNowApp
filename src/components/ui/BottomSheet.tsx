@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react';
+import { useRef, type FC, type ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -20,10 +20,11 @@ export const BottomSheet: FC<{
 }> = ({ title, subtitle, onClose, closeLabel, children, testID }) => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const keyboardInset = useKeyboardInset();
+  const frameRef = useRef<View>(null);
+  const keyboardInset = useKeyboardInset(undefined, 8, frameRef).height;
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <View style={styles.root}>
+      <View ref={frameRef} style={styles.root}>
         <Pressable
           accessibilityLabel={closeLabel}
           style={[styles.backdrop, { backgroundColor: colors.backdrop }]}
@@ -34,9 +35,8 @@ export const BottomSheet: FC<{
             styles.sheet,
             {
               backgroundColor: colors.background,
-              // The IME already resizes the window. Don't add its height or the
-              // navigation inset again while it is open.
-              paddingBottom: keyboardInset > 0 ? 12 : 24 + insets.bottom,
+              paddingBottom:
+                keyboardInset > 0 ? keyboardInset + 12 : 24 + insets.bottom,
             },
           ]}
           testID={testID}

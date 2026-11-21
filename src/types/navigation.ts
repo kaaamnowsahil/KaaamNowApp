@@ -64,6 +64,7 @@ export type AppStackParamList = CommonStackParamList & {
   };
   [ROUTES.businessLiveWorkPost]: { repost?: LiveRepost } | undefined;
   [ROUTES.applyCoupon]: undefined;
+  [ROUTES.myCoupons]: undefined;
   [ROUTES.businessLiveWork]: { bookingId: string };
   [ROUTES.workerLiveWork]: undefined;
   [ROUTES.workerLiveBooking]: { assignmentId: string };

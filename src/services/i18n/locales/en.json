@@ -10,6 +10,7 @@
     "choose": "Tap to choose",
     "noMatches": "Nothing matches your search.",
     "loading": "Loading...",
+    "appVersion": "Version {{version}}",
     "comingSoon": "Coming soon",
     "viewMore": "View more ({{count}})",
     "viewLess": "View less",

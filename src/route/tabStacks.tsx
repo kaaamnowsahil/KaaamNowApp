@@ -7,6 +7,7 @@ import { AddRolePage } from '@/pages/addRole/AddRolePage';
 import { AppearancePage } from '@/pages/appearance/AppearancePage';
 import { ApplicationSubmittedPage } from '@/pages/applicationSubmitted/ApplicationSubmittedPage';
 import { ApplyCouponPage } from '@/pages/applyCoupon/ApplyCouponPage';
+import { MyCouponsPage } from '@/pages/myCoupons/MyCouponsPage';
 import { BusinessApplicantProfilePage } from '@/pages/businessApplicants/BusinessApplicantProfilePage';
 import { BusinessApplicantsPage } from '@/pages/businessApplicants/BusinessApplicantsPage';
 import { BusinessRateWorkerPage } from '@/pages/businessApplicants/BusinessRateWorkerPage';
@@ -114,6 +115,7 @@ const DETAIL_SCREENS = (
       component={BusinessLiveWorkPage}
     />
     <Stack.Screen name={ROUTES.applyCoupon} component={ApplyCouponPage} />
+    <Stack.Screen name={ROUTES.myCoupons} component={MyCouponsPage} />
     <Stack.Screen
       name={ROUTES.businessShiftSchedule}
       component={BusinessShiftSchedulePage}

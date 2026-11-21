@@ -68,7 +68,6 @@ export const WelcomePage: FC<AuthScreenProps<typeof ROUTES.welcome>> = ({
       busy={busy}
       testID="welcome-page"
       gap={16}
-      keyboardScrollOffset={340}
       actions={
         <>
           <PrimaryButton

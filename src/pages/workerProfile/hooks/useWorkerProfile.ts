@@ -38,6 +38,7 @@ export const useWorkerProfile = () => {
     openNotifications: navigateToNotifications,
     openEditProfile: () => navigation.navigate(ROUTES.editProfile),
     openPayouts: () => navigation.navigate(ROUTES.payoutAccount),
+    openCoupons: () => navigation.navigate(ROUTES.myCoupons),
     openLanguage: () => navigation.navigate(ROUTES.language),
     openFaq: () => navigation.navigate(ROUTES.faq),
     openTerms: () => navigation.navigate(ROUTES.terms),

@@ -6,6 +6,7 @@ import FileTextIcon from '@/assets/icons/file-text.svg';
 import GlobeIcon from '@/assets/icons/globe.svg';
 import LogOutIcon from '@/assets/icons/log-out.svg';
 import PaletteIcon from '@/assets/icons/palette.svg';
+import TicketPercentIcon from '@/assets/icons/ticket-percent.svg';
 import UserRoundIcon from '@/assets/figma/user-round.svg';
 import WalletIcon from '@/assets/figma/wallet.svg';
 import { RoleSwitchRow } from '@/components/roleSwitch/RoleSwitchRow';
@@ -45,6 +46,11 @@ export const WorkerProfilePage: FC = () => {
         icon={WalletIcon}
         title={t('workerProfile.payoutAccount')}
         onPress={p.openPayouts}
+      />
+      <SettingsRow
+        icon={TicketPercentIcon}
+        title={t('coupons.row.label')}
+        onPress={p.openCoupons}
       />
       <RoleSwitchRow />
     </SettingsGroup>,

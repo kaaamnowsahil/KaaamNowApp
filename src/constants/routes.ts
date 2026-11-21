@@ -59,6 +59,7 @@ export const ROUTES = {
   businessShiftPosted: 'BusinessShiftPosted',
   businessLiveWorkPost: 'BusinessLiveWorkPost',
   applyCoupon: 'ApplyCoupon',
+  myCoupons: 'MyCoupons',
   businessLiveWork: 'BusinessLiveWork',
   workerLiveWork: 'WorkerLiveWork',
   workerLiveBooking: 'WorkerLiveBooking',

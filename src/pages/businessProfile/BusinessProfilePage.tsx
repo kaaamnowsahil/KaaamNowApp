@@ -7,6 +7,7 @@ import FileTextIcon from '@/assets/icons/file-text.svg';
 import GlobeIcon from '@/assets/icons/globe.svg';
 import LogOutIcon from '@/assets/icons/log-out.svg';
 import PaletteIcon from '@/assets/icons/palette.svg';
+import TicketPercentIcon from '@/assets/icons/ticket-percent.svg';
 import WalletIcon from '@/assets/figma/wallet.svg';
 import { RoleSwitchRow } from '@/components/roleSwitch/RoleSwitchRow';
 import { BrandAppBar } from '@/components/ui';
@@ -47,6 +48,11 @@ export const BusinessProfilePage: FC = () => {
         icon={WalletIcon}
         title={t('businessProfile.paymentHistory')}
         onPress={profile.openPaymentHistory}
+      />
+      <SettingsRow
+        icon={TicketPercentIcon}
+        title={t('coupons.row.label')}
+        onPress={profile.openCoupons}
       />
       <RoleSwitchRow />
     </SettingsGroup>,

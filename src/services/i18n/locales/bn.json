@@ -10,6 +10,7 @@
     "choose": "বেছে নিতে ট্যাপ করুন",
     "noMatches": "আপনার খোঁজের সাথে কিছু মেলেনি।",
     "loading": "লোড হচ্ছে...",
+    "appVersion": "সংস্করণ {{version}}",
     "comingSoon": "শীঘ্রই আসছে",
     "viewMore": "আরও দেখুন ({{count}})",
     "viewLess": "কম দেখুন",

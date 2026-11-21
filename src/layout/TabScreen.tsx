@@ -46,11 +46,19 @@ export const TabScreen: FC<TabScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const scrollRef = useRef<ScrollView>(null);
-  useKeyboardInset(scrollRef);
+  const frameRef = useRef<View>(null);
+  const keyboard = useKeyboardInset(scrollRef, 8, frameRef);
+  const keyboardInset = keyboard.height;
   return (
     <SafeAreaView
+      // The native view exposes measureInWindow; the public ref type is narrower.
+      ref={frameRef as never}
       edges={['top']}
-      style={[styles.root, { backgroundColor: colors.background }]}
+      style={[
+        styles.root,
+        { backgroundColor: colors.background },
+        keyboardInset > 0 && { paddingBottom: keyboardInset },
+      ]}
       testID={testID}
     >
       <Rise style={styles.appBar}>
@@ -67,6 +75,9 @@ export const TabScreen: FC<TabScreenProps> = ({
       {isLoading ? null : (
       <ScrollView
         ref={scrollRef}
+        style={styles.scroll}
+        onScroll={keyboard.onScroll}
+        scrollEventThrottle={16}
         contentContainerStyle={[
           styles.content,
           { paddingBottom: actions ? 20 : 32 },
@@ -107,7 +118,8 @@ export const TabScreen: FC<TabScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
+  root: { flex: 1, minHeight: 0 },
+  scroll: { flex: 1, minHeight: 0 },
   appBar: {
     height: 56,
     flexDirection: 'row',

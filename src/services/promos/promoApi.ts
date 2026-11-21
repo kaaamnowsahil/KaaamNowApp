@@ -50,6 +50,9 @@ export const promoApi = {
         query: { booking_type: bookingType, ...withAmount(amountMinor) },
       },
     ),
+  /** Assigned and listed coupons, with no booking selected yet. */
+  listed: () =>
+    apiRequest<{ items: CouponOffer[] }>('GET', '/business/promo-codes/available'),
   /** 400 `promo_invalid` with `details.reason` when the code can't be used. */
   validate: (
     code: string,
