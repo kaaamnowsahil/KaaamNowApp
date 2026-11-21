@@ -80,6 +80,7 @@ export const useBusinessShifts = () => {
     byStart,
   );
   const business = profile?.business;
+  const accountBusiness = profile?.account?.business_profile;
 
   const actions = useShiftCardActions(query.reload);
 
@@ -87,8 +88,10 @@ export const useBusinessShifts = () => {
     isLoading: query.isLoading,
     error: query.error,
     reload: query.reload,
-    businessName: business?.business_name ?? '',
-    isVerified: business?.verification_status === 'verified',
+    businessName: business?.business_name || accountBusiness?.business_name || '',
+    isVerified:
+      (business?.verification_status ?? accountBusiness?.verification_status) ===
+      'verified',
     hasShifts: shifts.length > 0,
     sections: SHIFT_SECTIONS.map(section => ({
       ...section,

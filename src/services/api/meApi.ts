@@ -52,6 +52,10 @@ export type MyAccount = {
   photo_url: string | null;
   language_code: string;
   theme_preference: 'system' | 'light' | 'dark';
+  business_profile?: {
+    business_name: string;
+    verification_status: string;
+  } | null;
 };
 
 export type MyProfileResponse = {

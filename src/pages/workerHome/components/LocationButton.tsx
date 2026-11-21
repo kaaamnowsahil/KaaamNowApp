@@ -1,9 +1,9 @@
 import type { FC } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import ChevronDownIcon from '@/assets/figma/chevron-down.svg';
 import MapPinIcon from '@/assets/figma/map-pin-home.svg';
+import RefreshIcon from '@/assets/figma/refresh-cw.svg';
 import { FONTS } from '@/constants/fonts';
 import { useTheme } from '@/theme/ThemeProvider';
 
@@ -36,7 +36,9 @@ export const LocationButton: FC<{
       >
         {error || (isLoading ? t('common.loading') : label)}
       </Text>
-      <ChevronDownIcon width={20} height={20} color={colors.textMuted} />
+      <View style={styles.refresh}>
+        <RefreshIcon width={18} height={18} color={colors.textMuted} />
+      </View>
     </Pressable>
   );
 };
@@ -45,4 +47,5 @@ const styles = StyleSheet.create({
   root: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   pressed: { opacity: 0.7 },
   text: { flex: 1, fontFamily: FONTS.regular, fontSize: 13, lineHeight: 18.2 },
+  refresh: { width: 18, height: 18, flexShrink: 0 },
 });

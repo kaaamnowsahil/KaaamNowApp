@@ -17,16 +17,21 @@ export const BusinessIdentity: FC<BusinessOverviewProps> = ({ businessName, isVe
     const { colors } = useTheme();
     const identityColor = isVerified ? colors.success : colors.warning;
 
+    const badge = isVerified ? (
+        <BadgeCheckIcon width={18} height={18} color={identityColor} />
+    ) : (
+        <BadgeAlertIcon width={18} height={18} color={identityColor} />
+    );
+
     return (
         <View style={styles.identity}>
-            <Text style={[styles.identityName, { color: identityColor }]}>
+            <Text
+                numberOfLines={2}
+                style={[styles.identityName, { color: identityColor }]}
+            >
                 {businessName}
             </Text>
-            {isVerified ? (
-                <BadgeCheckIcon width={18} height={18} color={identityColor} />
-            ) : (
-                <BadgeAlertIcon width={18} height={18} color={identityColor} />
-            )}
+            <View style={styles.badge}>{badge}</View>
         </View>
     );
 };
@@ -91,8 +96,19 @@ export const BusinessMetrics: FC<BusinessMetricsProps> = ({
 const styles = StyleSheet.create({
     root: { gap: 4 },
     heading: { fontFamily: FONTS.bold, fontSize: 20, lineHeight: 28 },
-    identity: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-    identityName: { fontFamily: FONTS.semiBold, fontSize: 13, lineHeight: 18 },
+    identity: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'stretch',
+        gap: 6,
+    },
+    identityName: {
+        flex: 1,
+        fontFamily: FONTS.semiBold,
+        fontSize: 13,
+        lineHeight: 18,
+    },
+    badge: { width: 18, height: 18, flexShrink: 0 },
     metrics: { flexDirection: 'row', gap: 10 },
     metric: {
         flex: 1,

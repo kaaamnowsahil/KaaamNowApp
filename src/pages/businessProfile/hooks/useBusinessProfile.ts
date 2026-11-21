@@ -14,16 +14,19 @@ export const useBusinessProfile = () => {
   const navigation = useNavigation<TabAppNavigation>();
   const query = useApiQuery(() => meApi.profile(), []);
   const business = query.data?.business;
+  const accountBusiness = query.data?.account?.business_profile;
   const theme = usePreferencesStore(state => state.theme);
   const language = usePreferencesStore(state => state.language);
   const [isSigningOut, setIsSigningOut] = useState(false);
-  const businessName = business?.business_name ?? '';
+  const businessName = business?.business_name || accountBusiness?.business_name || '';
   const location = business?.locality || business?.address_text || '';
 
   return {
     isLoading: query.isLoading,
     isSigningOut,
-    isVerified: business?.verification_status === 'verified',
+    isVerified:
+      (business?.verification_status ?? accountBusiness?.verification_status) ===
+      'verified',
     photoUri: mediaUrl(business?.logo_url),
     businessName,
     location,

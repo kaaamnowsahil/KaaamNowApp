@@ -27,11 +27,15 @@ export const useBusinessShiftsData = (
     ...(upcoming?.items ?? []),
   ].sort(byStart);
   const business = profile?.business;
+  const accountBusiness = profile?.account?.business_profile;
+  const businessName = business?.business_name || accountBusiness?.business_name || '';
+  const verificationStatus =
+    business?.verification_status ?? accountBusiness?.verification_status;
 
   return {
     ...query,
-    businessName: business?.business_name ?? '',
-    isVerified: business?.verification_status === 'verified',
+    businessName,
+    isVerified: verificationStatus === 'verified',
     location: business?.address_text || business?.locality || '',
     liveShifts: active.filter(item => item.shift_type === 'live'),
     scheduledShifts: active.filter(item => item.shift_type === 'scheduled'),
