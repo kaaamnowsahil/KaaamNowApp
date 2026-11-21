@@ -36,7 +36,7 @@ export const LocationButton: FC<{
       >
         {error || (isLoading ? t('common.loading') : label)}
       </Text>
-      <ChevronDownIcon width={16} height={16} color={colors.textMuted} />
+      <ChevronDownIcon width={20} height={20} color={colors.textMuted} />
     </Pressable>
   );
 };
