@@ -73,7 +73,14 @@ jobs:
             -PVERSION_CODE="${COUNT}" \
             -PVERSION_NAME="${NAME}"
 
-      - name: Upload to Firebase App Distribution
+      - name: Keep the release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
+
+      - name: Upload the APK to Firebase App Distribution
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
@@ -88,12 +95,6 @@ jobs:
           APP="1:1067311615363:android:ca5d942e3286a5befb7ab6"
           npx -y firebase-tools@latest appdistribution:distribute \
             android/app/build/outputs/apk/release/app-release.apk \
-            --app "$APP" \
-            --project kaaamnow-2c1e0 \
-            --groups kaaamnow \
-            --release-notes "$NOTES"
-          npx -y firebase-tools@latest appdistribution:distribute \
-            android/app/build/outputs/bundle/release/app-release.aab \
             --app "$APP" \
             --project kaaamnow-2c1e0 \
             --groups kaaamnow \
