@@ -1,10 +1,18 @@
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in /usr/local/Cellar/android-sdk/24.3.3/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Razorpay checkout looks up its classes and JavaScript bridge by name.
+-keepattributes JavascriptInterface
+-keepattributes *Annotation*
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-dontwarn com.razorpay.**
+-keep class com.razorpay.** { *; }
+-keepclasseswithmembers class * {
+    public void onPayment*(...);
+}
 
-# Add any project specific keep options here:
+# React Native Firebase loads these entry points from the native module registry.
+-keep class io.invertase.firebase.** { *; }
+-dontwarn io.invertase.firebase.**
+
+# The app's own modules are registered by class name from MainApplication.
+-keep class in.kaaamnow.app.** { *; }
