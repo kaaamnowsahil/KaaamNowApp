@@ -14,8 +14,6 @@ import type { AppStackParamList } from '@/types';
 
 const k = (key: string) => tr(`roleSwitch.${key}`);
 
-const ROLE_SWITCH_ENABLED = false;
-
 const STRINGS = {
   get toBusiness() {
     return k('toBusiness');
@@ -28,9 +26,6 @@ const STRINGS = {
   },
   get failedTitle() {
     return k('failedTitle');
-  },
-  get comingSoon() {
-    return tr('common.comingSoon');
   },
 };
 
@@ -64,14 +59,8 @@ export const RoleSwitchRow: FC = () => {
     <SettingsRow
       icon={target === 'business' ? BuildingIcon : UsersRoundIcon}
       title={target === 'business' ? STRINGS.toBusiness : STRINGS.toWorker}
-      value={
-        !ROLE_SWITCH_ENABLED
-          ? STRINGS.comingSoon
-          : busy
-          ? STRINGS.switching
-          : undefined
-      }
-      disabled={!ROLE_SWITCH_ENABLED}
+      value={busy ? STRINGS.switching : undefined}
+      disabled={busy}
       onPress={onPress}
       testID="profile-switch-role"
     />

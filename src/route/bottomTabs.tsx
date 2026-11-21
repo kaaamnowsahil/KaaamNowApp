@@ -109,20 +109,22 @@ export const BottomTabRoutes: FC = () => {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const role = useAuthStore(s => s.role);
-  const tabs =
-    role === 'business'
-      ? BUSINESS_TABS.map(tab => ({
-          ...tab,
-          title: t(`businessDashboard.tabs.${tab.title}`),
-        }))
-      : WORKER_TABS.map(tab => ({
-          ...tab,
-          title: t(`workerTabs.${tab.title}`),
-        }));
+  const isBusiness = role === 'business';
+  const tabs = isBusiness
+    ? BUSINESS_TABS.map(tab => ({
+        ...tab,
+        title: t(`businessDashboard.tabs.${tab.title}`),
+      }))
+    : WORKER_TABS.map(tab => ({
+        ...tab,
+        title: t(`workerTabs.${tab.title}`),
+      }));
 
   return (
     <View style={styles.root}>
       <Tab.Navigator
+        key={isBusiness ? 'business' : 'worker'}
+        initialRouteName={isBusiness ? ROUTES.businessLive : ROUTES.workerHome}
         screenOptions={{
           headerShown: false,
           popToTopOnBlur: true,
@@ -180,7 +182,7 @@ export const BottomTabRoutes: FC = () => {
           />
         ))}
       </Tab.Navigator>
-      {role === 'business' ? <ActiveLiveBubble /> : null}
+      {isBusiness ? <ActiveLiveBubble /> : null}
     </View>
   );
 };

@@ -10,6 +10,9 @@ export async function switchRole(role: UserRole) {
   await apiRequest('PUT', '/me/active-role', { body: { role } });
   await useAuthStore.getState().setRole(role);
   if (navigationRef.isReady()) {
-    navigationRef.reset({ index: 0, routes: [{ name: ROUTES.mainTabs }] });
+    navigationRef.reset({
+      index: 0,
+      routes: [{ name: ROUTES.mainTabs, key: `role-${role}` }],
+    });
   }
 }
