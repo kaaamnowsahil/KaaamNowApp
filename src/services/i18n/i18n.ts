@@ -52,6 +52,7 @@ i18n.use(initReactI18next).init({
   interpolation: {
     escapeValue: false, // React already escapes values
   },
+  showSupportNotice: false,
   compatibilityJSON: 'v4',
 });
 
